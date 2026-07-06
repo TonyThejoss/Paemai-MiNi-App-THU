@@ -684,8 +684,8 @@ textarea { resize: vertical; min-height: 70px; }
             <span class="err-msg" id="errDate">กรุณาเลือกวันที่</span>
           </div>
           <div class="field">
-            <label>ค่าเช่า/เดือน (฿) <span class="req">*</span></label>
-            <input type="number" id="rentPrice" placeholder="1500" min="0" oninput="livePreview();recalc()">
+            <label>ค่าเช่า/วัน (฿) <span class="req">*</span></label>
+            <input type="number" id="rentPrice" placeholder="150" min="0" oninput="livePreview();recalc()">
             <span class="err-msg" id="errRent">กรุณากรอกราคา</span>
           </div>
         </div>
@@ -739,7 +739,7 @@ textarea { resize: vertical; min-height: 70px; }
           <div class="fee-row">
             <label>จำนวนเงิน (฿)</label>
             <input type="number" id="feeFirstRentAmt" placeholder="0" min="0" oninput="recalc()" style="width:130px;flex:none;background:var(--surface2)" readonly>
-            <span class="hint" style="flex:1">← ดึงจากค่าเช่า/เดือน อัตโนมัติ</span>
+            <span class="hint" style="flex:1">← คำนวณอัตโนมัติ = ค่าเช่า/วัน × จำนวนวันพฤหัสฯ ในเดือนนี้</span>
           </div>
         </div>
 
@@ -851,7 +851,7 @@ textarea { resize: vertical; min-height: 70px; }
       <div class="sum-row"><span class="sum-label">เบอร์</span><span class="sum-val" id="vpPhone">—</span></div>
       <div class="sum-row"><span class="sum-label">สินค้า</span><span class="sum-val" id="vpProduct">—</span></div>
       <div class="sum-row"><span class="sum-label">ล็อค</span><span class="sum-val green" id="vpLock">ยังไม่เลือก</span></div>
-      <div class="sum-row"><span class="sum-label">ค่าเช่า/เดือน</span><span class="sum-val" id="vpRent">—</span></div>
+      <div class="sum-row"><span class="sum-label">ค่าเช่า/วัน</span><span class="sum-val" id="vpRent">—</span></div>
     </div>
   </div>
 
@@ -1021,8 +1021,8 @@ function nextStep(n, btn, goBack=false) {
 
   currentStep = n;
   if (n === 3) {
-    const r = parseFloat(document.getElementById('rentPrice').value) || 0;
-    document.getElementById('feeFirstRentAmt').value = r;
+    const daily = parseFloat(document.getElementById('rentPrice').value) || 0;
+    document.getElementById('feeFirstRentAmt').value = Math.round(daily * thisMonthThursdays());
     recalc();
   }
   if (n === 4) buildConfirm();
@@ -1208,7 +1208,7 @@ function buildConfirm() {
       <div class="sum-row"><span class="sum-label">เบอร์โทร</span><span class="sum-val">${phone}</span></div>
       <div class="sum-row"><span class="sum-label">สินค้า</span><span class="sum-val">${product}</span></div>
       <div class="sum-row"><span class="sum-label">ล็อค</span><span class="sum-val green">${selectedLock} (โซน ${selectedZone})</span></div>
-      <div class="sum-row"><span class="sum-label">ค่าเช่า/เดือน</span><span class="sum-val">฿${rent.toLocaleString()}</span></div>
+      <div class="sum-row"><span class="sum-label">ค่าเช่า/วัน</span><span class="sum-val">฿${rent.toLocaleString()}</span></div>
       <div class="sum-row"><span class="sum-label">วันเริ่มเช่า</span><span class="sum-val">${date}</span></div>
     </div>
     <div class="confirm-block gray-block">
@@ -1237,7 +1237,7 @@ async function submitForm(btn) {
   const line    = document.getElementById('vendorLine')?.value || '';
   const product = document.getElementById('vendorProduct').value;
   const detail  = document.getElementById('vendorProductDetail')?.value || '';
-  const rentMonthly = parse('rentPrice');
+  const rentDaily = parse('rentPrice');
   const entry   = parse('feeEntryAmt');
   const annual  = parse('feeAnnualAmt');
   const fRent   = parse('feeFirstRentAmt');
@@ -1267,8 +1267,8 @@ async function submitForm(btn) {
     const fullName = name + (nick ? ` (${nick})` : '');
     const fullProduct = product + (detail ? ` · ${detail}` : '');
 
-    // 1) สร้าง/อัปเดตผู้ค้าในชีต vendors — เก็บเป็น dailyRate (ค่าเช่ารายวันพฤหัสบดี)
-    const dailyRate = Math.round(rentMonthly / thisMonthThursdays());
+    // 1) สร้าง/อัปเดตผู้ค้าในชีต vendors — เก็บเป็น dailyRate (ค่าเช่ารายวันพฤหัสบดี) กรอกมาเป็นรายวันอยู่แล้ว ไม่ต้องแปลง
+    const dailyRate = rentDaily;
     const vRes = await apiPost('saveVendor', { data: {
       lock: selectedLock, zone: selectedZone, name: fullName, phone, line,
       product: fullProduct, type: 'regular', dailyRate,
