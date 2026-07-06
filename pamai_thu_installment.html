@@ -251,9 +251,10 @@ textarea{resize:vertical;min-height:56px;}
       <input class="sbox" id="s1q" placeholder="🔍 ค้นหาล็อค / ร้าน..." oninput="renderOv()">
       <select class="fsel" id="s1z" onchange="renderOv()">
         <option value="">ทุกโซน</option>
-        <option>SA</option><option>SB</option><option>SC</option>
-        <option>SD</option><option>SE</option><option>A</option>
-        <option>B</option><option>C</option><option>D</option>
+        <option>A</option><option>B</option><option>C</option><option>D</option><option>E</option><option>F</option>
+        <option>G</option><option>J</option><option>K</option><option>N</option><option>U</option>
+        <option>O</option><option>M</option><option>H</option><option>L</option><option>T</option><option>AB</option>
+        <option>TA</option><option>TB</option><option>TC</option>
       </select>
       <select class="fsel" id="s1s" onchange="renderOv()">
         <option value="">ทุกสถานะ</option>
@@ -464,15 +465,21 @@ function fmtDate(d){return `${d.getDate()} ${MONTH_TH[d.getMonth()]} ${d.getFull
 function fmtDateShort(d){return `${d.getDate()}/${d.getMonth()+1}/${String(d.getFullYear()+543).slice(2)}`;}
 
 function lastThursdayOf(year,month){
-  // month = 0-based
+  // month = 0-based; 4 = Thursday
   const last = new Date(year, month+1, 0); // last day of month
-  while(last.getDay()!==2) last.setDate(last.getDate()-1);
+  while(last.getDay()!==4) last.setDate(last.getDate()-1);
   return new Date(last);
 }
 function firstThursdayOf(year,month){
   const d = new Date(year,month,1);
-  while(d.getDay()!==2) d.setDate(d.getDate()+1);
+  while(d.getDay()!==4) d.setDate(d.getDate()+1);
   return new Date(d);
+}
+function thisMonthThursdays(){
+  const n=new Date();
+  let c=0; const d=new Date(n.getFullYear(),n.getMonth(),1);
+  while(d.getMonth()===n.getMonth()){ if(d.getDay()===4) c++; d.setDate(d.getDate()+1); }
+  return c||4;
 }
 function addThursdaysFrom(startDate, count){
   // generate `count` consecutive Thursdays starting from startDate (must be Thursday)
@@ -513,42 +520,49 @@ function computeSchedule(terms, debtRemain, firstAmt, interestRate, refDate=null
   return {schedule, deadline, firstPayDate, totalWithInt, first, restAmt};
 }
 
-// ─── DATA ────────────────────────────────────────────────────────────────────
-const VENDORS = [
-  {lock:'SA6',  zone:'SA',shop:'เนื้อสด',     months:3,total_debt:3750,collected:0,
-   debt:[{t:'ค่าเช่า 3 เดือน',a:3750}], plan:null},
-  {lock:'SA15', zone:'SA',shop:'ข้าวแต๋น',    months:2,total_debt:4150,collected:1400,
-   debt:[{t:'ค่าเช่า 2 เดือน',a:2500},{t:'ค่าไฟ',a:400},{t:'ค่าปรับลา',a:1250}],
-   plan:{terms:3,paid_terms:1,schedule:[
-     {term:1,due:new Date(2025,4,6), amount:1400,paid:1400,paid_date:new Date(2025,4,6),status:'paid'},
-     {term:2,due:new Date(2025,4,20),amount:1375,paid:0,paid_date:null,status:'overdue'},
-     {term:3,due:new Date(2025,4,27),amount:1375,paid:0,paid_date:null,status:'upcoming'},
-   ],deadline:new Date(2025,5,3)}},
-  {lock:'SB4',  zone:'SB',shop:'สปาเก็ตตี้', months:2,total_debt:3500,collected:1200,
-   debt:[{t:'ค่าเช่า 2 เดือน',a:2000},{t:'ค่าธรรมเนียมรายปี',a:1500}],
-   plan:{terms:3,paid_terms:1,schedule:[
-     {term:1,due:new Date(2025,4,13),amount:1200,paid:1200,paid_date:new Date(2025,4,13),status:'paid'},
-     {term:2,due:new Date(2025,4,20),amount:1150,paid:0,paid_date:null,status:'overdue'},
-     {term:3,due:new Date(2025,4,27),amount:1150,paid:0,paid_date:null,status:'upcoming'},
-   ],deadline:new Date(2025,5,3)}},
-  {lock:'A7',   zone:'A', shop:'ทะเลถัง',     months:3,total_debt:6300,collected:2100,
-   debt:[{t:'ค่าเช่า 3 เดือน',a:4500},{t:'ค่าไฟ',a:300},{t:'ค่าปรับ',a:1500}],
-   plan:{terms:3,paid_terms:1,schedule:[
-     {term:1,due:new Date(2025,3,15),amount:2100,paid:2100,paid_date:new Date(2025,3,15),status:'paid'},
-     {term:2,due:new Date(2025,3,22),amount:2100,paid:0,paid_date:null,status:'overdue'},
-     {term:3,due:new Date(2025,3,29),amount:2100,paid:0,paid_date:null,status:'upcoming'},
-   ],deadline:new Date(2025,4,6)}},
-  {lock:'C3',   zone:'C', shop:'ชาชีส',       months:1,total_debt:1580,collected:800,
-   debt:[{t:'ค่าเช่า',a:1500},{t:'ค่าไฟ',a:80}],
-   plan:{terms:2,paid_terms:1,schedule:[
-     {term:1,due:new Date(2025,5,3), amount:800,paid:800,paid_date:new Date(2025,5,3),status:'paid'},
-     {term:2,due:new Date(2025,5,10),amount:780,paid:0,paid_date:null,status:'upcoming'},
-   ],deadline:new Date(2025,5,17)}},
-  {lock:'B9',   zone:'B', shop:'ทะเลดอง',     months:1,total_debt:1500,collected:0,
-   debt:[{t:'ค่าเช่า',a:1500}], plan:null},
-  {lock:'SE17', zone:'SE',shop:'(ว่าง/ค้าง)', months:2,total_debt:2000,collected:0,
-   debt:[{t:'ค่าเช่า 2 เดือน',a:2000}], plan:null},
-];
+// ─── DATA — โหลดจาก Google Sheets จริงเท่านั้น (ไม่มีข้อมูลตัวอย่าง) ──────────────
+let VENDORS = [];
+
+function getApiUrl(){ return localStorage.getItem('pm-api-url')||''; }
+async function apiGet(action,params={}){
+  const url=getApiUrl(); if(!url) return null;
+  try{ const r=await fetch(url+'?'+new URLSearchParams({action,...params})); const j=await r.json(); return j.status==='ok'?j.data:null; }
+  catch(e){ return null; }
+}
+async function apiPost(action,data={}){
+  const url=getApiUrl(); if(!url) return null;
+  try{ const r=await fetch(url,{method:'POST',body:JSON.stringify({action,...data})}); return await r.json(); }
+  catch(e){ return null; }
+}
+function calcElecFromVendor(v){
+  const base=(parseInt(v.elec_bulb)||0)*10+(parseInt(v.elec_fan)||0)*20+(parseInt(v.elec_small)||0)*50+(parseInt(v.elec_large)||0)*100;
+  let sp=0; try{ (JSON.parse(v.elec_special||'[]')||[]).forEach(x=>sp+=(x.price||0)); }catch(e){}
+  return base+sp;
+}
+// แปลงผู้ค้าที่ "ค้างชำระ" จริงจาก Sheets → ยอดค้างของรอบปัจจุบัน (ไม่มีการสมมติจำนวนเดือนย้อนหลัง)
+function mapUnpaidVendor(sv){
+  const monthlyRent = Math.round((parseFloat(sv.dailyRate)||0) * thisMonthThursdays());
+  const elecAmt = calcElecFromVendor(sv);
+  const debt = [{t:'ค่าเช่าเดือนนี้', a:monthlyRent}];
+  if (elecAmt>0) debt.push({t:'ค่าไฟฟ้า', a:elecAmt});
+  const otherPenalty = parseFloat(sv.unpaid_penalty)||0;
+  const otherFee = parseFloat(sv.unpaid_other)||0;
+  if (otherPenalty>0) debt.push({t:'ค่าปรับ', a:otherPenalty});
+  if (otherFee>0) debt.push({t:sv.unpaid_other_label||'ค่าอื่นๆ', a:otherFee});
+  return {
+    lock: sv.lock, zone: sv.zone||'',
+    shop: (sv.name && sv.name!=='(ยังไม่ระบุ)') ? sv.name : (sv.product||'(ไม่ระบุ)'),
+    months: 1, total_debt: monthlyRent+elecAmt+otherPenalty+otherFee, collected: 0,
+    debt, plan: null,
+  };
+}
+async function loadVendorsFromSheets(){
+  if (!getApiUrl()) return;
+  const data = await apiGet('getVendors');
+  if (!Array.isArray(data)) return;
+  VENDORS = data.filter(v=>v.lock && v.status==='unpaid').map(mapUnpaidVendor);
+  renderOv(); renderTracking(); buildMap(); updateKPI();
+}
 
 const OUT_LOCKS=[{id:'A1',shop:'ว่าง',st:'vacant'},{id:'A2',shop:'ว่าง',st:'vacant'},{id:'A3',shop:'ว่าง',st:'vacant'},{id:'A4',shop:'ว่าง',st:'vacant'},{id:'A5',shop:'ว่าง',st:'vacant'},{id:'A6',shop:'ว่าง',st:'vacant'},{id:'A7',shop:'ว่าง',st:'vacant'},{id:'A8',shop:'ว่าง',st:'vacant'},{id:'A9',shop:'ว่าง',st:'vacant'},{id:'A10',shop:'ว่าง',st:'vacant'},{id:'A11',shop:'ว่าง',st:'vacant'},{id:'A12',shop:'ว่าง',st:'vacant'},{id:'A13',shop:'ว่าง',st:'vacant'},{id:'A14',shop:'ว่าง',st:'vacant'},{id:'A15',shop:'ว่าง',st:'vacant'},{id:'A16',shop:'ว่าง',st:'vacant'},{id:'A17',shop:'ว่าง',st:'vacant'},{id:'A18',shop:'ว่าง',st:'vacant'},{id:'A19',shop:'ว่าง',st:'vacant'},{id:'A20',shop:'ว่าง',st:'vacant'},{id:'B1',shop:'ว่าง',st:'vacant'},{id:'B2',shop:'ว่าง',st:'vacant'},{id:'B3',shop:'ว่าง',st:'vacant'},{id:'B4',shop:'ว่าง',st:'vacant'},{id:'B5',shop:'ว่าง',st:'vacant'},{id:'B6',shop:'ว่าง',st:'vacant'},{id:'B7',shop:'ว่าง',st:'vacant'},{id:'B8',shop:'ว่าง',st:'vacant'},{id:'B9',shop:'ว่าง',st:'vacant'},{id:'B10',shop:'ว่าง',st:'vacant'},{id:'B11',shop:'ว่าง',st:'vacant'},{id:'B12',shop:'ว่าง',st:'vacant'},{id:'B13',shop:'ว่าง',st:'vacant'},{id:'B14',shop:'ว่าง',st:'vacant'},{id:'B15',shop:'ว่าง',st:'vacant'},{id:'B16',shop:'ว่าง',st:'vacant'},{id:'B17',shop:'ว่าง',st:'vacant'},{id:'B18',shop:'ว่าง',st:'vacant'},{id:'B19',shop:'ว่าง',st:'vacant'},{id:'B20',shop:'ว่าง',st:'vacant'},{id:'C1',shop:'ว่าง',st:'vacant'},{id:'C2',shop:'ว่าง',st:'vacant'},{id:'C3',shop:'ว่าง',st:'vacant'},{id:'C4',shop:'ว่าง',st:'vacant'},{id:'C5',shop:'ว่าง',st:'vacant'},{id:'C6',shop:'ว่าง',st:'vacant'},{id:'C7',shop:'ว่าง',st:'vacant'},{id:'C8',shop:'ว่าง',st:'vacant'},{id:'C9',shop:'ว่าง',st:'vacant'},{id:'C10',shop:'ว่าง',st:'vacant'},{id:'C11',shop:'ว่าง',st:'vacant'},{id:'C12',shop:'ว่าง',st:'vacant'},{id:'C13',shop:'ว่าง',st:'vacant'},{id:'C14',shop:'ว่าง',st:'vacant'},{id:'C15',shop:'ว่าง',st:'vacant'},{id:'C16',shop:'ว่าง',st:'vacant'},{id:'C17',shop:'ว่าง',st:'vacant'},{id:'C18',shop:'ว่าง',st:'vacant'},{id:'C19',shop:'ว่าง',st:'vacant'},{id:'C20',shop:'ว่าง',st:'vacant'},{id:'C21',shop:'ว่าง',st:'vacant'},{id:'D1',shop:'ว่าง',st:'vacant'},{id:'D2',shop:'ว่าง',st:'vacant'},{id:'D3',shop:'ว่าง',st:'vacant'},{id:'D4',shop:'ว่าง',st:'vacant'},{id:'D5',shop:'ว่าง',st:'vacant'},{id:'D6',shop:'ว่าง',st:'vacant'},{id:'D7',shop:'ว่าง',st:'vacant'},{id:'D8',shop:'ว่าง',st:'vacant'},{id:'D9',shop:'ว่าง',st:'vacant'},{id:'D10',shop:'ว่าง',st:'vacant'},{id:'D11',shop:'ว่าง',st:'vacant'},{id:'D12',shop:'ว่าง',st:'vacant'},{id:'D13',shop:'ว่าง',st:'vacant'},{id:'D14',shop:'ว่าง',st:'vacant'},{id:'D15',shop:'ว่าง',st:'vacant'},{id:'D16',shop:'ว่าง',st:'vacant'},{id:'D17',shop:'ว่าง',st:'vacant'},{id:'D18',shop:'ว่าง',st:'vacant'},{id:'D19',shop:'ว่าง',st:'vacant'},{id:'D20',shop:'ว่าง',st:'vacant'},{id:'D21',shop:'ว่าง',st:'vacant'},{id:'D22',shop:'ว่าง',st:'vacant'},{id:'E1',shop:'ว่าง',st:'vacant'},{id:'E2',shop:'ว่าง',st:'vacant'},{id:'E3',shop:'ว่าง',st:'vacant'},{id:'E4',shop:'ว่าง',st:'vacant'},{id:'E5',shop:'ว่าง',st:'vacant'},{id:'E6',shop:'ว่าง',st:'vacant'},{id:'E7',shop:'ว่าง',st:'vacant'},{id:'E8',shop:'ว่าง',st:'vacant'},{id:'E9',shop:'ว่าง',st:'vacant'},{id:'E10',shop:'ว่าง',st:'vacant'},{id:'E11',shop:'ว่าง',st:'vacant'},{id:'F1',shop:'ว่าง',st:'vacant'},{id:'F2',shop:'ว่าง',st:'vacant'},{id:'F3',shop:'ว่าง',st:'vacant'},{id:'F4',shop:'ว่าง',st:'vacant'},{id:'F5',shop:'ว่าง',st:'vacant'},{id:'F6',shop:'ว่าง',st:'vacant'},{id:'F7',shop:'ว่าง',st:'vacant'},{id:'F8',shop:'ว่าง',st:'vacant'},{id:'F9',shop:'ว่าง',st:'vacant'},{id:'F10',shop:'ว่าง',st:'vacant'},{id:'F11',shop:'ว่าง',st:'vacant'},{id:'F12',shop:'ว่าง',st:'vacant'},{id:'F13',shop:'ว่าง',st:'vacant'},{id:'F14',shop:'ว่าง',st:'vacant'},{id:'F15',shop:'ว่าง',st:'vacant'},{id:'F16',shop:'ว่าง',st:'vacant'}];
 const B7_LOCKS=[{id:'G1',shop:'ว่าง',st:'vacant'},{id:'G2',shop:'ว่าง',st:'vacant'},{id:'G3',shop:'ว่าง',st:'vacant'},{id:'G4',shop:'ว่าง',st:'vacant'},{id:'G5',shop:'ว่าง',st:'vacant'},{id:'G6',shop:'ว่าง',st:'vacant'},{id:'G7',shop:'ว่าง',st:'vacant'},{id:'G8',shop:'ว่าง',st:'vacant'},{id:'G9',shop:'ว่าง',st:'vacant'},{id:'G10',shop:'ว่าง',st:'vacant'},{id:'G11',shop:'ว่าง',st:'vacant'},{id:'G12',shop:'ว่าง',st:'vacant'},{id:'G13',shop:'ว่าง',st:'vacant'},{id:'G14',shop:'ว่าง',st:'vacant'},{id:'G15',shop:'ว่าง',st:'vacant'},{id:'G16',shop:'ว่าง',st:'vacant'},{id:'G17',shop:'ว่าง',st:'vacant'},{id:'G18',shop:'ว่าง',st:'vacant'},{id:'G19',shop:'ว่าง',st:'vacant'},{id:'G20',shop:'ว่าง',st:'vacant'},{id:'G21',shop:'ว่าง',st:'vacant'},{id:'G22',shop:'ว่าง',st:'vacant'},{id:'G23',shop:'ว่าง',st:'vacant'},{id:'G24',shop:'ว่าง',st:'vacant'},{id:'G25',shop:'ว่าง',st:'vacant'},{id:'G26',shop:'ว่าง',st:'vacant'},{id:'G27',shop:'ว่าง',st:'vacant'},{id:'G28',shop:'ว่าง',st:'vacant'},{id:'J1',shop:'ว่าง',st:'vacant'},{id:'J2',shop:'ว่าง',st:'vacant'},{id:'J3',shop:'ว่าง',st:'vacant'},{id:'J4',shop:'ว่าง',st:'vacant'},{id:'K1',shop:'ว่าง',st:'vacant'},{id:'K2',shop:'ว่าง',st:'vacant'},{id:'K3',shop:'ว่าง',st:'vacant'},{id:'K4',shop:'ว่าง',st:'vacant'},{id:'K5',shop:'ว่าง',st:'vacant'},{id:'K6',shop:'ว่าง',st:'vacant'},{id:'K7',shop:'ว่าง',st:'vacant'},{id:'K8',shop:'ว่าง',st:'vacant'},{id:'K9',shop:'ว่าง',st:'vacant'},{id:'K10',shop:'ว่าง',st:'vacant'},{id:'K11',shop:'ว่าง',st:'vacant'},{id:'K12',shop:'ว่าง',st:'vacant'},{id:'N1',shop:'ว่าง',st:'vacant'},{id:'N2',shop:'ว่าง',st:'vacant'},{id:'N3',shop:'ว่าง',st:'vacant'},{id:'N4',shop:'ว่าง',st:'vacant'},{id:'N5',shop:'ว่าง',st:'vacant'},{id:'N6',shop:'ว่าง',st:'vacant'},{id:'N7',shop:'ว่าง',st:'vacant'},{id:'N8',shop:'ว่าง',st:'vacant'},{id:'U1',shop:'ว่าง',st:'vacant'},{id:'U3',shop:'ว่าง',st:'vacant'},{id:'U4',shop:'ว่าง',st:'vacant'},{id:'U5',shop:'ว่าง',st:'vacant'},{id:'U6',shop:'ว่าง',st:'vacant'}];
@@ -568,15 +582,20 @@ function switchMapZone(z){
 let payTarget=null;
 
 // ─── Init ─────────────────────────────────────────────────────────────────────
-window.onload=()=>{
+function populateInsLockSel(){
   const sel=document.getElementById('ins-lock');
+  sel.innerHTML='<option value="">-- เลือกล็อค --</option>';
   VENDORS.filter(v=>v.total_debt>0).forEach(v=>{
     const o=document.createElement('option');
     o.value=v.lock;
     o.textContent=`${v.lock} — ${v.shop}  (คงค้าง ฿${baht(v.total_debt-v.collected)})`;
     sel.appendChild(o);
   });
+}
+window.onload=()=>{
+  populateInsLockSel();
   renderOv(); renderTracking(); buildMap(); updateKPI();
+  loadVendorsFromSheets().then(populateInsLockSel);
 };
 
 function fmt(n){return `${Math.round(n).toLocaleString()}`;}
@@ -873,14 +892,26 @@ function openPay(lock, term){
   document.getElementById('pay-modal').classList.add('show');
 }
 function closeModal(){document.getElementById('pay-modal').classList.remove('show');payTarget=null;}
-function doPayInstallment(){
+async function doPayInstallment(){
   if(!payTarget) return;
   const v=VENDORS.find(v=>v.lock===payTarget.lock);
   const s=v.plan.schedule.find(s=>s.term===payTarget.term);
   const amt=parseFloat(document.getElementById('pay-amt').value)||0;
+  const method=document.getElementById('pay-method')?.value||'💵 เงินสด';
+  const note=document.getElementById('pay-note')?.value||`ผ่อนชำระงวดที่ ${payTarget.term}/${v.plan.terms}`;
   s.paid=amt;s.paid_date=new Date();s.status='paid';v.collected+=amt;v.plan.paid_terms++;
+  if(getApiUrl()){
+    await apiPost('savePayment',{data:{
+      lock_id:v.lock, vendor_name:v.shop, product:v.shop,
+      type:'ค่าเช่าประจำเดือน', amount:amt, penalty:0, other_fee:0, other_label:'',
+      method, note, date:fmtDate(new Date()), time:new Date().toTimeString().slice(0,5),
+    }});
+    if(v.collected>=v.total_debt){
+      await apiPost('saveVendor',{data:{lock:v.lock, status:'active'}});
+    }
+  }
   closeModal();renderOv();renderTracking();buildMap();updateKPI();
-  showToast(`✅ บันทึกงวดที่ ${payTarget.term} ล็อค ${payTarget.lock} ${baht(amt)}`,'success');
+  showToast(getApiUrl()?`☁️ บันทึกงวดที่ ${payTarget.term} ล็อค ${payTarget.lock} ${baht(amt)} ขึ้น Sheets แล้ว`:`✅ บันทึกงวดที่ ${payTarget.term} ล็อค ${payTarget.lock} ${baht(amt)}`,'success');
 }
 
 // ─── Map ──────────────────────────────────────────────────────────────────────

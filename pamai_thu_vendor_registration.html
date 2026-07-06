@@ -901,7 +901,7 @@ function arr(n,p,vacant=[]){ return Array.from({length:n},(_,i)=>({id:`${p}${i+1
 
 let currentStep = 1;
 let selectedLock = null;
-let selectedZone = 'SA';
+let selectedZone = 'A';
 let extras = [];
 let extraCnt = 0;
 
@@ -1299,7 +1299,7 @@ function resetAll() {
   document.getElementById('mainLayout').style.display  = 'grid';
   document.getElementById('successScreen').style.display = 'none';
   document.querySelectorAll('input[type=text],input[type=number],input[type=tel],textarea').forEach(el=>el.value='');
-  selectedLock = null; selectedZone = 'SA'; extras = []; extraCnt = 0;
+  selectedLock = null; selectedZone = 'A'; extras = []; extraCnt = 0;
   document.getElementById('extrasList').innerHTML = '';
   document.getElementById('lockSelectedWrap').style.display = 'none';
   document.getElementById('vendorPreviewCard').style.display = 'none';

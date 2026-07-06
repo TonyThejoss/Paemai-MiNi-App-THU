@@ -400,12 +400,13 @@ body {
       <input class="search-input" id="searchInput" placeholder="🔍 ค้นหาชื่อร้าน / ล็อค / สินค้า..." oninput="renderTable()">
       <select class="filter-sel" id="zoneFilter" onchange="renderTable()">
         <option value="">ทุกโซน</option>
-        <option value="SA">โรงหน้า (SA)</option>
-        <option value="SB">SB</option><option value="SC">SC</option>
-        <option value="SD">SD</option><option value="SE">SE</option>
-        <option value="SF">SF</option><option value="A">A</option>
-        <option value="B">B</option><option value="C">C</option>
-        <option value="D">D</option><option value="F">F</option>
+        <option value="A">A</option><option value="B">B</option><option value="C">C</option>
+        <option value="D">D</option><option value="E">E</option><option value="F">F</option>
+        <option value="G">G</option><option value="J">J</option><option value="K">K</option>
+        <option value="N">N</option><option value="U">U</option>
+        <option value="O">O</option><option value="M">M</option><option value="H">H</option>
+        <option value="L">L</option><option value="T">T</option><option value="AB">AB</option>
+        <option value="TA">TA</option><option value="TB">TB</option><option value="TC">TC</option>
       </select>
       <select class="filter-sel" id="statusFilter" onchange="renderTable()">
         <option value="">ทุกสถานะ</option>
@@ -514,11 +515,7 @@ body {
 <!-- ═══════════════════ TAB 3: BILLING ═══════════════════ -->
 <div id="tab-billing" class="page">
   <div class="month-bar">
-    <select class="month-select" id="billMonth" onchange="renderBilling()">
-      <option value="2568-06">มิถุนายน 2568</option>
-      <option value="2568-07" selected>กรกฎาคม 2568</option>
-      <option value="2568-08">สิงหาคม 2568</option>
-    </select>
+    <div class="month-select" id="billMonth" style="display:flex;align-items:center;font-weight:700"></div>
     <div class="zone-filter-row" id="zoneFilterBill"></div>
     <button class="btn btn-primary" style="margin-left:auto;padding:7px 16px;font-size:.78rem" onclick="exportBill()">📥 Export Excel</button>
   </div>
@@ -635,54 +632,10 @@ const ELEC_TYPES = [
 ];
 
 // ══════════════════════════════════════
-//  VENDOR DATABASE (mock — อิงจาก Excel)
+//  VENDOR DATABASE — โหลดจาก Google Sheets จริงเท่านั้น (ไม่มีข้อมูลตัวอย่าง)
 // ══════════════════════════════════════
-let vendors = [
-  {id:'SA1', zone:'SA', shop:'เส้นผัด ไส้กรอก', rent:1750, status:'unpaid',
-   elec:{bulb:2,fan:0,small:0,large:0,special:[]}, phone:'—'},
-  {id:'SA2', zone:'SA', shop:'สายไหม', rent:1500, status:'paid',
-   elec:{bulb:2,fan:0,small:0,large:0,special:[]}, phone:'—'},
-  {id:'SA3', zone:'SA', shop:'ปลาส้ม', rent:1500, status:'unpaid',
-   elec:{bulb:0,fan:0,small:1,large:0,special:[]}, phone:'—'},
-  {id:'SA8', zone:'SA', shop:'ข้าวหมกไก่', rent:2000, status:'paid',
-   elec:{bulb:3,fan:1,small:0,large:0,special:[]}, phone:'—'},
-  {id:'SA12', zone:'SA', shop:'ต้มเนื้อ', rent:1750, status:'unpaid',
-   elec:{bulb:2,fan:0,small:0,large:0,special:[]}, phone:'—'},
-  {id:'SA14', zone:'SA', shop:'พี่ปุ้ย', rent:1750, status:'paid',
-   elec:{bulb:5,fan:0,small:0,large:0,special:[]}, phone:'—'},
-  {id:'SA15', zone:'SA', shop:'ข้าวแต๋น', rent:1250, status:'unpaid',
-   elec:{bulb:2,fan:1,small:0,large:0,special:[]}, phone:'—'},
-  {id:'SA16', zone:'SA', shop:'ลูกชิ้น', rent:1500, status:'paid',
-   elec:{bulb:2,fan:0,small:0,large:0,special:[]}, phone:'—'},
-  {id:'SA17', zone:'SA', shop:'ขนมปังปิ้ง น้ำแตงโม', rent:1500, status:'unpaid',
-   elec:{bulb:0,fan:0,small:0,large:0,special:[]}, phone:'—'},
-  {id:'SB1', zone:'SB', shop:'อาหารเหนือ', rent:1400, status:'unpaid',
-   elec:{bulb:0,fan:1,small:0,large:0,special:[]}, phone:'—'},
-  {id:'SB5', zone:'SB', shop:'ขนมเบื่อง+รังผึ้ง', rent:1000, status:'paid',
-   elec:{bulb:1,fan:0,small:0,large:0,special:[]}, phone:'—'},
-  {id:'SC1', zone:'SC', shop:'เป็ดพะโล้', rent:2000, status:'unpaid',
-   elec:{bulb:2,fan:1,small:0,large:0,special:[]}, phone:'—'},
-  {id:'SD1', zone:'SD', shop:'ก๋วยเตี๋ยวม้าทอง', rent:1500, status:'paid',
-   elec:{bulb:1,fan:1,small:0,large:0,special:[]}, phone:'—'},
-  {id:'SE5', zone:'SE', shop:'ส้มตำ', rent:1500, status:'unpaid',
-   elec:{bulb:0,fan:0,small:1,large:0,special:[]}, phone:'—'},
-  {id:'SF1', zone:'SF', shop:'ทุเรียน', rent:1500, status:'paid',
-   elec:{bulb:0,fan:0,small:0,large:0,special:[]}, phone:'—'},
-  {id:'A1', zone:'A', shop:'ไก่แซบ', rent:1000, status:'unpaid',
-   elec:{bulb:2,fan:1,small:1,large:0,special:[]}, phone:'—'},
-  {id:'A3', zone:'A', shop:'เฟรนฟราย', rent:1500, status:'paid',
-   elec:{bulb:0,fan:0,small:0,large:0,special:[]}, phone:'—'},
-  {id:'B1', zone:'B', shop:'ไส้กรอกเม', rent:1000, status:'unpaid',
-   elec:{bulb:1,fan:1,small:0,large:0,special:[]}, phone:'—'},
-  {id:'B5', zone:'B', shop:'กะเพรา', rent:1000, status:'paid',
-   elec:{bulb:1,fan:0,small:2,large:0,special:[]}, phone:'—'},
-  {id:'C3', zone:'C', shop:'ชาชีส', rent:1500, status:'unpaid',
-   elec:{bulb:0,fan:1,small:0,large:1,special:[{name:'เครื่องชงชา',price:80}]}, phone:'—'},
-  {id:'D1', zone:'D', shop:'น้ำยาปู', rent:1500, status:'paid',
-   elec:{bulb:1,fan:0,small:0,large:0,special:[]}, phone:'—'},
-  {id:'F1', zone:'F', shop:'หมูทอด', rent:1000, status:'unpaid',
-   elec:{bulb:1,fan:0,small:0,large:1,special:[]}, phone:'—'},
-];
+let vendors = [];
+const ALL_ZONES = ['A','B','C','D','E','F','G','J','K','N','U','O','M','H','L','T','AB','TA','TB','TC'];
 
 // ══════════════════════════════════════
 //  HELPERS
@@ -736,6 +689,15 @@ function renderTable() {
   });
 
   const tbody = document.getElementById('vendorTbody');
+  if (!getApiUrl()) {
+    tbody.innerHTML = '<tr><td colspan="9" style="text-align:center;padding:16px;color:var(--text-lo)">⚠️ ยังไม่ได้เชื่อมต่อ Google Sheets — กรุณาตั้งค่าที่หน้าหลักก่อนใช้งานหน้านี้</td></tr>';
+    document.getElementById('tableCount').textContent = 'แสดง 0 จาก 0 ราย';
+    animKpi('kpi-total-vendors', 0);
+    document.getElementById('kpi-total-elec').textContent = fmt(0);
+    document.getElementById('kpi-total-rent').textContent = fmt(0);
+    document.getElementById('kpi-grand').textContent      = fmt(0);
+    return;
+  }
   tbody.innerHTML = filtered.map(v => {
     const elec = calcElec(v.elec);
     const total = v.rent + elec;
@@ -1021,6 +983,17 @@ function renderBilling() {
   const tbody = document.getElementById('billingTbody');
   const foot  = document.getElementById('billingFoot');
 
+  if (!getApiUrl()) {
+    tbody.innerHTML = '<tr><td colspan="9" style="text-align:center;padding:16px;color:var(--text-lo)">⚠️ ยังไม่ได้เชื่อมต่อ Google Sheets — กรุณาตั้งค่าที่หน้าหลักก่อนใช้งานหน้านี้</td></tr>';
+    foot.innerHTML = '';
+    document.getElementById('b-total').textContent  = fmt(0);
+    document.getElementById('b-rent').textContent   = fmt(0);
+    document.getElementById('b-elec').textContent   = fmt(0);
+    document.getElementById('b-unpaid').textContent = 0;
+    document.getElementById('zoneFilterBill').innerHTML = '';
+    return;
+  }
+
   let fv = vendors;
   if (zoneFilterBillActive) fv = fv.filter(v=>v.zone===zoneFilterBillActive);
 
@@ -1060,10 +1033,10 @@ function renderBilling() {
   document.getElementById('b-elec').textContent   = fmt(tElec);
   document.getElementById('b-unpaid').textContent = tUnpaid;
 
-  // build zone filter buttons
-  const zones = [...new Set(vendors.map(v=>v.zone))];
+  // build zone filter buttons — เฉพาะโซนที่มีผู้ค้าจริงเท่านั้น
+  const zones = [...new Set(vendors.map(v=>v.zone).filter(Boolean))].sort();
   document.getElementById('zoneFilterBill').innerHTML =
-    ['','SA','SB','SC','SD','SE','SF','A','B','C','D','F'].map(z=>
+    ['',...zones].map(z=>
       `<button class="zf-btn ${zoneFilterBillActive===z?'active':''}" onclick="setBillZone('${z}')">${z||'ทั้งหมด'}</button>`
     ).join('');
 }
@@ -1074,33 +1047,69 @@ function setBillZone(z) {
 }
 
 // ══════════════════════════════════════
-//  TAB 4: HISTORY (mock data)
+//  TAB 4: HISTORY — จากข้อมูลรับชำระจริงใน Google Sheets (payments) เท่านั้น
 // ══════════════════════════════════════
-const MONTHS = ['มิ.ย. 2568','พ.ค. 2568','เม.ย. 2568','มี.ค. 2568','ก.พ. 2568','ม.ค. 2568'];
+function parsePayDate(dstr){
+  // รูปแบบวันที่จริงที่บันทึกไว้: "6 ก.ค. 2569" (วัน เดือนย่อ ปี พ.ศ.)
+  const parts = (dstr||'').trim().split(/\s+/);
+  if (parts.length < 3) return null;
+  const mIdx = MONS.indexOf(parts[1]);
+  const year = parseInt(parts[2]) || 0;
+  if (mIdx < 0 || !year) return null;
+  return { key: parts[1]+' '+year, sortKey: year*12+mIdx };
+}
 
-function renderHistory() {
+async function renderHistory() {
+  const tbody = document.getElementById('historyTbody');
+  tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:16px;color:var(--text-lo)">⏳ กำลังโหลดข้อมูล...</td></tr>';
+  if (!getApiUrl()) {
+    tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:16px;color:var(--text-lo)">ยังไม่ได้เชื่อมต่อ Google Sheets</td></tr>';
+    return;
+  }
   const lid = document.getElementById('histLockSel')?.value||'';
   const mth = parseInt(document.getElementById('histMonths')?.value||3);
-  const months = MONTHS.slice(0, mth);
+  const payments = await apiGet('getPayments');
+  if (!Array.isArray(payments)) {
+    tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:16px;color:var(--text-lo)">โหลดข้อมูลไม่สำเร็จ</td></tr>';
+    return;
+  }
+  let recs = payments.filter(p=>p.type==='ค่าเช่าประจำเดือน'||p.type==='ค่าไฟฟ้า');
+  if (lid) recs = recs.filter(p=>p.lock_id===lid);
+  recs = recs.map(p=>({...p, _pd:parsePayDate(p.date)})).filter(p=>p._pd);
+  if (!recs.length) {
+    tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:16px;color:var(--text-lo)">ยังไม่มีประวัติการชำระ</td></tr>';
+    return;
+  }
+  const monthKeys = [...new Set(recs.map(p=>p._pd.key))]
+    .sort((a,b)=>{
+      const pa = recs.find(x=>x._pd.key===a)._pd.sortKey;
+      const pb = recs.find(x=>x._pd.key===b)._pd.sortKey;
+      return pb-pa;
+    }).slice(0, mth);
 
-  let rows = '';
-  vendors.filter(v=>!lid||v.id===lid).forEach(v => {
-    months.forEach((m,mi) => {
-      const elec = calcElec(v.elec) * (0.9 + Math.random()*0.2); // slight variation
-      const elecR = Math.round(elec/10)*10;
-      const total = v.rent + elecR;
-      rows += `<tr>
-        <td>${m}</td>
-        <td><span class="lock-badge">${v.id}</span></td>
-        <td>${v.shop}</td>
-        <td style="font-size:.72rem;color:var(--text-lo)">${elecBreakdown(v.elec)}</td>
-        <td class="tbl-amount" style="text-align:right;color:var(--yellow)">${elecR>0?fmt(elecR):'—'}</td>
-        <td class="tbl-amount" style="text-align:right">${fmt(v.rent)}</td>
-        <td class="tbl-amount" style="text-align:right;font-weight:800">${fmt(total)}</td>
-      </tr>`;
-    });
+  const groups = {};
+  recs.forEach(p=>{
+    if (!monthKeys.includes(p._pd.key)) return;
+    const gk = p.lock_id+'|'+p._pd.key;
+    if (!groups[gk]) groups[gk] = { lock:p.lock_id, vendor:p.vendor_name||p.product||'—', month:p._pd.key, sortKey:p._pd.sortKey, rent:0, elec:0 };
+    const amt = parseFloat(p.amount)||0;
+    if (p.type==='ค่าเช่าประจำเดือน') groups[gk].rent += amt;
+    else groups[gk].elec += amt;
   });
-  document.getElementById('historyTbody').innerHTML = rows;
+  const rows = Object.values(groups).sort((a,b)=>b.sortKey-a.sortKey || a.lock.localeCompare(b.lock));
+  if (!rows.length) {
+    tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:16px;color:var(--text-lo)">ยังไม่มีประวัติการชำระ</td></tr>';
+    return;
+  }
+  tbody.innerHTML = rows.map(r=>`<tr>
+    <td>${r.month}</td>
+    <td><span class="lock-badge">${r.lock}</span></td>
+    <td>${r.vendor}</td>
+    <td style="font-size:.72rem;color:var(--text-lo)">—</td>
+    <td class="tbl-amount" style="text-align:right;color:var(--yellow)">${r.elec>0?fmt(r.elec):'—'}</td>
+    <td class="tbl-amount" style="text-align:right">${r.rent>0?fmt(r.rent):'—'}</td>
+    <td class="tbl-amount" style="text-align:right;font-weight:800">${fmt(r.rent+r.elec)}</td>
+  </tr>`).join('');
 }
 
 // ══════════════════════════════════════
@@ -1255,7 +1264,12 @@ async function persistVendorElec(v){
 // ══════════════════════════════════════
 //  INIT
 // ══════════════════════════════════════
-window.onload = () => { renderTable(); initUpdateTab(); loadVendorsFromSheets(); };
+window.onload = () => {
+  const n=new Date();
+  const bm=document.getElementById('billMonth');
+  if(bm) bm.textContent = '🗓️ '+MONS[n.getMonth()]+' '+(n.getFullYear()+543);
+  renderTable(); initUpdateTab(); loadVendorsFromSheets();
+};
 </script>
 </body>
 </html>
