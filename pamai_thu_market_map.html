@@ -413,6 +413,15 @@ function refreshLk(el){
 }
 
 // ════════════════════════════════════════════════════
+// ล็อคว่าง → ไปหน้าลงทะเบียนผู้ค้าใหม่ (ส่งเลขล็อคไปให้ล่วงหน้า)
+// ════════════════════════════════════════════════════
+function goRegisterLock(lockId, zone){
+  if(window.parent && window.parent!==window){
+    window.parent.postMessage({type:'pm-open-register', lock:lockId, zone:zone||''}, '*');
+  }
+}
+
+// ════════════════════════════════════════════════════
 // LEAVE / ABSENT — พร้อม toggle cancel
 // ════════════════════════════════════════════════════
 let pendingLeaveId=null;
@@ -709,6 +718,7 @@ function showPopup(el,ev){
   }
   if(isAvailForDaily&&!isDaily) acts+='<button class="pp-btn b-daily" onclick="openDailyModal(\''+lockId+'\')">🏷️ จองจร</button>';
   if(isDaily) acts+='<button class="pp-btn b-cancel" onclick="cancelDaily(\''+lockId+'\')">✕ ยกเลิกจร</button>';
+  if(isVacant) acts+='<button class="pp-btn" style="background:#dcfce7;color:#15803d" onclick="goRegisterLock(\''+lockId+'\',\''+(d.zone||'')+'\')">➕ เพิ่มผู้ค้าประจำ</button>';
   if(isOccupied||isDaily){
     acts+='<button class="pp-btn" style="background:var(--bl);color:var(--b)" onclick="openMoveModal(\''+lockId+'\')">🔄 ย้ายล็อค</button>';
     acts+='<button class="pp-btn" style="background:var(--rl);color:var(--r)" onclick="openCancelLeaseModal(\''+lockId+'\')">🚫 ยกเลิกเช่า</button>';

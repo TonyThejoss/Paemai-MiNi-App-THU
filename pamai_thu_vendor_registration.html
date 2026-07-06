@@ -932,11 +932,29 @@ function countThursdaysInMonth(year,month){let c=0;const d=new Date(year,month,1
 function thisMonthThursdays(){const n=new Date();return countThursdaysInMonth(n.getFullYear(),n.getMonth())||4;}
 function getApiUrl(){ return localStorage.getItem('pm-api-url')||''; }
 function getCurrentUserName(){ try{const s=sessionStorage.getItem('pm-session');if(s){const u=JSON.parse(s);return u.username||'ผู้ใช้';}}catch(e){} return 'ผู้ใช้'; }
+async function apiGet(action,params={}){
+  const url=getApiUrl(); if(!url) return null;
+  try{ const r=await fetch(url+'?'+new URLSearchParams({action,...params})); const j=await r.json(); return j.status==='ok'?j.data:null; }
+  catch(e){ console.error('apiGet error:',action,e); return null; }
+}
 async function apiPost(action,data={}){
   const url=getApiUrl(); if(!url) return null;
   try{ const r=await fetch(url,{method:'POST',body:JSON.stringify({action,...data})}); return await r.json(); }
   catch(e){ console.error('apiPost error:',action,e); return null; }
 }
+
+// ── โซนล็อคที่ "ไม่ว่าง" จริงจาก Google Sheets (แทนค่า o:0 คงที่เดิมที่ไม่เคยอัปเดต) ──
+let OCCUPIED_LOCKS = new Set();
+async function loadOccupiedLocks(){
+  if(!getApiUrl()) return;
+  const data = await apiGet('getVendors');
+  if(!Array.isArray(data)) return;
+  OCCUPIED_LOCKS = new Set(
+    data.filter(v=>v.lock && (v.status==='active'||v.status==='unpaid')).map(v=>v.lock)
+  );
+  updateLockGrid();
+}
+function isLockOccupied(id){ return OCCUPIED_LOCKS.has(id); }
 
 // ══════════════════════════════════
 //  INIT
@@ -947,7 +965,22 @@ window.onload = () => {
   document.getElementById('payDate').value   = today;
   document.getElementById('feeAnnualYear').value = new Date().getFullYear() + 543;
   buildZoneTabs(); updateLockGrid(); recalc();
+  loadOccupiedLocks();
+  // แจ้งหน้าหลัก (parent) ว่าโหลดเสร็จแล้ว เผื่อมีล็อคที่รอเลือกไว้ล่วงหน้า (มาจากผังตลาด)
+  if(window.parent && window.parent!==window){
+    window.parent.postMessage({type:'pm-register-ready'}, '*');
+  }
 };
+
+// รับเลขล็อค/โซนที่ส่งมาจากผังตลาด (เมื่อกด "เพิ่มผู้ค้าประจำ" บนล็อคว่าง) แล้วเลือกให้อัตโนมัติ
+window.addEventListener('message', function(e){
+  if(!e.data || e.data.type !== 'pm-preset-lock' || !e.data.lock) return;
+  const lock = e.data.lock;
+  const zone = e.data.zone && LOCKS[e.data.zone] ? e.data.zone : (lock.match(/^[A-Za-z]+/)||[])[0];
+  if(!zone || !LOCKS[zone]) return;
+  selectZone(zone);
+  setTimeout(()=>pickLock(lock), 50);
+});
 
 // ══════════════════════════════════
 //  LIVE PREVIEW
@@ -1044,12 +1077,14 @@ function selectZone(z) {
 function updateLockGrid() {
   const grid = document.getElementById('lockGrid');
   grid.innerHTML = LOCKS[selectedZone].data.map(l => {
-    const cls = l.o ? 'occupied' : (selectedLock===l.id ? 'selected' : 'vacant');
-    return `<div class="lock-cell ${cls}" onclick="${l.o?'':'pickLock(\''+l.id+'\')'}" title="${l.id}">${l.id}</div>`;
+    const occ = isLockOccupied(l.id);
+    const cls = occ ? 'occupied' : (selectedLock===l.id ? 'selected' : 'vacant');
+    return `<div class="lock-cell ${cls}" onclick="${occ?'':'pickLock(\''+l.id+'\')'}" title="${l.id}${occ?' (มีผู้ค้าประจำแล้ว)':''}">${l.id}</div>`;
   }).join('');
 }
 
 function pickLock(id) {
+  if(isLockOccupied(id)){ showToast('ล็อค '+id+' มีผู้ค้าประจำแล้ว ไม่สามารถเลือกได้', 'error'); return; }
   selectedLock = id;
   updateLockGrid();
   document.getElementById('errLock').style.display = 'none';
@@ -1268,6 +1303,7 @@ async function submitForm(btn) {
     }});
 
     const vOk = vRes && vRes.status==='ok';
+    if (vOk) OCCUPIED_LOCKS.add(selectedLock); // อัปเดตสถานะล็อคว่าให้ไม่ว่างทันที ไม่ต้องรอโหลดใหม่
     saveNote = (vOk && payOk)
       ? '<div style="margin-top:10px;padding:8px 12px;background:#e6f7ee;border-radius:8px;color:#1a7f4b;font-weight:700;font-size:.72rem">☁️ บันทึกขึ้น Google Sheets แล้ว</div>'
       : '<div style="margin-top:10px;padding:8px 12px;background:#fff3cd;border-radius:8px;color:#92400e;font-weight:700;font-size:.72rem">⚠️ บันทึกบางส่วนไม่สำเร็จ กรุณาตรวจสอบการเชื่อมต่อ</div>';

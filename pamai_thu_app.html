@@ -369,7 +369,6 @@ input:focus,select:focus,textarea:focus{border-color:var(--gm);box-shadow:0 0 0 
       <div class="sb-lbl">ภาพรวม</div>
       <button class="ni active" id="ni-dash" onclick="goTab('dash')"><span class="ico">🏠</span>หน้าหลัก</button>
       <button class="ni" id="ni-map" onclick="goTab('map')"><span class="ico">🗺️</span>ผังตลาด<span class="nb or" id="sb-vacant-badge">ว่าง —</span></button>
-      <button class="ni" id="ni-vdb" onclick="goTab('vdb')"><span class="ico">👥</span>ข้อมูลผู้ค้า</button>
     </div>
     <div class="sb-div"></div>
     <div class="sb-sec">
@@ -440,7 +439,6 @@ input:focus,select:focus,textarea:focus{border-color:var(--gm);box-shadow:0 0 0 
           <div class="dcb">
             <div class="mgrid">
               <div class="mc" onclick="goTab('map')"><div class="mc-i">🗺️</div><div class="mc-n">ผังตลาด</div><div class="mc-d">ดูตำแหน่งล็อค</div></div>
-              <div class="mc" onclick="goTab('vdb')"><div class="mc-i">👥</div><div class="mc-n">ข้อมูลผู้ค้า</div><div class="mc-d">ดู แก้ไข ค่าไฟ</div></div>
               <div class="mc" onclick="goTab('payment')"><div class="mc-i">💰</div><div class="mc-n">รับชำระ</div><div class="mc-d">บันทึกชำระ + ค่าปรับ</div></div>
               <div class="mc" onclick="goTab('install')"><div class="mc-i">📋</div><div class="mc-n">ผ่อนชำระ</div><div class="mc-d">2 งวด ติดตาม deadline</div></div>
               <div class="mc" onclick="goTab('electric')"><div class="mc-i">⚡</div><div class="mc-n">ค่าไฟฟ้า</div><div class="mc-d">บันทึกอุปกรณ์</div></div>
@@ -706,7 +704,7 @@ function applyRole(role){
       });
     },500);
     // Disable sidebar buttons that viewer can't access
-    ['ni-map','ni-payment','ni-install','ni-electric','ni-register','ni-vdb'].forEach(id=>{
+    ['ni-map','ni-payment','ni-install','ni-electric','ni-register'].forEach(id=>{
       const el=document.getElementById(id);
       if(el){el.style.opacity='.4';el.style.cursor='not-allowed';el.onclick=function(){showToast('⛔ ไม่มีสิทธิ์เข้าถึง','e');};}
     });
@@ -725,7 +723,7 @@ function doLogout(){
   document.getElementById('readonly-banner').style.display='none';
   // re-enable buttons
   document.querySelectorAll('.btn-p,.btn-d,.btn-icon').forEach(b=>{b.disabled=false;b.style.opacity='';b.style.cursor='';});
-  ['ni-map','ni-payment','ni-install','ni-electric','ni-register','ni-vdb'].forEach(id=>{
+  ['ni-map','ni-payment','ni-install','ni-electric','ni-register'].forEach(id=>{
     const el=document.getElementById(id);
     if(el){el.style.opacity='';el.style.cursor='';}
   });
@@ -1227,6 +1225,35 @@ function showToast(msg,type='i'){
 // MODULE LOADER — load sub-modules into panes
 // ════════════════════════════════════════════════════
 const loadedModules = new Set();
+
+// ── รับข้อความจากผังตลาด (iframe) เมื่อกด "เพิ่มผู้ค้าประจำ" บนล็อคว่าง ──
+// ส่งเลขล็อค/โซนต่อไปยังหน้าลงทะเบียนผู้ค้าใหม่ (คนละ iframe) ให้เลือกล็อคให้อัตโนมัติ
+window._pendingLockPreset = null;
+window.addEventListener('message', function(e){
+  if(!e.data || typeof e.data !== 'object') return;
+  if(e.data.type === 'pm-open-register'){
+    const preset = {lock: e.data.lock, zone: e.data.zone || ''};
+    goTab('register');
+    const pane = document.getElementById('register');
+    const frame = pane && pane.querySelector('iframe');
+    if(frame && loadedModules.has('register') && frame.contentWindow){
+      // โมดูลลงทะเบียนโหลดไว้แล้วก่อนหน้า — ส่งข้อมูลตรงได้เลย
+      frame.contentWindow.postMessage(Object.assign({type:'pm-preset-lock'}, preset), '*');
+    } else {
+      // ยังไม่เคยโหลด — รอให้หน้านั้นโหลดเสร็จแล้วขอข้อมูลมาเอง (pm-register-ready)
+      window._pendingLockPreset = preset;
+    }
+  } else if(e.data.type === 'pm-register-ready'){
+    if(window._pendingLockPreset){
+      const pane = document.getElementById('register');
+      const frame = pane && pane.querySelector('iframe');
+      if(frame && frame.contentWindow){
+        frame.contentWindow.postMessage(Object.assign({type:'pm-preset-lock'}, window._pendingLockPreset), '*');
+      }
+      window._pendingLockPreset = null;
+    }
+  }
+});
 
 function loadModule(id) {
   const pane = document.getElementById(id);
