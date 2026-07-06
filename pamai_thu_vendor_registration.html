@@ -1,0 +1,1338 @@
+<!DOCTYPE html>
+<html lang="th" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ลงทะเบียนผู้ค้าใหม่ — แพไม้มินิ วันพฤหัสบดี</title>
+<style>
+/* ══════════════════════════════════════════
+   DESIGN TOKENS — Light & Dark
+══════════════════════════════════════════ */
+:root {
+  --green:      #c2410c;
+  --green-m:    #ea580c;
+  --green-b:    #f97316;
+  --green-l:    #ffedd5;
+  --green-ll:   #fff7ed;
+  --red:        #c0392b;
+  --red-l:      #fde8e8;
+  --orange:     #c05621;
+  --orange-l:   #feebc8;
+  --blue:       #2b6cb0;
+  --blue-l:     #ebf8ff;
+  --yellow:     #fefcbf;
+
+  /* Surface */
+  --bg:         #eef2f7;
+  --surface:    #ffffff;
+  --surface2:   #f7fafc;
+  --border:     #e2e8f0;
+  --border2:    #cbd5e0;
+
+  /* Text */
+  --text-hi:    #1a202c;
+  --text-md:    #4a5568;
+  --text-lo:    #718096;
+  --text-inv:   #ffffff;
+
+  /* Topbar */
+  --top-from:   #1b4332;
+  --top-to:     #c2410c;
+
+  /* Shadows */
+  --shadow-sm:  0 1px 4px rgba(0,0,0,.07);
+  --shadow-md:  0 4px 16px rgba(0,0,0,.09);
+  --shadow-lg:  0 12px 40px rgba(0,0,0,.14);
+  --shadow-btn: 0 4px 14px rgba(45,106,79,.32);
+
+  --radius:     14px;
+  --radius-sm:  9px;
+  --ease:       cubic-bezier(.4,0,.2,1);
+}
+
+[data-theme="dark"] {
+  --bg:         #0f1117;
+  --surface:    #1a1d27;
+  --surface2:   #22263a;
+  --border:     #2d3349;
+  --border2:    #3d4460;
+
+  --text-hi:    #f0f4ff;
+  --text-md:    #a8b4d0;
+  --text-lo:    #6b7a99;
+  --text-inv:   #ffffff;
+
+  --top-from:   #0d2618;
+  --top-to:     #1b4332;
+
+  --green-l:    #1b3d2a;
+  --green-ll:   #111f18;
+  --red-l:      #2d1414;
+  --orange-l:   #2d1e0a;
+  --blue-l:     #0d1e35;
+  --yellow:     #2a2600;
+
+  --shadow-sm:  0 1px 4px rgba(0,0,0,.3);
+  --shadow-md:  0 4px 20px rgba(0,0,0,.4);
+  --shadow-lg:  0 16px 48px rgba(0,0,0,.55);
+  --shadow-btn: 0 4px 16px rgba(64,145,108,.4);
+}
+
+/* ── BASE ── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body {
+  font-family: 'Segoe UI', system-ui, sans-serif;
+  background: var(--bg); color: var(--text-hi);
+  font-size: 14px; line-height: 1.5;
+  transition: background .35s var(--ease), color .35s var(--ease);
+}
+
+/* ── TOPBAR ── */
+.topbar {
+  background: linear-gradient(135deg, var(--top-from), var(--top-to));
+  color: var(--text-inv); padding: 14px 24px;
+  display: flex; align-items: center; justify-content: space-between;
+  position: sticky; top: 0; z-index: 200;
+  box-shadow: 0 2px 20px rgba(0,0,0,.3);
+  transition: background .35s var(--ease);
+}
+.topbar::after {
+  content: '';
+  position: absolute; inset: 0;
+  background: linear-gradient(90deg, transparent 60%, rgba(82,183,136,.08));
+  pointer-events: none;
+}
+.topbar-left { display: flex; align-items: center; gap: 12px; position: relative; }
+.topbar-brand { display: flex; flex-direction: column; }
+.topbar h1 { font-size: 1rem; font-weight: 800; letter-spacing: -.3px; }
+.topbar p  { font-size: .72rem; opacity: .75; }
+.btn-back {
+  background: rgba(255,255,255,.14); border: 1px solid rgba(255,255,255,.25);
+  color: white; padding: 6px 14px; border-radius: 8px; cursor: pointer;
+  font-size: .76rem; font-weight: 700; transition: all .2s var(--ease);
+  white-space: nowrap;
+}
+.btn-back:hover { background: rgba(255,255,255,.26); transform: translateX(-2px); }
+
+/* ── DARK MODE TOGGLE ── */
+.dm-toggle {
+  width: 44px; height: 24px; border-radius: 12px; border: none; cursor: pointer;
+  background: rgba(255,255,255,.2); position: relative; transition: background .3s;
+  flex-shrink: 0;
+}
+.dm-toggle::before {
+  content: ''; position: absolute; top: 3px; left: 3px;
+  width: 18px; height: 18px; border-radius: 50%; background: white;
+  transition: transform .3s var(--ease), background .3s;
+  box-shadow: 0 1px 4px rgba(0,0,0,.25);
+}
+[data-theme="dark"] .dm-toggle::before { transform: translateX(20px); background: #fbbf24; }
+.dm-icon { font-size: .82rem; position: absolute; top: 50%; transform: translateY(-50%); }
+.dm-icon.sun { right: 5px; }
+.dm-icon.moon { left: 5px; display: none; }
+[data-theme="dark"] .dm-icon.sun { display: none; }
+[data-theme="dark"] .dm-icon.moon { display: block; }
+
+/* ── STEP BAR ── */
+.stepbar {
+  background: var(--surface); padding: 13px 24px;
+  border-bottom: 1px solid var(--border);
+  display: flex; align-items: center;
+  transition: background .35s var(--ease), border-color .35s var(--ease);
+}
+.step {
+  display: flex; align-items: center; gap: 7px; flex: 1;
+  font-size: .75rem; font-weight: 600; color: var(--text-lo);
+  transition: color .3s var(--ease);
+}
+.step.active { color: var(--green-m); }
+.step.done   { color: var(--green-b); }
+.step-dot {
+  width: 30px; height: 30px; border-radius: 50%;
+  border: 2px solid var(--border2); background: var(--surface2);
+  display: flex; align-items: center; justify-content: center;
+  font-size: .72rem; font-weight: 800; flex-shrink: 0;
+  transition: all .3s var(--ease);
+}
+.step.active .step-dot {
+  border-color: var(--green-m); background: var(--green-m); color: white;
+  box-shadow: 0 0 0 4px rgba(64,145,108,.18);
+  animation: pulse-dot 2s infinite;
+}
+@keyframes pulse-dot {
+  0%,100% { box-shadow: 0 0 0 4px rgba(64,145,108,.18); }
+  50%      { box-shadow: 0 0 0 8px rgba(64,145,108,.06); }
+}
+.step.done .step-dot {
+  border-color: var(--green-b); background: var(--green-l); color: var(--green);
+}
+.step.done .step-dot::after { content: '✓'; }
+.step-line {
+  flex: 1; height: 2px; background: var(--border); margin: 0 6px; max-width: 40px;
+  transition: background .4s var(--ease); border-radius: 2px;
+  position: relative; overflow: hidden;
+}
+.step.done ~ .step-line { background: var(--green-b); }
+
+/* ── LAYOUT ── */
+.layout {
+  display: grid; grid-template-columns: 1fr 350px;
+  gap: 20px; max-width: 1080px; margin: 22px auto; padding: 0 20px 48px;
+}
+
+/* ── CARD ── */
+.card {
+  background: var(--surface); border-radius: var(--radius);
+  padding: 22px 24px; box-shadow: var(--shadow-md);
+  border: 1px solid var(--border); margin-bottom: 14px;
+  transition: background .35s var(--ease), border-color .35s var(--ease), box-shadow .35s var(--ease);
+  animation: fadeSlideUp .35s var(--ease) both;
+}
+@keyframes fadeSlideUp {
+  from { opacity: 0; transform: translateY(14px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.card:hover { box-shadow: var(--shadow-lg); }
+
+.card-title {
+  font-size: .87rem; font-weight: 800; color: var(--text-hi);
+  margin-bottom: 18px; padding-bottom: 12px;
+  border-bottom: 1.5px solid var(--border);
+  display: flex; align-items: center; gap: 8px;
+  transition: border-color .35s var(--ease);
+}
+.badge-section {
+  margin-left: auto; font-size: .66rem; font-weight: 700;
+  padding: 3px 10px; border-radius: 20px;
+}
+
+/* ── FORM ── */
+.field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 13px; margin-bottom: 13px; }
+.field-row.col3 { grid-template-columns: 1fr 1fr 1fr; }
+.field-row.col1 { grid-template-columns: 1fr; }
+
+.field { display: flex; flex-direction: column; gap: 5px; }
+.field label {
+  font-size: .71rem; font-weight: 700; color: var(--text-lo);
+  text-transform: uppercase; letter-spacing: .5px;
+  transition: color .2s;
+}
+.field:focus-within label { color: var(--green-m); }
+.req { color: var(--red); margin-left: 2px; }
+
+input[type=text], input[type=number], input[type=date], input[type=tel],
+select, textarea {
+  padding: 9px 12px; border: 1.5px solid var(--border); border-radius: var(--radius-sm);
+  font-size: .84rem; outline: none;
+  background: var(--surface2); color: var(--text-hi);
+  transition: border-color .2s var(--ease), box-shadow .2s var(--ease),
+              background .35s var(--ease), color .35s var(--ease);
+  font-family: inherit; width: 100%;
+}
+input:hover, select:hover { border-color: var(--border2); }
+input:focus, select:focus, textarea:focus {
+  border-color: var(--green-m);
+  box-shadow: 0 0 0 3px rgba(64,145,108,.15);
+  background: var(--surface);
+}
+textarea { resize: vertical; min-height: 70px; }
+.hint    { font-size: .70rem; color: var(--text-lo); margin-top: 2px; }
+.err-msg { font-size: .70rem; color: var(--red); margin-top: 2px; display: none; }
+.err-msg.show { display: block; animation: shake .3s var(--ease); }
+@keyframes shake {
+  0%,100% { transform: translateX(0); }
+  25%      { transform: translateX(-4px); }
+  75%      { transform: translateX(4px); }
+}
+
+/* floating label effect on input */
+.field-wrap { position: relative; }
+
+/* ── LOCK PICKER ── */
+.lock-zone-tabs { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 10px; }
+.zone-tab {
+  padding: 5px 12px; border-radius: 20px; font-size: .73rem; font-weight: 700;
+  border: 1.5px solid var(--border); cursor: pointer;
+  background: var(--surface2); color: var(--text-lo);
+  transition: all .18s var(--ease);
+}
+.zone-tab:hover { border-color: var(--green-m); color: var(--green-m); }
+.zone-tab.active {
+  background: var(--green-m); border-color: var(--green-m); color: white;
+  box-shadow: 0 2px 8px rgba(64,145,108,.3);
+}
+
+.lock-grid {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(60px, 1fr));
+  gap: 5px; max-height: 210px; overflow-y: auto; padding: 2px;
+}
+.lock-grid::-webkit-scrollbar { width: 4px; }
+.lock-grid::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 2px; }
+
+.lock-cell {
+  padding: 7px 3px; border-radius: 8px; text-align: center;
+  font-size: .65rem; font-weight: 700; cursor: pointer;
+  border: 1.5px solid transparent;
+  transition: all .18s var(--ease); line-height: 1.3; user-select: none;
+}
+.lock-cell.vacant {
+  background: var(--yellow); color: #744210; border-color: #f6e05e;
+}
+[data-theme="dark"] .lock-cell.vacant { color: #d4a017; border-color: #5a4a00; }
+.lock-cell.vacant:hover {
+  transform: translateY(-2px) scale(1.06);
+  border-color: var(--green-m);
+  box-shadow: 0 3px 10px rgba(64,145,108,.2);
+}
+.lock-cell.occupied {
+  background: var(--surface2); color: var(--text-lo);
+  cursor: not-allowed; opacity: .55;
+}
+.lock-cell.selected {
+  background: var(--green-m); color: white; border-color: var(--green-m);
+  transform: scale(1.08);
+  box-shadow: 0 4px 12px rgba(64,145,108,.4);
+  animation: lockPop .25s var(--ease);
+}
+@keyframes lockPop {
+  0%  { transform: scale(.9); }
+  60% { transform: scale(1.12); }
+  100%{ transform: scale(1.08); }
+}
+
+/* ── FEE BLOCKS ── */
+.fee-block {
+  border: 1.5px solid var(--border); border-radius: 11px;
+  padding: 15px 17px; margin-bottom: 10px;
+  transition: all .25s var(--ease);
+  background: var(--surface2);
+}
+.fee-block.required-fee {
+  border-color: var(--green-m); background: var(--green-ll);
+  box-shadow: 0 2px 8px rgba(64,145,108,.1);
+}
+[data-theme="dark"] .fee-block.required-fee { box-shadow: 0 2px 12px rgba(64,145,108,.15); }
+.fee-block:focus-within { border-color: var(--green-b); }
+
+.fee-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+.fee-label { font-size: .82rem; font-weight: 800; color: var(--text-hi); }
+.badge-req { font-size: .65rem; font-weight: 800; background: var(--red-l); color: var(--red); padding: 2px 9px; border-radius: 20px; }
+.badge-opt { font-size: .65rem; font-weight: 800; background: var(--blue-l); color: var(--blue); padding: 2px 9px; border-radius: 20px; }
+
+.fee-row { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+.fee-row:last-child { margin-bottom: 0; }
+.fee-row label { font-size: .76rem; color: var(--text-lo); font-weight: 600; min-width: 110px; }
+
+/* ── EXTRAS ── */
+.extra-item {
+  display: grid; grid-template-columns: 1fr 110px 32px; gap: 7px;
+  align-items: center; margin-bottom: 7px; padding: 9px 11px;
+  border: 1.5px solid var(--border); border-radius: 9px; background: var(--surface2);
+  animation: fadeSlideUp .2s var(--ease) both;
+  transition: border-color .2s var(--ease), background .35s var(--ease);
+}
+.extra-item:hover { border-color: var(--border2); }
+
+.btn-add-extra {
+  display: flex; align-items: center; justify-content: center; gap: 6px;
+  padding: 9px 16px; border: 2px dashed var(--border2); border-radius: 9px;
+  background: none; cursor: pointer; font-size: .78rem; color: var(--text-lo);
+  font-weight: 700; width: 100%; transition: all .2s var(--ease);
+  font-family: inherit;
+}
+.btn-add-extra:hover { border-color: var(--green-m); color: var(--green-m); background: var(--green-ll); }
+.btn-rm {
+  width: 30px; height: 30px; border-radius: 7px; border: none;
+  background: var(--red-l); color: var(--red); cursor: pointer;
+  font-size: .85rem; display: flex; align-items: center; justify-content: center;
+  transition: all .15s var(--ease);
+}
+.btn-rm:hover { background: var(--red); color: white; transform: scale(1.1) rotate(90deg); }
+
+/* ── SECTION DIVIDER ── */
+.section-divider {
+  display: flex; align-items: center; gap: 10px;
+  margin: 16px 0 12px;
+}
+.section-divider span { font-size: .73rem; font-weight: 800; color: var(--text-lo); white-space: nowrap; }
+.section-divider::before,.section-divider::after { content:''; flex:1; height:1px; background: var(--border); }
+
+/* ── BADGES ── */
+.badge { display: inline-flex; align-items: center; gap: 4px; padding: 3px 10px; border-radius: 20px; font-size: .70rem; font-weight: 700; }
+.badge-green  { background: var(--green-l); color: var(--green); }
+.badge-red    { background: var(--red-l); color: var(--red); }
+.badge-blue   { background: var(--blue-l); color: var(--blue); }
+.badge-gray   { background: var(--surface2); color: var(--text-lo); border: 1px solid var(--border); }
+
+/* ── BUTTONS ── */
+.btn {
+  padding: 10px 20px; border: none; border-radius: 10px;
+  font-size: .84rem; font-weight: 700; cursor: pointer;
+  transition: all .2s var(--ease); font-family: inherit; display: inline-flex;
+  align-items: center; justify-content: center; gap: 6px;
+}
+.btn-primary {
+  background: linear-gradient(135deg, var(--green), var(--green-m));
+  color: white; box-shadow: var(--shadow-btn); width: 100%;
+}
+.btn-primary:hover:not(:disabled) {
+  transform: translateY(-2px); box-shadow: 0 8px 24px rgba(64,145,108,.45);
+  filter: brightness(1.06);
+}
+.btn-primary:active:not(:disabled) { transform: translateY(0) scale(.98); }
+.btn-primary:disabled { background: var(--border2); box-shadow: none; cursor: not-allowed; color: var(--text-lo); }
+.btn-secondary {
+  background: var(--surface2); border: 1.5px solid var(--border); color: var(--text-md);
+}
+.btn-secondary:hover { background: var(--border); transform: translateY(-1px); }
+
+/* ── RIGHT PANEL ── */
+.summary-sticky { position: sticky; top: 72px; }
+.summary-card {
+  background: var(--surface); border-radius: var(--radius); padding: 18px 20px;
+  box-shadow: var(--shadow-md); margin-bottom: 14px;
+  border: 1px solid var(--border);
+  transition: background .35s var(--ease), border-color .35s var(--ease);
+  animation: fadeSlideUp .4s var(--ease) .1s both;
+}
+.sum-title { font-size: .86rem; font-weight: 800; color: var(--text-hi); margin-bottom: 13px; }
+.sum-row {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 6px 0; border-bottom: 1px solid var(--border); font-size: .80rem;
+}
+.sum-row:last-of-type { border: none; }
+.sum-label { color: var(--text-lo); }
+.sum-val { font-weight: 700; color: var(--text-hi); transition: all .3s var(--ease); }
+.sum-val.changed { animation: numFlash .4s var(--ease); }
+@keyframes numFlash {
+  0%,100% { color: var(--text-hi); }
+  50%     { color: var(--green-m); }
+}
+.sum-val.red { color: var(--red); }
+.sum-val.green { color: var(--green-m); }
+
+.total-bar {
+  background: linear-gradient(135deg, var(--green), var(--green-m));
+  border-radius: 11px; padding: 14px 16px; margin-top: 12px;
+  display: flex; justify-content: space-between; align-items: center; color: white;
+  transition: all .3s var(--ease);
+}
+.total-label { font-size: .78rem; opacity: .88; }
+.total-amount {
+  font-size: 1.55rem; font-weight: 800;
+  transition: all .35s var(--ease);
+}
+.total-method { font-size: .67rem; opacity: .75; margin-top: 2px; }
+
+/* vendor preview */
+.vendor-preview {
+  background: var(--surface); border-radius: var(--radius); padding: 16px 18px;
+  box-shadow: var(--shadow-md); margin-bottom: 14px;
+  border: 1px solid var(--border);
+  transition: all .35s var(--ease);
+  transform-origin: top center;
+}
+.vp-avatar {
+  width: 42px; height: 42px; border-radius: 50%;
+  background: linear-gradient(135deg, var(--green), var(--green-m));
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.2rem; margin-bottom: 10px; color: white;
+  box-shadow: 0 3px 10px rgba(64,145,108,.3);
+}
+
+/* ── STEP CONTENT ── */
+.step-content { display: none; }
+.step-content.visible {
+  display: block;
+  animation: stepIn .32s var(--ease) both;
+}
+@keyframes stepIn {
+  from { opacity: 0; transform: translateX(18px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+.step-content.back-anim {
+  animation: stepBack .32s var(--ease) both;
+}
+@keyframes stepBack {
+  from { opacity: 0; transform: translateX(-18px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+/* ── LOCK SELECTED BADGE ── */
+.lock-selected-badge {
+  background: var(--green-ll); border: 1.5px solid var(--green-m);
+  border-radius: 9px; padding: 10px 14px;
+  font-size: .82rem; color: var(--green-m); font-weight: 700;
+  display: flex; align-items: center; gap: 8px; margin-top: 10px;
+  animation: fadeSlideUp .25s var(--ease);
+}
+.lock-badge-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--green-m); animation: pulse-dot 1.5s infinite; }
+
+/* ── CONFIRM SECTION ── */
+.confirm-block {
+  border-radius: 11px; padding: 15px 17px; margin-bottom: 12px;
+  animation: fadeSlideUp .25s var(--ease) both;
+}
+.confirm-block.green-block { background: var(--green-ll); border: 1.5px solid var(--green-m); }
+.confirm-block.gray-block  { background: var(--surface2); border: 1.5px solid var(--border); }
+
+/* ── SUCCESS ── */
+.success-wrap {
+  display: none; flex-direction: column; align-items: center;
+  justify-content: center; padding: 60px 24px; text-align: center;
+  max-width: 500px; margin: 0 auto;
+}
+.success-wrap.show { display: flex; }
+.success-circle {
+  width: 88px; height: 88px; border-radius: 50%;
+  background: linear-gradient(135deg, var(--green), var(--green-m));
+  display: flex; align-items: center; justify-content: center;
+  font-size: 2.6rem; margin-bottom: 18px; color: white;
+  box-shadow: 0 8px 32px rgba(64,145,108,.4);
+  animation: successPop .5s var(--ease);
+}
+@keyframes successPop {
+  0%  { transform: scale(0) rotate(-180deg); opacity: 0; }
+  70% { transform: scale(1.12) rotate(5deg); }
+  100%{ transform: scale(1) rotate(0); opacity: 1; }
+}
+.success-title { font-size: 1.3rem; font-weight: 800; margin-bottom: 6px; animation: fadeSlideUp .4s .3s both; }
+.success-sub   { font-size: .86rem; color: var(--text-lo); margin-bottom: 22px; animation: fadeSlideUp .4s .4s both; }
+.success-receipt {
+  background: var(--surface); border-radius: 14px; padding: 18px 22px;
+  box-shadow: var(--shadow-lg); width: 100%;
+  border: 1px solid var(--border); text-align: left; margin-bottom: 22px;
+  animation: fadeSlideUp .4s .5s both;
+}
+.sr-title { font-weight: 800; font-size: .86rem; text-align: center; margin-bottom: 12px; color: var(--green-m); }
+.sr-row { display: flex; justify-content: space-between; padding: 6px 0; font-size: .82rem; border-bottom: 1px dashed var(--border); }
+.sr-row:last-child { border: none; font-weight: 800; font-size: .92rem; color: var(--green-m); padding-top: 10px; }
+.success-btns { display: flex; gap: 10px; width: 100%; animation: fadeSlideUp .4s .6s both; }
+.success-btns .btn { flex: 1; }
+
+/* ── TOAST ── */
+.toast {
+  position: fixed; bottom: 22px; right: 22px; z-index: 9999;
+  padding: 12px 20px; border-radius: 12px; font-size: .83rem; font-weight: 700;
+  box-shadow: var(--shadow-lg); transform: translateY(80px) scale(.9); opacity: 0;
+  transition: all .3s var(--ease); color: white; display: flex; align-items: center; gap: 8px;
+  backdrop-filter: blur(8px);
+}
+.toast.show { transform: translateY(0) scale(1); opacity: 1; }
+.toast.success { background: var(--green-m); }
+.toast.error   { background: var(--red); }
+.toast.info    { background: var(--blue); }
+
+/* ── PRESET CHIPS ── */
+.preset-chips { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 8px; }
+.preset-chip {
+  padding: 4px 11px; border: 1.5px solid var(--border); border-radius: 20px;
+  font-size: .70rem; font-weight: 700; cursor: pointer; background: var(--surface2);
+  color: var(--text-md); transition: all .18s var(--ease); font-family: inherit;
+}
+.preset-chip:hover { border-color: var(--green-m); color: var(--green-m); background: var(--green-ll); transform: translateY(-1px); }
+
+/* ── ELECTRIC DISPLAY ── */
+.elec-display {
+  background: var(--surface); border-radius: 9px; padding: 10px 13px;
+  margin-top: 10px; font-size: .80rem; border: 1.5px solid var(--border);
+  display: flex; gap: 16px; align-items: center;
+  transition: all .35s var(--ease);
+}
+.elec-num { font-weight: 800; color: var(--green-m); font-size: 1rem; }
+
+/* ── RIPPLE ── */
+.btn-primary { position: relative; overflow: hidden; }
+.ripple {
+  position: absolute; border-radius: 50%; background: rgba(255,255,255,.25);
+  transform: scale(0); animation: rippleAnim .5s linear;
+  pointer-events: none;
+}
+@keyframes rippleAnim { to { transform: scale(4); opacity: 0; } }
+
+/* ── SCROLLBAR ── */
+::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 3px; }
+
+/* ── RESPONSIVE ── */
+@media (max-width: 900px) {
+  .layout { grid-template-columns: 1fr; }
+  .summary-sticky { position: static; }
+}
+@media (max-width: 580px) {
+  .field-row { grid-template-columns: 1fr; }
+  .field-row.col3 { grid-template-columns: 1fr 1fr; }
+  .topbar h1 { font-size: .9rem; }
+}
+</style>
+</head>
+<body>
+
+<!-- ════════ TOPBAR ════════ -->
+<div class="topbar">
+  <div class="topbar-left">
+    <button class="btn-back" onclick="history.back()">← กลับ</button>
+    <div class="topbar-brand">
+      <h1>🏪 ลงทะเบียนผู้ค้าประจำใหม่</h1>
+      <p>แพไม้มินิ วันพฤหัสบดี · บันทึกข้อมูลและรับชำระค่าธรรมเนียมแรกเข้า</p>
+    </div>
+  </div>
+  <button class="dm-toggle" onclick="toggleDark()" title="เปลี่ยน Dark/Light mode">
+    <span class="dm-icon sun">☀️</span>
+    <span class="dm-icon moon">🌙</span>
+  </button>
+</div>
+
+<!-- ════════ STEPBAR ════════ -->
+<div class="stepbar">
+  <div class="step active" id="step1-tab"><div class="step-dot" id="dot1">1</div><span>ข้อมูลผู้ค้า</span></div>
+  <div class="step-line" id="line1"></div>
+  <div class="step" id="step2-tab"><div class="step-dot" id="dot2">2</div><span>เลือกล็อค</span></div>
+  <div class="step-line" id="line2"></div>
+  <div class="step" id="step3-tab"><div class="step-dot" id="dot3">3</div><span>ค่าธรรมเนียม</span></div>
+  <div class="step-line" id="line3"></div>
+  <div class="step" id="step4-tab"><div class="step-dot" id="dot4">4</div><span>ยืนยัน</span></div>
+</div>
+
+<!-- ════════ MAIN ════════ -->
+<div class="layout" id="mainLayout">
+
+  <!-- ── LEFT ── -->
+  <div id="formArea">
+
+    <!-- STEP 1 -->
+    <div id="step1" class="step-content visible">
+      <div class="card">
+        <div class="card-title">👤 ข้อมูลผู้ค้า <span class="badge-section badge badge-blue">ขั้นตอน 1 / 4</span></div>
+        <div class="field-row">
+          <div class="field">
+            <label>ชื่อ-นามสกุล <span class="req">*</span></label>
+            <input type="text" id="vendorName" placeholder="ชื่อผู้ค้า" oninput="livePreview()">
+            <span class="err-msg" id="errName">กรุณากรอกชื่อ</span>
+          </div>
+          <div class="field">
+            <label>ชื่อเรียก / ชื่อร้าน</label>
+            <input type="text" id="vendorNick" placeholder="เช่น พี่ปุ้ย / ร้านแม่มาลี" oninput="livePreview()">
+          </div>
+        </div>
+        <div class="field-row">
+          <div class="field">
+            <label>เบอร์โทรศัพท์ <span class="req">*</span></label>
+            <input type="tel" id="vendorPhone" placeholder="0xx-xxx-xxxx" oninput="livePreview()">
+            <span class="err-msg" id="errPhone">กรุณากรอกเบอร์โทร</span>
+          </div>
+          <div class="field">
+            <label>LINE ID</label>
+            <input type="text" id="vendorLine" placeholder="@lineid หรือ ชื่อ LINE">
+          </div>
+        </div>
+        <div class="field-row">
+          <div class="field">
+            <label>เลขบัตรประชาชน</label>
+            <input type="text" id="vendorCid" placeholder="x-xxxx-xxxxx-xx-x" maxlength="17">
+            <span class="hint">ใช้สำหรับออกใบเสร็จ (ไม่บังคับ)</span>
+          </div>
+          <div class="field">
+            <label>ที่อยู่</label>
+            <input type="text" id="vendorAddr" placeholder="ที่อยู่โดยย่อ">
+          </div>
+        </div>
+        <div class="section-divider"><span>สินค้าที่จำหน่าย</span></div>
+        <div class="field-row">
+          <div class="field">
+            <label>ประเภทสินค้า <span class="req">*</span></label>
+            <input type="text" id="vendorProduct" placeholder="เช่น ส้มตำ, ผลไม้, ของสด..." oninput="livePreview()">
+            <span class="err-msg" id="errProduct">กรุณาระบุสินค้า</span>
+          </div>
+          <div class="field">
+            <label>รายละเอียดเพิ่มเติม</label>
+            <input type="text" id="vendorProductDetail" placeholder="ของสด / ปรุงสำเร็จ / เครื่องดื่ม...">
+          </div>
+        </div>
+        <div class="field-row col1">
+          <div class="field">
+            <label>หมายเหตุ</label>
+            <textarea id="vendorNote" placeholder="ข้อมูลเพิ่มเติม เงื่อนไขพิเศษ ฯลฯ"></textarea>
+          </div>
+        </div>
+        <div style="display:flex;justify-content:flex-end;margin-top:8px">
+          <button class="btn btn-primary" style="width:auto;padding:10px 26px" onclick="nextStep(2,this)">ถัดไป →</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- STEP 2 -->
+    <div id="step2" class="step-content">
+      <div class="card">
+        <div class="card-title">🔑 เลือกล็อค <span class="badge-section badge badge-blue">ขั้นตอน 2 / 4</span></div>
+        <div class="field-row col3" style="margin-bottom:16px">
+          <div class="field">
+            <label>ผู้จัดรับผิดชอบ <span class="req">*</span></label>
+            <select id="managerSelect">
+              <option value="">-- เลือกผู้จัด --</option>
+              <option value="tony">โทนี่ (082-581-1144)</option>
+              <option value="fon">คุณฝน (097-236-8330)</option>
+              <option value="tu">คุณตู่ (097-236-8330)</option>
+              <option value="aew">คุณแอ๋ว (081-353-7693)</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>วันเริ่มเช่า <span class="req">*</span></label>
+            <input type="date" id="startDate">
+            <span class="err-msg" id="errDate">กรุณาเลือกวันที่</span>
+          </div>
+          <div class="field">
+            <label>ค่าเช่า/เดือน (฿) <span class="req">*</span></label>
+            <input type="number" id="rentPrice" placeholder="1500" min="0" oninput="livePreview();recalc()">
+            <span class="err-msg" id="errRent">กรุณากรอกราคา</span>
+          </div>
+        </div>
+        <div class="lock-zone-tabs" id="zoneTabs"></div>
+        <div class="lock-grid" id="lockGrid"></div>
+        <div style="margin-top:7px;font-size:.72rem;color:var(--text-lo);display:flex;gap:14px">
+          <span><span style="display:inline-block;width:10px;height:10px;background:var(--yellow);border-radius:2px;vertical-align:middle;margin-right:3px"></span>ว่าง</span>
+          <span><span style="display:inline-block;width:10px;height:10px;background:var(--surface2);border-radius:2px;vertical-align:middle;margin-right:3px;opacity:.5"></span>มีผู้เช่าแล้ว</span>
+          <span><span style="display:inline-block;width:10px;height:10px;background:var(--green-m);border-radius:2px;vertical-align:middle;margin-right:3px"></span>เลือกแล้ว</span>
+        </div>
+        <div id="lockSelectedWrap" style="display:none">
+          <div class="lock-selected-badge"><div class="lock-badge-dot"></div> เลือกล็อค: <strong id="lockSelectedLabel">—</strong></div>
+        </div>
+        <span class="err-msg" id="errLock" style="display:none">กรุณาเลือกล็อค</span>
+        <div style="display:flex;justify-content:space-between;margin-top:18px">
+          <button class="btn btn-secondary" onclick="nextStep(1,this,true)">← ย้อนกลับ</button>
+          <button class="btn btn-primary" style="width:auto;padding:10px 26px" onclick="nextStep(3,this)">ถัดไป →</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- STEP 3 -->
+    <div id="step3" class="step-content">
+      <div class="card">
+        <div class="card-title">💰 ค่าธรรมเนียม <span class="badge-section badge badge-red">ต้องชำระทันที</span></div>
+
+        <!-- แรกเข้า -->
+        <div class="fee-block required-fee">
+          <div class="fee-header"><span class="fee-label">📋 ค่าธรรมเนียมแรกเข้า</span><span class="badge-req">บังคับ</span></div>
+          <div class="fee-row">
+            <label>จำนวนเงิน (฿)</label>
+            <input type="number" id="feeEntryAmt" placeholder="0" min="0" oninput="recalc()" style="width:130px;flex:none">
+            <input type="text" id="feeEntryNote" placeholder="หมายเหตุ..." style="flex:1">
+          </div>
+        </div>
+
+        <!-- รายปี -->
+        <div class="fee-block required-fee">
+          <div class="fee-header"><span class="fee-label">📅 ค่าธรรมเนียมรายปี</span><span class="badge-req">บังคับ</span></div>
+          <div class="fee-row" style="margin-bottom:8px">
+            <label>จำนวนเงิน (฿)</label>
+            <input type="number" id="feeAnnualAmt" placeholder="0" min="0" oninput="recalc()" style="width:130px;flex:none">
+            <input type="number" id="feeAnnualYear" placeholder="2568" style="width:90px;flex:none">
+            <input type="text" id="feeAnnualNote" placeholder="หมายเหตุ..." style="flex:1">
+          </div>
+        </div>
+
+        <!-- เช่าเดือนแรก -->
+        <div class="fee-block required-fee">
+          <div class="fee-header"><span class="fee-label">🏠 ค่าเช่าเดือนแรก</span><span class="badge-req">บังคับ</span></div>
+          <div class="fee-row">
+            <label>จำนวนเงิน (฿)</label>
+            <input type="number" id="feeFirstRentAmt" placeholder="0" min="0" oninput="recalc()" style="width:130px;flex:none;background:var(--surface2)" readonly>
+            <span class="hint" style="flex:1">← ดึงจากค่าเช่า/เดือน อัตโนมัติ</span>
+          </div>
+        </div>
+
+        <div class="section-divider"><span>ค่าใช้จ่ายเพิ่มเติม</span></div>
+
+        <!-- ค่าไฟ -->
+        <div class="fee-block">
+          <div class="fee-header"><span class="fee-label">⚡ ค่าไฟฟ้าเริ่มต้น</span><span class="badge-opt">ไม่บังคับ</span></div>
+          <div class="field-row col3">
+            <div class="field">
+              <label>หลอดไฟเล็ก (ดวง)</label>
+              <input type="number" id="bulbSmall" placeholder="0" min="0" oninput="calcElectric()">
+              <span class="hint">10 ฿/ดวง</span>
+            </div>
+            <div class="field">
+              <label>ไฟกระจาย (ดวง)</label>
+              <input type="number" id="bulbSpread" placeholder="0" min="0" oninput="calcElectric()">
+              <span class="hint">10 ฿/ดวง</span>
+            </div>
+            <div class="field">
+              <label>พัดลม (ตัว)</label>
+              <input type="number" id="fanCount" placeholder="0" min="0" oninput="calcElectric()">
+              <span class="hint">20 ฿/ตัว</span>
+            </div>
+          </div>
+          <div class="elec-display" id="elecDisplay">
+            ⚡ <span id="elecPerThu" class="elec-num">฿0</span>/พฤหัสบดี &nbsp;|&nbsp;
+            📅 <span id="elecPerMonth" class="elec-num">฿0</span>/เดือน (5 พฤหัสบดี)
+          </div>
+        </div>
+
+        <!-- ค่าอื่นๆ -->
+        <div class="fee-block">
+          <div class="fee-header"><span class="fee-label">📌 ค่าอื่น ๆ / ค่าปรับ</span><span class="badge-opt">เพิ่มได้หลายรายการ</span></div>
+          <div id="extrasList"></div>
+          <button class="btn-add-extra" onclick="addExtra()">＋ เพิ่มรายการ</button>
+          <div class="preset-chips" style="margin-top:10px">
+            <span style="font-size:.70rem;color:var(--text-lo);font-weight:700;padding-top:2px">ลัด:</span>
+            <button class="preset-chip" onclick="addExtra('ค่าปรับลาเกินโควต้า')">ค่าปรับลา</button>
+            <button class="preset-chip" onclick="addExtra('ค่าป้ายชื่อร้าน')">ค่าป้าย</button>
+            <button class="preset-chip" onclick="addExtra('ค่ามัดจำ')">ค่ามัดจำ</button>
+            <button class="preset-chip" onclick="addExtra('ค่าเปลี่ยนสินค้า')">ค่าเปลี่ยนสินค้า</button>
+            <button class="preset-chip" onclick="addExtra('ค่าใช้จ่ายอื่น ๆ')">อื่น ๆ</button>
+          </div>
+        </div>
+
+        <div class="section-divider"><span>ช่องทางชำระเงิน</span></div>
+        <div class="field-row col3">
+          <div class="field">
+            <label>ช่องทาง <span class="req">*</span></label>
+            <select id="payMethod" onchange="recalc()">
+              <option value="cash">💵 เงินสด</option>
+              <option value="transfer">📱 โอนเงิน</option>
+              <option value="qr">📷 QR Code</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>วันที่ชำระ</label>
+            <input type="date" id="payDate">
+          </div>
+          <div class="field">
+            <label>ผู้รับเงิน</label>
+            <input type="text" id="payCollector" placeholder="ชื่อผู้รับเงิน">
+          </div>
+        </div>
+
+        <div style="display:flex;justify-content:space-between;margin-top:18px">
+          <button class="btn btn-secondary" onclick="nextStep(2,this,true)">← ย้อนกลับ</button>
+          <button class="btn btn-primary" style="width:auto;padding:10px 26px" onclick="nextStep(4,this)">ตรวจสอบ & ยืนยัน →</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- STEP 4 -->
+    <div id="step4" class="step-content">
+      <div class="card">
+        <div class="card-title">✅ ตรวจสอบและยืนยัน <span class="badge-section badge badge-green">ขั้นตอนสุดท้าย</span></div>
+        <div id="confirmContent"></div>
+        <div style="display:flex;justify-content:space-between;margin-top:18px;gap:12px">
+          <button class="btn btn-secondary" onclick="nextStep(3,this,true)">← แก้ไข</button>
+          <button class="btn btn-primary" onclick="submitForm(this)">✅ ยืนยันลงทะเบียน & รับชำระ</button>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- end formArea -->
+
+  <!-- ── RIGHT: SUMMARY ── -->
+  <div class="summary-sticky">
+    <div class="summary-card">
+      <div class="sum-title">💳 สรุปยอดชำระ</div>
+      <div class="sum-row"><span class="sum-label">ค่าธรรมเนียมแรกเข้า</span><span class="sum-val" id="s-entry">฿0</span></div>
+      <div class="sum-row"><span class="sum-label">ค่าธรรมเนียมรายปี</span><span class="sum-val" id="s-annual">฿0</span></div>
+      <div class="sum-row"><span class="sum-label">ค่าเช่าเดือนแรก</span><span class="sum-val" id="s-rent">฿0</span></div>
+      <div class="sum-row"><span class="sum-label">ค่าไฟฟ้า</span><span class="sum-val" id="s-elec">฿0</span></div>
+      <div class="sum-row" id="s-extras-row" style="display:none"><span class="sum-label">ค่าอื่น ๆ</span><span class="sum-val red" id="s-extras">฿0</span></div>
+      <div class="total-bar">
+        <div>
+          <div class="total-label">ยอดรวมทั้งหมด</div>
+          <div class="total-method" id="s-method">💵 เงินสด</div>
+        </div>
+        <div class="total-amount" id="s-grand">฿0</div>
+      </div>
+    </div>
+
+    <div class="vendor-preview" id="vendorPreviewCard" style="display:none">
+      <div class="vp-avatar" id="vpAvatar">🏪</div>
+      <div class="sum-title" style="margin-bottom:10px" id="vpName">ผู้ค้าใหม่</div>
+      <div class="sum-row"><span class="sum-label">เบอร์</span><span class="sum-val" id="vpPhone">—</span></div>
+      <div class="sum-row"><span class="sum-label">สินค้า</span><span class="sum-val" id="vpProduct">—</span></div>
+      <div class="sum-row"><span class="sum-label">ล็อค</span><span class="sum-val green" id="vpLock">ยังไม่เลือก</span></div>
+      <div class="sum-row"><span class="sum-label">ค่าเช่า/เดือน</span><span class="sum-val" id="vpRent">—</span></div>
+    </div>
+  </div>
+
+</div><!-- end mainLayout -->
+
+<!-- SUCCESS -->
+<div class="success-wrap" id="successScreen">
+  <div class="success-circle">✅</div>
+  <div class="success-title">ลงทะเบียนสำเร็จ!</div>
+  <div class="success-sub">บันทึกข้อมูลและรับชำระค่าธรรมเนียมเรียบร้อย</div>
+  <div class="success-receipt" id="successReceipt"></div>
+  <div class="success-btns">
+    <button class="btn btn-secondary" onclick="showToast('กำลังส่งไปยังเครื่องพิมพ์...','info')">🖨️ พิมพ์ใบเสร็จ</button>
+    <button class="btn btn-primary" onclick="resetAll()">➕ ลงทะเบียนรายใหม่</button>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ══════════════════════════════════
+//  DATA
+// ══════════════════════════════════
+const LOCKS = {
+  A:{label:'โซนด้านนอก A', data: arr(20,'A')},
+  B:{label:'โซนด้านนอก B', data: arr(20,'B')},
+  C:{label:'โซนด้านนอก C', data: arr(21,'C')},
+  D:{label:'โซนด้านนอก D', data: arr(22,'D')},
+  E:{label:'โซนด้านนอก E', data: arr(11,'E')},
+  F:{label:'โซนด้านนอก F', data: arr(16,'F')},
+  G:{label:'ข้าง 7-Eleven G', data: arr(28,'G')},
+  J:{label:'ข้าง 7-Eleven J', data: arr(4,'J')},
+  K:{label:'ข้าง 7-Eleven K', data: arr(12,'K')},
+  N:{label:'ข้าง 7-Eleven N', data: arr(8,'N')},
+  U:{label:'ข้าง 7-Eleven U', data:[{id:'U1',o:0},{id:'U3',o:0},{id:'U4',o:0},{id:'U5',o:0},{id:'U6',o:0}]},
+  O:{label:'ข้างโลตัส O', data: arr(13,'O')},
+  M:{label:'ข้างโลตัส M', data: arr(12,'M')},
+  H:{label:'ข้างโลตัส H', data: arr(12,'H')},
+  L:{label:'ข้างโลตัส L', data: Array.from({length:28},(_,i)=>i+1).map(n=>({id:`L${n}`,o:0}))},
+  T:{label:'ข้างโลตัส T', data:[{id:'T1',o:0},{id:'T2',o:0}]},
+  AB:{label:'ข้างโลตัส AB', data:[{id:'AB4',o:0},{id:'AB5',o:0},{id:'AB6',o:0}]},
+  TA:{label:'โซนเปิดท้าย TA', data: arr(20,'TA')},
+  TB:{label:'โซนเปิดท้าย TB', data: arr(20,'TB')},
+  TC:{label:'โซนเปิดท้าย TC', data: arr(20,'TC')},
+};
+function arr(n,p,vacant=[]){ return Array.from({length:n},(_,i)=>({id:`${p}${i+1}`,o:!vacant.includes(i+1)?0:0})); }
+
+let currentStep = 1;
+let selectedLock = null;
+let selectedZone = 'SA';
+let extras = [];
+let extraCnt = 0;
+
+// ══════════════════════════════════
+//  DARK MODE
+// ══════════════════════════════════
+function toggleDark() {
+  const html = document.documentElement;
+  const isDark = html.getAttribute('data-theme') === 'dark';
+  html.setAttribute('data-theme', isDark ? 'light' : 'dark');
+  localStorage.setItem('pamai-theme', isDark ? 'light' : 'dark');
+}
+(function() {
+  const saved = localStorage.getItem('pamai-theme');
+  if (saved) document.documentElement.setAttribute('data-theme', saved);
+  else if (window.matchMedia('(prefers-color-scheme: dark)').matches)
+    document.documentElement.setAttribute('data-theme','dark');
+})();
+
+// ══════════════════════════════════
+//  GOOGLE SHEETS API
+// ══════════════════════════════════
+const MONS=['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
+function nowTH(){const n=new Date();return n.getDate()+' '+MONS[n.getMonth()]+' '+(n.getFullYear()+543);}
+function dateToTH(dateStr){ if(!dateStr) return nowTH(); const n=new Date(dateStr+'T00:00:00'); return n.getDate()+' '+MONS[n.getMonth()]+' '+(n.getFullYear()+543); }
+function nowTime(){const n=new Date();return String(n.getHours()).padStart(2,'0')+':'+String(n.getMinutes()).padStart(2,'0');}
+function countThursdaysInMonth(year,month){let c=0;const d=new Date(year,month,1);while(d.getMonth()===month){if(d.getDay()===4)c++;d.setDate(d.getDate()+1);}return c;}
+function thisMonthThursdays(){const n=new Date();return countThursdaysInMonth(n.getFullYear(),n.getMonth())||4;}
+function getApiUrl(){ return localStorage.getItem('pm-api-url')||''; }
+function getCurrentUserName(){ try{const s=sessionStorage.getItem('pm-session');if(s){const u=JSON.parse(s);return u.username||'ผู้ใช้';}}catch(e){} return 'ผู้ใช้'; }
+async function apiPost(action,data={}){
+  const url=getApiUrl(); if(!url) return null;
+  try{ const r=await fetch(url,{method:'POST',body:JSON.stringify({action,...data})}); return await r.json(); }
+  catch(e){ console.error('apiPost error:',action,e); return null; }
+}
+
+// ══════════════════════════════════
+//  INIT
+// ══════════════════════════════════
+window.onload = () => {
+  const today = new Date().toISOString().split('T')[0];
+  document.getElementById('startDate').value = today;
+  document.getElementById('payDate').value   = today;
+  document.getElementById('feeAnnualYear').value = new Date().getFullYear() + 543;
+  buildZoneTabs(); updateLockGrid(); recalc();
+};
+
+// ══════════════════════════════════
+//  LIVE PREVIEW
+// ══════════════════════════════════
+function livePreview() {
+  const name = document.getElementById('vendorName').value;
+  const card = document.getElementById('vendorPreviewCard');
+  if (!name) { card.style.display = 'none'; return; }
+  card.style.display = 'block';
+  const emojis = ['🥘','🍖','🌽','🍜','🥗','🍱','🍡','🫙','🥬','🧆'];
+  document.getElementById('vpAvatar').textContent = emojis[name.charCodeAt(0) % emojis.length];
+  document.getElementById('vpName').textContent = name + (document.getElementById('vendorNick').value ? ` (${document.getElementById('vendorNick').value})` : '');
+  document.getElementById('vpPhone').textContent   = document.getElementById('vendorPhone').value || '—';
+  document.getElementById('vpProduct').textContent = document.getElementById('vendorProduct').value || '—';
+  document.getElementById('vpLock').textContent    = selectedLock || 'ยังไม่เลือก';
+  const r = parseFloat(document.getElementById('rentPrice').value) || 0;
+  document.getElementById('vpRent').textContent    = r ? `฿${r.toLocaleString()}` : '—';
+}
+
+// ══════════════════════════════════
+//  STEP NAVIGATION
+// ══════════════════════════════════
+function nextStep(n, btn, goBack=false) {
+  if (n > currentStep && !validate(currentStep)) return;
+  if (btn) ripple(btn);
+
+  const prev = document.getElementById(`step${currentStep}`);
+  prev.classList.remove('visible','back-anim');
+  prev.style.display = 'none';
+
+  document.querySelectorAll('.stepbar .step').forEach((el,i) => {
+    el.classList.remove('active','done');
+    const dot = el.querySelector('.step-dot');
+    if (i+1 < n) { el.classList.add('done'); dot.textContent = ''; }
+    else if (i+1 === n) { el.classList.add('active'); dot.textContent = i+1; }
+    else dot.textContent = i+1;
+  });
+
+  currentStep = n;
+  if (n === 3) {
+    const r = parseFloat(document.getElementById('rentPrice').value) || 0;
+    document.getElementById('feeFirstRentAmt').value = r;
+    recalc();
+  }
+  if (n === 4) buildConfirm();
+
+  const next = document.getElementById(`step${n}`);
+  next.style.display = 'block';
+  next.classList.remove('visible','back-anim');
+  void next.offsetWidth; // force reflow
+  next.classList.add(goBack ? 'back-anim' : 'visible');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function validate(s) {
+  let ok = true;
+  const show = (id, v) => { const e = document.getElementById(id); if(e){e.classList.toggle('show',v);} };
+  if (s === 1) {
+    const name    = document.getElementById('vendorName').value.trim();
+    const phone   = document.getElementById('vendorPhone').value.trim();
+    const product = document.getElementById('vendorProduct').value.trim();
+    show('errName',!name);    if(!name)    ok=false;
+    show('errPhone',!phone);  if(!phone)   ok=false;
+    show('errProduct',!product); if(!product) ok=false;
+  }
+  if (s === 2) {
+    const date = document.getElementById('startDate').value;
+    const rent = document.getElementById('rentPrice').value;
+    show('errDate',!date);       if(!date)          ok=false;
+    show('errRent',!rent||rent<=0); if(!rent||rent<=0) ok=false;
+    const noLock = !selectedLock;
+    document.getElementById('errLock').style.display = noLock ? 'block' : 'none';
+    if(noLock) ok=false;
+  }
+  if (!ok) showToast('กรุณากรอกข้อมูลให้ครบ', 'error');
+  return ok;
+}
+
+// ══════════════════════════════════
+//  LOCK PICKER
+// ══════════════════════════════════
+function buildZoneTabs() {
+  document.getElementById('zoneTabs').innerHTML =
+    Object.entries(LOCKS).map(([z,d]) =>
+      `<button class="zone-tab ${z===selectedZone?'active':''}" onclick="selectZone('${z}')">${z}</button>`
+    ).join('');
+}
+
+function selectZone(z) {
+  selectedZone = z;
+  buildZoneTabs(); updateLockGrid();
+}
+
+function updateLockGrid() {
+  const grid = document.getElementById('lockGrid');
+  grid.innerHTML = LOCKS[selectedZone].data.map(l => {
+    const cls = l.o ? 'occupied' : (selectedLock===l.id ? 'selected' : 'vacant');
+    return `<div class="lock-cell ${cls}" onclick="${l.o?'':'pickLock(\''+l.id+'\')'}" title="${l.id}">${l.id}</div>`;
+  }).join('');
+}
+
+function pickLock(id) {
+  selectedLock = id;
+  updateLockGrid();
+  document.getElementById('errLock').style.display = 'none';
+  document.getElementById('lockSelectedWrap').style.display = 'block';
+  document.getElementById('lockSelectedLabel').textContent = `${id}  (โซน ${selectedZone})`;
+  document.getElementById('vpLock').textContent = id;
+  showToast(`✅ เลือกล็อค ${id} เรียบร้อย`, 'success');
+}
+
+// ══════════════════════════════════
+//  ELECTRIC
+// ══════════════════════════════════
+function calcElectric() {
+  const s  = parseInt(document.getElementById('bulbSmall').value)||0;
+  const sp = parseInt(document.getElementById('bulbSpread').value)||0;
+  const f  = parseInt(document.getElementById('fanCount').value)||0;
+  const per = (s+sp)*10 + f*20;
+  document.getElementById('elecPerThu').textContent   = `฿${per}`;
+  document.getElementById('elecPerMonth').textContent = `฿${per*5}`;
+  recalc();
+}
+
+// ══════════════════════════════════
+//  EXTRAS
+// ══════════════════════════════════
+function addExtra(label='') {
+  const id = ++extraCnt;
+  extras.push(id);
+  const div = document.createElement('div');
+  div.className = 'extra-item'; div.id = `ex-${id}`;
+  div.innerHTML = `
+    <input type="text" placeholder="รายการ เช่น ค่าปรับ, ค่าป้าย..." value="${label}" oninput="recalc()" id="exl-${id}">
+    <input type="number" placeholder="฿ จำนวน" min="0" oninput="recalc()" id="exa-${id}" style="text-align:right">
+    <button class="btn-rm" onclick="removeExtra(${id})" title="ลบ">✕</button>`;
+  document.getElementById('extrasList').appendChild(div);
+  document.getElementById(`exl-${id}`).focus();
+  recalc();
+}
+
+function removeExtra(id) {
+  const el = document.getElementById(`ex-${id}`);
+  if (el) { el.style.transform='scale(.95)'; el.style.opacity='0'; el.style.transition='all .2s'; setTimeout(()=>{el.remove();},200); }
+  extras = extras.filter(i=>i!==id);
+  setTimeout(recalc, 220);
+}
+
+// ══════════════════════════════════
+//  RECALC
+// ══════════════════════════════════
+function animateVal(id, newText) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  if (el.textContent !== newText) {
+    el.textContent = newText;
+    el.classList.remove('changed');
+    void el.offsetWidth;
+    el.classList.add('changed');
+  }
+}
+
+function recalc() {
+  const entry  = parse('feeEntryAmt');
+  const annual = parse('feeAnnualAmt');
+  const rent   = parse('feeFirstRentAmt');
+  const s  = parseInt(document.getElementById('bulbSmall').value)||0;
+  const sp = parseInt(document.getElementById('bulbSpread').value)||0;
+  const f  = parseInt(document.getElementById('fanCount').value)||0;
+  const elec = (s+sp)*10 + f*20;
+
+  let extSum = 0;
+  extras.forEach(id => { extSum += parse(`exa-${id}`); });
+
+  const grand = entry + annual + rent + elec + extSum;
+
+  animateVal('s-entry',  `฿${entry.toLocaleString()}`);
+  animateVal('s-annual', `฿${annual.toLocaleString()}`);
+  animateVal('s-rent',   `฿${rent.toLocaleString()}`);
+  animateVal('s-elec',   `฿${elec.toLocaleString()}`);
+  animateVal('s-extras', `฿${extSum.toLocaleString()}`);
+  animateVal('s-grand',  `฿${grand.toLocaleString()}`);
+  document.getElementById('s-extras-row').style.display = extSum > 0 ? 'flex' : 'none';
+
+  const mMap = {cash:'💵 เงินสด', transfer:'📱 โอนเงิน', qr:'📷 QR Code'};
+  document.getElementById('s-method').textContent = mMap[document.getElementById('payMethod').value]||'';
+}
+
+function parse(id) { return parseFloat(document.getElementById(id)?.value)||0; }
+
+// ══════════════════════════════════
+//  CONFIRM PAGE
+// ══════════════════════════════════
+function buildConfirm() {
+  const name    = document.getElementById('vendorName').value;
+  const nick    = document.getElementById('vendorNick').value;
+  const phone   = document.getElementById('vendorPhone').value;
+  const product = document.getElementById('vendorProduct').value;
+  const rent    = parse('rentPrice');
+  const date    = document.getElementById('startDate').value;
+  const entry   = parse('feeEntryAmt');
+  const annual  = parse('feeAnnualAmt');
+  const fRent   = parse('feeFirstRentAmt');
+  const s  = parseInt(document.getElementById('bulbSmall').value)||0;
+  const sp = parseInt(document.getElementById('bulbSpread').value)||0;
+  const f  = parseInt(document.getElementById('fanCount').value)||0;
+  const elec = (s+sp)*10 + f*20;
+  let extSum = 0, extRows = '';
+  extras.forEach(id => {
+    const lbl = document.getElementById(`exl-${id}`)?.value||'ค่าอื่น ๆ';
+    const amt = parse(`exa-${id}`);
+    if (amt > 0) { extSum += amt; extRows += `<div class="sum-row"><span class="sum-label" style="padding-left:10px">↳ ${lbl}</span><span class="sum-val red">฿${amt.toLocaleString()}</span></div>`; }
+  });
+  const grand   = entry + annual + fRent + elec + extSum;
+  const mMap    = {cash:'💵 เงินสด',transfer:'📱 โอนเงิน',qr:'📷 QR Code'};
+  const method  = mMap[document.getElementById('payMethod').value];
+  const collector = document.getElementById('payCollector').value || '—';
+
+  document.getElementById('confirmContent').innerHTML = `
+    <div class="confirm-block green-block">
+      <div style="font-size:.80rem;font-weight:800;color:var(--green-m);margin-bottom:10px">👤 ข้อมูลผู้ค้า</div>
+      <div class="sum-row"><span class="sum-label">ชื่อ</span><span class="sum-val">${name}${nick?' ('+nick+')':''}</span></div>
+      <div class="sum-row"><span class="sum-label">เบอร์โทร</span><span class="sum-val">${phone}</span></div>
+      <div class="sum-row"><span class="sum-label">สินค้า</span><span class="sum-val">${product}</span></div>
+      <div class="sum-row"><span class="sum-label">ล็อค</span><span class="sum-val green">${selectedLock} (โซน ${selectedZone})</span></div>
+      <div class="sum-row"><span class="sum-label">ค่าเช่า/เดือน</span><span class="sum-val">฿${rent.toLocaleString()}</span></div>
+      <div class="sum-row"><span class="sum-label">วันเริ่มเช่า</span><span class="sum-val">${date}</span></div>
+    </div>
+    <div class="confirm-block gray-block">
+      <div style="font-size:.80rem;font-weight:800;color:var(--text-hi);margin-bottom:10px">💰 รายการชำระ</div>
+      <div class="sum-row"><span class="sum-label">ค่าธรรมเนียมแรกเข้า</span><span class="sum-val">฿${entry.toLocaleString()}</span></div>
+      <div class="sum-row"><span class="sum-label">ค่าธรรมเนียมรายปี</span><span class="sum-val">฿${annual.toLocaleString()}</span></div>
+      <div class="sum-row"><span class="sum-label">ค่าเช่าเดือนแรก</span><span class="sum-val">฿${fRent.toLocaleString()}</span></div>
+      ${elec>0?`<div class="sum-row"><span class="sum-label">ค่าไฟฟ้า</span><span class="sum-val">฿${elec.toLocaleString()}</span></div>`:''}
+      ${extRows}
+      <div style="border-top:2px solid var(--border);margin-top:10px;padding-top:12px;display:flex;justify-content:space-between;font-size:1rem;font-weight:800">
+        <span>ยอดรวม</span><span style="color:var(--green-m)">฿${grand.toLocaleString()}</span>
+      </div>
+      <div class="sum-row" style="margin-top:6px"><span class="sum-label">ช่องทาง</span><span class="sum-val">${method}</span></div>
+      <div class="sum-row"><span class="sum-label">ผู้รับเงิน</span><span class="sum-val">${collector}</span></div>
+    </div>`;
+}
+
+// ══════════════════════════════════
+//  SUBMIT
+// ══════════════════════════════════
+async function submitForm(btn) {
+  if (btn) ripple(btn);
+  const name    = document.getElementById('vendorName').value;
+  const nick    = document.getElementById('vendorNick').value;
+  const phone   = document.getElementById('vendorPhone').value;
+  const line    = document.getElementById('vendorLine')?.value || '';
+  const product = document.getElementById('vendorProduct').value;
+  const detail  = document.getElementById('vendorProductDetail')?.value || '';
+  const rentMonthly = parse('rentPrice');
+  const entry   = parse('feeEntryAmt');
+  const annual  = parse('feeAnnualAmt');
+  const fRent   = parse('feeFirstRentAmt');
+  const s  = parseInt(document.getElementById('bulbSmall').value)||0;
+  const sp = parseInt(document.getElementById('bulbSpread').value)||0;
+  const f  = parseInt(document.getElementById('fanCount').value)||0;
+  const elec = (s+sp)*10 + f*20;
+  let extSum = 0; const extItems=[];
+  extras.forEach(id => {
+    const amt = parse(`exa-${id}`);
+    const lbl = document.getElementById(`exl-${id}`)?.value || 'ค่าอื่น ๆ';
+    if(amt>0){ extSum += amt; extItems.push({label:lbl, amount:amt}); }
+  });
+  const grand = entry + annual + fRent + elec + extSum;
+  const today = new Date().toLocaleDateString('th-TH',{year:'numeric',month:'long',day:'numeric'});
+
+  // ── บันทึกลง Google Sheets (ถ้าเชื่อมต่อไว้) ──
+  let saveNote = '';
+  if (getApiUrl() && selectedLock) {
+    if (btn){ btn.disabled = true; btn.textContent = '⏳ กำลังบันทึก...'; }
+    const payDateISO = document.getElementById('payDate').value;
+    const payDateTH  = dateToTH(payDateISO);
+    const time = nowTime();
+    const collector = document.getElementById('payCollector').value || getCurrentUserName();
+    const mMap = {cash:'💵 เงินสด', transfer:'📱 โอนเงิน', qr:'📷 QR Code'};
+    const method = mMap[document.getElementById('payMethod').value] || 'เงินสด';
+    const fullName = name + (nick ? ` (${nick})` : '');
+    const fullProduct = product + (detail ? ` · ${detail}` : '');
+
+    // 1) สร้าง/อัปเดตผู้ค้าในชีต vendors — เก็บเป็น dailyRate (ค่าเช่ารายวันพฤหัสบดี)
+    const dailyRate = Math.round(rentMonthly / thisMonthThursdays());
+    const vRes = await apiPost('saveVendor', { data: {
+      lock: selectedLock, zone: selectedZone, name: fullName, phone, line,
+      product: fullProduct, type: 'regular', dailyRate,
+      elec_bulb: s + sp, elec_fan: f, elec_small: 0, elec_large: 0, elec_special: [],
+      status: 'active',
+    }});
+
+    // 2) บันทึกรายการรับชำระแต่ละประเภทลงชีต payments (วันที่แบบไทย ให้ตรงกับรายงาน)
+    const baseNote = 'ลงทะเบียนผู้ค้าใหม่ · ผู้รับเงิน: ' + collector;
+    const payRows = [];
+    if (entry  > 0) payRows.push({type:'ค่าแรกเข้า',        amount:entry});
+    if (annual > 0) payRows.push({type:'ค่าธรรมเนียมรายปี', amount:annual});
+    if (fRent  > 0) payRows.push({type:'ค่าเช่าประจำเดือน',  amount:fRent});
+    if (elec   > 0) payRows.push({type:'ค่าไฟฟ้า',          amount:elec});
+    extItems.forEach(it => payRows.push({type: it.label, amount: it.amount}));
+
+    let payOk = true;
+    for (const row of payRows){
+      const pr = await apiPost('savePayment', { data: {
+        lock_id: selectedLock, vendor_name: fullName, product: fullProduct,
+        type: row.type, amount: row.amount, penalty: 0, other_fee: 0, other_label: '',
+        method, note: baseNote, date: payDateTH, time,
+      }});
+      if(!(pr && pr.status==='ok')) payOk = false;
+    }
+
+    // 3) log กิจกรรม
+    apiPost('logActivity', { data: {
+      user: getCurrentUserName(), type: 'register',
+      message: 'ลงทะเบียนผู้ค้าใหม่: ' + fullName + ' (' + selectedLock + ')',
+      detail: 'ยอดรวม ฿' + grand.toLocaleString(), date: payDateTH, time,
+    }});
+
+    const vOk = vRes && vRes.status==='ok';
+    saveNote = (vOk && payOk)
+      ? '<div style="margin-top:10px;padding:8px 12px;background:#e6f7ee;border-radius:8px;color:#1a7f4b;font-weight:700;font-size:.72rem">☁️ บันทึกขึ้น Google Sheets แล้ว</div>'
+      : '<div style="margin-top:10px;padding:8px 12px;background:#fff3cd;border-radius:8px;color:#92400e;font-weight:700;font-size:.72rem">⚠️ บันทึกบางส่วนไม่สำเร็จ กรุณาตรวจสอบการเชื่อมต่อ</div>';
+    if (btn){ btn.disabled = false; btn.textContent = '✅ ยืนยันลงทะเบียน & รับชำระ'; }
+  } else if (!getApiUrl()) {
+    saveNote = '<div style="margin-top:10px;padding:8px 12px;background:#fff3cd;border-radius:8px;color:#92400e;font-weight:700;font-size:.72rem">⚠️ ยังไม่ได้เชื่อมต่อ Google Sheets — รายการนี้ยังไม่ถูกบันทึกลงระบบกลาง</div>';
+  }
+
+  document.getElementById('mainLayout').style.display  = 'none';
+  document.getElementById('successScreen').style.display = 'flex';
+  document.getElementById('successScreen').classList.add('show');
+
+  document.getElementById('successReceipt').innerHTML = `
+    <div class="sr-title">🧾 ใบรับชำระค่าธรรมเนียม</div>
+    <div class="sr-row"><span>ชื่อผู้ค้า</span><span>${name}</span></div>
+    <div class="sr-row"><span>สินค้า</span><span>${product}</span></div>
+    <div class="sr-row"><span>ล็อค</span><span>${selectedLock} (${selectedZone})</span></div>
+    <div class="sr-row"><span>ค่าธรรมเนียมแรกเข้า</span><span>฿${entry.toLocaleString()}</span></div>
+    <div class="sr-row"><span>ค่าธรรมเนียมรายปี</span><span>฿${annual.toLocaleString()}</span></div>
+    <div class="sr-row"><span>ค่าเช่าเดือนแรก</span><span>฿${fRent.toLocaleString()}</span></div>
+    ${elec>0?`<div class="sr-row"><span>ค่าไฟฟ้า</span><span>฿${elec.toLocaleString()}</span></div>`:''}
+    ${extSum>0?`<div class="sr-row"><span>ค่าอื่น ๆ</span><span>฿${extSum.toLocaleString()}</span></div>`:''}
+    <div class="sr-row"><span>วันที่</span><span>${today}</span></div>
+    <div class="sr-row"><span>ยอดรวม</span><span>฿${grand.toLocaleString()}</span></div>
+    ${saveNote}`;
+}
+
+function resetAll() {
+  document.getElementById('mainLayout').style.display  = 'grid';
+  document.getElementById('successScreen').style.display = 'none';
+  document.querySelectorAll('input[type=text],input[type=number],input[type=tel],textarea').forEach(el=>el.value='');
+  selectedLock = null; selectedZone = 'SA'; extras = []; extraCnt = 0;
+  document.getElementById('extrasList').innerHTML = '';
+  document.getElementById('lockSelectedWrap').style.display = 'none';
+  document.getElementById('vendorPreviewCard').style.display = 'none';
+  const today = new Date().toISOString().split('T')[0];
+  document.getElementById('startDate').value = today;
+  document.getElementById('payDate').value   = today;
+  document.getElementById('feeAnnualYear').value = new Date().getFullYear()+543;
+  buildZoneTabs(); updateLockGrid(); recalc();
+  nextStep(1);
+}
+
+// ══════════════════════════════════
+//  RIPPLE
+// ══════════════════════════════════
+function ripple(btn) {
+  const r = document.createElement('span');
+  r.className = 'ripple';
+  const rect = btn.getBoundingClientRect();
+  const size = Math.max(rect.width, rect.height);
+  r.style.cssText = `width:${size}px;height:${size}px;left:${rect.width/2-size/2}px;top:${rect.height/2-size/2}px`;
+  btn.appendChild(r);
+  setTimeout(()=>r.remove(), 600);
+}
+
+// ══════════════════════════════════
+//  TOAST
+// ══════════════════════════════════
+function showToast(msg, type='info') {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.className = `toast ${type} show`;
+  clearTimeout(t._timer);
+  t._timer = setTimeout(()=>t.classList.remove('show'), 3000);
+}
+</script>
+</body>
+</html>
