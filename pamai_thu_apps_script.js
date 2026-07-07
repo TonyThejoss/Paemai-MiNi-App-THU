@@ -35,8 +35,8 @@ function doGet(e) {
     const action = e.parameter.action || '';
     switch(action) {
       case 'getVendors':    return getVendors();
-      case 'getLeaveLog':   return getLeaveLog(e.parameter.date);
-      case 'getDailyBookings': return getDailyBookings(e.parameter.date);
+      case 'getLeaveLog':   return getLeaveLog(e.parameter.date, e.parameter.lockId);
+      case 'getDailyBookings': return getDailyBookings(e.parameter.date, e.parameter.lockId);
       case 'getPayments':   return getPayments(e.parameter.date);
       case 'getUsers':      return getUsers();
       case 'initSheets':    return initSheets();
@@ -79,6 +79,12 @@ function getSheet(name) {
     sheet = ss.insertSheet(name);
   }
   return sheet;
+}
+
+// ป้องกันกรณี sheet ยังไม่เคยถูก initSheets() มาก่อน — ถ้าไม่มี header แถวแรกเลย ให้ใส่ headers ให้ก่อน appendRow
+// (ถ้าไม่มีขั้นตอนนี้ แถวข้อมูลจริงแถวแรกจะกลายเป็น header โดยไม่ตั้งใจ ทำให้อ่านข้อมูลผิดพลาดภายหลัง)
+function ensureHeaders(sheet, headers) {
+  if (sheet.getLastRow() === 0) sheet.appendRow(headers);
 }
 
 // ════════════════════════════════════════
@@ -211,7 +217,7 @@ function deleteVendor(lockId) {
 // ════════════════════════════════════════
 // LEAVE LOG
 // ════════════════════════════════════════
-function getLeaveLog(date) {
+function getLeaveLog(date, lockId) {
   const sheet = getSheet(S.LEAVE);
   const rows  = sheet.getDataRange().getValues();
   if (rows.length <= 1) return makeRes([]);
@@ -219,12 +225,14 @@ function getLeaveLog(date) {
   let data = rows.slice(1).map(row => {
     const obj = {}; headers.forEach((h,i)=>obj[h]=row[i]); return obj;
   });
-  if (date) data = data.filter(r => r.date === date);
+  if (date)   data = data.filter(r => r.date === date);
+  if (lockId) data = data.filter(r => r.lock_id === lockId);
   return makeRes(data);
 }
 
 function logLeave(data) {
   const sheet = getSheet(S.LEAVE);
+  ensureHeaders(sheet, ['id','lock_id','zone','shop','type','note','manager','date','time','created_at']);
   const id    = 'LV' + Date.now();
   const now   = new Date().toISOString();
   sheet.appendRow([id, data.lock_id, data.zone, data.shop, data.type,
@@ -235,20 +243,27 @@ function logLeave(data) {
 // ════════════════════════════════════════
 // DAILY BOOKINGS (ผู้ค้าจร)
 // ════════════════════════════════════════
-function getDailyBookings(date) {
+function getDailyBookings(date, lockId) {
   const sheet = getSheet(S.DAILY);
   const rows  = sheet.getDataRange().getValues();
   if (rows.length <= 1) return makeRes([]);
   const headers = rows[0];
   let data = rows.slice(1).map(row => {
     const obj = {}; headers.forEach((h,i)=>obj[h]=row[i]); return obj;
-  }).filter(r => r.cancelled !== true && r.cancelled !== 'TRUE');
-  if (date) data = data.filter(r => r.date === date);
+  });
+  // เมื่อดูประวัติเจาะจงล็อค (lockId) ให้เห็นทั้งหมดรวมที่ยกเลิกแล้วด้วย
+  // แต่โหมดปกติ (เช็คว่าล็อคไหนมีจรอยู่วันนี้) ยังกรองเฉพาะที่ active เหมือนเดิม
+  if (!lockId) data = data.filter(r => r.cancelled !== true && r.cancelled !== 'TRUE');
+  if (date)    data = data.filter(r => r.date === date);
+  if (lockId)  data = data.filter(r => r.lock_id === lockId);
   return makeRes(data);
 }
 
 function saveDailyBooking(data) {
   const sheet = getSheet(S.DAILY);
+  ensureHeaders(sheet, ['id','lock_id','zone','vendor_name','phone','product',
+                    'price','elec','total','method','date','time',
+                    'original_status','cancelled','created_at']);
   const id    = 'DV' + Date.now();
   const now   = new Date().toISOString();
   sheet.appendRow([id, data.lock_id, data.zone, data.vendor_name, data.phone||'',

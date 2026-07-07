@@ -290,6 +290,20 @@ function nowTime(){const n=new Date();return String(n.getHours()).padStart(2,'0'
 function addHist(id,e){if(!lockHistory[id])lockHistory[id]=[];lockHistory[id].unshift({...e,date:nowTH(),time:nowTime()});if(lockHistory[id].length>30)lockHistory[id].pop();}
 function fmt(n){return '฿'+Math.round(n).toLocaleString();}
 
+// ── Google Sheets API (บันทึกแจ้งลา/ขาดล็อค/ล็อคจร/ยกเลิก ลงหลังบ้านจริง ไม่ใช่แค่ localStorage) ──
+function getApiUrl(){ return localStorage.getItem('pm-api-url')||''; }
+async function apiGet(action,params={}){
+  const url=getApiUrl(); if(!url) return null;
+  try{ const r=await fetch(url+'?'+new URLSearchParams({action,...params})); const j=await r.json(); return j.status==='ok'?j.data:null; }
+  catch(e){ console.error('apiGet error:',action,e); return null; }
+}
+async function apiPost(action,data={}){
+  const url=getApiUrl(); if(!url) return null;
+  try{ const r=await fetch(url,{method:'POST',body:JSON.stringify({action,...data})}); return await r.json(); }
+  catch(e){ console.error('apiPost error:',action,e); return null; }
+}
+function getCurrentUserName(){ try{const s=sessionStorage.getItem('pm-session');if(s){const u=JSON.parse(s);return u.username||'ผู้ใช้';}}catch(e){} return 'ผู้ใช้'; }
+
 const STATE_KEY='pmthu-mkt-state';
 const STATE_EXPIRE_DAYS=3;
 
@@ -443,6 +457,7 @@ function confirmLeave(){
   addHist(id,{type:'leave',label:'📋 แจ้งลา',note:note||'—'});
   const el=document.querySelector('.lk[data-id="'+id+'"]');
   if(el) refreshLk(el);
+  apiPost('logLeave',{lock_id:id,zone:el?.dataset.zone||'',shop:el?.dataset.shop||'',type:'leave',note:note||'',manager:getCurrentUserName(),date:nowTH(),time:nowTime()});
   document.getElementById('leaveModal').classList.remove('show');
   saveMarketState(); updateExpireBanner();
   toast('✅ บันทึกแจ้งลาล็อค '+id+' (คงอยู่ 3 วัน)','s');
@@ -453,6 +468,7 @@ function doAbsent(lockId){
   addHist(lockId,{type:'absent',label:'⚠️ ขาดล็อค (ไม่แจ้ง)',note:'บันทึกโดยผู้ดูแล'});
   const el=document.querySelector('.lk[data-id="'+lockId+'"]');
   if(el) refreshLk(el);
+  apiPost('logLeave',{lock_id:lockId,zone:el?.dataset.zone||'',shop:el?.dataset.shop||'',type:'absent',note:'บันทึกโดยผู้ดูแล',manager:getCurrentUserName(),date:nowTH(),time:nowTime()});
   saveMarketState(); updateExpireBanner();
   closePopup();
   toast('⚠️ บันทึกขาดล็อค '+lockId+' (คงอยู่ 3 วัน)','e');
@@ -465,6 +481,7 @@ function cancelAbsent(lockId){
   addHist(lockId,{type:'leave',label:'↩️ ยกเลิก'+(prevType==='leave'?'การแจ้งลา':'บันทึกขาดล็อค'),note:'คืนสถานะปกติโดยผู้ดูแล'});
   const el=document.querySelector('.lk[data-id="'+lockId+'"]');
   if(el) refreshLk(el);
+  apiPost('logLeave',{lock_id:lockId,zone:el?.dataset.zone||'',shop:el?.dataset.shop||'',type:prevType==='leave'?'leave_cancel':'absent_cancel',note:'คืนสถานะปกติโดยผู้ดูแล',manager:getCurrentUserName(),date:nowTH(),time:nowTime()});
   saveMarketState(); updateExpireBanner();
   closePopup();
   toast('↩️ ยกเลิก'+(prevType==='leave'?'การแจ้งลา':'ขาดล็อค')+' '+lockId+' — คืนสถานะปกติแล้ว','i');
@@ -512,6 +529,9 @@ function confirmDailyBooking(){
   addHist(lockId,{type:'daily',label:'🏷️ จร: '+name,note:product+' · '+fmt(booking.total)});
   const el=document.querySelector('.lk[data-id="'+lockId+'"]');
   if(el) refreshLk(el);
+  apiPost('saveDailyBooking',{lock_id:lockId,zone:el?.dataset.zone||'',vendor_name:name,phone:booking.phone,
+    product,price,elec,total:booking.total,method:booking.method,date:booking.date,time:booking.time,
+    original_status:el?.dataset.status||''});
   document.getElementById('dailyModal').classList.remove('show');
   saveMarketState(); updateExpireBanner();
   toast('✅ จองล็อคจร '+lockId+' — '+name+' · '+fmt(booking.total)+' (คงอยู่ 3 วัน)','s');
@@ -519,9 +539,11 @@ function confirmDailyBooking(){
 }
 function cancelDaily(lockId){
   if(!confirm('ยกเลิกผู้ค้าจรล็อค '+lockId+'?'))return;
+  const bk=dailyBookings[lockId];
   delete dailyBookings[lockId];
   const el=document.querySelector('.lk[data-id="'+lockId+'"]');
   if(el) refreshLk(el);
+  if(bk) apiPost('cancelDailyBooking',{lockId,date:bk.date});
   saveMarketState(); updateExpireBanner();
   closePopup(); toast('↩️ ยกเลิกผู้ค้าจร '+lockId,'i'); updateStats();
 }
@@ -614,10 +636,15 @@ function confirmCancelLease(){
   if(isDaily){
     const db=dailyBookings[lockId];
     addHist(lockId,{type:'daily',label:'🚫 ยกเลิกจร: '+db.name,note:note||'ยกเลิก'});
+    apiPost('cancelDailyBooking',{lockId,date:db.date});
     delete dailyBookings[lockId];
     el.dataset.daily='';
   } else {
+    const oldZone=el.dataset.zone||'', oldShop=el.dataset.shop||'';
     addHist(lockId,{type:'absent',label:'🚫 ยกเลิกการเช่า',note:note||'สิ้นสุดสัญญา'});
+    // อัปเดตสถานะจริงใน Sheets ด้วย ไม่งั้นล็อคจะยังโชว์มีคนอยู่ในหน้าลงทะเบียนผู้ค้า/แดชบอร์ด
+    apiPost('saveVendor',{lock:lockId,status:'cancelled'});
+    apiPost('logLeave',{lock_id:lockId,zone:oldZone,shop:oldShop,type:'lease_cancel',note:note||'สิ้นสุดสัญญา',manager:getCurrentUserName(),date:nowTH(),time:nowTime()});
     el.dataset.status='vacant'; el.dataset.shop='ว่าง'; el.dataset.rent='0';
     el.querySelector('.lk-shop').textContent='ว่าง';
     ['occupied','unpaid','cancelled'].forEach(c=>el.classList.remove(c));
@@ -696,11 +723,8 @@ function showPopup(el,ev){
   else diEl.style.display='none';
 
   const hist=lockHistory[lockId]||[];
-  const hEl=document.getElementById('ppHist');
-  if(hist.length){
-    const chips=hist.slice(0,5).map(h=>{const cls=h.type==='leave'?'hi-leave':h.type==='absent'?'hi-absent':'hi-daily';return'<span class="hist-item '+cls+'">'+h.label+' '+h.date+'</span>';}).join('');
-    hEl.innerHTML='<div style="font-size:.62rem;font-weight:700;color:var(--txl);margin-bottom:2px">ประวัติ:</div>'+chips;
-  } else hEl.innerHTML='<span style="font-size:.62rem;color:var(--txl)">ยังไม่มีประวัติ</span>';
+  renderHistChips(hist);
+  loadRealHistory(lockId); // ดึงประวัติจริงจาก Google Sheets มาแทนที่ (ของในเซสชันนี้จะหายเมื่อรีเฟรช แต่ของจริงไม่หาย)
 
   // ACTIONS — ลา/ขาด เป็น toggle
   let acts='';
@@ -741,6 +765,47 @@ function showPopup(el,ev){
 }
 function closePopup(){if(popWrap)popWrap.classList.remove('show');curLk=null;}
 // click listener moved to initPopup()
+
+// ── ประวัติจริงจาก Google Sheets (leave_log + daily_bookings) ──
+const HIST_TYPE_LABEL={
+  leave:'📋 แจ้งลา', absent:'⚠️ ขาดล็อค (ไม่แจ้ง)',
+  leave_cancel:'↩️ ยกเลิกการแจ้งลา', absent_cancel:'↩️ ยกเลิกบันทึกขาดล็อค',
+  lease_cancel:'🚫 ยกเลิกการเช่า',
+};
+function histChipClass(type){
+  if(type==='absent'||type==='absent_cancel'||type==='lease_cancel') return 'hi-absent';
+  if(type==='daily') return 'hi-daily';
+  return 'hi-leave';
+}
+function renderHistChips(list){
+  const hEl=document.getElementById('ppHist');
+  if(!hEl) return;
+  if(list && list.length){
+    const chips=list.slice(0,5).map(h=>'<span class="hist-item '+histChipClass(h.type)+'">'+h.label+' '+h.date+'</span>').join('');
+    hEl.innerHTML='<div style="font-size:.62rem;font-weight:700;color:var(--txl);margin-bottom:2px">ประวัติ:</div>'+chips;
+  } else {
+    hEl.innerHTML='<span style="font-size:.62rem;color:var(--txl)">ยังไม่มีประวัติ</span>';
+  }
+}
+async function loadRealHistory(lockId){
+  if(!getApiUrl()) return; // ยังไม่เชื่อมต่อ Sheets — ใช้ประวัติในเซสชันนี้ต่อไป
+  const [leaveRows, dailyRows] = await Promise.all([
+    apiGet('getLeaveLog', {lockId}),
+    apiGet('getDailyBookings', {lockId}),
+  ]);
+  if(curLk===null || curLk.dataset.id!==lockId) return; // ผู้ใช้ปิด/สลับล็อคไปแล้วระหว่างรอโหลด
+  const merged=[];
+  (leaveRows||[]).forEach(r=>merged.push({
+    type:r.type, label:HIST_TYPE_LABEL[r.type]||r.type, date:r.date, time:r.time,
+    sortKey:(r.created_at||'')+r.date+r.time,
+  }));
+  (dailyRows||[]).forEach(r=>merged.push({
+    type:'daily', label:'🏷️ จร: '+r.vendor_name+(r.cancelled===true||r.cancelled==='TRUE'?' (ยกเลิก)':''),
+    date:r.date, time:r.time, sortKey:(r.created_at||'')+r.date+r.time,
+  }));
+  merged.sort((a,b)=>b.sortKey.localeCompare(a.sortKey));
+  renderHistChips(merged);
+}
 
 // ════════════════════════════════════════════════════
 // LOCK DATA
