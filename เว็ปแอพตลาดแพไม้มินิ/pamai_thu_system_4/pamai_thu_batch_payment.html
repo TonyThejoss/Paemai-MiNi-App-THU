@@ -1,0 +1,865 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>รับชำระเงินหลายล็อค — แพไม้มินิ วันพฤหัสบดี</title>
+<style>a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible,[tabindex]:focus-visible,.lk:focus-visible,.zone-tab:focus-visible{outline:2.5px solid #ea580c !important;outline-offset:2px;}.ico{width:1em;height:1em;display:inline-block;vertical-align:-0.15em;flex-shrink:0}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'Segoe UI', Tahoma, sans-serif; background: #f0f4f8; color: #1a202c; font-size: 14px; }
+
+/* ── TOP BAR ── */
+.topbar {
+  background: linear-gradient(135deg, #c2410c, #ea580c);
+  color: white; padding: 14px 24px;
+  display: flex; align-items: center; justify-content: space-between;
+}
+.topbar h1 { font-size: 1.15rem; font-weight: 700; }
+.topbar .meta { font-size: 0.78rem; opacity: 0.85; margin-top: 2px; }
+.btn-back {
+  background: rgba(255,255,255,0.2); border: none; color: white;
+  padding: 7px 14px; border-radius: 8px; cursor: pointer; font-size: 0.8rem;
+  font-weight: 600;
+}
+.btn-back:hover { background: rgba(255,255,255,0.3); }
+
+/* ── LAYOUT ── */
+.layout { display: flex; height: calc(100vh - 58px); overflow: hidden; }
+
+/* ── LEFT: Filter + Lock List ── */
+.left-panel {
+  width: 420px; flex-shrink: 0; background: white;
+  border-right: 1px solid #e2e8f0;
+  display: flex; flex-direction: column; overflow: hidden;
+}
+
+.panel-header {
+  padding: 14px 16px; border-bottom: 1px solid #e2e8f0; background: #fafafa;
+}
+.panel-title { font-weight: 700; font-size: 0.95rem; color: #2d3748; margin-bottom: 10px; }
+
+.filter-row { display: flex; gap: 8px; margin-bottom: 8px; flex-wrap: wrap; }
+
+.search-box {
+  flex: 1; min-width: 150px; padding: 8px 12px; border: 1.5px solid #e2e8f0;
+  border-radius: 8px; font-size: 0.82rem; outline: none;
+  transition: border-color 0.2s;
+}
+.search-box:focus { border-color: #ea580c; }
+
+select.filter-select {
+  padding: 8px 10px; border: 1.5px solid #e2e8f0; border-radius: 8px;
+  font-size: 0.8rem; background: white; cursor: pointer; outline: none;
+}
+select.filter-select:focus { border-color: #ea580c; }
+
+.check-all-row {
+  display: flex; align-items: center; gap: 8px;
+  padding: 8px 12px; background: #ebf8ff; border-radius: 8px;
+  font-size: 0.8rem; font-weight: 600; color: #2c5282; cursor: pointer;
+  user-select: none;
+}
+.check-all-row input[type=checkbox] { width: 16px; height: 16px; cursor: pointer; accent-color: #c2410c; }
+
+/* lock list */
+.lock-list { flex: 1; overflow-y: auto; padding: 8px; }
+
+.lock-item {
+  display: flex; align-items: center; gap: 10px;
+  padding: 10px 12px; border-radius: 10px; margin-bottom: 6px;
+  border: 1.5px solid #e2e8f0; cursor: pointer; transition: all 0.15s;
+  background: white; user-select: none;
+}
+.lock-item:hover { border-color: #9ae6b4; background: #fff7ed; }
+.lock-item.selected { border-color: #38a169; background: #fff7ed; }
+.lock-item.unpaid-item { border-left: 4px solid #e53e3e; }
+.lock-item.paid-item { border-left: 4px solid #38a169; }
+.lock-item.partial-item { border-left: 4px solid #dd6b20; }
+
+.lock-item input[type=checkbox] { width: 17px; height: 17px; flex-shrink: 0; accent-color: #c2410c; cursor: pointer; }
+
+.lock-info { flex: 1; min-width: 0; }
+.lock-id { font-weight: 700; font-size: 0.88rem; color: #2d3748; }
+.lock-product { font-size: 0.75rem; color: #5b6b82; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-top: 1px; }
+.lock-vendor { font-size: 0.72rem; color: #5b6b82; margin-top: 1px; }
+
+.lock-amount { text-align: right; flex-shrink: 0; }
+.amount-due { font-weight: 700; font-size: 0.9rem; color: #2d3748; }
+.amount-label { font-size: 0.68rem; color: #5b6b82; margin-top: 2px; }
+
+.badge-status {
+  font-size: 0.65rem; font-weight: 700; padding: 2px 7px; border-radius: 10px;
+  white-space: nowrap; flex-shrink: 0;
+}
+.status-unpaid { background: #fed7d7; color: #9b2c2c; }
+.status-paid { background: #c6f6d5; color: #276749; }
+.status-partial { background: #feebc8; color: #7b341e; }
+
+/* ── RIGHT: Batch Payment Form ── */
+.right-panel {
+  flex: 1; display: flex; flex-direction: column; overflow: hidden;
+}
+
+.right-scroll { flex: 1; overflow-y: auto; padding: 20px 24px; }
+
+/* summary box */
+.summary-box {
+  background: white; border-radius: 14px; padding: 18px 20px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.06); margin-bottom: 18px;
+}
+.summary-title { font-weight: 700; font-size: 1rem; color: #2d3748; margin-bottom: 14px; display: flex; align-items: center; gap: 8px; }
+
+.summary-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 16px; }
+.stat-card {
+  background: #f7fafc; border-radius: 10px; padding: 12px;
+  text-align: center; border: 1.5px solid #e2e8f0;
+}
+.stat-num { font-size: 1.5rem; font-weight: 800; color: #2d3748; }
+.stat-num.green { color: #276749; }
+.stat-num.red { color: #9b2c2c; }
+.stat-label { font-size: 0.72rem; color: #5b6b82; margin-top: 2px; }
+
+.total-bar {
+  background: linear-gradient(135deg, #c2410c, #ea580c);
+  color: white; border-radius: 10px; padding: 14px 18px;
+  display: flex; align-items: center; justify-content: space-between;
+}
+.total-label { font-size: 0.85rem; opacity: 0.9; }
+.total-amount { font-size: 1.6rem; font-weight: 800; }
+
+/* selected items table */
+.items-box {
+  background: white; border-radius: 14px; padding: 18px 20px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.06); margin-bottom: 18px;
+}
+.items-title { font-weight: 700; font-size: 0.95rem; color: #2d3748; margin-bottom: 14px; display: flex; align-items: center; justify-content: space-between; }
+
+.items-table { width: 100%; border-collapse: collapse; font-size: 0.8rem; }
+.items-table th {
+  background: #f7fafc; padding: 9px 10px; text-align: left;
+  font-weight: 700; color: #4a5568; border-bottom: 2px solid #e2e8f0;
+  font-size: 0.78rem;
+}
+.items-table td { padding: 9px 10px; border-bottom: 1px solid #f0f4f8; color: #2d3748; vertical-align: middle; }
+.items-table tr:hover td { background: #fafafa; }
+.items-table tr.row-paid td { background: #fff7ed; color: #276749; }
+
+.input-amount {
+  width: 90px; padding: 5px 8px; border: 1.5px solid #e2e8f0; border-radius: 6px;
+  font-size: 0.8rem; text-align: right; outline: none; transition: border-color 0.2s;
+}
+.input-amount:focus { border-color: #ea580c; }
+.input-amount.overpaid { border-color: #dd6b20; background: #fffaf0; }
+.input-amount.exact { border-color: #38a169; background: #fff7ed; }
+
+.note-input {
+  width: 100%; padding: 5px 8px; border: 1.5px solid #e2e8f0; border-radius: 6px;
+  font-size: 0.78rem; outline: none; transition: border-color 0.2s;
+}
+.note-input:focus { border-color: #ea580c; }
+
+.remove-btn {
+  background: none; border: none; color: #fc8181; cursor: pointer;
+  font-size: 1rem; padding: 2px 6px; border-radius: 4px;
+  transition: background 0.15s;
+}
+.remove-btn:hover { background: #fff5f5; }
+
+/* payment options */
+.options-box {
+  background: white; border-radius: 14px; padding: 18px 20px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.06); margin-bottom: 18px;
+}
+.options-title { font-weight: 700; font-size: 0.95rem; color: #2d3748; margin-bottom: 14px; }
+
+.option-row { display: flex; gap: 12px; margin-bottom: 12px; flex-wrap: wrap; }
+.option-label { font-size: 0.8rem; color: #4a5568; font-weight: 600; width: 110px; flex-shrink: 0; padding-top: 8px; }
+
+.method-btn {
+  padding: 7px 16px; border: 2px solid #e2e8f0; border-radius: 8px;
+  cursor: pointer; font-size: 0.8rem; font-weight: 600; color: #4a5568;
+  background: white; transition: all 0.15s;
+}
+.method-btn:hover { border-color: #9ae6b4; color: #276749; }
+.method-btn.active { border-color: #c2410c; background: #fff7ed; color: #c2410c; }
+
+.form-input {
+  flex: 1; padding: 8px 12px; border: 1.5px solid #e2e8f0; border-radius: 8px;
+  font-size: 0.82rem; outline: none; transition: border-color 0.2s;
+}
+.form-input:focus { border-color: #ea580c; }
+
+/* footer action bar */
+.action-bar {
+  padding: 14px 24px; background: white; border-top: 1px solid #e2e8f0;
+  display: flex; align-items: center; justify-content: space-between;
+  box-shadow: 0 -4px 12px rgba(0,0,0,0.05);
+}
+.action-info { font-size: 0.82rem; color: #5b6b82; }
+.action-info strong { color: #2d3748; }
+
+.action-btns { display: flex; gap: 10px; }
+
+.btn {
+  padding: 10px 22px; border: none; border-radius: 10px;
+  font-size: 0.85rem; font-weight: 700; cursor: pointer; transition: all 0.2s;
+}
+.btn-outline { background: white; border: 2px solid #e2e8f0; color: #4a5568; }
+.btn-outline:hover { border-color: #5b6b82; }
+.btn-primary {
+  background: linear-gradient(135deg, #c2410c, #ea580c); color: white;
+  box-shadow: 0 4px 12px rgba(45,106,79,0.35);
+}
+.btn-primary:hover { transform: translateY(-1px); box-shadow: 0 6px 16px rgba(45,106,79,0.45); }
+.btn-primary:disabled { background: #5b6b82; transform: none; box-shadow: none; cursor: not-allowed; }
+.btn-danger { background: #e53e3e; color: white; }
+.btn-danger:hover { background: #c53030; }
+
+/* ── MODAL ── */
+.modal-overlay {
+  display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.45);
+  z-index: 1000; align-items: center; justify-content: center;
+}
+.modal-overlay.show { display: flex; }
+.modal {
+  background: white; border-radius: 16px; padding: 28px 32px;
+  max-width: 500px; width: 90%; box-shadow: 0 20px 60px rgba(0,0,0,0.25);
+  animation: slideUp 0.25s ease;
+}
+@keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+
+.modal-title { font-size: 1.1rem; font-weight: 800; color: #2d3748; margin-bottom: 6px; }
+.modal-sub { font-size: 0.82rem; color: #5b6b82; margin-bottom: 20px; }
+.modal-receipt { background: #f7fafc; border-radius: 10px; padding: 16px; margin-bottom: 20px; }
+.receipt-row { display: flex; justify-content: space-between; padding: 5px 0; font-size: 0.82rem; border-bottom: 1px solid #edf2f7; }
+.receipt-row:last-child { border: none; font-weight: 700; font-size: 0.9rem; color: #276749; margin-top: 4px; }
+.modal-btns { display: flex; gap: 10px; justify-content: flex-end; }
+
+/* ── EMPTY STATE ── */
+.empty-state {
+  text-align: center; padding: 48px 24px; color: #5b6b82;
+}
+.empty-icon { font-size: 3rem; margin-bottom: 12px; }
+.empty-text { font-size: 0.88rem; }
+
+/* ── TOAST ── */
+.toast {
+  position: fixed; bottom: 24px; right: 24px; z-index: 2000;
+  background: #276749; color: white; padding: 12px 20px; border-radius: 10px;
+  font-size: 0.85rem; font-weight: 600; box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+  transform: translateY(80px); opacity: 0; transition: all 0.3s;
+}
+.toast.show { transform: translateY(0); opacity: 1; }
+
+/* ── SCROLLBAR ── */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #cbd5e0; border-radius: 3px; }
+</style>
+</head>
+<body>
+
+<!-- TOP BAR -->
+<div class="topbar">
+  <div>
+    <div style="display:flex;align-items:center;gap:10px">
+      <button class="btn-back">← กลับ</button>
+      <div>
+        <h1><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v10M9.5 9.2c0-1.2 1.1-2.2 2.5-2.2s2.5.9 2.5 2c0 2.8-5 1.6-5 4.3 0 1.1 1.1 2 2.5 2s2.5-.9 2.5-2"/></svg> รับชำระเงินรวม — แพไม้มินิ วันพฤหัสบดี</h1>
+        <div class="meta" id="metaDate">วันพฤหัสบดีที่ — · เดือน — · รอบการเก็บเงิน</div>
+      </div>
+    </div>
+  </div>
+  <div style="display:flex;gap:8px">
+    <select class="filter-select" id="monthSelect" aria-label="เลือกเดือน" style="background:rgba(255,255,255,0.15);color:white;border-color:rgba(255,255,255,0.3)" onchange="filterChanged()">
+      <option value="2025-06">มิ.ย. 2568</option>
+      <option value="2025-07" selected>ก.ค. 2568</option>
+      <option value="2025-08">ส.ค. 2568</option>
+    </select>
+    <select class="filter-select" id="roundSelect" aria-label="เลือกรอบ" style="background:rgba(255,255,255,0.15);color:white;border-color:rgba(255,255,255,0.3)">
+      <option>รายเดือน</option>
+      <option>รายวัน (จร)</option>
+      <option>ค่าไฟ</option>
+      <option>ค่าธรรมเนียมรายปี</option>
+    </select>
+  </div>
+</div>
+
+<div class="layout">
+
+  <!-- ════ LEFT PANEL ════ -->
+  <div class="left-panel">
+    <div class="panel-header">
+      <div class="panel-title"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="4" width="12" height="17" rx="2"/><rect x="9" y="2.5" width="6" height="3" rx="1"/><path d="M9 11h6M9 15h6"/></svg> รายการล็อค</div>
+      <div class="filter-row">
+        <input class="search-box" id="searchInput" aria-label="ค้นหาล็อค / ร้านค้า" placeholder="🔍 ค้นหาล็อค / ร้านค้า..." oninput="filterLocks()">
+        <select class="filter-select" id="zoneFilter" aria-label="กรองโซน" onchange="filterLocks()">
+          <option value="">ทุกโซน</option>
+          <option value="A">A</option><option value="B">B</option><option value="C">C</option>
+          <option value="D">D</option><option value="E">E</option><option value="F">F</option>
+          <option value="G">G</option><option value="J">J</option><option value="K">K</option>
+          <option value="N">N</option><option value="U">U</option>
+          <option value="O">O</option><option value="M">M</option><option value="H">H</option>
+          <option value="L">L</option><option value="T">T</option><option value="AB">AB</option>
+          <option value="TA">TA</option><option value="TB">TB</option><option value="TC">TC</option>
+        </select>
+        <select class="filter-select" id="statusFilter" aria-label="กรองสถานะ" onchange="filterLocks()">
+          <option value="">ทุกสถานะ</option>
+          <option value="unpaid">ค้างชำระ</option>
+          <option value="partial">ชำระบางส่วน</option>
+          <option value="paid">ชำระแล้ว</option>
+        </select>
+      </div>
+      <div class="check-all-row" onclick="toggleAll()">
+        <input type="checkbox" id="checkAll" aria-label="เลือกทั้งหมด" onclick="event.stopPropagation();toggleAll()">
+        <span id="checkAllLabel">เลือกทั้งหมดที่แสดง</span>
+      </div>
+    </div>
+
+    <div class="lock-list" id="lockList"></div>
+  </div>
+
+  <!-- ════ RIGHT PANEL ════ -->
+  <div class="right-panel">
+    <div class="right-scroll">
+
+      <!-- SUMMARY -->
+      <div class="summary-box">
+        <div class="summary-title"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20V10M11 20V4M18 20v-7"/><path d="M2.5 20h19"/></svg> สรุปรายการที่เลือก</div>
+        <div class="summary-grid">
+          <div class="stat-card">
+            <div class="stat-num" id="statSelected">0</div>
+            <div class="stat-label">ล็อคที่เลือก</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-num red" id="statTotalDue">฿0</div>
+            <div class="stat-label">ยอดรวมที่ต้องชำระ</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-num green" id="statTotalPaid">฿0</div>
+            <div class="stat-label">ยอดที่กรอกแล้ว</div>
+          </div>
+        </div>
+        <div class="total-bar">
+          <div>
+            <div class="total-label">ยอดรวมทั้งหมดที่จะบันทึก</div>
+            <div style="font-size:0.72rem;opacity:0.8;margin-top:2px" id="lockCountLabel">กรุณาเลือกล็อคที่ต้องการ</div>
+          </div>
+          <div class="total-amount" id="grandTotal">฿0</div>
+        </div>
+      </div>
+
+      <!-- SELECTED ITEMS TABLE -->
+      <div class="items-box">
+        <div class="items-title">
+          <span><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h4L19.5 8.5a2.1 2.1 0 0 0-3-3L5.5 16 4 20z"/><path d="M14.5 6.5l3 3"/></svg>️ กรอกจำนวนที่รับมา</span>
+          <span style="font-size:0.75rem;color:#5b6b82;font-weight:400">* กรอก 0 หมายถึงยังไม่ได้รับชำระ</span>
+        </div>
+        <div id="selectedTableWrap">
+          <div class="empty-state">
+            <div class="empty-icon"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 12h11M9 12l4-4M9 12l4 4"/></svg></div>
+            <div class="empty-text">เลือกล็อคจากรายการด้านซ้ายก่อน<br>สามารถเลือกได้พร้อมกันหลายล็อค</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- OPTIONS -->
+      <div class="options-box">
+        <div class="options-title"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M12 3v2.2M12 18.8V21M4.2 12H2M22 12h-2.2M5.8 5.8l1.5 1.5M16.7 16.7l1.5 1.5M18.2 5.8l-1.5 1.5M7.3 16.7l-1.5 1.5"/></svg>️ ตั้งค่าการบันทึก</div>
+        <div class="option-row">
+          <span class="option-label">ช่องทางชำระ</span>
+          <div style="display:flex;gap:8px;flex-wrap:wrap">
+            <button class="method-btn active" onclick="setMethod(this,'เงินสด')"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2.5" y="6" width="19" height="12" rx="2"/><circle cx="12" cy="12" r="3"/><path d="M6 9v6M18 9v6"/></svg> เงินสด</button>
+            <button class="method-btn" onclick="setMethod(this,'โอนเงิน')"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="6.5" y="2.5" width="11" height="19" rx="2"/><path d="M11 19h2"/></svg> โอนเงิน</button>
+            <button class="method-btn" onclick="setMethod(this,'QR Code')"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2.5" y="7" width="19" height="13" rx="2"/><path d="M8 7l1.5-2.5h5L16 7"/><circle cx="12" cy="13.5" r="3.5"/></svg> QR Code</button>
+          </div>
+        </div>
+        <div class="option-row">
+          <label class="option-label" for="payDate">วันที่รับเงิน</label>
+          <input class="form-input" type="date" id="payDate" style="max-width:200px">
+        </div>
+        <div class="option-row">
+          <label class="option-label" for="collector">ผู้รับเงิน</label>
+          <input class="form-input" type="text" id="collector" placeholder="ชื่อพนักงานผู้เก็บเงิน" style="max-width:260px">
+        </div>
+        <div class="option-row">
+          <label class="option-label" for="globalNote">หมายเหตุรวม</label>
+          <input class="form-input" type="text" id="globalNote" placeholder="หมายเหตุสำหรับรอบนี้ (ถ้ามี)">
+        </div>
+      </div>
+
+    </div><!-- end right-scroll -->
+
+    <!-- ACTION BAR -->
+    <div class="action-bar">
+      <div class="action-info">
+        เลือก <strong id="footerCount">0</strong> ล็อค ·
+        กรอกแล้ว <strong id="footerFilled">0</strong> ล็อค ·
+        ยอดรวม <strong id="footerTotal">฿0</strong>
+      </div>
+      <div class="action-btns">
+        <button class="btn btn-outline" onclick="clearAll()"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 7h14M9 7V4.5h6V7M7 7l1 13.5h8L17 7"/><path d="M10 11v6M14 11v6"/></svg>️ ล้างทั้งหมด</button>
+        <button class="btn btn-outline" onclick="fillAllFull()"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="m8 12 3 3 5-6"/></svg> กรอกเต็มทุกล็อค</button>
+        <button class="btn btn-primary" id="saveBtn" disabled onclick="openConfirm()">
+          <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 3h13l3 3v15H4z"/><path d="M8 3v6h8V3M7 14h10v7H7z"/></svg> บันทึกการรับเงิน
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════ CONFIRM MODAL ═══════════ -->
+<div class="modal-overlay" id="confirmModal">
+  <div class="modal">
+    <div class="modal-title"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="m8 12 3 3 5-6"/></svg> ยืนยันการบันทึกรับเงิน</div>
+    <div class="modal-sub">ตรวจสอบรายการก่อนกดยืนยัน</div>
+    <div class="modal-receipt" id="receiptContent"></div>
+    <div class="modal-btns">
+      <button class="btn btn-outline" onclick="closeModal()">ยกเลิก</button>
+      <button class="btn btn-primary" onclick="confirmSave()"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="m8 12 3 3 5-6"/></svg> ยืนยันบันทึก</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<!-- ═══════════ SCRIPT ═══════════ -->
+<script>
+// ════════════════════════════════════════════════════
+// GOOGLE SHEETS API — เชื่อมกับฐานข้อมูลกลางเดียวกับทั้งระบบ
+// ════════════════════════════════════════════════════
+function getApiUrl(){return localStorage.getItem('pm-api-url')||'';}
+async function apiPost(action,data={}){
+  const url=getApiUrl(); if(!url) return null;
+  try{
+    const r=await fetch(url,{method:'POST',body:JSON.stringify({action,...data})});
+    return await r.json();
+  }catch(e){ console.error('apiPost error:',action,e); return null; }
+}
+async function apiGet(action,params={}){
+  const url=getApiUrl(); if(!url) return null;
+  try{
+    const r=await fetch(url+'?'+new URLSearchParams({action,...params}));
+    const j=await r.json();
+    return j.status==='ok'?j.data:null;
+  }catch(e){ console.error('apiGet error:',action,e); return null; }
+}
+function getCurrentUserName(){
+  try{
+    const sess=sessionStorage.getItem('pm-session');
+    if(sess){ const u=JSON.parse(sess); return u.username||'ผู้ใช้'; }
+  }catch(e){}
+  return 'ผู้ใช้';
+}
+const MONS=['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
+function nowTH(){const n=new Date();return n.getDate()+' '+MONS[n.getMonth()]+' '+(n.getFullYear()+543);}
+function dateToTH(dateStr){ if(!dateStr) return nowTH(); const n=new Date(dateStr+'T00:00:00'); if(isNaN(n)) return nowTH(); return n.getDate()+' '+MONS[n.getMonth()]+' '+(n.getFullYear()+543); }
+function nowTime(){const n=new Date();return String(n.getHours()).padStart(2,'0')+':'+String(n.getMinutes()).padStart(2,'0');}
+function countThursdaysInMonth(year, month){
+  let count=0; const d=new Date(year, month, 1);
+  while(d.getMonth()===month){ if(d.getDay()===4) count++; d.setDate(d.getDate()+1); }
+  return count;
+}
+function thisMonthThursdays(){ const n=new Date(); return countThursdaysInMonth(n.getFullYear(), n.getMonth()); }
+function calcElecFromVendor(v){
+  return (parseInt(v.elec_bulb)||0)*10 + (parseInt(v.elec_fan)||0)*20 + (parseInt(v.elec_small)||0)*50 + (parseInt(v.elec_large)||0)*100;
+}
+
+// ── DATA — โหลดจาก Google Sheets จริง (แทน mock data เดิม) ──
+let ALL_LOCKS = [];
+
+async function loadLocksFromSheets(){
+  const wrap=document.getElementById('lockList');
+  if(!getApiUrl()){
+    if(wrap) wrap.innerHTML='<div class="empty-state"><div class="empty-icon">⚠️</div><div class="empty-text">ยังไม่ได้เชื่อมต่อ Google Sheets<br>กรุณาตั้งค่าที่หน้าหลักก่อนใช้งานหน้านี้</div></div>';
+    return;
+  }
+  if(wrap) wrap.innerHTML='<div class="empty-state"><div class="empty-icon">⏳</div><div class="empty-text">กำลังโหลดข้อมูลผู้ค้าจาก Google Sheets...</div></div>';
+  const vendors = await apiGet('getVendors');
+  if(!Array.isArray(vendors)){
+    if(wrap) wrap.innerHTML='<div class="empty-state"><div class="empty-icon">❌</div><div class="empty-text">โหลดข้อมูลผู้ค้าไม่สำเร็จ<br>ตรวจสอบการเชื่อมต่อ Google Sheets</div></div>';
+    return;
+  }
+  const tuesdays = thisMonthThursdays();
+  ALL_LOCKS = vendors.filter(v=>v.status==='active'||v.status==='unpaid').map(v=>({
+    id: v.lock,
+    zone: v.zone,
+    product: v.product || v.name || '—',
+    vendor: v.name || '(ยังไม่ระบุชื่อ)',
+    status: v.status==='unpaid' ? 'unpaid' : 'paid', // ใช้สถานะจาก Sheets เป็นจุดเริ่มต้น
+    due: Math.round((parseFloat(v.dailyRate)||0) * tuesdays),
+    electric: calcElecFromVendor(v),
+  }));
+  filteredLocks=[...ALL_LOCKS];
+  renderLockList();
+}
+
+let selectedIds = new Set();
+let payAmounts = {}; // id -> amount string
+let payNotes = {};
+let payPenalties = {}; // id -> number
+let payOthers = {};    // id -> number
+let payOtherLabels = {}; // id -> string
+let payMethod = 'เงินสด';
+let filteredLocks = [...ALL_LOCKS];
+
+// ── INIT ──
+window.onload = () => {
+  const today = new Date();
+  document.getElementById('payDate').value = today.toISOString().split('T')[0];
+  document.getElementById('metaDate').textContent =
+    `วันที่ ${today.toLocaleDateString('th-TH', {weekday:'long', year:'numeric', month:'long', day:'numeric'})} · รอบการเก็บเงิน`;
+  loadLocksFromSheets();
+};
+
+// ── RENDER LOCK LIST ──
+function renderLockList() {
+  const q = document.getElementById('searchInput').value.toLowerCase();
+  const zone = document.getElementById('zoneFilter').value;
+  const status = document.getElementById('statusFilter').value;
+
+  filteredLocks = ALL_LOCKS.filter(l => {
+    const matchQ = !q || l.id.toLowerCase().includes(q) || l.product.toLowerCase().includes(q) || l.vendor.toLowerCase().includes(q);
+    const matchZone = !zone || l.zone === zone;
+    const matchStatus = !status || l.status === status;
+    return matchQ && matchZone && matchStatus;
+  });
+
+  const html = filteredLocks.map(l => {
+    const totalDue = l.due + l.electric;
+    const statusMap = {unpaid:'status-unpaid', paid:'status-paid', partial:'status-partial'};
+    const statusLabel = {unpaid:'ค้างชำระ', paid:'ชำระแล้ว', partial:'บางส่วน'};
+    const itemClass = {unpaid:'unpaid-item', paid:'paid-item', partial:'partial-item'};
+    const checked = selectedIds.has(l.id) ? 'checked' : '';
+    const selectedClass = selectedIds.has(l.id) ? 'selected' : '';
+
+    return `<div class="lock-item ${itemClass[l.status]} ${selectedClass}" id="item-${l.id}" onclick="toggleLock('${l.id}')">
+      <input type="checkbox" ${checked} onclick="event.stopPropagation();toggleLock('${l.id}')">
+      <div class="lock-info">
+        <div class="lock-id">${l.id}</div>
+        <div class="lock-product">${l.product}</div>
+        <div class="lock-vendor">${l.vendor}</div>
+      </div>
+      <div class="lock-amount">
+        <div class="amount-due">฿${totalDue.toLocaleString()}</div>
+        <div class="amount-label">เช่า ฿${l.due.toLocaleString()} + ไฟ ฿${l.electric}</div>
+      </div>
+      <span class="badge-status ${statusMap[l.status]}">${statusLabel[l.status]}</span>
+    </div>`;
+  }).join('');
+
+  document.getElementById('lockList').innerHTML = html || '<div class="empty-state"><div class="empty-icon">🔍</div><div class="empty-text">ไม่พบล็อคที่ตรงกัน</div></div>';
+  updateCheckAll();
+}
+
+function filterLocks() { renderLockList(); }
+
+// ── TOGGLE LOCK ──
+function toggleLock(id) {
+  if (selectedIds.has(id)) {
+    selectedIds.delete(id);
+    delete payAmounts[id];
+    delete payNotes[id];
+  } else {
+    selectedIds.add(id);
+    // auto-fill with total due
+    const lock = ALL_LOCKS.find(l => l.id === id);
+    if (lock) payAmounts[id] = String(lock.due + lock.electric);
+  }
+  renderLockList();
+  renderTable();
+  updateSummary();
+}
+
+function toggleAll() {
+  const allVisible = filteredLocks.map(l => l.id);
+  const allSelected = allVisible.every(id => selectedIds.has(id));
+  if (allSelected) {
+    allVisible.forEach(id => { selectedIds.delete(id); delete payAmounts[id]; delete payNotes[id]; });
+  } else {
+    allVisible.forEach(id => {
+      selectedIds.add(id);
+      if (!payAmounts[id]) {
+        const lock = ALL_LOCKS.find(l => l.id === id);
+        if (lock) payAmounts[id] = String(lock.due + lock.electric);
+      }
+    });
+  }
+  renderLockList();
+  renderTable();
+  updateSummary();
+}
+
+function updateCheckAll() {
+  const allVisible = filteredLocks.map(l => l.id);
+  const cb = document.getElementById('checkAll');
+  const allSel = allVisible.length > 0 && allVisible.every(id => selectedIds.has(id));
+  cb.checked = allSel;
+  cb.indeterminate = !allSel && allVisible.some(id => selectedIds.has(id));
+  document.getElementById('checkAllLabel').textContent =
+    allSel ? `ยกเลิกเลือกทั้งหมด (${allVisible.length})` : `เลือกทั้งหมดที่แสดง (${allVisible.length})`;
+}
+
+// ── RENDER TABLE ──
+function renderTable() {
+  const selected = ALL_LOCKS.filter(l => selectedIds.has(l.id));
+  if (selected.length === 0) {
+    document.getElementById('selectedTableWrap').innerHTML = `
+      <div class="empty-state">
+        <div class="empty-icon">👈</div>
+        <div class="empty-text">เลือกล็อคจากรายการด้านซ้ายก่อน<br>สามารถเลือกได้พร้อมกันหลายล็อค</div>
+      </div>`;
+    return;
+  }
+
+  const rows = selected.map(l => {
+    const penalty = payPenalties[l.id] || 0;
+    const other   = payOthers[l.id]   || 0;
+    const otherLbl= payOtherLabels[l.id] || '';
+    const base = l.due + l.electric;
+    const totalDue = base + penalty + other;
+    // auto-update payAmounts when extras change
+    if (!payAmounts[l.id] || payAmounts[l.id] === String(base)) {
+      payAmounts[l.id] = String(totalDue);
+    }
+    const amt = payAmounts[l.id] ?? String(totalDue);
+    const amtNum = parseFloat(amt) || 0;
+    let amtClass = amtNum === totalDue ? 'exact' : amtNum > totalDue ? 'overpaid' : '';
+    const note = payNotes[l.id] ?? '';
+    const isPaid = l.status === 'paid';
+    const rowClass = isPaid ? 'row-paid' : '';
+
+    return `<tr class="${rowClass}">
+      <td><strong>${l.id}</strong></td>
+      <td style="max-width:90px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:.76rem">${l.product}</td>
+      <td style="text-align:right">฿${l.due.toLocaleString()}</td>
+      <td style="text-align:right">${l.electric ? '฿'+l.electric : '—'}</td>
+      <td style="text-align:right">
+        <input type="number" placeholder="0" value="${penalty||''}" min="0"
+          style="width:72px;padding:4px 7px;border:1.5px solid #fbd38d;border-radius:6px;font-size:.78rem;text-align:right;background:#fffaf0;display:block;margin-left:auto"
+          oninput="setPenalty('${l.id}',this.value)">
+      </td>
+      <td style="text-align:right">
+        <input type="number" placeholder="0" value="${other||''}" min="0"
+          style="width:72px;padding:4px 7px;border:1.5px solid #bee3f8;border-radius:6px;font-size:.78rem;text-align:right;background:#ebf8ff;display:block;margin-left:auto"
+          oninput="setOther('${l.id}',this.value)">
+      </td>
+      <td>
+        <input type="text" placeholder="ระบุ..." value="${otherLbl}"
+          style="width:100%;padding:4px 7px;border:1.5px solid #bee3f8;border-radius:6px;font-size:.72rem;background:#ebf8ff"
+          oninput="setOtherLabel('${l.id}',this.value)">
+      </td>
+      <td style="text-align:right;font-weight:800;color:${penalty||other?'#c05621':'inherit'}">฿${totalDue.toLocaleString()}</td>
+      <td style="text-align:right">
+        <input class="input-amount ${amtClass}" type="number" value="${amt}" min="0"
+          style="width:90px;text-align:right"
+          oninput="setAmount('${l.id}', this.value)">
+      </td>
+      <td>
+        <input class="note-input" type="text" value="${note}" placeholder="หมายเหตุ..."
+          oninput="setNote('${l.id}', this.value)" style="width:85px">
+      </td>
+      <td>
+        <button class="remove-btn" onclick="removeLock('${l.id}')" title="ลบออก" aria-label="ลบล็อคนี้ออก">✕</button>
+      </td>
+    </tr>`;
+  }).join('');
+
+  document.getElementById('selectedTableWrap').innerHTML = `
+    <table class="items-table" style="font-size:.78rem;min-width:860px">
+      <thead>
+        <tr>
+          <th style="min-width:48px">ล็อค</th>
+          <th style="min-width:90px">สินค้า</th>
+          <th style="text-align:right;min-width:72px">ค่าเช่า</th>
+          <th style="text-align:right;min-width:58px">ค่าไฟ</th>
+          <th style="text-align:right;min-width:80px">⚠️ ค่าปรับ (฿)</th>
+          <th style="text-align:right;min-width:80px">📌 ค่าอื่น (฿)</th>
+          <th style="min-width:90px">📌 ระบุรายการ</th>
+          <th style="text-align:right;min-width:88px">รวมที่ต้องชำระ</th>
+          <th style="text-align:right;min-width:96px">จำนวนที่รับ (฿)</th>
+          <th style="min-width:85px">หมายเหตุ</th>
+          <th style="min-width:32px"></th>
+        </tr>
+      </thead>
+      <tbody>${rows}</tbody>
+    </table>`;
+}
+
+function setPenalty(id, val) {
+  payPenalties[id] = parseFloat(val)||0;
+  // recalc total
+  const lock = ALL_LOCKS.find(l => l.id === id);
+  if (lock) {
+    const total = lock.due + lock.electric + (payPenalties[id]||0) + (payOthers[id]||0);
+    payAmounts[id] = String(total);
+  }
+  updateSummary(); renderTable();
+}
+function setOther(id, val) {
+  payOthers[id] = parseFloat(val)||0;
+  const lock = ALL_LOCKS.find(l => l.id === id);
+  if (lock) {
+    const total = lock.due + lock.electric + (payPenalties[id]||0) + (payOthers[id]||0);
+    payAmounts[id] = String(total);
+  }
+  updateSummary(); renderTable();
+}
+function setOtherLabel(id, val) { payOtherLabels[id] = val; }
+function setAmount(id, val) { payAmounts[id] = val; updateSummary(); renderTable(); }
+function setNote(id, val) { payNotes[id] = val; }
+function removeLock(id) { toggleLock(id); }
+
+// ── FILL ALL FULL ──
+function fillAllFull() {
+  selectedIds.forEach(id => {
+    const lock = ALL_LOCKS.find(l => l.id === id);
+    if (lock) {
+      const total = lock.due + lock.electric + (payPenalties[id]||0) + (payOthers[id]||0);
+      payAmounts[id] = String(total);
+    }
+  });
+  renderTable();
+  updateSummary();
+}
+
+function clearAll() {
+  selectedIds.clear();
+  payAmounts = {};
+  payNotes = {};
+  payPenalties = {};
+  payOthers = {};
+  payOtherLabels = {};
+  renderLockList();
+  renderTable();
+  updateSummary();
+}
+
+// ── UPDATE SUMMARY ──
+function updateSummary() {
+  const selected = ALL_LOCKS.filter(l => selectedIds.has(l.id));
+  const totalDue = selected.reduce((s, l) => {
+    return s + l.due + l.electric + (payPenalties[l.id]||0) + (payOthers[l.id]||0);
+  }, 0);
+  const totalPaid = selected.reduce((s, l) => {
+    return s + (parseFloat(payAmounts[l.id]) || 0);
+  }, 0);
+  const filled = selected.filter(l => (parseFloat(payAmounts[l.id]) || 0) > 0).length;
+  const penaltySum = selected.reduce((s,l)=>s+(payPenalties[l.id]||0),0);
+  const otherSum   = selected.reduce((s,l)=>s+(payOthers[l.id]||0),0);
+
+  document.getElementById('statSelected').textContent = selected.length;
+  document.getElementById('statTotalDue').textContent = `฿${totalDue.toLocaleString()}`;
+  document.getElementById('statTotalPaid').textContent = `฿${totalPaid.toLocaleString()}`;
+  document.getElementById('grandTotal').textContent = `฿${totalPaid.toLocaleString()}`;
+  document.getElementById('lockCountLabel').textContent = selected.length > 0
+    ? `${selected.length} ล็อค · กรอกแล้ว ${filled} ล็อค${penaltySum>0?' · ค่าปรับ ฿'+penaltySum.toLocaleString():''}${otherSum>0?' · อื่นๆ ฿'+otherSum.toLocaleString():''}`
+    : 'กรุณาเลือกล็อคที่ต้องการ';
+
+  document.getElementById('footerCount').textContent = selected.length;
+  document.getElementById('footerFilled').textContent = filled;
+  document.getElementById('footerTotal').textContent = `฿${totalPaid.toLocaleString()}`;
+
+  document.getElementById('saveBtn').disabled = selected.length === 0 || totalPaid === 0;
+}
+
+// ── METHOD ──
+function setMethod(btn, method) {
+  document.querySelectorAll('.method-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  payMethod = method;
+}
+
+// ── CONFIRM ──
+function openConfirm() {
+  const selected = ALL_LOCKS.filter(l => selectedIds.has(l.id));
+  const paid = selected.filter(l => (parseFloat(payAmounts[l.id]) || 0) > 0);
+  const zero = selected.filter(l => !(parseFloat(payAmounts[l.id]) || 0));
+  const totalPaid = paid.reduce((s, l) => s + (parseFloat(payAmounts[l.id]) || 0), 0);
+  const collector = document.getElementById('collector').value || '(ไม่ระบุ)';
+  const payDate = document.getElementById('payDate').value;
+
+  let html = `<div class="receipt-row"><span class="modal-label">วันที่</span><span>${payDate}</span></div>
+    <div class="receipt-row"><span class="modal-label">ผู้รับเงิน</span><span>${collector}</span></div>
+    <div class="receipt-row"><span class="modal-label">ช่องทาง</span><span>${payMethod}</span></div>
+    <div class="receipt-row"><span class="modal-label">จำนวนล็อคที่บันทึก</span><span>${paid.length} ล็อค</span></div>`;
+
+  if (zero.length > 0) {
+    html += `<div class="receipt-row" style="color:#dd6b20"><span class="modal-label">⚠️ ยอด 0 (ข้าม)</span><span>${zero.map(l => l.id).join(', ')}</span></div>`;
+  }
+
+  const top5 = paid.slice(0, 5).map(l => `<div class="receipt-row"><span>${l.id} ${l.product}</span><span>฿${(parseFloat(payAmounts[l.id])||0).toLocaleString()}</span></div>`).join('');
+  html += top5;
+  if (paid.length > 5) html += `<div class="receipt-row"><span style="color:#5b6b82">...และอีก ${paid.length - 5} ล็อค</span><span></span></div>`;
+  html += `<div class="receipt-row"><span>ยอดรวมทั้งหมด</span><span>฿${totalPaid.toLocaleString()}</span></div>`;
+
+  document.getElementById('receiptContent').innerHTML = html;
+  document.getElementById('confirmModal').classList.add('show');
+}
+
+function closeModal() {
+  document.getElementById('confirmModal').classList.remove('show');
+}
+
+async function confirmSave() {
+  closeModal();
+  if(!getApiUrl()){
+    showToast('⚠️ ยังไม่ได้เชื่อมต่อ Google Sheets — บันทึกไม่สำเร็จ');
+    return;
+  }
+  const selected = ALL_LOCKS.filter(l => selectedIds.has(l.id) && (parseFloat(payAmounts[l.id]) || 0) > 0);
+  const total = selected.reduce((s, l) => s + (parseFloat(payAmounts[l.id]) || 0), 0);
+  const collector = document.getElementById('collector').value || '(ไม่ระบุ)';
+  // เก็บวันที่แบบไทย (เช่น "2 ก.ค. 2569") ให้ตรงกับที่รายงานใช้ค้นหา — เดิมเก็บเป็น ISO ทำให้รายงานหาไม่เจอ
+  const payDate = dateToTH(document.getElementById('payDate').value);
+
+  const saveBtn=document.getElementById('saveBtn');
+  if(saveBtn){ saveBtn.disabled=true; saveBtn.textContent='⏳ กำลังบันทึก...'; }
+
+  // บันทึกแต่ละล็อคเป็น 1 รายการใน sheet "payments" (ค่าเช่า+ค่าไฟ รวมเป็นยอดเดียวต่อล็อค
+  // แยกค่าปรับ/ค่าอื่น เป็น field penalty / other_fee เพื่อให้รายงานแยกประเภทได้)
+  let okCount=0, failCount=0;
+  for(const l of selected){
+    const amount = parseFloat(payAmounts[l.id]) || 0;
+    const penalty = payPenalties[l.id] || 0;
+    const other = payOthers[l.id] || 0;
+    const otherLabel = payOtherLabels[l.id] || '';
+    const note = payNotes[l.id] || '';
+    const res = await apiPost('savePayment', { data: {
+      lock_id: l.id, vendor_name: l.vendor, product: l.product,
+      type: 'ค่าเช่าประจำเดือน', amount, penalty, other_fee: other,
+      other_label: otherLabel, method: payMethod, note: note || ('ผู้รับเงิน: '+collector),
+      date: payDate, time: nowTime(),
+    }});
+    if(res && res.status==='ok'){
+      okCount++;
+      l.status='paid';
+      // อัปเดตสถานะผู้ค้าใน Sheets ด้วย ถ้าก่อนหน้านี้ค้างชำระ ให้เปลี่ยนเป็นปกติ
+      apiPost('saveVendor',{data:{lock:l.id, status:'active'}});
+    } else {
+      failCount++;
+    }
+  }
+
+  if(saveBtn){ saveBtn.disabled=false; saveBtn.textContent='💾 บันทึกการรับชำระ'; }
+
+  if(failCount===0){
+    showToast(`✅ บันทึกสำเร็จ ${okCount} ล็อค · รวม ฿${total.toLocaleString()}`);
+  } else {
+    showToast(`⚠️ บันทึกสำเร็จ ${okCount} ล็อค · ล้มเหลว ${failCount} ล็อค กรุณาตรวจสอบ`);
+  }
+  clearAll();
+  renderLockList();
+}
+
+function filterChanged() { renderLockList(); }
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 3500);
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,1275 @@
+<!DOCTYPE html>
+<html lang="th" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ระบบค่าไฟฟ้า — แพไม้มินิ วันพฤหัสบดี</title>
+<style>a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible,[tabindex]:focus-visible,.lk:focus-visible,.zone-tab:focus-visible{outline:2.5px solid var(--green-m) !important;outline-offset:2px;}.ico{width:1em;height:1em;display:inline-block;vertical-align:-0.15em;flex-shrink:0}
+:root {
+  --green:      #c2410c;
+  --green-m:    #ea580c;
+  --green-b:    #f97316;
+  --green-l:    #ffedd5;
+  --green-ll:   #fff7ed;
+  --yellow:     #f59e0b;
+  --yellow-l:   #fef3c7;
+  --red:        #dc2626;
+  --red-l:      #fee2e2;
+  --blue:       #2563eb;
+  --blue-l:     #dbeafe;
+  --purple:     #7c3aed;
+  --purple-l:   #ede9fe;
+  --orange:     #ea580c;
+  --orange-l:   #ffedd5;
+
+  --bg:         #f0f4f8;
+  --surface:    #ffffff;
+  --surface2:   #f8fafc;
+  --surface3:   #f1f5f9;
+  --border:     #e2e8f0;
+  --border2:    #cbd5e0;
+
+  --text-hi:    #0f172a;
+  --text-md:    #475569;
+  --text-lo:    #5b6b82;
+  --text-inv:   #ffffff;
+
+  --shadow-sm:  0 1px 3px rgba(0,0,0,.06);
+  --shadow-md:  0 4px 16px rgba(0,0,0,.08);
+  --shadow-lg:  0 12px 40px rgba(0,0,0,.12);
+  --shadow-btn: 0 4px 14px rgba(45,106,79,.3);
+  --radius:     14px;
+  --ease:       cubic-bezier(.4,0,.2,1);
+}
+
+[data-theme="dark"] {
+  --bg:         #0d1117;
+  --surface:    #161b22;
+  --surface2:   #1c2333;
+  --surface3:   #21262d;
+  --border:     #30363d;
+  --border2:    #484f58;
+  --text-hi:    #e6edf3;
+  --text-md:    #8b949e;
+  --text-lo:    #7d8590;
+  --green-l:    #132a1d;
+  --green-ll:   #0d1f14;
+  --yellow-l:   #2d2000;
+  --red-l:      #2d0a0a;
+  --blue-l:     #0d1b3e;
+  --purple-l:   #1e0f3d;
+  --orange-l:   #2d1200;
+  --shadow-md:  0 4px 20px rgba(0,0,0,.4);
+  --shadow-lg:  0 16px 48px rgba(0,0,0,.55);
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body {
+  font-family: 'Segoe UI', system-ui, sans-serif;
+  background: var(--bg); color: var(--text-hi);
+  font-size: 14px; min-height: 100vh;
+  transition: background .35s var(--ease), color .35s var(--ease);
+}
+
+/* ── TOPBAR ── */
+.topbar {
+  background: linear-gradient(135deg, #0d2618 0%, #1b4332 50%, #c2410c 100%);
+  color: white; padding: 14px 24px;
+  display: flex; align-items: center; justify-content: space-between;
+  position: sticky; top: 0; z-index: 300;
+  box-shadow: 0 2px 20px rgba(0,0,0,.35);
+}
+.topbar h1 { font-size: 1rem; font-weight: 800; }
+.topbar p  { font-size: .72rem; opacity: .75; margin-top: 2px; }
+.topbar-right { display: flex; align-items: center; gap: 10px; }
+.dm-btn {
+  width: 36px; height: 36px; border-radius: 50%; border: 1.5px solid rgba(255,255,255,.3);
+  background: rgba(255,255,255,.12); color: white; cursor: pointer; font-size: .95rem;
+  display: flex; align-items: center; justify-content: center;
+  transition: all .2s var(--ease);
+}
+.dm-btn:hover { background: rgba(255,255,255,.22); transform: rotate(20deg); }
+
+/* ── TABS ── */
+.main-tabs {
+  background: var(--surface); border-bottom: 1px solid var(--border);
+  display: flex; overflow-x: auto; padding: 0 20px; gap: 2px;
+  position: sticky; top: 58px; z-index: 200;
+  transition: background .35s var(--ease);
+}
+.main-tabs::-webkit-scrollbar { display: none; }
+.tab-btn {
+  padding: 13px 18px; border: none; background: none; cursor: pointer;
+  font-size: .80rem; font-weight: 700; color: var(--text-lo);
+  border-bottom: 3px solid transparent; white-space: nowrap;
+  transition: all .2s var(--ease); font-family: inherit;
+}
+.tab-btn:hover { color: var(--text-md); }
+.tab-btn.active { color: var(--green-m); border-bottom-color: var(--green-m); }
+
+/* ── LAYOUT ── */
+.page { display: none; max-width: 1080px; margin: 22px auto; padding: 0 20px 48px; }
+.page.active { display: block; animation: fadeUp .3s var(--ease); }
+@keyframes fadeUp { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
+
+.two-col { display: grid; grid-template-columns: 1fr 340px; gap: 18px; }
+
+/* ── CARD ── */
+.card {
+  background: var(--surface); border-radius: var(--radius);
+  border: 1px solid var(--border); box-shadow: var(--shadow-md);
+  padding: 20px 22px; margin-bottom: 16px;
+  transition: background .35s var(--ease), border-color .35s var(--ease);
+}
+.card:hover { box-shadow: var(--shadow-lg); }
+.card-title {
+  font-size: .86rem; font-weight: 800; color: var(--text-hi);
+  margin-bottom: 16px; padding-bottom: 11px;
+  border-bottom: 1.5px solid var(--border);
+  display: flex; align-items: center; gap: 8px;
+}
+.card-title span { margin-left: auto; }
+
+/* ── KPI BAR ── */
+.kpi-row { display: grid; grid-template-columns: repeat(4,1fr); gap: 12px; margin-bottom: 18px; }
+.kpi {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 11px; padding: 14px 15px;
+  transition: all .25s var(--ease);
+  box-shadow: var(--shadow-sm);
+}
+.kpi:hover { transform: translateY(-2px); box-shadow: var(--shadow-md); }
+.kpi-num { font-size: 1.45rem; font-weight: 800; color: var(--text-hi); transition: color .2s; }
+.kpi-label { font-size: .70rem; color: var(--text-lo); margin-top: 3px; }
+.kpi-sub { font-size: .75rem; font-weight: 700; margin-top: 4px; }
+.kpi.green  .kpi-num { color: var(--green-m); }
+.kpi.yellow .kpi-num { color: var(--yellow); }
+.kpi.red    .kpi-num { color: var(--red); }
+.kpi.blue   .kpi-num { color: var(--blue); }
+
+/* ── VENDOR TABLE ── */
+.search-row { display: flex; gap: 8px; margin-bottom: 12px; flex-wrap: wrap; }
+.search-input {
+  flex: 1; min-width: 160px; padding: 8px 12px;
+  border: 1.5px solid var(--border); border-radius: 9px; font-size: .82rem;
+  background: var(--surface2); color: var(--text-hi); outline: none;
+  transition: all .2s var(--ease); font-family: inherit;
+}
+.search-input:focus { border-color: var(--green-m); box-shadow: 0 0 0 3px rgba(64,145,108,.12); }
+.filter-sel {
+  padding: 8px 10px; border: 1.5px solid var(--border); border-radius: 9px;
+  font-size: .78rem; background: var(--surface2); color: var(--text-hi);
+  outline: none; cursor: pointer; transition: all .2s var(--ease); font-family: inherit;
+}
+.filter-sel:focus { border-color: var(--green-m); }
+
+.vendor-table { width: 100%; border-collapse: collapse; font-size: .80rem; }
+.vendor-table th {
+  background: var(--surface2); padding: 10px 11px; text-align: left;
+  font-weight: 700; color: var(--text-lo); font-size: .72rem;
+  text-transform: uppercase; letter-spacing: .4px;
+  border-bottom: 1.5px solid var(--border); white-space: nowrap;
+  position: sticky; top: 0;
+}
+.vendor-table td { padding: 10px 11px; border-bottom: 1px solid var(--border); color: var(--text-hi); vertical-align: middle; }
+.vendor-table tr { transition: background .15s var(--ease); }
+.vendor-table tr:hover td { background: var(--surface2); }
+.vendor-table tr.unpaid td { background: rgba(220,38,38,.04); }
+[data-theme="dark"] .vendor-table tr.unpaid td { background: rgba(220,38,38,.08); }
+
+.lock-badge {
+  display: inline-block; padding: 2px 8px; border-radius: 6px;
+  font-size: .70rem; font-weight: 800; background: var(--green-l); color: var(--green);
+}
+.status-badge {
+  display: inline-flex; align-items: center; gap: 4px;
+  padding: 3px 9px; border-radius: 20px; font-size: .68rem; font-weight: 800;
+}
+.s-paid    { background: var(--green-l); color: var(--green); }
+.s-unpaid  { background: var(--red-l); color: var(--red); }
+.s-partial { background: var(--yellow-l); color: var(--yellow); }
+
+.tbl-amount { font-weight: 700; font-family: 'Courier New', monospace; }
+.tbl-action {
+  padding: 5px 11px; border: none; border-radius: 7px; cursor: pointer;
+  font-size: .72rem; font-weight: 700; transition: all .18s var(--ease); font-family: inherit;
+}
+.btn-edit  { background: var(--blue-l); color: var(--blue); }
+.btn-edit:hover  { background: var(--blue); color: white; }
+.btn-pay   { background: var(--green-l); color: var(--green); }
+.btn-pay:hover   { background: var(--green-m); color: white; }
+
+/* ── ELECTRIC TYPE CARDS ── */
+.elec-types { display: grid; grid-template-columns: repeat(auto-fill,minmax(180px,1fr)); gap: 10px; margin-bottom: 14px; }
+.elec-type-card {
+  border: 2px solid var(--border); border-radius: 11px; padding: 13px 14px;
+  cursor: pointer; transition: all .2s var(--ease);
+  background: var(--surface2); position: relative; overflow: hidden;
+}
+.elec-type-card::before {
+  content: ''; position: absolute; inset: 0;
+  background: linear-gradient(135deg, transparent 60%, rgba(255,255,255,.04));
+  pointer-events: none;
+}
+.elec-type-card:hover { transform: translateY(-2px); box-shadow: var(--shadow-md); }
+.elec-type-card.selected { border-color: var(--green-m); background: var(--green-ll); }
+.etc-icon { font-size: 1.6rem; margin-bottom: 6px; }
+.etc-name { font-size: .78rem; font-weight: 800; color: var(--text-hi); }
+.etc-price { font-size: .72rem; color: var(--text-lo); margin-top: 2px; }
+.etc-count { display: flex; align-items: center; gap: 6px; margin-top: 10px; }
+.count-btn {
+  width: 26px; height: 26px; border-radius: 7px; border: 1.5px solid var(--border2);
+  background: var(--surface); cursor: pointer; font-size: 1rem; font-weight: 700;
+  display: flex; align-items: center; justify-content: center; color: var(--text-hi);
+  transition: all .15s var(--ease); font-family: inherit;
+}
+.count-btn:hover { background: var(--green-m); color: white; border-color: var(--green-m); }
+.count-num {
+  width: 36px; text-align: center; font-weight: 800; font-size: .88rem;
+  color: var(--text-hi); background: var(--surface); border: 1.5px solid var(--border);
+  border-radius: 7px; padding: 3px 0; font-family: inherit;
+}
+.count-num:focus { outline: none; border-color: var(--green-m); }
+
+/* special price input */
+.special-price-row { display: flex; align-items: center; gap: 6px; margin-top: 8px; }
+.special-price-row input {
+  width: 90px; padding: 5px 8px; border: 1.5px solid var(--border); border-radius: 7px;
+  font-size: .80rem; background: var(--surface); color: var(--text-hi); outline: none;
+  transition: border-color .2s; font-family: inherit;
+}
+.special-price-row input:focus { border-color: var(--green-m); }
+.special-price-row label { font-size: .72rem; color: var(--text-lo); }
+
+/* ── BILL PREVIEW ── */
+.bill-preview {
+  background: var(--surface2); border: 1.5px solid var(--border);
+  border-radius: 11px; padding: 15px; margin-top: 10px; font-size: .80rem;
+}
+.bp-title { font-weight: 800; font-size: .86rem; margin-bottom: 10px; color: var(--text-hi); text-align: center; }
+.bp-row { display: flex; justify-content: space-between; padding: 5px 0; border-bottom: 1px dashed var(--border); }
+.bp-row:last-child { border: none; font-weight: 800; font-size: .9rem; padding-top: 10px; color: var(--green-m); }
+.bp-indent { padding-left: 12px; color: var(--text-md); }
+
+/* ── STICKY TOTAL BAR ── */
+.sticky-total {
+  position: sticky; top: 105px;
+  background: linear-gradient(135deg, var(--green), var(--green-m));
+  border-radius: 12px; padding: 16px 18px; color: white; margin-bottom: 14px;
+  box-shadow: 0 6px 24px rgba(45,106,79,.35);
+  transition: all .3s var(--ease);
+}
+.st-label { font-size: .76rem; opacity: .85; }
+.st-amount { font-size: 1.8rem; font-weight: 800; margin: 4px 0; }
+.st-sub { font-size: .72rem; opacity: .72; }
+
+/* ── MONTH SUMMARY ── */
+.month-bar { display: flex; align-items: center; gap: 10px; margin-bottom: 14px; flex-wrap: wrap; }
+.month-select { padding: 8px 12px; border: 1.5px solid var(--border); border-radius: 9px; background: var(--surface2); color: var(--text-hi); font-size: .82rem; font-family: inherit; outline: none; }
+.zone-filter-row { display: flex; gap: 6px; flex-wrap: wrap; }
+.zf-btn {
+  padding: 5px 12px; border-radius: 20px; border: 1.5px solid var(--border);
+  background: var(--surface2); color: var(--text-lo); font-size: .72rem;
+  font-weight: 700; cursor: pointer; transition: all .15s var(--ease); font-family: inherit;
+}
+.zf-btn:hover { border-color: var(--green-m); color: var(--green-m); }
+.zf-btn.active { background: var(--green-m); border-color: var(--green-m); color: white; }
+
+/* ── MODALS ── */
+.overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.5); z-index: 1000; align-items: center; justify-content: center; backdrop-filter: blur(3px); }
+.overlay.show { display: flex; }
+.modal {
+  background: var(--surface); border-radius: 18px; padding: 26px 28px;
+  max-width: 580px; width: 94%; box-shadow: var(--shadow-lg);
+  border: 1px solid var(--border);
+  animation: modalPop .25s var(--ease);
+  max-height: 90vh; overflow-y: auto;
+}
+.modal::-webkit-scrollbar { width: 4px; }
+.modal::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 2px; }
+@keyframes modalPop { from{transform:scale(.92) translateY(10px);opacity:0} to{transform:scale(1);opacity:1} }
+.modal-title { font-size: 1rem; font-weight: 800; margin-bottom: 4px; }
+.modal-sub   { font-size: .78rem; color: var(--text-lo); margin-bottom: 18px; }
+.modal-close { float: right; background: none; border: none; font-size: 1.2rem; cursor: pointer; color: var(--text-lo); transition: color .15s; }
+.modal-close:hover { color: var(--red); }
+.modal-btns { display: flex; gap: 9px; margin-top: 18px; }
+.modal-btns .btn { flex: 1; }
+
+/* ── BUTTONS ── */
+.btn {
+  padding: 10px 18px; border: none; border-radius: 9px;
+  font-size: .82rem; font-weight: 700; cursor: pointer;
+  transition: all .2s var(--ease); font-family: inherit;
+  display: inline-flex; align-items: center; justify-content: center; gap: 5px;
+}
+.btn-primary {
+  background: linear-gradient(135deg, var(--green), var(--green-m));
+  color: white; box-shadow: var(--shadow-btn);
+}
+.btn-primary:hover { transform: translateY(-1px); filter: brightness(1.08); }
+.btn-primary:active { transform: translateY(0) scale(.98); }
+.btn-secondary { background: var(--surface2); border: 1.5px solid var(--border); color: var(--text-md); }
+.btn-secondary:hover { background: var(--border); }
+.btn-danger { background: var(--red-l); color: var(--red); }
+.btn-danger:hover { background: var(--red); color: white; }
+
+/* ── TOAST ── */
+.toast {
+  position: fixed; bottom: 22px; right: 22px; z-index: 9999;
+  padding: 12px 18px; border-radius: 11px; font-size: .82rem; font-weight: 700;
+  box-shadow: var(--shadow-lg); color: white;
+  transform: translateY(80px) scale(.9); opacity: 0;
+  transition: all .3s var(--ease);
+}
+.toast.show { transform: translateY(0) scale(1); opacity: 1; }
+.toast.success { background: var(--green-m); }
+.toast.error   { background: var(--red); }
+.toast.info    { background: var(--blue); }
+
+/* ── ELEC HISTORY TABLE ── */
+.history-table { width: 100%; border-collapse: collapse; font-size: .78rem; }
+.history-table th { background: var(--surface2); padding: 8px 10px; text-align: left; font-weight: 700; color: var(--text-lo); border-bottom: 1.5px solid var(--border); font-size: .70rem; text-transform: uppercase; letter-spacing: .3px; }
+.history-table td { padding: 8px 10px; border-bottom: 1px solid var(--border); }
+.history-table tr:last-child td { border: none; }
+
+/* ── MISC ── */
+.section-div { display: flex; align-items: center; gap: 10px; margin: 16px 0 12px; }
+.section-div span { font-size: .72rem; font-weight: 800; color: var(--text-lo); white-space: nowrap; }
+.section-div::before, .section-div::after { content:''; flex:1; height:1px; background: var(--border); }
+
+.elec-icon-legend { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 10px; }
+.eil { display: flex; align-items: center; gap: 5px; font-size: .72rem; color: var(--text-lo); }
+
+::-webkit-scrollbar { width: 5px; }
+::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 3px; }
+
+@media (max-width:900px) { .two-col { grid-template-columns: 1fr; } .kpi-row { grid-template-columns: repeat(2,1fr); } }
+@media (max-width:520px) { .elec-types { grid-template-columns: repeat(2,1fr); } }
+</style>
+</head>
+<body>
+
+<!-- TOPBAR -->
+<div class="topbar">
+  <div>
+    <h1><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2 4 14h6l-1 8 9-13h-6l1-7z"/></svg> ระบบค่าไฟฟ้า — แพไม้มินิ วันพฤหัสบดี</h1>
+    <p>Electric Utility Management · คำนวณรวมค่าล็อคประจำเดือน</p>
+  </div>
+  <div class="topbar-right">
+    <button class="dm-btn" onclick="toggleDark()" title="Dark/Light mode" aria-label="สลับโหมดมืด/สว่าง"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 3a9 9 0 0 0 0 18z" fill="currentColor" stroke="none"/></svg></button>
+  </div>
+</div>
+
+<!-- TABS -->
+<div class="main-tabs">
+  <button class="tab-btn active" onclick="showTab('tab-vendors',this)"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="4" width="12" height="17" rx="2"/><rect x="9" y="2.5" width="6" height="3" rx="1"/><path d="M9 11h6M9 15h6"/></svg> รายชื่อผู้ค้า + ค่าไฟ</button>
+  <button class="tab-btn" onclick="showTab('tab-update',this)"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h4L19.5 8.5a2.1 2.1 0 0 0-3-3L5.5 16 4 20z"/><path d="M14.5 6.5l3 3"/></svg>️ แก้ไขค่าไฟรายล็อค</button>
+  <button class="tab-btn" onclick="showTab('tab-billing',this)"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v10M9.5 9.2c0-1.2 1.1-2.2 2.5-2.2s2.5.9 2.5 2c0 2.8-5 1.6-5 4.3 0 1.1 1.1 2 2.5 2s2.5-.9 2.5-2"/></svg> สรุปบิลประจำเดือน</button>
+  <button class="tab-btn" onclick="showTab('tab-history',this)"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20V10M11 20V4M18 20v-7"/><path d="M2.5 20h19"/></svg> ประวัติค่าไฟ</button>
+</div>
+
+<!-- ═══════════════════ TAB 1: VENDORS ═══════════════════ -->
+<div id="tab-vendors" class="page active">
+  <div class="kpi-row">
+    <div class="kpi green">
+      <div class="kpi-num" id="kpi-total-vendors">0</div>
+      <div class="kpi-label">ผู้ค้าทั้งหมด</div>
+    </div>
+    <div class="kpi yellow">
+      <div class="kpi-num" id="kpi-total-elec">฿0</div>
+      <div class="kpi-label">ค่าไฟรวม/เดือน</div>
+      <div class="kpi-sub" style="color:var(--yellow)">คำนวณจากอุปกรณ์จริง</div>
+    </div>
+    <div class="kpi blue">
+      <div class="kpi-num" id="kpi-total-rent">฿0</div>
+      <div class="kpi-label">ค่าเช่ารวม/เดือน</div>
+    </div>
+    <div class="kpi green">
+      <div class="kpi-num" id="kpi-grand">฿0</div>
+      <div class="kpi-label">รวมทั้งหมด/เดือน</div>
+      <div class="kpi-sub" style="color:var(--green-m)">เช่า + ค่าไฟ</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="4" width="12" height="17" rx="2"/><rect x="9" y="2.5" width="6" height="3" rx="1"/><path d="M9 11h6M9 15h6"/></svg> รายชื่อผู้ค้าพร้อมค่าไฟฟ้า
+      <span><button class="btn btn-primary" style="padding:6px 14px;font-size:.74rem" onclick="openAddModal()"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg> เพิ่มผู้ค้า</button></span>
+    </div>
+    <div class="search-row">
+      <input class="search-input" id="searchInput" aria-label="ค้นหาชื่อร้าน / ล็อค / สินค้า" placeholder="🔍 ค้นหาชื่อร้าน / ล็อค / สินค้า..." oninput="renderTable()">
+      <select class="filter-sel" id="zoneFilter" aria-label="กรองโซน" onchange="renderTable()">
+        <option value="">ทุกโซน</option>
+        <option value="A">A</option><option value="B">B</option><option value="C">C</option>
+        <option value="D">D</option><option value="E">E</option><option value="F">F</option>
+        <option value="G">G</option><option value="J">J</option><option value="K">K</option>
+        <option value="N">N</option><option value="U">U</option>
+        <option value="O">O</option><option value="M">M</option><option value="H">H</option>
+        <option value="L">L</option><option value="T">T</option><option value="AB">AB</option>
+        <option value="TA">TA</option><option value="TB">TB</option><option value="TC">TC</option>
+      </select>
+      <select class="filter-sel" id="statusFilter" aria-label="กรองสถานะ" onchange="renderTable()">
+        <option value="">ทุกสถานะ</option>
+        <option value="paid">ชำระแล้ว</option>
+        <option value="unpaid">ค้างชำระ</option>
+      </select>
+    </div>
+    <div style="overflow-x:auto">
+      <table class="vendor-table">
+        <thead>
+          <tr>
+            <th>ล็อค</th><th>ร้าน / สินค้า</th><th>โซน</th>
+            <th style="text-align:right">ค่าเช่า</th>
+            <th>อุปกรณ์ไฟฟ้า</th>
+            <th style="text-align:right">ค่าไฟ/เดือน</th>
+            <th style="text-align:right">รวม/เดือน</th>
+            <th>สถานะ</th>
+            <th style="text-align:center">จัดการ</th>
+          </tr>
+        </thead>
+        <tbody id="vendorTbody"></tbody>
+      </table>
+    </div>
+    <div style="margin-top:10px;font-size:.72rem;color:var(--text-lo)" id="tableCount"></div>
+  </div>
+</div>
+
+<!-- ═══════════════════ TAB 2: UPDATE ELECTRIC ═══════════════════ -->
+<div id="tab-update" class="page">
+  <div class="two-col">
+    <div>
+      <div class="card">
+        <div class="card-title"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2 4 14h6l-1 8 9-13h-6l1-7z"/></svg> แก้ไขอุปกรณ์ไฟฟ้าประจำล็อค</div>
+        <div class="field-row-2">
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px">
+            <div>
+              <label for="editLockSel" style="font-size:.72rem;font-weight:700;color:var(--text-lo);text-transform:uppercase;letter-spacing:.4px;display:block;margin-bottom:5px">เลือกล็อค <span style="color:var(--red)">*</span></label>
+              <select id="editLockSel" aria-label="เลือกล็อค" class="filter-sel" style="width:100%;padding:9px 12px;font-size:.84rem" onchange="loadLockElec()">
+                <option value="">-- เลือกล็อค --</option>
+              </select>
+            </div>
+            <div id="editVendorInfo" style="display:none;background:var(--green-ll);border:1.5px solid var(--green-m);border-radius:9px;padding:10px 13px;font-size:.78rem">
+              <div style="font-weight:800;color:var(--green-m)" id="editVendorName">—</div>
+              <div style="color:var(--text-lo);margin-top:3px" id="editVendorProduct">—</div>
+              <div style="color:var(--green);font-weight:700;margin-top:2px" id="editVendorRent">—</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="section-div"><span>ประเภทอุปกรณ์ไฟฟ้า</span></div>
+
+        <div class="elec-icon-legend">
+          <div class="eil"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18h6M10 21h4"/><path d="M12 3a6 6 0 0 0-3.5 10.9c.6.5 1 1.2 1 2.1h5c0-.9.4-1.6 1-2.1A6 6 0 0 0 12 3z"/></svg> = หลอดไฟ ฿10/ดวง</div>
+          <div class="eil"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><g><ellipse cx="12" cy="7.3" rx="2.6" ry="4" transform="rotate(0 12 12)"/><ellipse cx="12" cy="7.3" rx="2.6" ry="4" transform="rotate(120 12 12)"/><ellipse cx="12" cy="7.3" rx="2.6" ry="4" transform="rotate(240 12 12)"/><circle cx="12" cy="12" r="1.5" fill="currentColor" stroke="none"/></g></svg> = พัดลม ฿20/ตัว</div>
+          <div class="eil"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 2v6M15 2v6M7 8h10v4a5 5 0 0 1-10 0V8z"/><path d="M12 17v5"/></svg> = อุปกรณ์เล็ก ฿50/ชิ้น</div>
+          <div class="eil"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M12 3v2.2M12 18.8V21M4.2 12H2M22 12h-2.2M5.8 5.8l1.5 1.5M16.7 16.7l1.5 1.5M18.2 5.8l-1.5 1.5M7.3 16.7l-1.5 1.5"/></svg>️ = อุปกรณ์ใหญ่ ฿100/ชิ้น</div>
+          <div class="eil">⭐ = พิเศษ (ระบุราคา)</div>
+        </div>
+
+        <div class="elec-types" id="elecTypeCards"></div>
+
+        <!-- Special items -->
+        <div class="section-div"><span>อุปกรณ์พิเศษ (ระบุราคาเอง)</span></div>
+        <div id="specialItems"></div>
+        <button class="btn btn-secondary" style="width:100%;margin-bottom:14px;border-style:dashed" onclick="addSpecialItem()">
+          ⭐ เพิ่มอุปกรณ์พิเศษ
+        </button>
+
+        <button class="btn btn-primary" style="width:100%" onclick="saveElectric()">
+          <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 3h13l3 3v15H4z"/><path d="M8 3v6h8V3M7 14h10v7H7z"/></svg> บันทึกค่าไฟประจำล็อค
+        </button>
+      </div>
+    </div>
+
+    <!-- Right: bill preview -->
+    <div>
+      <div class="sticky-total">
+        <div class="st-label">ค่าไฟรวม/เดือน (ล็อคที่เลือก)</div>
+        <div class="st-amount" id="editElecTotal">฿0</div>
+        <div class="st-sub" id="editElecBreakdown">กรุณาเลือกล็อค</div>
+      </div>
+
+      <div class="card">
+        <div class="card-title"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2.5h12v19l-2-1.5-2 1.5-2-1.5-2 1.5-2-1.5-2 1.5v-19z"/><path d="M9 7h6M9 11h6M9 15h4"/></svg> ตัวอย่างบิลประจำเดือน</div>
+        <div class="bill-preview" id="billPreview">
+          <div class="bp-title">บิลรวมประจำเดือน</div>
+          <div style="color:var(--text-lo);font-size:.78rem;text-align:center">เลือกล็อคเพื่อดูตัวอย่าง</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20V10M11 20V4M18 20v-7"/><path d="M2.5 20h19"/></svg> อัตราค่าไฟอ้างอิง</div>
+        <table class="history-table">
+          <tr><th>ประเภท</th><th>ราคา/ชิ้น</th></tr>
+          <tr><td><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18h6M10 21h4"/><path d="M12 3a6 6 0 0 0-3.5 10.9c.6.5 1 1.2 1 2.1h5c0-.9.4-1.6 1-2.1A6 6 0 0 0 12 3z"/></svg> หลอดไฟ</td><td style="font-weight:700;color:var(--yellow)">฿10</td></tr>
+          <tr><td><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><g><ellipse cx="12" cy="7.3" rx="2.6" ry="4" transform="rotate(0 12 12)"/><ellipse cx="12" cy="7.3" rx="2.6" ry="4" transform="rotate(120 12 12)"/><ellipse cx="12" cy="7.3" rx="2.6" ry="4" transform="rotate(240 12 12)"/><circle cx="12" cy="12" r="1.5" fill="currentColor" stroke="none"/></g></svg> พัดลม</td><td style="font-weight:700;color:var(--blue)">฿20</td></tr>
+          <tr><td><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 2v6M15 2v6M7 8h10v4a5 5 0 0 1-10 0V8z"/><path d="M12 17v5"/></svg> เครื่องเล็ก</td><td style="font-weight:700;color:var(--orange)">฿50</td></tr>
+          <tr><td><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M12 3v2.2M12 18.8V21M4.2 12H2M22 12h-2.2M5.8 5.8l1.5 1.5M16.7 16.7l1.5 1.5M18.2 5.8l-1.5 1.5M7.3 16.7l-1.5 1.5"/></svg>️ เครื่องใหญ่</td><td style="font-weight:700;color:var(--purple)">฿100</td></tr>
+          <tr><td>⭐ พิเศษ</td><td style="font-weight:700;color:var(--green-m)">ระบุเอง</td></tr>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════ TAB 3: BILLING ═══════════════════ -->
+<div id="tab-billing" class="page">
+  <div class="month-bar">
+    <div class="month-select" id="billMonth" style="display:flex;align-items:center;font-weight:700"></div>
+    <div class="zone-filter-row" id="zoneFilterBill"></div>
+    <button class="btn btn-primary" style="margin-left:auto;padding:7px 16px;font-size:.78rem" onclick="exportBill()"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 4h12v10M4 14h5l1.5 2h3L15 14h5v6H4z"/></svg> Export Excel</button>
+  </div>
+
+  <div class="kpi-row">
+    <div class="kpi green"><div class="kpi-num" id="b-total">฿0</div><div class="kpi-label">บิลรวมทั้งหมด</div></div>
+    <div class="kpi blue"><div class="kpi-num" id="b-rent">฿0</div><div class="kpi-label">ค่าเช่ารวม</div></div>
+    <div class="kpi yellow"><div class="kpi-num" id="b-elec">฿0</div><div class="kpi-label">ค่าไฟรวม</div></div>
+    <div class="kpi red"><div class="kpi-num" id="b-unpaid">0</div><div class="kpi-label">ยังไม่ชำระ</div></div>
+  </div>
+
+  <div class="card">
+    <div class="card-title"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v10M9.5 9.2c0-1.2 1.1-2.2 2.5-2.2s2.5.9 2.5 2c0 2.8-5 1.6-5 4.3 0 1.1 1.1 2 2.5 2s2.5-.9 2.5-2"/></svg> บิลรวมค่าเช่า + ค่าไฟ ประจำเดือน
+      <span style="font-size:.72rem;color:var(--text-lo);font-weight:400">ค่าไฟฟ้ารวมอยู่ในยอดเรียกเก็บเดียวกัน</span>
+    </div>
+    <div style="overflow-x:auto">
+      <table class="vendor-table">
+        <thead>
+          <tr>
+            <th>#</th><th>ล็อค</th><th>ร้าน</th><th>โซน</th>
+            <th style="text-align:right">ค่าเช่า</th>
+            <th style="text-align:right">ค่าไฟ</th>
+            <th style="text-align:right">รวมที่ต้องชำระ</th>
+            <th>สถานะ</th>
+            <th style="text-align:center">รับชำระ</th>
+          </tr>
+        </thead>
+        <tbody id="billingTbody"></tbody>
+        <tfoot id="billingFoot" style="font-weight:800;background:var(--green-ll)"></tfoot>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════ TAB 4: HISTORY ═══════════════════ -->
+<div id="tab-history" class="page">
+  <div class="card">
+    <div class="card-title"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20V10M11 20V4M18 20v-7"/><path d="M2.5 20h19"/></svg> ประวัติค่าไฟฟ้ารายล็อค</div>
+    <div class="search-row">
+      <select class="filter-sel" id="histLockSel" aria-label="เลือกล็อคดูประวัติ" onchange="renderHistory()" style="min-width:130px">
+        <option value="">ทุกล็อค</option>
+      </select>
+      <select class="filter-sel" id="histMonths" aria-label="เลือกช่วงเดือน" onchange="renderHistory()">
+        <option value="3">3 เดือนล่าสุด</option>
+        <option value="6">6 เดือนล่าสุด</option>
+        <option value="12">12 เดือนล่าสุด</option>
+      </select>
+    </div>
+    <div style="overflow-x:auto">
+      <table class="history-table" id="historyTable">
+        <thead>
+          <tr><th>เดือน</th><th>ล็อค</th><th>ร้าน</th><th>อุปกรณ์</th><th style="text-align:right">ค่าไฟ</th><th style="text-align:right">ค่าเช่า</th><th style="text-align:right">รวม</th></tr>
+        </thead>
+        <tbody id="historyTbody"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════ MODAL: EDIT VENDOR ELEC (from table) ═══════ -->
+<div class="overlay" id="editModal">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('editModal')" aria-label="ปิดหน้าต่าง"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 5l14 14M19 5 5 19"/></svg></button>
+    <div class="modal-title" id="editModalTitle">แก้ไขค่าไฟ</div>
+    <div class="modal-sub" id="editModalSub">ปรับอุปกรณ์ไฟฟ้าสำหรับล็อคนี้</div>
+    <div id="editModalContent"></div>
+    <div class="modal-btns">
+      <button class="btn btn-secondary" onclick="closeModal('editModal')">ยกเลิก</button>
+      <button class="btn btn-primary" onclick="saveFromModal()"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 3h13l3 3v15H4z"/><path d="M8 3v6h8V3M7 14h10v7H7z"/></svg> บันทึก</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: PAY CONFIRM -->
+<div class="overlay" id="payModal">
+  <div class="modal" style="max-width:420px">
+    <button class="modal-close" onclick="closeModal('payModal')" aria-label="ปิดหน้าต่าง"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 5l14 14M19 5 5 19"/></svg></button>
+    <div class="modal-title"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v10M9.5 9.2c0-1.2 1.1-2.2 2.5-2.2s2.5.9 2.5 2c0 2.8-5 1.6-5 4.3 0 1.1 1.1 2 2.5 2s2.5-.9 2.5-2"/></svg> บันทึกรับชำระ</div>
+    <div class="modal-sub" id="payModalSub">ยืนยันการรับชำระเงิน</div>
+    <div id="payModalContent"></div>
+    <div class="modal-btns">
+      <button class="btn btn-secondary" onclick="closeModal('payModal')">ยกเลิก</button>
+      <button class="btn btn-primary" onclick="confirmPay()"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="m8 12 3 3 5-6"/></svg> ยืนยันรับชำระ</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ══════════════════════════════════════
+//  DARK MODE
+// ══════════════════════════════════════
+function toggleDark() {
+  const h = document.documentElement;
+  const isDark = h.getAttribute('data-theme') === 'dark';
+  h.setAttribute('data-theme', isDark ? 'light' : 'dark');
+  localStorage.setItem('pamai-theme', isDark ? 'light' : 'dark');
+}
+(()=>{
+  const s = localStorage.getItem('pamai-theme');
+  if (s) document.documentElement.setAttribute('data-theme',s);
+  else if (window.matchMedia('(prefers-color-scheme:dark)').matches) document.documentElement.setAttribute('data-theme','dark');
+})();
+
+// ══════════════════════════════════════
+//  ELECTRIC TYPE DEFINITIONS
+// ══════════════════════════════════════
+const ELEC_TYPES = [
+  { id:'bulb',    icon:'💡', name:'หลอดไฟ',           price:10,  unit:'ดวง' },
+  { id:'fan',     icon:'🌀', name:'พัดลม',            price:20,  unit:'ตัว' },
+  { id:'small',   icon:'🔌', name:'เครื่องใช้ไฟฟ้าเล็ก', price:50,  unit:'ชิ้น' },
+  { id:'large',   icon:'⚙️', name:'เครื่องใช้ไฟฟ้าใหญ่', price:100, unit:'ชิ้น' },
+];
+
+// ══════════════════════════════════════
+//  VENDOR DATABASE — โหลดจาก Google Sheets จริงเท่านั้น (ไม่มีข้อมูลตัวอย่าง)
+// ══════════════════════════════════════
+let vendors = [];
+const ALL_ZONES = ['A','B','C','D','E','F','G','J','K','N','U','O','M','H','L','T','AB','TA','TB','TC'];
+
+// ══════════════════════════════════════
+//  HELPERS
+// ══════════════════════════════════════
+function calcElec(elec) {
+  const base = (elec.bulb||0)*10 + (elec.fan||0)*20 +
+               (elec.small||0)*50 + (elec.large||0)*100;
+  const sp = (elec.special||[]).reduce((s,i)=>s+(i.price||0),0);
+  return base + sp;
+}
+
+function elecBreakdown(elec) {
+  const parts = [];
+  if (elec.bulb)  parts.push(`💡×${elec.bulb}`);
+  if (elec.fan)   parts.push(`🌀×${elec.fan}`);
+  if (elec.small) parts.push(`🔌×${elec.small}`);
+  if (elec.large) parts.push(`⚙️×${elec.large}`);
+  (elec.special||[]).forEach(s=>parts.push(`⭐${s.name||''}`));
+  return parts.join(' ') || '—';
+}
+
+function fmt(n) { return `฿${n.toLocaleString()}`; }
+
+// ══════════════════════════════════════
+//  TABS
+// ══════════════════════════════════════
+function showTab(id, btn) {
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  btn.classList.add('active');
+  if (id==='tab-vendors') renderTable();
+  if (id==='tab-update')  initUpdateTab();
+  if (id==='tab-billing') renderBilling();
+  if (id==='tab-history') renderHistory();
+}
+
+// ══════════════════════════════════════
+//  TAB 1: VENDOR TABLE
+// ══════════════════════════════════════
+function renderTable() {
+  const q    = (document.getElementById('searchInput').value||'').toLowerCase();
+  const zone = document.getElementById('zoneFilter').value;
+  const stat = document.getElementById('statusFilter').value;
+
+  const filtered = vendors.filter(v => {
+    const mq = !q || v.id.toLowerCase().includes(q) || v.shop.toLowerCase().includes(q) || v.zone.toLowerCase().includes(q);
+    const mz = !zone || v.zone === zone;
+    const ms = !stat || v.status === stat;
+    return mq && mz && ms;
+  });
+
+  const tbody = document.getElementById('vendorTbody');
+  if (!getApiUrl()) {
+    tbody.innerHTML = '<tr><td colspan="9" style="text-align:center;padding:16px;color:var(--text-lo)">⚠️ ยังไม่ได้เชื่อมต่อ Google Sheets — กรุณาตั้งค่าที่หน้าหลักก่อนใช้งานหน้านี้</td></tr>';
+    document.getElementById('tableCount').textContent = 'แสดง 0 จาก 0 ราย';
+    animKpi('kpi-total-vendors', 0);
+    document.getElementById('kpi-total-elec').textContent = fmt(0);
+    document.getElementById('kpi-total-rent').textContent = fmt(0);
+    document.getElementById('kpi-grand').textContent      = fmt(0);
+    return;
+  }
+  tbody.innerHTML = filtered.map(v => {
+    const elec = calcElec(v.elec);
+    const total = v.rent + elec;
+    const sBadge = v.status==='paid'
+      ? '<span class="status-badge s-paid">✅ ชำระแล้ว</span>'
+      : '<span class="status-badge s-unpaid">❌ ค้างชำระ</span>';
+    return `<tr class="${v.status==='unpaid'?'unpaid-item':''}">
+      <td><span class="lock-badge">${v.id}</span></td>
+      <td style="max-width:140px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${v.shop}</td>
+      <td>${v.zone}</td>
+      <td class="tbl-amount" style="text-align:right">${fmt(v.rent)}</td>
+      <td style="font-size:.72rem;color:var(--text-lo);max-width:120px">${elecBreakdown(v.elec)}</td>
+      <td class="tbl-amount" style="text-align:right;color:var(--yellow)">${elec>0?fmt(elec):'—'}</td>
+      <td class="tbl-amount" style="text-align:right;font-size:.9rem">${fmt(total)}</td>
+      <td>${sBadge}</td>
+      <td style="text-align:center;white-space:nowrap">
+        <button class="tbl-action btn-edit" onclick="openEditFromTable('${v.id}')">✏️ ไฟ</button>
+        <button class="tbl-action btn-pay" onclick="openPayModal('${v.id}')" style="margin-left:4px">💰 รับเงิน</button>
+      </td>
+    </tr>`;
+  }).join('');
+
+  document.getElementById('tableCount').textContent = `แสดง ${filtered.length} จาก ${vendors.length} ราย`;
+
+  // KPIs
+  const totalElec = vendors.reduce((s,v)=>s+calcElec(v.elec),0);
+  const totalRent = vendors.reduce((s,v)=>s+v.rent,0);
+  animKpi('kpi-total-vendors', vendors.length);
+  document.getElementById('kpi-total-elec').textContent = fmt(totalElec);
+  document.getElementById('kpi-total-rent').textContent = fmt(totalRent);
+  document.getElementById('kpi-grand').textContent      = fmt(totalRent+totalElec);
+}
+
+// ══════════════════════════════════════
+//  TAB 2: UPDATE ELECTRIC
+// ══════════════════════════════════════
+let editCounts = {bulb:0,fan:0,small:0,large:0};
+let editSpecials = [];
+let specialCnt = 0;
+
+function initUpdateTab() {
+  const sel = document.getElementById('editLockSel');
+  sel.innerHTML = '<option value="">-- เลือกล็อค --</option>' +
+    vendors.map(v=>`<option value="${v.id}">${v.id} — ${v.shop}</option>`).join('');
+
+  // also populate history
+  const hs = document.getElementById('histLockSel');
+  if (hs) {
+    hs.innerHTML = '<option value="">ทุกล็อค</option>' +
+      vendors.map(v=>`<option value="${v.id}">${v.id}</option>`).join('');
+  }
+
+  buildElecTypeCards();
+}
+
+function buildElecTypeCards(counts={}) {
+  editCounts = { bulb: counts.bulb||0, fan: counts.fan||0, small: counts.small||0, large: counts.large||0 };
+  document.getElementById('elecTypeCards').innerHTML = ELEC_TYPES.map(t => `
+    <div class="elec-type-card" id="etc-${t.id}">
+      <div class="etc-icon">${t.icon}</div>
+      <div class="etc-name">${t.name}</div>
+      <div class="etc-price">฿${t.price}/${t.unit}</div>
+      <div class="etc-count">
+        <button class="count-btn" onclick="changeCount('${t.id}',-1)">−</button>
+        <input class="count-num" type="number" id="cnt-${t.id}" value="${editCounts[t.id]||0}" min="0" oninput="editCounts['${t.id}']=parseInt(this.value)||0;updateEditTotal()">
+        <button class="count-btn" onclick="changeCount('${t.id}',1)">＋</button>
+      </div>
+    </div>`).join('');
+  updateEditTotal();
+}
+
+function changeCount(id, delta) {
+  const inp = document.getElementById(`cnt-${id}`);
+  const cur = parseInt(inp.value)||0;
+  const nv = Math.max(0, cur + delta);
+  inp.value = nv;
+  editCounts[id] = nv;
+  // animate
+  inp.style.color = 'var(--green-m)';
+  setTimeout(()=>inp.style.color='',300);
+  updateEditTotal();
+}
+
+function addSpecialItem(name='', price='') {
+  const id = ++specialCnt;
+  editSpecials.push(id);
+  const div = document.createElement('div');
+  div.id = `sp-${id}`;
+  div.style.cssText = 'display:grid;grid-template-columns:1fr 100px 32px;gap:8px;align-items:center;margin-bottom:8px;animation:fadeUp .2s var(--ease)';
+  div.innerHTML = `
+    <input type="text" placeholder="ชื่ออุปกรณ์ เช่น เครื่องชงกาแฟ, ตู้เย็น..." value="${name}"
+      id="sp-name-${id}" oninput="updateEditTotal()"
+      style="padding:8px 10px;border:1.5px solid var(--border);border-radius:8px;background:var(--surface2);color:var(--text-hi);font-size:.80rem;font-family:inherit;outline:none;transition:border-color .2s;"
+      onfocus="this.style.borderColor='var(--green-m)'" onblur="this.style.borderColor='var(--border)'">
+    <div class="special-price-row" style="margin:0">
+      <span style="font-size:.76rem;color:var(--text-lo)">฿</span>
+      <input type="number" placeholder="ราคา" value="${price}" min="0"
+        id="sp-price-${id}" oninput="updateEditTotal()"
+        style="width:100%;padding:8px;border:1.5px solid var(--border);border-radius:8px;background:var(--surface2);color:var(--text-hi);font-size:.80rem;font-family:inherit;outline:none;text-align:right;transition:border-color .2s;"
+        onfocus="this.style.borderColor='var(--green-m)'" onblur="this.style.borderColor='var(--border)'">
+    </div>
+    <button onclick="removeSpecial(${id})"
+      style="width:32px;height:32px;border-radius:7px;border:none;background:var(--red-l);color:var(--red);cursor:pointer;font-size:.85rem;transition:all .15s;"
+      onmouseover="this.style.background='var(--red)';this.style.color='white'"
+      onmouseout="this.style.background='var(--red-l)';this.style.color='var(--red)'">✕</button>`;
+  document.getElementById('specialItems').appendChild(div);
+  updateEditTotal();
+}
+
+function removeSpecial(id) {
+  const el = document.getElementById(`sp-${id}`);
+  if (el) { el.style.opacity='0'; el.style.transform='scale(.95)'; el.style.transition='all .2s'; setTimeout(()=>el.remove(),200); }
+  editSpecials = editSpecials.filter(i=>i!==id);
+  setTimeout(updateEditTotal,220);
+}
+
+function updateEditTotal() {
+  const base = (editCounts.bulb||0)*10 + (editCounts.fan||0)*20 +
+               (editCounts.small||0)*50 + (editCounts.large||0)*100;
+  let spTotal = 0;
+  editSpecials.forEach(id => { spTotal += parseFloat(document.getElementById(`sp-price-${id}`)?.value)||0; });
+  const total = base + spTotal;
+
+  document.getElementById('editElecTotal').textContent = fmt(total);
+  const parts = [];
+  if (editCounts.bulb)  parts.push(`💡 ${editCounts.bulb}ดวง = ${fmt(editCounts.bulb*10)}`);
+  if (editCounts.fan)   parts.push(`🌀 ${editCounts.fan}ตัว = ${fmt(editCounts.fan*20)}`);
+  if (editCounts.small) parts.push(`🔌 ${editCounts.small}ชิ้น = ${fmt(editCounts.small*50)}`);
+  if (editCounts.large) parts.push(`⚙️ ${editCounts.large}ชิ้น = ${fmt(editCounts.large*100)}`);
+  editSpecials.forEach(id=>{
+    const nm = document.getElementById(`sp-name-${id}`)?.value||'พิเศษ';
+    const pr = parseFloat(document.getElementById(`sp-price-${id}`)?.value)||0;
+    if(pr>0) parts.push(`⭐ ${nm} = ${fmt(pr)}`);
+  });
+  document.getElementById('editElecBreakdown').textContent = parts.join(' · ') || 'ยังไม่มีอุปกรณ์';
+
+  // Update bill preview
+  const lockSel = document.getElementById('editLockSel').value;
+  const v = vendors.find(v=>v.id===lockSel);
+  if (v) {
+    const rent = v.rent;
+    const grandTotal = rent + total;
+    let rows = `<div class="bp-row"><span>ค่าเช่า</span><span style="font-weight:700">${fmt(rent)}</span></div>`;
+    if (editCounts.bulb)  rows += `<div class="bp-row bp-indent"><span>💡 หลอดไฟ ×${editCounts.bulb}</span><span>${fmt(editCounts.bulb*10)}</span></div>`;
+    if (editCounts.fan)   rows += `<div class="bp-row bp-indent"><span>🌀 พัดลม ×${editCounts.fan}</span><span>${fmt(editCounts.fan*20)}</span></div>`;
+    if (editCounts.small) rows += `<div class="bp-row bp-indent"><span>🔌 เครื่องเล็ก ×${editCounts.small}</span><span>${fmt(editCounts.small*50)}</span></div>`;
+    if (editCounts.large) rows += `<div class="bp-row bp-indent"><span>⚙️ เครื่องใหญ่ ×${editCounts.large}</span><span>${fmt(editCounts.large*100)}</span></div>`;
+    editSpecials.forEach(id=>{
+      const nm = document.getElementById(`sp-name-${id}`)?.value||'พิเศษ';
+      const pr = parseFloat(document.getElementById(`sp-price-${id}`)?.value)||0;
+      if(pr>0) rows += `<div class="bp-row bp-indent"><span>⭐ ${nm}</span><span>${fmt(pr)}</span></div>`;
+    });
+    if (total > 0) rows += `<div class="bp-row"><span>ค่าไฟรวม</span><span style="color:var(--yellow);font-weight:700">${fmt(total)}</span></div>`;
+    rows += `<div class="bp-row"><span>ยอดรวมที่ต้องชำระ</span><span>${fmt(grandTotal)}</span></div>`;
+    document.getElementById('billPreview').innerHTML = `<div class="bp-title">🧾 ล็อค ${v.id} — ${v.shop}</div>${rows}`;
+  }
+
+  // highlight active cards
+  ELEC_TYPES.forEach(t => {
+    const c = document.getElementById(`etc-${t.id}`);
+    if(c) c.classList.toggle('selected', (editCounts[t.id]||0)>0);
+  });
+}
+
+function loadLockElec() {
+  const lid = document.getElementById('editLockSel').value;
+  const v = vendors.find(v=>v.id===lid);
+  if (!v) { document.getElementById('editVendorInfo').style.display='none'; document.getElementById('billPreview').innerHTML='<div class="bp-title">บิลรวมประจำเดือน</div><div style="color:var(--text-lo);font-size:.78rem;text-align:center">เลือกล็อคเพื่อดูตัวอย่าง</div>'; return; }
+  document.getElementById('editVendorInfo').style.display='block';
+  document.getElementById('editVendorName').textContent    = `${v.id} — ${v.shop}`;
+  document.getElementById('editVendorProduct').textContent = `โซน ${v.zone}`;
+  document.getElementById('editVendorRent').textContent    = `ค่าเช่า ${fmt(v.rent)}/เดือน`;
+  // load existing
+  document.getElementById('specialItems').innerHTML='';
+  editSpecials=[];
+  buildElecTypeCards(v.elec);
+  (v.elec.special||[]).forEach(s=>addSpecialItem(s.name,s.price));
+}
+
+function saveElectric() {
+  const lid = document.getElementById('editLockSel').value;
+  if (!lid) { showToast('กรุณาเลือกล็อค','error'); return; }
+  const v = vendors.find(v=>v.id===lid);
+  if (!v) return;
+  const spData = editSpecials.map(id=>({
+    name: document.getElementById(`sp-name-${id}`)?.value||'พิเศษ',
+    price: parseFloat(document.getElementById(`sp-price-${id}`)?.value)||0
+  })).filter(s=>s.price>0);
+  v.elec = { ...editCounts, special: spData };
+  persistVendorElec(v);
+  showToast(getApiUrl()?`☁️ บันทึกค่าไฟล็อค ${lid} ขึ้น Sheets แล้ว`:`✅ บันทึกค่าไฟล็อค ${lid} เรียบร้อย`, 'success');
+  renderTable();
+}
+
+// ══════════════════════════════════════
+//  EDIT FROM TABLE
+// ══════════════════════════════════════
+let editModalLockId = null;
+let modalCounts = {};
+let modalSpecials = [];
+let modalSpCnt = 0;
+
+function openEditFromTable(lid) {
+  const v = vendors.find(v=>v.id===lid);
+  if (!v) return;
+  editModalLockId = lid;
+  modalCounts = {...v.elec};
+  modalSpecials = [];
+  modalSpCnt = 0;
+  document.getElementById('editModalTitle').textContent = `⚡ แก้ไขค่าไฟ — ${lid}`;
+  document.getElementById('editModalSub').textContent   = `${v.shop} | ค่าเช่า ${fmt(v.rent)}/เดือน`;
+
+  let html = '<div style="display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:12px">';
+  ELEC_TYPES.forEach(t => {
+    html += `<div style="border:1.5px solid var(--border);border-radius:9px;padding:10px 12px;background:var(--surface2)">
+      <div style="display:flex;align-items:center;gap:6px;margin-bottom:6px">
+        <span style="font-size:1.1rem">${t.icon}</span>
+        <span style="font-size:.76rem;font-weight:700">${t.name}</span>
+        <span style="font-size:.68rem;color:var(--text-lo);margin-left:auto">฿${t.price}/${t.unit}</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:5px">
+        <button class="count-btn" onclick="modalChange('${t.id}',-1)">−</button>
+        <input class="count-num" id="mcnt-${t.id}" type="number" value="${v.elec[t.id]||0}" min="0" oninput="modalCounts['${t.id}']=parseInt(this.value)||0">
+        <button class="count-btn" onclick="modalChange('${t.id}',1)">＋</button>
+      </div>
+    </div>`;
+  });
+  html += '</div>';
+  html += `<div style="font-size:.76rem;font-weight:700;color:var(--text-lo);text-transform:uppercase;letter-spacing:.4px;margin-bottom:8px">อุปกรณ์พิเศษ</div>`;
+  html += `<div id="modalSpecialItems"></div>`;
+  html += `<button onclick="addModalSpecial()" class="btn btn-secondary" style="width:100%;border-style:dashed;margin-bottom:10px">⭐ เพิ่มอุปกรณ์พิเศษ</button>`;
+
+  document.getElementById('editModalContent').innerHTML = html;
+  // load existing specials
+  (v.elec.special||[]).forEach(s=>addModalSpecial(s.name,s.price));
+  openModal('editModal');
+}
+
+function modalChange(id, d) {
+  const inp = document.getElementById(`mcnt-${id}`);
+  const nv = Math.max(0,(parseInt(inp.value)||0)+d);
+  inp.value = nv; modalCounts[id] = nv;
+}
+
+function addModalSpecial(name='', price='') {
+  const id = ++modalSpCnt;
+  modalSpecials.push(id);
+  const div = document.createElement('div');
+  div.id = `msp-${id}`;
+  div.style.cssText = 'display:grid;grid-template-columns:1fr 90px 28px;gap:7px;align-items:center;margin-bottom:7px';
+  div.innerHTML = `
+    <input type="text" placeholder="ชื่ออุปกรณ์..." value="${name}" id="mspn-${id}"
+      style="padding:7px 10px;border:1.5px solid var(--border);border-radius:7px;font-size:.78rem;background:var(--surface2);color:var(--text-hi);outline:none;font-family:inherit">
+    <input type="number" placeholder="ราคา" value="${price}" min="0" id="mspp-${id}"
+      style="padding:7px;border:1.5px solid var(--border);border-radius:7px;font-size:.78rem;text-align:right;background:var(--surface2);color:var(--text-hi);outline:none;font-family:inherit">
+    <button onclick="this.parentElement.remove();modalSpecials=modalSpecials.filter(i=>i!=${id})"
+      style="width:28px;height:28px;border-radius:6px;border:none;background:var(--red-l);color:var(--red);cursor:pointer">✕</button>`;
+  document.getElementById('modalSpecialItems').appendChild(div);
+}
+
+function saveFromModal() {
+  if (!editModalLockId) return;
+  const v = vendors.find(v=>v.id===editModalLockId);
+  if (!v) return;
+  ELEC_TYPES.forEach(t=>{ modalCounts[t.id]=parseInt(document.getElementById(`mcnt-${t.id}`)?.value)||0; });
+  const spData = modalSpecials.map(id=>({
+    name:document.getElementById(`mspn-${id}`)?.value||'พิเศษ',
+    price:parseFloat(document.getElementById(`mspp-${id}`)?.value)||0
+  })).filter(s=>s.price>0);
+  v.elec = {...modalCounts, special:spData};
+  persistVendorElec(v);
+  closeModal('editModal');
+  renderTable();
+  showToast(getApiUrl()?`☁️ บันทึกค่าไฟล็อค ${editModalLockId} ขึ้น Sheets แล้ว`:`✅ บันทึกค่าไฟล็อค ${editModalLockId} เรียบร้อย`, 'success');
+}
+
+// ══════════════════════════════════════
+//  TAB 3: BILLING
+// ══════════════════════════════════════
+let zoneFilterBillActive = '';
+
+function renderBilling() {
+  const tbody = document.getElementById('billingTbody');
+  const foot  = document.getElementById('billingFoot');
+
+  if (!getApiUrl()) {
+    tbody.innerHTML = '<tr><td colspan="9" style="text-align:center;padding:16px;color:var(--text-lo)">⚠️ ยังไม่ได้เชื่อมต่อ Google Sheets — กรุณาตั้งค่าที่หน้าหลักก่อนใช้งานหน้านี้</td></tr>';
+    foot.innerHTML = '';
+    document.getElementById('b-total').textContent  = fmt(0);
+    document.getElementById('b-rent').textContent   = fmt(0);
+    document.getElementById('b-elec').textContent   = fmt(0);
+    document.getElementById('b-unpaid').textContent = 0;
+    document.getElementById('zoneFilterBill').innerHTML = '';
+    return;
+  }
+
+  let fv = vendors;
+  if (zoneFilterBillActive) fv = fv.filter(v=>v.zone===zoneFilterBillActive);
+
+  let tRent=0, tElec=0, tUnpaid=0;
+  tbody.innerHTML = fv.map((v,i) => {
+    const elec  = calcElec(v.elec);
+    const total = v.rent + elec;
+    tRent += v.rent; tElec += elec;
+    if (v.status!=='paid') tUnpaid++;
+    const sBadge = v.status==='paid'
+      ? '<span class="status-badge s-paid">✅ ชำระ</span>'
+      : '<span class="status-badge s-unpaid">❌ ค้าง</span>';
+    return `<tr class="${v.status==='unpaid'?'unpaid-item':''}">
+      <td style="color:var(--text-lo)">${i+1}</td>
+      <td><span class="lock-badge">${v.id}</span></td>
+      <td style="max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${v.shop}</td>
+      <td>${v.zone}</td>
+      <td class="tbl-amount" style="text-align:right">${fmt(v.rent)}</td>
+      <td class="tbl-amount" style="text-align:right;color:var(--yellow)">${elec>0?fmt(elec):'—'}</td>
+      <td class="tbl-amount" style="text-align:right;font-size:.9rem;font-weight:800">${fmt(total)}</td>
+      <td>${sBadge}</td>
+      <td style="text-align:center"><button class="tbl-action btn-pay" onclick="openPayModal('${v.id}')">💰 รับเงิน</button></td>
+    </tr>`;
+  }).join('');
+
+  const grand = tRent + tElec;
+  foot.innerHTML = `<tr>
+    <td colspan="4" style="padding:10px 11px;font-weight:800">รวม ${fv.length} ล็อค</td>
+    <td class="tbl-amount" style="text-align:right;padding:10px 11px;font-weight:800">${fmt(tRent)}</td>
+    <td class="tbl-amount" style="text-align:right;padding:10px 11px;font-weight:800;color:var(--yellow)">${fmt(tElec)}</td>
+    <td class="tbl-amount" style="text-align:right;padding:10px 11px;font-weight:800;color:var(--green-m)">${fmt(grand)}</td>
+    <td colspan="2"></td>
+  </tr>`;
+
+  document.getElementById('b-total').textContent  = fmt(grand);
+  document.getElementById('b-rent').textContent   = fmt(tRent);
+  document.getElementById('b-elec').textContent   = fmt(tElec);
+  document.getElementById('b-unpaid').textContent = tUnpaid;
+
+  // build zone filter buttons — เฉพาะโซนที่มีผู้ค้าจริงเท่านั้น
+  const zones = [...new Set(vendors.map(v=>v.zone).filter(Boolean))].sort();
+  document.getElementById('zoneFilterBill').innerHTML =
+    ['',...zones].map(z=>
+      `<button class="zf-btn ${zoneFilterBillActive===z?'active':''}" onclick="setBillZone('${z}')">${z||'ทั้งหมด'}</button>`
+    ).join('');
+}
+
+function setBillZone(z) {
+  zoneFilterBillActive = z;
+  renderBilling();
+}
+
+// ══════════════════════════════════════
+//  TAB 4: HISTORY — จากข้อมูลรับชำระจริงใน Google Sheets (payments) เท่านั้น
+// ══════════════════════════════════════
+function parsePayDate(dstr){
+  // รูปแบบวันที่จริงที่บันทึกไว้: "6 ก.ค. 2569" (วัน เดือนย่อ ปี พ.ศ.)
+  const parts = (dstr||'').trim().split(/\s+/);
+  if (parts.length < 3) return null;
+  const mIdx = MONS.indexOf(parts[1]);
+  const year = parseInt(parts[2]) || 0;
+  if (mIdx < 0 || !year) return null;
+  return { key: parts[1]+' '+year, sortKey: year*12+mIdx };
+}
+
+async function renderHistory() {
+  const tbody = document.getElementById('historyTbody');
+  tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:16px;color:var(--text-lo)">⏳ กำลังโหลดข้อมูล...</td></tr>';
+  if (!getApiUrl()) {
+    tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:16px;color:var(--text-lo)">ยังไม่ได้เชื่อมต่อ Google Sheets</td></tr>';
+    return;
+  }
+  const lid = document.getElementById('histLockSel')?.value||'';
+  const mth = parseInt(document.getElementById('histMonths')?.value||3);
+  const payments = await apiGet('getPayments');
+  if (!Array.isArray(payments)) {
+    tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:16px;color:var(--text-lo)">โหลดข้อมูลไม่สำเร็จ</td></tr>';
+    return;
+  }
+  let recs = payments.filter(p=>p.type==='ค่าเช่าประจำเดือน'||p.type==='ค่าไฟฟ้า');
+  if (lid) recs = recs.filter(p=>p.lock_id===lid);
+  recs = recs.map(p=>({...p, _pd:parsePayDate(p.date)})).filter(p=>p._pd);
+  if (!recs.length) {
+    tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:16px;color:var(--text-lo)">ยังไม่มีประวัติการชำระ</td></tr>';
+    return;
+  }
+  const monthKeys = [...new Set(recs.map(p=>p._pd.key))]
+    .sort((a,b)=>{
+      const pa = recs.find(x=>x._pd.key===a)._pd.sortKey;
+      const pb = recs.find(x=>x._pd.key===b)._pd.sortKey;
+      return pb-pa;
+    }).slice(0, mth);
+
+  const groups = {};
+  recs.forEach(p=>{
+    if (!monthKeys.includes(p._pd.key)) return;
+    const gk = p.lock_id+'|'+p._pd.key;
+    if (!groups[gk]) groups[gk] = { lock:p.lock_id, vendor:p.vendor_name||p.product||'—', month:p._pd.key, sortKey:p._pd.sortKey, rent:0, elec:0 };
+    const amt = parseFloat(p.amount)||0;
+    if (p.type==='ค่าเช่าประจำเดือน') groups[gk].rent += amt;
+    else groups[gk].elec += amt;
+  });
+  const rows = Object.values(groups).sort((a,b)=>b.sortKey-a.sortKey || a.lock.localeCompare(b.lock));
+  if (!rows.length) {
+    tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:16px;color:var(--text-lo)">ยังไม่มีประวัติการชำระ</td></tr>';
+    return;
+  }
+  tbody.innerHTML = rows.map(r=>`<tr>
+    <td>${r.month}</td>
+    <td><span class="lock-badge">${r.lock}</span></td>
+    <td>${r.vendor}</td>
+    <td style="font-size:.72rem;color:var(--text-lo)">—</td>
+    <td class="tbl-amount" style="text-align:right;color:var(--yellow)">${r.elec>0?fmt(r.elec):'—'}</td>
+    <td class="tbl-amount" style="text-align:right">${r.rent>0?fmt(r.rent):'—'}</td>
+    <td class="tbl-amount" style="text-align:right;font-weight:800">${fmt(r.rent+r.elec)}</td>
+  </tr>`).join('');
+}
+
+// ══════════════════════════════════════
+//  PAY MODAL
+// ══════════════════════════════════════
+let payLockId = null;
+
+function openPayModal(lid) {
+  const v = vendors.find(v=>v.id===lid);
+  if (!v) return;
+  payLockId = lid;
+  const elec  = calcElec(v.elec);
+  const total = v.rent + elec;
+  document.getElementById('payModalSub').textContent = `${v.id} — ${v.shop}`;
+  document.getElementById('payModalContent').innerHTML = `
+    <div style="background:var(--surface2);border-radius:10px;padding:14px 16px;margin-bottom:12px">
+      <div style="display:flex;justify-content:space-between;padding:5px 0;font-size:.82rem;border-bottom:1px dashed var(--border)">
+        <span style="color:var(--text-lo)">ค่าเช่า</span><span style="font-weight:700">${fmt(v.rent)}</span>
+      </div>
+      <div style="display:flex;justify-content:space-between;padding:5px 0;font-size:.82rem;border-bottom:1px dashed var(--border)">
+        <span style="color:var(--text-lo)">ค่าไฟฟ้า</span><span style="font-weight:700;color:var(--yellow)">${elec>0?fmt(elec):'—'}</span>
+      </div>
+      <div style="display:flex;justify-content:space-between;padding:8px 0 4px;font-size:.92rem;font-weight:800">
+        <span>ยอดรวม</span><span style="color:var(--green-m)">${fmt(total)}</span>
+      </div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+      <div>
+        <label for="payMethodSel" style="font-size:.72rem;font-weight:700;color:var(--text-lo);text-transform:uppercase;letter-spacing:.4px;display:block;margin-bottom:5px">ช่องทางชำระ</label>
+        <select id="payMethodSel" aria-label="เลือกช่องทางชำระ" style="width:100%;padding:8px 10px;border:1.5px solid var(--border);border-radius:8px;background:var(--surface2);color:var(--text-hi);font-size:.82rem;font-family:inherit;outline:none">
+          <option>💵 เงินสด</option><option>📱 โอนเงิน</option><option>📷 QR Code</option>
+        </select>
+      </div>
+      <div>
+        <label style="font-size:.72rem;font-weight:700;color:var(--text-lo);text-transform:uppercase;letter-spacing:.4px;display:block;margin-bottom:5px">วันที่รับเงิน</label>
+        <input type="date" value="${new Date().toISOString().split('T')[0]}"
+          style="width:100%;padding:8px 10px;border:1.5px solid var(--border);border-radius:8px;background:var(--surface2);color:var(--text-hi);font-size:.82rem;font-family:inherit;outline:none">
+      </div>
+    </div>`;
+  openModal('payModal');
+}
+
+function confirmPay() {
+  const v = vendors.find(v=>v.id===payLockId);
+  if (v) {
+    v.status = 'paid';
+    if (getApiUrl()) {
+      const elec = calcElec(v.elec);
+      // อัปเดตสถานะผู้ค้าเป็นปกติ + บันทึกรายการค่าไฟลงชีต payments (วันที่แบบไทย ให้ตรงกับรายงาน)
+      apiPost('saveVendor', { data: { lock: v.id, status: 'active' } });
+      if (elec > 0) apiPost('savePayment', { data: {
+        lock_id: v.id, vendor_name: v.shop, product: v.shop,
+        type: 'ค่าไฟฟ้า', amount: elec, penalty: 0, other_fee: 0, other_label: '',
+        method: '💵 เงินสด', note: 'รับชำระค่าไฟ (โมดูลค่าไฟฟ้า)', date: nowTH(), time: nowTime(),
+      }});
+    }
+  }
+  closeModal('payModal');
+  renderTable();
+  if (document.getElementById('tab-billing').classList.contains('active')) renderBilling();
+  showToast(getApiUrl()?`☁️ บันทึกรับชำระล็อค ${payLockId} ขึ้น Sheets แล้ว`:`✅ บันทึกรับชำระล็อค ${payLockId} เรียบร้อย`, 'success');
+}
+
+// ══════════════════════════════════════
+//  ADD NEW VENDOR (stub)
+// ══════════════════════════════════════
+function openAddModal() {
+  showToast('💡 ใช้หน้า "ลงทะเบียนผู้ค้าใหม่" เพื่อเพิ่มผู้ค้า', 'info');
+}
+
+function exportBill() { showToast('📥 กำลังสร้างไฟล์ Excel...', 'info'); }
+
+// ══════════════════════════════════════
+//  MODAL HELPERS
+// ══════════════════════════════════════
+function openModal(id)  { document.getElementById(id).classList.add('show'); }
+function closeModal(id) { document.getElementById(id).classList.remove('show'); }
+document.querySelectorAll('.overlay').forEach(o=>o.addEventListener('click',e=>{ if(e.target===o) o.classList.remove('show'); }));
+
+// ══════════════════════════════════════
+//  TOAST
+// ══════════════════════════════════════
+function showToast(msg, type='info') {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.className = `toast ${type} show`;
+  clearTimeout(t._t);
+  t._t = setTimeout(()=>t.classList.remove('show'), 3200);
+}
+
+function animKpi(id, val) { document.getElementById(id).textContent = val; }
+
+// ══════════════════════════════════════
+//  GOOGLE SHEETS API
+// ══════════════════════════════════════
+const MONS=['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
+function nowTH(){const n=new Date();return n.getDate()+' '+MONS[n.getMonth()]+' '+(n.getFullYear()+543);}
+function nowTime(){const n=new Date();return String(n.getHours()).padStart(2,'0')+':'+String(n.getMinutes()).padStart(2,'0');}
+function countThursdaysInMonth(y,m){let c=0;const d=new Date(y,m,1);while(d.getMonth()===m){if(d.getDay()===4)c++;d.setDate(d.getDate()+1);}return c;}
+function thisMonthThursdays(){const n=new Date();return countThursdaysInMonth(n.getFullYear(),n.getMonth())||4;}
+function getApiUrl(){ return localStorage.getItem('pm-api-url')||''; }
+async function apiGet(action,params={}){
+  const url=getApiUrl(); if(!url) return null;
+  try{ const r=await fetch(url+'?'+new URLSearchParams({action,...params})); const j=await r.json(); return j.status==='ok'?j.data:null; }
+  catch(e){ console.error('apiGet error:',action,e); return null; }
+}
+async function apiPost(action,data={}){
+  const url=getApiUrl(); if(!url) return null;
+  try{ const r=await fetch(url,{method:'POST',body:JSON.stringify({action,...data})}); return await r.json(); }
+  catch(e){ console.error('apiPost error:',action,e); return null; }
+}
+
+// แปลงข้อมูลผู้ค้าจาก Google Sheets → โครงสร้างที่โมดูลค่าไฟใช้
+function mapSheetVendor(sv){
+  return {
+    id: sv.lock, zone: sv.zone || '',
+    shop: sv.product || sv.name || '(ไม่ระบุ)',
+    rent: Math.round((parseFloat(sv.dailyRate)||0) * thisMonthThursdays()),
+    status: sv.status==='unpaid' ? 'unpaid' : 'paid',
+    elec: {
+      bulb:  parseInt(sv.elec_bulb)||0,  fan:  parseInt(sv.elec_fan)||0,
+      small: parseInt(sv.elec_small)||0, large:parseInt(sv.elec_large)||0,
+      special: Array.isArray(sv.elec_special) ? sv.elec_special : [],
+    },
+    phone: sv.phone || '—',
+  };
+}
+
+async function loadVendorsFromSheets(){
+  if(!getApiUrl()) return; // ไม่ได้เชื่อมต่อ → ใช้ข้อมูลตัวอย่างในไฟล์
+  const data = await apiGet('getVendors');
+  if(Array.isArray(data) && data.length){
+    vendors = data.filter(v=>v.lock).map(mapSheetVendor);
+    renderTable(); initUpdateTab();
+    const active = document.querySelector('.page.active')?.id;
+    if(active==='tab-billing') renderBilling();
+    if(active==='tab-history') renderHistory();
+    showToast(`☁️ โหลดผู้ค้า ${vendors.length} รายจาก Google Sheets`, 'success');
+  }
+}
+
+// บันทึกค่าไฟกลับขึ้น Sheets (partial update — ส่งเฉพาะ field ค่าไฟ)
+async function persistVendorElec(v){
+  if(!getApiUrl()) return;
+  await apiPost('saveVendor', { data: {
+    lock: v.id,
+    elec_bulb: v.elec.bulb||0, elec_fan: v.elec.fan||0,
+    elec_small: v.elec.small||0, elec_large: v.elec.large||0,
+    elec_special: v.elec.special||[],
+  }});
+}
+
+// ══════════════════════════════════════
+//  INIT
+// ══════════════════════════════════════
+window.onload = () => {
+  const n=new Date();
+  const bm=document.getElementById('billMonth');
+  if(bm) bm.textContent = '🗓️ '+MONS[n.getMonth()]+' '+(n.getFullYear()+543);
+  renderTable(); initUpdateTab(); loadVendorsFromSheets();
+};
+</script>
+</body>
+</html>
