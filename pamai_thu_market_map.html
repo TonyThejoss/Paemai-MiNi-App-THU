@@ -317,6 +317,12 @@ function parseThaiFullDate(dstr){
   if(!day||mIdx<0||!yearBE) return null;
   return new Date(yearBE-543, mIdx, day);
 }
+function countThursdaysInMonth(year,month){
+  let count=0; const d=new Date(year,month,1);
+  while(d.getMonth()===month){ if(d.getDay()===4) count++; d.setDate(d.getDate()+1); }
+  return count;
+}
+function thisMonthThursdays(){ const n=new Date(); return countThursdaysInMonth(n.getFullYear(), n.getMonth()); }
 function addHist(id,e){if(!lockHistory[id])lockHistory[id]=[];lockHistory[id].unshift({...e,date:nowTH(),time:nowTime()});if(lockHistory[id].length>30)lockHistory[id].pop();}
 function fmt(n){return '฿'+Math.round(n).toLocaleString();}
 
@@ -822,6 +828,35 @@ function renderHistChips(list){
     hEl.innerHTML='<span style="font-size:.62rem;color:var(--txl)">ยังไม่มีประวัติ</span>';
   }
 }
+
+// ════════════════════════════════════════════════════
+// ซิงค์สถานะล็อคจริงจาก Google Sheets (vendors) ขึ้นผังตลาด
+// (บั๊กเดิม: ผังตลาดสร้างล็อคเริ่มต้นเป็น "ว่าง" ทุกล็อคเสมอ ไม่เคยดึงสถานะ
+//  ผู้เช่าจริงจาก getVendors มาแสดง ทำให้ล็อคที่มีผู้เช่าอยู่จริงก็ยังโชว์ว่าง)
+// ════════════════════════════════════════════════════
+async function loadVendorOccupancy(){
+  if(!getApiUrl()) return;
+  const vendors = await apiGet('getVendors');
+  if(!Array.isArray(vendors)) return;
+  const monthlyThursdays = thisMonthThursdays();
+  vendors.forEach(v=>{
+    if(!v.lock || v.status==='cancelled') return; // ยกเลิกแล้ว/ไม่มีเลขล็อค → ให้คงเป็นว่างตามผัง
+    const el = document.querySelector('.lk[data-id="'+v.lock+'"]');
+    if(!el) return; // ไม่พบล็อคนี้ในผัง (ข้อมูลทดสอบเก่า/เลขล็อคผิดรูปแบบ) — ข้ามอย่างปลอดภัย
+    VENDORS[v.lock] = { name:v.name||'', phone:v.phone||'', product:v.product||'' };
+    const monthlyRent = Math.round((parseFloat(v.dailyRate)||0) * monthlyThursdays);
+    const newStatus = v.status==='unpaid' ? 'unpaid' : 'occupied';
+    el.dataset.shop = v.product || v.name || 'ผู้ค้า';
+    el.dataset.rent = monthlyRent;
+    el.dataset.status = newStatus;
+    const shopEl = el.querySelector('.lk-shop');
+    if(shopEl) shopEl.textContent = el.dataset.shop;
+    ['vacant','occupied','unpaid','cancelled'].forEach(c=>el.classList.remove(c));
+    el.classList.add(newStatus);
+    refreshLk(el);
+  });
+  updateStats();
+}
 async function loadRealHistory(lockId){
   if(!getApiUrl()) return; // ยังไม่เชื่อมต่อ Sheets — ใช้ประวัติในเซสชันนี้ต่อไป
   const [leaveRows, dailyRows] = await Promise.all([
@@ -976,6 +1011,7 @@ function buildAll(){
   buildLotusZone();
   buildTailgateZone();
   updateStats();
+  loadVendorOccupancy();
 }
 
 function switchZone(z,btn){

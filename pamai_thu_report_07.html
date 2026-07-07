@@ -150,7 +150,9 @@ async function render(){
     const other = parseFloat(v.unpaid_other)||0;
     const otherLabel = v.unpaid_other_label||'';
     const total = rent + elec + penalty + other;
-    return {...v, rent, elec, penalty, other, otherLabel, total};
+    // เผื่อข้อมูลเก่า/ไม่สมบูรณ์ที่ไม่มีค่า zone บันทึกไว้ ให้เดาโซนจากเลขล็อคแทน กันไม่ให้หายไปจากตารางแยกโซน
+    const zone = v.zone || ((v.lock||'').match(/^[A-Z]+/)||[''])[0];
+    return {...v, zone, rent, elec, penalty, other, otherLabel, total};
   });
 
   const totalDebt = withDebt.reduce((s,v)=>s+v.total,0);

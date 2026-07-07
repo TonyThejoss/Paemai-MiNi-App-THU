@@ -128,6 +128,9 @@ function calcElec(v){
   return (parseInt(v.elec_bulb)||0)*10+(parseInt(v.elec_fan)||0)*20+(parseInt(v.elec_small)||0)*50+(parseInt(v.elec_large)||0)*100;
 }
 function monthlyRent(v){ return (parseFloat(v.dailyRate)||0) * thisMonthThursdays(); }
+// เผื่อข้อมูลผู้ค้าเก่า/ไม่สมบูรณ์ที่ไม่มีค่า zone บันทึกไว้ ให้เดาโซนจากเลขล็อคแทน
+// (ป้องกันไม่ให้ตัวเลขสรุปรวมบนสุดกับตารางแยกโซนไม่ตรงกัน)
+function vendorZone(v){ return v.zone || ((v.lock||'').match(/^[A-Z]+/)||[''])[0]; }
 
 async function render(){
   document.getElementById('r-date').textContent = nowTH();
@@ -180,7 +183,7 @@ async function render(){
     let zTotal=0,zOcc=0,zRev=0;
     zones.forEach(z=>{
       const zt = ZONE_TOTALS[z]||0;
-      const zv = occupiedVendors.filter(v=>v.zone===z);
+      const zv = occupiedVendors.filter(v=>vendorZone(v)===z);
       zTotal += zt; zOcc += zv.length;
       zRev += zv.reduce((s,v)=>s+monthlyRent(v)+calcElec(v),0);
     });

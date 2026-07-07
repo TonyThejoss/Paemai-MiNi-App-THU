@@ -915,6 +915,9 @@ function renderVDB(){
 // ════════════════════════════════════════════════════
 // DASHBOARD — คำนวณจากข้อมูลจริงใน VENDORS (Google Sheets) เท่านั้น
 // ════════════════════════════════════════════════════
+// เผื่อข้อมูลผู้ค้าเก่า/ไม่สมบูรณ์ที่ไม่มีค่า zone บันทึกไว้ ให้เดาโซนจากเลขล็อคแทน
+// (ป้องกันไม่ให้ตัวเลขสรุปรวมบนสุดกับสรุปแยกโซนไม่ตรงกัน)
+function vendorZone(v){ return v.zone || ((v.lock||'').match(/^[A-Z]+/)||[''])[0]; }
 function renderDashKPIs(){
   const occupiedVendors = VENDORS.filter(v=>v.status==='active'||v.status==='unpaid');
   const occupiedCount = occupiedVendors.length;
@@ -936,7 +939,7 @@ function renderDashKPIs(){
     let zTotal=0, zOcc=0;
     zones.forEach(z=>{
       zTotal += ZONE_TOTALS[z]||0;
-      zOcc += occupiedVendors.filter(v=>v.zone===z).length;
+      zOcc += occupiedVendors.filter(v=>vendorZone(v)===z).length;
     });
     const zVac = zTotal - zOcc;
     const zPct = zTotal ? Math.round(zOcc/zTotal*100) : 0;
