@@ -133,6 +133,12 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(
 /* MOVE/CANCEL modals */
 #mv-target-info{background:var(--gll);border:1.5px solid var(--gm);border-radius:8px;padding:9px 12px;font-size:.74rem;color:var(--gm);margin-bottom:8px;display:none;}
 #cl-warn{background:var(--rl);border:1.5px solid var(--r);border-radius:8px;padding:9px 12px;font-size:.74rem;color:var(--r);font-weight:700;margin-bottom:10px;display:none;}
+/* QUOTA WARNING MODAL */
+.quota-rule-box{background:var(--yl);border:1.5px solid var(--y);border-radius:8px;padding:9px 12px;font-size:.68rem;color:var(--txm);line-height:1.55;margin-bottom:12px;font-style:italic;}
+.q-stat{display:flex;justify-content:space-between;align-items:center;padding:7px 11px;border-radius:8px;font-size:.78rem;font-weight:700;margin-bottom:7px;}
+.q-stat.warn{background:var(--yl);color:var(--y);}
+.q-stat.danger{background:var(--rl);color:var(--r);}
+.q-consec{background:var(--rl);border:1.5px solid var(--r);border-radius:8px;padding:9px 12px;font-size:.74rem;color:var(--r);font-weight:700;margin-top:2px;margin-bottom:7px;}
 /* TOAST */
 .toast{position:fixed;bottom:18px;right:18px;z-index:9999;padding:9px 15px;border-radius:9px;font-size:.76rem;font-weight:700;color:#fff;transform:translateY(60px);opacity:0;transition:all .26s var(--ease);}
 .toast.show{transform:translateY(0);opacity:1;}
@@ -271,6 +277,18 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(
     <div class="m-footer"><button class="m-btn secondary" onclick="document.getElementById('cancelLeaseModal').classList.remove('show')">ยกเลิก</button><button class="m-btn" style="background:var(--r);color:#fff" onclick="confirmCancelLease()"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M6 6l12 12"/></svg> ยืนยันยกเลิก</button></div>
   </div>
 </div>
+<!-- QUOTA WARNING MODAL -->
+<div class="modal-bg" id="quotaModal">
+  <div class="modal-box" style="max-width:420px">
+    <div class="m-title" id="qm-title"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 9v4M12 17h.01"/><path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/></svg> แจ้งเตือนโควต้าตามกฎของตลาด</div>
+    <div class="m-sub" id="qm-sub">—</div>
+    <div class="quota-rule-box">"การลาล็อคสามารถลาได้ไม่เกินเดือนละ 2 ครั้ง และการขาดล็อค ขาดได้ไม่เกิน 2 ครั้ง ต่อปี หากเกินตามจำนวนครั้งข้างต้นทางตลาดขอสงวนสิทธิในการยกเลิกการเช่า ในกรณีที่ลาล็อค 3 ครั้งติดกันคร่อมเดือนจะถูกยกเลิกการเช่าเช่นกัน"</div>
+    <div id="qm-stats"></div>
+    <div class="m-footer" id="qm-footer">
+      <button class="m-btn secondary" onclick="document.getElementById('quotaModal').classList.remove('show')">รับทราบ</button>
+    </div>
+  </div>
+</div>
 <div class="toast" id="toast"></div>
 <script>
 // ════════════════════════════════════════════════════
@@ -289,6 +307,16 @@ const lockHistory={}, dailyBookings={}, lockAbsent={};
 const MONS=['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
 function nowTH(){const n=new Date();return n.getDate()+' '+MONS[n.getMonth()]+' '+(n.getFullYear()+543);}
 function nowTime(){const n=new Date();return String(n.getHours()).padStart(2,'0')+':'+String(n.getMinutes()).padStart(2,'0');}
+// แปลงวันที่รูปแบบไทยที่บันทึกไว้ "6 ก.ค. 2569" (วัน เดือนย่อ ปี พ.ศ.) → Date object จริง
+function parseThaiFullDate(dstr){
+  const parts=(dstr||'').trim().split(/\s+/);
+  if(parts.length<3) return null;
+  const day=parseInt(parts[0]);
+  const mIdx=MONS.indexOf(parts[1]);
+  const yearBE=parseInt(parts[2]);
+  if(!day||mIdx<0||!yearBE) return null;
+  return new Date(yearBE-543, mIdx, day);
+}
 function addHist(id,e){if(!lockHistory[id])lockHistory[id]=[];lockHistory[id].unshift({...e,date:nowTH(),time:nowTime()});if(lockHistory[id].length>30)lockHistory[id].pop();}
 function fmt(n){return '฿'+Math.round(n).toLocaleString();}
 
@@ -451,7 +479,7 @@ function openLeaveModal(lockId){
   closePopup();
   document.getElementById('leaveModal').classList.add('show');
 }
-function confirmLeave(){
+async function confirmLeave(){
   if(!pendingLeaveId)return;
   const id=pendingLeaveId;
   const note=document.getElementById('lm-note').value.trim();
@@ -459,23 +487,27 @@ function confirmLeave(){
   addHist(id,{type:'leave',label:'📋 แจ้งลา',note:note||'—'});
   const el=document.querySelector('.lk[data-id="'+id+'"]');
   if(el) refreshLk(el);
-  apiPost('logLeave',{lock_id:id,zone:el?.dataset.zone||'',shop:el?.dataset.shop||'',type:'leave',note:note||'',manager:getCurrentUserName(),date:nowTH(),time:nowTime()});
+  const shop=el?.dataset.shop||'';
+  await apiPost('logLeave',{lock_id:id,zone:el?.dataset.zone||'',shop,type:'leave',note:note||'',manager:getCurrentUserName(),date:nowTH(),time:nowTime()});
   document.getElementById('leaveModal').classList.remove('show');
   saveMarketState(); updateExpireBanner();
   toast('✅ บันทึกแจ้งลาล็อค '+id+' (คงอยู่ 3 วัน)','s');
   updateStats(); pendingLeaveId=null;
+  checkLeaveAbsentQuota(id, shop);
 }
-function doAbsent(lockId){
+async function doAbsent(lockId){
   if(!confirm('บันทึกล็อค '+lockId+' เป็น "ขาดล็อค (ไม่แจ้ง)" ใช่หรือไม่?'))return;
   lockAbsent[lockId]='absent';
   addHist(lockId,{type:'absent',label:'⚠️ ขาดล็อค (ไม่แจ้ง)',note:'บันทึกโดยผู้ดูแล'});
   const el=document.querySelector('.lk[data-id="'+lockId+'"]');
   if(el) refreshLk(el);
-  apiPost('logLeave',{lock_id:lockId,zone:el?.dataset.zone||'',shop:el?.dataset.shop||'',type:'absent',note:'บันทึกโดยผู้ดูแล',manager:getCurrentUserName(),date:nowTH(),time:nowTime()});
+  const shop=el?.dataset.shop||'';
+  await apiPost('logLeave',{lock_id:lockId,zone:el?.dataset.zone||'',shop,type:'absent',note:'บันทึกโดยผู้ดูแล',manager:getCurrentUserName(),date:nowTH(),time:nowTime()});
   saveMarketState(); updateExpireBanner();
   closePopup();
   toast('⚠️ บันทึกขาดล็อค '+lockId+' (คงอยู่ 3 วัน)','e');
   updateStats();
+  checkLeaveAbsentQuota(lockId, shop);
 }
 // TOGGLE cancel leave/absent
 function cancelAbsent(lockId){
@@ -808,6 +840,77 @@ async function loadRealHistory(lockId){
   }));
   merged.sort((a,b)=>b.sortKey.localeCompare(a.sortKey));
   renderHistChips(merged);
+}
+
+// ════════════════════════════════════════════════════
+// QUOTA WARNING — กฎตลาด: ลา ≤2 ครั้ง/เดือน, ขาด ≤2 ครั้ง/ปี,
+// ลา 3 ครั้งติดกัน (สัปดาห์ต่อเนื่อง แม้คร่อมเดือน) = เข้าเงื่อนไขยกเลิกสัญญา
+// ════════════════════════════════════════════════════
+const QUOTA_RULE_TEXT = 'การลาล็อคสามารถลาได้ไม่เกินเดือนละ 2 ครั้ง และการขาดล็อค ขาดได้ไม่เกิน 2 ครั้ง ต่อปี หากเกินตามจำนวนครั้งข้างต้นทางตลาดขอสงวนสิทธิในการยกเลิกการเช่า ในกรณีที่ลาล็อค 3 ครั้งติดกันคร่อมเดือนจะถูกยกเลิกการเช่าเช่นกัน';
+
+// ตรวจว่ามีการแจ้งลา "ติดต่อกัน" ตั้งแต่ 3 ครั้งขึ้นไปหรือไม่ (นับเฉพาะรายการล่าสุดที่ห่างกันประมาณ 1 สัปดาห์ต่อเนื่องไม่ขาดช่วง)
+function countConsecutiveWeeklyRun(datesAsc){
+  if(datesAsc.length<2) return datesAsc.length;
+  let run=1, best=1;
+  for(let i=datesAsc.length-1;i>0;i--){
+    const gapDays=Math.round((datesAsc[i]-datesAsc[i-1])/86400000);
+    if(gapDays>=5 && gapDays<=9){ run++; } else { break; }
+  }
+  best=run;
+  return best;
+}
+
+async function checkLeaveAbsentQuota(lockId, shopName){
+  if(!getApiUrl()) return; // ตรวจสอบโควต้าได้เฉพาะเมื่อเชื่อมต่อ Google Sheets แล้วเท่านั้น
+  const rows = await apiGet('getLeaveLog', {lockId});
+  if(!Array.isArray(rows) || !rows.length) return;
+
+  const now = new Date();
+  const curMonth = now.getMonth(), curYear = now.getFullYear();
+
+  const leaveDates = rows.filter(r=>r.type==='leave')
+    .map(r=>parseThaiFullDate(r.date)).filter(Boolean)
+    .sort((a,b)=>a-b);
+  const absentDates = rows.filter(r=>r.type==='absent')
+    .map(r=>parseThaiFullDate(r.date)).filter(Boolean)
+    .sort((a,b)=>a-b);
+
+  const leaveThisMonth = leaveDates.filter(d=>d.getMonth()===curMonth && d.getFullYear()===curYear).length;
+  const absentThisYear = absentDates.filter(d=>d.getFullYear()===curYear).length;
+  const consecRun = countConsecutiveWeeklyRun(leaveDates);
+  const consecFlag = consecRun >= 3;
+
+  const leaveAtQuota = leaveThisMonth === 2;
+  const leaveOver = leaveThisMonth > 2;
+  const absentAtQuota = absentThisYear === 2;
+  const absentOver = absentThisYear > 2;
+
+  if(!leaveAtQuota && !leaveOver && !absentAtQuota && !absentOver && !consecFlag) return; // ยังไม่ถึงเกณฑ์ ไม่ต้องรบกวน
+
+  const severe = leaveOver || absentOver || consecFlag;
+  document.getElementById('qm-title').innerHTML =
+    (severe
+      ? '<svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M6 6l12 12"/></svg> เกินโควต้าตามกฎของตลาด'
+      : '<svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 9v4M12 17h.01"/><path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/></svg> ใกล้ครบโควต้าตามกฎของตลาด');
+  document.getElementById('qm-sub').textContent = 'ล็อค '+lockId+' — ร้าน: '+(shopName||'—');
+
+  let statsHtml = '';
+  if(leaveAtQuota || leaveOver){
+    statsHtml += `<div class="q-stat ${leaveOver?'danger':'warn'}"><span>📋 แจ้งลาเดือนนี้</span><span>${leaveThisMonth} / 2 ครั้ง</span></div>`;
+  }
+  if(absentAtQuota || absentOver){
+    statsHtml += `<div class="q-stat ${absentOver?'danger':'warn'}"><span>⚠️ ขาดล็อคปีนี้</span><span>${absentThisYear} / 2 ครั้ง</span></div>`;
+  }
+  if(consecFlag){
+    statsHtml += `<div class="q-consec">🔴 ตรวจพบการแจ้งลาติดต่อกัน ${consecRun} สัปดาห์ (อาจคร่อมเดือน) — เข้าเงื่อนไขยกเลิกการเช่าตามกฎตลาด</div>`;
+  }
+  document.getElementById('qm-stats').innerHTML = statsHtml;
+
+  const footer = document.getElementById('qm-footer');
+  footer.innerHTML = '<button class="m-btn secondary" onclick="document.getElementById(\'quotaModal\').classList.remove(\'show\')">รับทราบ</button>'
+    + (severe ? `<button class="m-btn" style="background:var(--r);color:#fff" onclick="document.getElementById('quotaModal').classList.remove('show');openCancelLeaseModal('${lockId}')"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M6 6l12 12"/></svg> ไปหน้ายกเลิกสัญญาเช่า</button>` : '');
+
+  document.getElementById('quotaModal').classList.add('show');
 }
 
 // ════════════════════════════════════════════════════
