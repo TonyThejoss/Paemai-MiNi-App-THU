@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>ระบบผ่อนชำระ & ยอดคงค้าง — แพไม้มินิ วันพฤหัสบดี</title>
-<style>
+<style>a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible,[tabindex]:focus-visible,.lk:focus-visible,.zone-tab:focus-visible{outline:2.5px solid var(--gm) !important;outline-offset:2px;}.ico{width:1em;height:1em;display:inline-block;vertical-align:-0.15em;flex-shrink:0}
 :root {
   --g:#7c2d12;--gm:#c2410c;--gb:#ea580c;--gl:#ffedd5;--gll:#fff7ed;
   --r:#b91c1c;--rl:#fef2f2;--o:#c2410c;--ol:#fff7ed;
@@ -12,7 +12,7 @@
   --y:#92400e;--yl:#fffbeb;
   --bg:#f4f6f4;--sf:#fff;--sf2:#f8faf9;--sf3:#f1f5f2;
   --bd:#c8d8cf;--bd2:#9bb5a5;
-  --tx:#0f1e14;--txm:#3d5247;--txl:#7a9184;
+  --tx:#0f1e14;--txm:#3d5247;--txl:#4d6854;
   --shadow:0 2px 12px rgba(15,30,20,.07);
   --ease:cubic-bezier(.4,0,.2,1);
   --rad:10px;
@@ -20,7 +20,7 @@
 [data-theme="dark"]{
   --bg:#0a0f0c;--sf:#111a14;--sf2:#162019;--sf3:#1c2a20;
   --bd:#2a3d30;--bd2:#3d5a46;
-  --tx:#d4e8d8;--txm:#8aab8f;--txl:#4a6350;
+  --tx:#d4e8d8;--txm:#8aab8f;--txl:#8ca696;
   --gl:#112318;--gll:#0b170f;--rl:#1f0a0a;--ol:#1f1008;
   --bl:#0a1228;--pul:#170f28;--yl:#1a1208;
   --shadow:0 4px 20px rgba(0,0,0,.45);
@@ -220,17 +220,17 @@ textarea{resize:vertical;min-height:56px;}
 
 <div class="topbar">
   <div>
-    <h1>💳 ระบบผ่อนชำระ & ยอดคงค้าง — แพไม้มินิ วันพฤหัสบดี</h1>
+    <h1><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2.5" y="5.5" width="19" height="13" rx="2"/><path d="M2.5 9.5h19M6 14.5h4"/></svg> ระบบผ่อนชำระ & ยอดคงค้าง — แพไม้มินิ วันพฤหัสบดี</h1>
     <p>งวดแรก = พฤหัสบดีสุดท้ายของเดือน · ชำระให้ครบภายในพฤหัสบดีต้นเดือนถัดไป</p>
   </div>
-  <button class="dm-btn" onclick="toggleDark()" title="Dark/Light">🌓</button>
+  <button class="dm-btn" onclick="toggleDark()" title="Dark/Light" aria-label="สลับโหมดมืด/สว่าง"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 3a9 9 0 0 0 0 18z" fill="currentColor" stroke="none"/></svg></button>
 </div>
 
 <div class="tabs">
-  <button class="tab active" onclick="showTab('t1',this)">📊 ภาพรวมค้างชำระ</button>
-  <button class="tab"       onclick="showTab('t2',this)">📋 ตั้งแผนผ่อนชำระ</button>
-  <button class="tab"       onclick="showTab('t3',this)">🔍 ติดตามการผ่อน</button>
-  <button class="tab"       onclick="showTab('t4',this)">🗺️ แผนที่สถานะ</button>
+  <button class="tab active" onclick="showTab('t1',this)"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20V10M11 20V4M18 20v-7"/><path d="M2.5 20h19"/></svg> ภาพรวมค้างชำระ</button>
+  <button class="tab"       onclick="showTab('t2',this)"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="4" width="12" height="17" rx="2"/><rect x="9" y="2.5" width="6" height="3" rx="1"/><path d="M9 11h6M9 15h6"/></svg> ตั้งแผนผ่อนชำระ</button>
+  <button class="tab"       onclick="showTab('t3',this)"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m20 20-4.3-4.3"/></svg> ติดตามการผ่อน</button>
+  <button class="tab"       onclick="showTab('t4',this)"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 4 3 6.5v14L9 18l6 2.5L21 18V4l-6 2.5L9 4z"/><path d="M9 4v14M15 6.5v14"/></svg>️ แผนที่สถานะ</button>
 </div>
 
 <!-- ═══ TAB 1 ═══ -->
@@ -244,26 +244,26 @@ textarea{resize:vertical;min-height:56px;}
   </div>
 
   <div class="card">
-    <div class="card-title">⚠️ รายชื่อผู้ค้าค้างชำระทั้งหมด
-      <span><button class="btn btn-primary btn-sm" onclick="switchTab('t2')">➕ ตั้งแผนผ่อน</button></span>
+    <div class="card-title"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 2 20h20L12 3z"/><path d="M12 10v4"/><circle cx="12" cy="17" r=".6" fill="currentColor" stroke="none"/></svg>️ รายชื่อผู้ค้าค้างชำระทั้งหมด
+      <span><button class="btn btn-primary btn-sm" onclick="switchTab('t2')"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg> ตั้งแผนผ่อน</button></span>
     </div>
     <div class="search-row">
-      <input class="sbox" id="s1q" placeholder="🔍 ค้นหาล็อค / ร้าน..." oninput="renderOv()">
-      <select class="fsel" id="s1z" onchange="renderOv()">
+      <input class="sbox" id="s1q" aria-label="ค้นหาล็อค / ร้าน" placeholder="🔍 ค้นหาล็อค / ร้าน..." oninput="renderOv()">
+      <select class="fsel" id="s1z" aria-label="กรองโซน" onchange="renderOv()">
         <option value="">ทุกโซน</option>
         <option>A</option><option>B</option><option>C</option><option>D</option><option>E</option><option>F</option>
         <option>G</option><option>J</option><option>K</option><option>N</option><option>U</option>
         <option>O</option><option>M</option><option>H</option><option>L</option><option>T</option><option>AB</option>
         <option>TA</option><option>TB</option><option>TC</option>
       </select>
-      <select class="fsel" id="s1s" onchange="renderOv()">
+      <select class="fsel" id="s1s" aria-label="กรองสถานะ" onchange="renderOv()">
         <option value="">ทุกสถานะ</option>
         <option value="no_plan">ยังไม่มีแผน</option>
         <option value="paying">กำลังผ่อน</option>
         <option value="overdue_term">ค้างงวด</option>
         <option value="near_deadline">ใกล้หมดสิทธิ์</option>
       </select>
-      <select class="fsel" id="s1o" onchange="renderOv()">
+      <select class="fsel" id="s1o" aria-label="เรียงลำดับ" onchange="renderOv()">
         <option value="remain_desc">คงเหลือมาก→น้อย</option>
         <option value="months_desc">ค้างนาน→สั้น</option>
         <option value="lock">เลขล็อค</option>
@@ -291,11 +291,11 @@ textarea{resize:vertical;min-height:56px;}
   <div class="two-col">
     <div>
       <div class="card">
-        <div class="card-title">📋 ตั้งแผนผ่อนชำระ</div>
+        <div class="card-title"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="4" width="12" height="17" rx="2"/><rect x="9" y="2.5" width="6" height="3" rx="1"/><path d="M9 11h6M9 15h6"/></svg> ตั้งแผนผ่อนชำระ</div>
 
         <div class="field-row">
           <div class="field">
-            <label>เลือกล็อค <span class="req">*</span></label>
+            <label for="ins-lock">เลือกล็อค <span class="req">*</span></label>
             <select id="ins-lock" onchange="loadDebt()">
               <option value="">-- เลือกล็อคที่มียอดค้าง --</option>
             </select>
@@ -315,7 +315,7 @@ textarea{resize:vertical;min-height:56px;}
 
         <!-- วันที่อิงอัตโนมัติ -->
         <div id="date-info-box" style="display:none;background:var(--gll);border:1.5px solid var(--gm);border-radius:8px;padding:9px 13px;margin-bottom:10px;font-size:.76rem">
-          <div style="font-weight:800;color:var(--gm);margin-bottom:5px">📅 กำหนดการผ่อนชำระ (อิงวันพฤหัสบดี)</div>
+          <div style="font-weight:800;color:var(--gm);margin-bottom:5px"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="5" width="17" height="16" rx="2"/><path d="M3.5 9.5h17M8 3v4M16 3v4"/></svg> กำหนดการผ่อนชำระ (อิงวันพฤหัสบดี)</div>
           <div style="display:flex;gap:16px;flex-wrap:wrap">
             <div><span style="color:var(--txl)">งวดแรก (พฤหัสบดีสุดท้ายเดือนนี้):</span> <strong id="date-first" style="color:var(--gm)">—</strong></div>
             <div><span style="color:var(--txl)">ชำระให้ครบภายใน:</span> <strong id="date-deadline" style="color:var(--r)">—</strong></div>
@@ -325,7 +325,7 @@ textarea{resize:vertical;min-height:56px;}
 
         <div class="field-row c3" style="margin-bottom:10px">
           <div class="field">
-            <label>จำนวนงวด <span class="req">*</span></label>
+            <label for="ins-terms">จำนวนงวด <span class="req">*</span></label>
             <select id="ins-terms" onchange="calcPlan()">
               <option value="2">2 งวด</option>
               <option value="3" selected>3 งวด (แนะนำ)</option>
@@ -333,18 +333,18 @@ textarea{resize:vertical;min-height:56px;}
             </select>
           </div>
           <div class="field">
-            <label>งวดแรก (฿)</label>
+            <label for="ins-first">งวดแรก (฿)</label>
             <input type="number" id="ins-first" placeholder="0 = เฉลี่ย" min="0" oninput="calcPlan()">
           </div>
           <div class="field">
-            <label>ดอกเบี้ย (%/เดือน)</label>
+            <label for="ins-rate">ดอกเบี้ย (%/เดือน)</label>
             <input type="number" id="ins-rate" value="0" min="0" step="0.1" oninput="calcPlan()">
           </div>
         </div>
 
         <!-- กฎระเบียบ -->
         <div class="rule-box">
-          <div class="rule-title">📌 กฎการผ่อนชำระ</div>
+          <div class="rule-title"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 3.5 20.5 9.5 17 13l-1.5 6-2-2-4.5 4.5-1-1L12.5 16l-2-2 3.5-1.5z"/></svg> กฎการผ่อนชำระ</div>
           <ul>
             <li>งวดแรก ชำระ <strong>วันพฤหัสบดีสุดท้าย</strong>ของเดือนที่ตั้งแผน</li>
             <li>ต้องชำระให้ครบภายใน <strong>วันพฤหัสบดีต้นเดือน</strong>ของเดือนถัดจากงวดสุดท้าย</li>
@@ -361,8 +361,8 @@ textarea{resize:vertical;min-height:56px;}
         </div>
 
         <div style="display:flex;gap:9px;margin-top:14px">
-          <button class="btn btn-secondary" style="flex:1" onclick="resetForm()">🗑️ ล้าง</button>
-          <button class="btn btn-primary" style="flex:1" onclick="savePlan()">💾 บันทึกแผนผ่อน</button>
+          <button class="btn btn-secondary" style="flex:1" onclick="resetForm()"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 7h14M9 7V4.5h6V7M7 7l1 13.5h8L17 7"/><path d="M10 11v6M14 11v6"/></svg>️ ล้าง</button>
+          <button class="btn btn-primary" style="flex:1" onclick="savePlan()"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 3h13l3 3v15H4z"/><path d="M8 3v6h8V3M7 14h10v7H7z"/></svg> บันทึกแผนผ่อน</button>
         </div>
       </div>
     </div>
@@ -377,7 +377,7 @@ textarea{resize:vertical;min-height:56px;}
         </div>
 
         <div class="sum-rows">
-          <div style="font-size:.78rem;font-weight:800;margin-bottom:8px">📆 สรุปแผน</div>
+          <div style="font-size:.78rem;font-weight:800;margin-bottom:8px"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="5" width="17" height="16" rx="2"/><path d="M3.5 9.5h17M8 3v4M16 3v4"/><rect x="7" y="12.5" width="3" height="3" fill="currentColor" stroke="none"/></svg> สรุปแผน</div>
           <div class="sum-row"><span class="sum-lbl">จำนวนงวด</span><span class="sum-val" id="p-terms">—</span></div>
           <div class="sum-row"><span class="sum-lbl">งวดแรก (ครั้ง/วัน)</span><span class="sum-val" id="p-d1">—</span></div>
           <div class="sum-row"><span class="sum-lbl">ค่างวดเฉลี่ย</span><span class="sum-val" id="p-avg">—</span></div>
@@ -387,7 +387,7 @@ textarea{resize:vertical;min-height:56px;}
         </div>
 
         <div class="deadline-info" id="p-deadline-box" style="display:none">
-          <div class="dl-title">⚠️ ผลหากไม่ชำระตามกำหนด</div>
+          <div class="dl-title"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 2 20h20L12 3z"/><path d="M12 10v4"/><circle cx="12" cy="17" r=".6" fill="currentColor" stroke="none"/></svg>️ ผลหากไม่ชำระตามกำหนด</div>
           <div class="dl-row"><span>สิทธิ์ผู้ค้าประจำ</span><span class="dl-val">สิ้นสุดทันที</span></div>
           <div class="dl-row"><span>ต้องสมัครใหม่</span><span class="dl-val">ค่าแรกเข้า + รายปี</span></div>
         </div>
@@ -399,12 +399,12 @@ textarea{resize:vertical;min-height:56px;}
 <!-- ═══ TAB 3 ═══ -->
 <div id="t3" class="page">
   <div class="card">
-    <div class="card-title">🔍 ติดตามแผนผ่อนชำระ
+    <div class="card-title"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m20 20-4.3-4.3"/></svg> ติดตามแผนผ่อนชำระ
       <span style="font-size:.68rem;font-weight:400;color:var(--txl)">กด "รับงวด" เพื่อบันทึกชำระ</span>
     </div>
     <div class="search-row">
-      <input class="sbox" id="s3q" placeholder="🔍 ค้นหา..." oninput="renderTracking()">
-      <select class="fsel" id="s3s" onchange="renderTracking()">
+      <input class="sbox" id="s3q" aria-label="ค้นหา" placeholder="🔍 ค้นหา..." oninput="renderTracking()">
+      <select class="fsel" id="s3s" aria-label="กรองสถานะ" onchange="renderTracking()">
         <option value="">ทุกสถานะ</option>
         <option value="active">กำลังผ่อน</option>
         <option value="overdue_term">ค้างงวด</option>
@@ -418,21 +418,21 @@ textarea{resize:vertical;min-height:56px;}
 <!-- ═══ TAB 4 ═══ -->
 <div id="t4" class="page">
   <div class="card">
-    <div class="card-title">🗺️ แผนที่สถานะการชำระ — ทุกโซน
+    <div class="card-title"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 4 3 6.5v14L9 18l6 2.5L21 18V4l-6 2.5L9 4z"/><path d="M9 4v14M15 6.5v14"/></svg>️ แผนที่สถานะการชำระ — ทุกโซน
       <span style="display:flex;gap:6px;flex-wrap:wrap;margin-left:auto">
-        <span class="badge b-green">✅ ชำระครบ</span>
-        <span class="badge b-orange">🔄 กำลังผ่อน</span>
-        <span class="badge b-red">❌ ค้างชำระ</span>
-        <span class="badge b-yellow">🟡 ว่าง</span>
+        <span class="badge b-green"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="m8 12 3 3 5-6"/></svg> ชำระครบ</span>
+        <span class="badge b-orange"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 11a8 8 0 0 0-14.9-4M4 13a8 8 0 0 0 14.9 4"/><path d="M4 4v4h4M20 20v-4h-4"/></svg> กำลังผ่อน</span>
+        <span class="badge b-red"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="m9 9 6 6M15 9l-6 6"/></svg> ค้างชำระ</span>
+        <span class="badge b-yellow"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8" fill="currentColor" stroke="none"/></svg> ว่าง</span>
       </span>
     </div>
     <div style="font-size:.68rem;color:var(--txl);margin-bottom:8px">ตัวเลขแดงมุมบนขวา = ยอดคงค้าง (หน่วยพัน) · กดล็อคเพื่อดูรายละเอียด</div>
     <!-- Zone tabs -->
     <div style="display:flex;gap:6px;margin-bottom:10px;flex-wrap:wrap">
-      <button id="mztab-out" class="btn btn-primary btn-sm" style="padding:5px 12px;font-size:.68rem" onclick="switchMapZone('out')">🌳 โซนด้านนอก A–F</button>
-      <button id="mztab-b7" class="btn btn-secondary btn-sm" style="padding:5px 12px;font-size:.68rem" onclick="switchMapZone('b7')">🏪 ข้าง 7-Eleven</button>
-      <button id="mztab-lt" class="btn btn-secondary btn-sm" style="padding:5px 12px;font-size:.68rem" onclick="switchMapZone('lt')">🛒 ข้างโลตัส</button>
-      <button id="mztab-tg" class="btn btn-secondary btn-sm" style="padding:5px 12px;font-size:.68rem" onclick="switchMapZone('tg')">🚚 เปิดท้าย TA–TC</button>
+      <button id="mztab-out" class="btn btn-primary btn-sm" style="padding:5px 12px;font-size:.68rem" onclick="switchMapZone('out')"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2 7 9h3l-4 6h4v6h4v-6h4l-4-6h3z"/></svg> โซนด้านนอก A–F</button>
+      <button id="mztab-b7" class="btn btn-secondary btn-sm" style="padding:5px 12px;font-size:.68rem" onclick="switchMapZone('b7')"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 10h16v9a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1v-9z"/><path d="M3 6l1.5-3h15L21 6M3 6l.8 3.2A1.7 1.7 0 0 0 8 9.4M8 9.4a1.7 1.7 0 0 0 3.3 0M11.3 9.4a1.7 1.7 0 0 0 3.4 0M14.7 9.4a1.7 1.7 0 0 0 3.3 0M18 9.4A1.7 1.7 0 0 0 21.2 9.2L22 6"/></svg> ข้าง 7-Eleven</button>
+      <button id="mztab-lt" class="btn btn-secondary btn-sm" style="padding:5px 12px;font-size:.68rem" onclick="switchMapZone('lt')"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="20" r="1.3" fill="currentColor" stroke="none"/><circle cx="17" cy="20" r="1.3" fill="currentColor" stroke="none"/><path d="M2.5 3h2.5L8 14h9l2.5-8H6.5"/></svg> ข้างโลตัส</button>
+      <button id="mztab-tg" class="btn btn-secondary btn-sm" style="padding:5px 12px;font-size:.68rem" onclick="switchMapZone('tg')"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="12" height="9" rx="1"/><path d="M14 10h4l3 3v3h-7z"/><circle cx="7" cy="18.5" r="1.6"/><circle cx="17.5" cy="18.5" r="1.6"/></svg> เปิดท้าย TA–TC</button>
     </div>
     <div class="map-grid" id="map-grid"></div>
   </div>
@@ -442,13 +442,13 @@ textarea{resize:vertical;min-height:56px;}
 <!-- MODAL PAY -->
 <div class="overlay" id="pay-modal">
   <div class="modal">
-    <button class="modal-close" onclick="closeModal()">✕</button>
+    <button class="modal-close" onclick="closeModal()" aria-label="ปิดหน้าต่าง"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 5l14 14M19 5 5 19"/></svg></button>
     <div class="modal-title" id="pm-title">รับชำระงวด</div>
     <div class="modal-sub" id="pm-sub">—</div>
     <div id="pm-body"></div>
     <div class="modal-footer">
       <button class="btn btn-secondary" onclick="closeModal()">ยกเลิก</button>
-      <button class="btn btn-primary" onclick="doPayInstallment()">✅ บันทึก</button>
+      <button class="btn btn-primary" onclick="doPayInstallment()"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="m8 12 3 3 5-6"/></svg> บันทึก</button>
     </div>
   </div>
 </div>
@@ -885,10 +885,10 @@ function openPay(lock, term){
       ${v.plan.deadline?`<div style="margin-top:6px;font-size:.68rem;color:var(--txl)">วันครบกำหนดทั้งแผน: <strong style="color:var(--r)">${fmtDate(v.plan.deadline)}</strong></div>`:''}
     </div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-bottom:10px">
-      <div class="field"><label>จำนวนที่รับ (฿)</label><input type="number" id="pay-amt" value="${s.amount}" min="0"></div>
-      <div class="field"><label>ช่องทาง</label><select id="pay-method"><option>💵 เงินสด</option><option>📱 โอนเงิน</option><option>📷 QR Code</option></select></div>
+      <div class="field"><label for="pay-amt">จำนวนที่รับ (฿)</label><input type="number" id="pay-amt" value="${s.amount}" min="0"></div>
+      <div class="field"><label for="pay-method">ช่องทาง</label><select id="pay-method"><option>💵 เงินสด</option><option>📱 โอนเงิน</option><option>📷 QR Code</option></select></div>
     </div>
-    <div class="field"><label>หมายเหตุ</label><input type="text" id="pay-note" placeholder="—"></div>`;
+    <div class="field"><label for="pay-note">หมายเหตุ</label><input type="text" id="pay-note" placeholder="—"></div>`;
   document.getElementById('pay-modal').classList.add('show');
 }
 function closeModal(){document.getElementById('pay-modal').classList.remove('show');payTarget=null;}

@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>รับชำระเงินหลายล็อค — แพไม้มินิ วันพฤหัสบดี</title>
-<style>
+<style>a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible,[tabindex]:focus-visible,.lk:focus-visible,.zone-tab:focus-visible{outline:2.5px solid #ea580c !important;outline-offset:2px;}.ico{width:1em;height:1em;display:inline-block;vertical-align:-0.15em;flex-shrink:0}
 * { box-sizing: border-box; margin: 0; padding: 0; }
 body { font-family: 'Segoe UI', Tahoma, sans-serif; background: #f0f4f8; color: #1a202c; font-size: 14px; }
 
@@ -80,12 +80,12 @@ select.filter-select:focus { border-color: #ea580c; }
 
 .lock-info { flex: 1; min-width: 0; }
 .lock-id { font-weight: 700; font-size: 0.88rem; color: #2d3748; }
-.lock-product { font-size: 0.75rem; color: #718096; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-top: 1px; }
-.lock-vendor { font-size: 0.72rem; color: #a0aec0; margin-top: 1px; }
+.lock-product { font-size: 0.75rem; color: #5b6b82; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-top: 1px; }
+.lock-vendor { font-size: 0.72rem; color: #5b6b82; margin-top: 1px; }
 
 .lock-amount { text-align: right; flex-shrink: 0; }
 .amount-due { font-weight: 700; font-size: 0.9rem; color: #2d3748; }
-.amount-label { font-size: 0.68rem; color: #a0aec0; margin-top: 2px; }
+.amount-label { font-size: 0.68rem; color: #5b6b82; margin-top: 2px; }
 
 .badge-status {
   font-size: 0.65rem; font-weight: 700; padding: 2px 7px; border-radius: 10px;
@@ -117,7 +117,7 @@ select.filter-select:focus { border-color: #ea580c; }
 .stat-num { font-size: 1.5rem; font-weight: 800; color: #2d3748; }
 .stat-num.green { color: #276749; }
 .stat-num.red { color: #9b2c2c; }
-.stat-label { font-size: 0.72rem; color: #718096; margin-top: 2px; }
+.stat-label { font-size: 0.72rem; color: #5b6b82; margin-top: 2px; }
 
 .total-bar {
   background: linear-gradient(135deg, #c2410c, #ea580c);
@@ -195,7 +195,7 @@ select.filter-select:focus { border-color: #ea580c; }
   display: flex; align-items: center; justify-content: space-between;
   box-shadow: 0 -4px 12px rgba(0,0,0,0.05);
 }
-.action-info { font-size: 0.82rem; color: #718096; }
+.action-info { font-size: 0.82rem; color: #5b6b82; }
 .action-info strong { color: #2d3748; }
 
 .action-btns { display: flex; gap: 10px; }
@@ -205,13 +205,13 @@ select.filter-select:focus { border-color: #ea580c; }
   font-size: 0.85rem; font-weight: 700; cursor: pointer; transition: all 0.2s;
 }
 .btn-outline { background: white; border: 2px solid #e2e8f0; color: #4a5568; }
-.btn-outline:hover { border-color: #a0aec0; }
+.btn-outline:hover { border-color: #5b6b82; }
 .btn-primary {
   background: linear-gradient(135deg, #c2410c, #ea580c); color: white;
   box-shadow: 0 4px 12px rgba(45,106,79,0.35);
 }
 .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 6px 16px rgba(45,106,79,0.45); }
-.btn-primary:disabled { background: #a0aec0; transform: none; box-shadow: none; cursor: not-allowed; }
+.btn-primary:disabled { background: #5b6b82; transform: none; box-shadow: none; cursor: not-allowed; }
 .btn-danger { background: #e53e3e; color: white; }
 .btn-danger:hover { background: #c53030; }
 
@@ -229,7 +229,7 @@ select.filter-select:focus { border-color: #ea580c; }
 @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
 
 .modal-title { font-size: 1.1rem; font-weight: 800; color: #2d3748; margin-bottom: 6px; }
-.modal-sub { font-size: 0.82rem; color: #718096; margin-bottom: 20px; }
+.modal-sub { font-size: 0.82rem; color: #5b6b82; margin-bottom: 20px; }
 .modal-receipt { background: #f7fafc; border-radius: 10px; padding: 16px; margin-bottom: 20px; }
 .receipt-row { display: flex; justify-content: space-between; padding: 5px 0; font-size: 0.82rem; border-bottom: 1px solid #edf2f7; }
 .receipt-row:last-child { border: none; font-weight: 700; font-size: 0.9rem; color: #276749; margin-top: 4px; }
@@ -237,7 +237,7 @@ select.filter-select:focus { border-color: #ea580c; }
 
 /* ── EMPTY STATE ── */
 .empty-state {
-  text-align: center; padding: 48px 24px; color: #a0aec0;
+  text-align: center; padding: 48px 24px; color: #5b6b82;
 }
 .empty-icon { font-size: 3rem; margin-bottom: 12px; }
 .empty-text { font-size: 0.88rem; }
@@ -265,18 +265,18 @@ select.filter-select:focus { border-color: #ea580c; }
     <div style="display:flex;align-items:center;gap:10px">
       <button class="btn-back">← กลับ</button>
       <div>
-        <h1>💰 รับชำระเงินรวม — แพไม้มินิ วันพฤหัสบดี</h1>
+        <h1><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v10M9.5 9.2c0-1.2 1.1-2.2 2.5-2.2s2.5.9 2.5 2c0 2.8-5 1.6-5 4.3 0 1.1 1.1 2 2.5 2s2.5-.9 2.5-2"/></svg> รับชำระเงินรวม — แพไม้มินิ วันพฤหัสบดี</h1>
         <div class="meta" id="metaDate">วันพฤหัสบดีที่ — · เดือน — · รอบการเก็บเงิน</div>
       </div>
     </div>
   </div>
   <div style="display:flex;gap:8px">
-    <select class="filter-select" id="monthSelect" style="background:rgba(255,255,255,0.15);color:white;border-color:rgba(255,255,255,0.3)" onchange="filterChanged()">
+    <select class="filter-select" id="monthSelect" aria-label="เลือกเดือน" style="background:rgba(255,255,255,0.15);color:white;border-color:rgba(255,255,255,0.3)" onchange="filterChanged()">
       <option value="2025-06">มิ.ย. 2568</option>
       <option value="2025-07" selected>ก.ค. 2568</option>
       <option value="2025-08">ส.ค. 2568</option>
     </select>
-    <select class="filter-select" id="roundSelect" style="background:rgba(255,255,255,0.15);color:white;border-color:rgba(255,255,255,0.3)">
+    <select class="filter-select" id="roundSelect" aria-label="เลือกรอบ" style="background:rgba(255,255,255,0.15);color:white;border-color:rgba(255,255,255,0.3)">
       <option>รายเดือน</option>
       <option>รายวัน (จร)</option>
       <option>ค่าไฟ</option>
@@ -290,10 +290,10 @@ select.filter-select:focus { border-color: #ea580c; }
   <!-- ════ LEFT PANEL ════ -->
   <div class="left-panel">
     <div class="panel-header">
-      <div class="panel-title">📋 รายการล็อค</div>
+      <div class="panel-title"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="4" width="12" height="17" rx="2"/><rect x="9" y="2.5" width="6" height="3" rx="1"/><path d="M9 11h6M9 15h6"/></svg> รายการล็อค</div>
       <div class="filter-row">
-        <input class="search-box" id="searchInput" placeholder="🔍 ค้นหาล็อค / ร้านค้า..." oninput="filterLocks()">
-        <select class="filter-select" id="zoneFilter" onchange="filterLocks()">
+        <input class="search-box" id="searchInput" aria-label="ค้นหาล็อค / ร้านค้า" placeholder="🔍 ค้นหาล็อค / ร้านค้า..." oninput="filterLocks()">
+        <select class="filter-select" id="zoneFilter" aria-label="กรองโซน" onchange="filterLocks()">
           <option value="">ทุกโซน</option>
           <option value="A">A</option><option value="B">B</option><option value="C">C</option>
           <option value="D">D</option><option value="E">E</option><option value="F">F</option>
@@ -303,7 +303,7 @@ select.filter-select:focus { border-color: #ea580c; }
           <option value="L">L</option><option value="T">T</option><option value="AB">AB</option>
           <option value="TA">TA</option><option value="TB">TB</option><option value="TC">TC</option>
         </select>
-        <select class="filter-select" id="statusFilter" onchange="filterLocks()">
+        <select class="filter-select" id="statusFilter" aria-label="กรองสถานะ" onchange="filterLocks()">
           <option value="">ทุกสถานะ</option>
           <option value="unpaid">ค้างชำระ</option>
           <option value="partial">ชำระบางส่วน</option>
@@ -311,7 +311,7 @@ select.filter-select:focus { border-color: #ea580c; }
         </select>
       </div>
       <div class="check-all-row" onclick="toggleAll()">
-        <input type="checkbox" id="checkAll" onclick="event.stopPropagation();toggleAll()">
+        <input type="checkbox" id="checkAll" aria-label="เลือกทั้งหมด" onclick="event.stopPropagation();toggleAll()">
         <span id="checkAllLabel">เลือกทั้งหมดที่แสดง</span>
       </div>
     </div>
@@ -325,7 +325,7 @@ select.filter-select:focus { border-color: #ea580c; }
 
       <!-- SUMMARY -->
       <div class="summary-box">
-        <div class="summary-title">📊 สรุปรายการที่เลือก</div>
+        <div class="summary-title"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20V10M11 20V4M18 20v-7"/><path d="M2.5 20h19"/></svg> สรุปรายการที่เลือก</div>
         <div class="summary-grid">
           <div class="stat-card">
             <div class="stat-num" id="statSelected">0</div>
@@ -352,12 +352,12 @@ select.filter-select:focus { border-color: #ea580c; }
       <!-- SELECTED ITEMS TABLE -->
       <div class="items-box">
         <div class="items-title">
-          <span>✏️ กรอกจำนวนที่รับมา</span>
-          <span style="font-size:0.75rem;color:#718096;font-weight:400">* กรอก 0 หมายถึงยังไม่ได้รับชำระ</span>
+          <span><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h4L19.5 8.5a2.1 2.1 0 0 0-3-3L5.5 16 4 20z"/><path d="M14.5 6.5l3 3"/></svg>️ กรอกจำนวนที่รับมา</span>
+          <span style="font-size:0.75rem;color:#5b6b82;font-weight:400">* กรอก 0 หมายถึงยังไม่ได้รับชำระ</span>
         </div>
         <div id="selectedTableWrap">
           <div class="empty-state">
-            <div class="empty-icon">👈</div>
+            <div class="empty-icon"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 12h11M9 12l4-4M9 12l4 4"/></svg></div>
             <div class="empty-text">เลือกล็อคจากรายการด้านซ้ายก่อน<br>สามารถเลือกได้พร้อมกันหลายล็อค</div>
           </div>
         </div>
@@ -365,25 +365,25 @@ select.filter-select:focus { border-color: #ea580c; }
 
       <!-- OPTIONS -->
       <div class="options-box">
-        <div class="options-title">⚙️ ตั้งค่าการบันทึก</div>
+        <div class="options-title"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M12 3v2.2M12 18.8V21M4.2 12H2M22 12h-2.2M5.8 5.8l1.5 1.5M16.7 16.7l1.5 1.5M18.2 5.8l-1.5 1.5M7.3 16.7l-1.5 1.5"/></svg>️ ตั้งค่าการบันทึก</div>
         <div class="option-row">
           <span class="option-label">ช่องทางชำระ</span>
           <div style="display:flex;gap:8px;flex-wrap:wrap">
-            <button class="method-btn active" onclick="setMethod(this,'เงินสด')">💵 เงินสด</button>
-            <button class="method-btn" onclick="setMethod(this,'โอนเงิน')">📱 โอนเงิน</button>
-            <button class="method-btn" onclick="setMethod(this,'QR Code')">📷 QR Code</button>
+            <button class="method-btn active" onclick="setMethod(this,'เงินสด')"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2.5" y="6" width="19" height="12" rx="2"/><circle cx="12" cy="12" r="3"/><path d="M6 9v6M18 9v6"/></svg> เงินสด</button>
+            <button class="method-btn" onclick="setMethod(this,'โอนเงิน')"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="6.5" y="2.5" width="11" height="19" rx="2"/><path d="M11 19h2"/></svg> โอนเงิน</button>
+            <button class="method-btn" onclick="setMethod(this,'QR Code')"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2.5" y="7" width="19" height="13" rx="2"/><path d="M8 7l1.5-2.5h5L16 7"/><circle cx="12" cy="13.5" r="3.5"/></svg> QR Code</button>
           </div>
         </div>
         <div class="option-row">
-          <span class="option-label">วันที่รับเงิน</span>
+          <label class="option-label" for="payDate">วันที่รับเงิน</label>
           <input class="form-input" type="date" id="payDate" style="max-width:200px">
         </div>
         <div class="option-row">
-          <span class="option-label">ผู้รับเงิน</span>
+          <label class="option-label" for="collector">ผู้รับเงิน</label>
           <input class="form-input" type="text" id="collector" placeholder="ชื่อพนักงานผู้เก็บเงิน" style="max-width:260px">
         </div>
         <div class="option-row">
-          <span class="option-label">หมายเหตุรวม</span>
+          <label class="option-label" for="globalNote">หมายเหตุรวม</label>
           <input class="form-input" type="text" id="globalNote" placeholder="หมายเหตุสำหรับรอบนี้ (ถ้ามี)">
         </div>
       </div>
@@ -398,10 +398,10 @@ select.filter-select:focus { border-color: #ea580c; }
         ยอดรวม <strong id="footerTotal">฿0</strong>
       </div>
       <div class="action-btns">
-        <button class="btn btn-outline" onclick="clearAll()">🗑️ ล้างทั้งหมด</button>
-        <button class="btn btn-outline" onclick="fillAllFull()">✅ กรอกเต็มทุกล็อค</button>
+        <button class="btn btn-outline" onclick="clearAll()"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 7h14M9 7V4.5h6V7M7 7l1 13.5h8L17 7"/><path d="M10 11v6M14 11v6"/></svg>️ ล้างทั้งหมด</button>
+        <button class="btn btn-outline" onclick="fillAllFull()"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="m8 12 3 3 5-6"/></svg> กรอกเต็มทุกล็อค</button>
         <button class="btn btn-primary" id="saveBtn" disabled onclick="openConfirm()">
-          💾 บันทึกการรับเงิน
+          <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 3h13l3 3v15H4z"/><path d="M8 3v6h8V3M7 14h10v7H7z"/></svg> บันทึกการรับเงิน
         </button>
       </div>
     </div>
@@ -411,12 +411,12 @@ select.filter-select:focus { border-color: #ea580c; }
 <!-- ═══════════ CONFIRM MODAL ═══════════ -->
 <div class="modal-overlay" id="confirmModal">
   <div class="modal">
-    <div class="modal-title">✅ ยืนยันการบันทึกรับเงิน</div>
+    <div class="modal-title"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="m8 12 3 3 5-6"/></svg> ยืนยันการบันทึกรับเงิน</div>
     <div class="modal-sub">ตรวจสอบรายการก่อนกดยืนยัน</div>
     <div class="modal-receipt" id="receiptContent"></div>
     <div class="modal-btns">
       <button class="btn btn-outline" onclick="closeModal()">ยกเลิก</button>
-      <button class="btn btn-primary" onclick="confirmSave()">✅ ยืนยันบันทึก</button>
+      <button class="btn btn-primary" onclick="confirmSave()"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="m8 12 3 3 5-6"/></svg> ยืนยันบันทึก</button>
     </div>
   </div>
 </div>
@@ -660,7 +660,7 @@ function renderTable() {
           oninput="setNote('${l.id}', this.value)" style="width:85px">
       </td>
       <td>
-        <button class="remove-btn" onclick="removeLock('${l.id}')" title="ลบออก">✕</button>
+        <button class="remove-btn" onclick="removeLock('${l.id}')" title="ลบออก" aria-label="ลบล็อคนี้ออก">✕</button>
       </td>
     </tr>`;
   }).join('');
@@ -790,7 +790,7 @@ function openConfirm() {
 
   const top5 = paid.slice(0, 5).map(l => `<div class="receipt-row"><span>${l.id} ${l.product}</span><span>฿${(parseFloat(payAmounts[l.id])||0).toLocaleString()}</span></div>`).join('');
   html += top5;
-  if (paid.length > 5) html += `<div class="receipt-row"><span style="color:#718096">...และอีก ${paid.length - 5} ล็อค</span><span></span></div>`;
+  if (paid.length > 5) html += `<div class="receipt-row"><span style="color:#5b6b82">...และอีก ${paid.length - 5} ล็อค</span><span></span></div>`;
   html += `<div class="receipt-row"><span>ยอดรวมทั้งหมด</span><span>฿${totalPaid.toLocaleString()}</span></div>`;
 
   document.getElementById('receiptContent').innerHTML = html;

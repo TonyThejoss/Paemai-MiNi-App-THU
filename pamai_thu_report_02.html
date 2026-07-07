@@ -4,14 +4,15 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
 <title>รายงานรับชำระเงินประจำวัน — แพไม้มินิ วันพฤหัสบดี</title>
-<style>
+<style>a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible,[tabindex]:focus-visible,.lk:focus-visible,.zone-tab:focus-visible{outline:2.5px solid var(--gm) !important;outline-offset:2px;}.ico{width:1em;height:1em;display:inline-block;vertical-align:-0.15em;flex-shrink:0}
 :root{
   --g:#7c2d12;--gm:#c2410c;--gb:#ea580c;--gl:#ffedd5;--gll:#fff7ed;
   --r:#b91c1c;--rl:#fee2e2;--o:#c2410c;--ol:#fff7ed;
   --y:#92400e;--yl:#fffbeb;--pu:#6d28d9;--pul:#f5f3ff;
   --bg:#eef2f0;--sf:#fff;--sf2:#f4f8f5;--bd:#d0ddd5;--bd2:#a8c0b0;
-  --tx:#0a1a10;--txm:#2e4a38;--txl:#6b8c76;
+  --tx:#0a1a10;--txm:#2e4a38;--txl:#4d6854;
 }
+[data-theme="dark"]{--bg:#090f0b;--sf:#0f1a13;--sf2:#141f17;--bd:#243028;--bd2:#364d3c;--tx:#d8ead0;--txm:#8aab8e;--txl:#8ca696;--gl:#2d1200;--gll:#1a0f06;--rl:#1f0a0a;--ol:#1a0f06;--bl:#091228;--yl:#120f06;}
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
 body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--tx);font-size:13px;}
 .toolbar{position:sticky;top:0;z-index:50;background:linear-gradient(135deg,var(--g),var(--gm));color:#fff;padding:10px 18px;display:flex;align-items:center;justify-content:space-between;box-shadow:0 2px 12px rgba(0,0,0,.25);}
@@ -22,7 +23,7 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(
 .tb-btn.print{background:#fff;color:var(--gm);}
 .tb-btn.back{background:rgba(255,255,255,.16);color:#fff;border:1px solid rgba(255,255,255,.3);}
 .tb-btn.refresh{background:rgba(255,255,255,.16);color:#fff;border:1px solid rgba(255,255,255,.3);}
-.page{max-width:920px;margin:18px auto;background:#fff;padding:26px 30px;border-radius:10px;box-shadow:0 2px 16px rgba(0,0,0,.08);}
+.page{max-width:920px;margin:18px auto;background:#fff;padding:26px 30px;overflow-x:auto;border-radius:10px;box-shadow:0 2px 16px rgba(0,0,0,.08);}
 .r-head{display:flex;justify-content:space-between;align-items:flex-start;border-bottom:3px solid var(--gm);padding-bottom:12px;margin-bottom:14px;}
 .r-brand{font-size:1.05rem;font-weight:800;color:var(--g);}
 .r-sub{font-size:.68rem;color:var(--txl);margin-top:1px;}
@@ -66,13 +67,13 @@ tfoot td{font-weight:800;background:var(--gll);border-top:2px solid var(--gm);}
 
 <div class="toolbar">
   <div>
-    <h1>💰 รายงานรับชำระเงินประจำวัน</h1>
+    <h1><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v10M9.5 9.2c0-1.2 1.1-2.2 2.5-2.2s2.5.9 2.5 2c0 2.8-5 1.6-5 4.3 0 1.1 1.1 2 2.5 2s2.5-.9 2.5-2"/></svg> รายงานรับชำระเงินประจำวัน</h1>
     <p>แพไม้มินิ วันพฤหัสบดี วันพฤหัสบดี · ข้อมูลสด จาก Google Sheets</p>
   </div>
   <div class="tb-actions">
-    <button class="tb-btn refresh" onclick="render()">🔄 รีเฟรช</button>
+    <button class="tb-btn dm-toggle" onclick="toggleDark()" aria-label="สลับโหมดสว่าง/มืด" style="background:rgba(255,255,255,.16);color:#fff;border:1px solid rgba(255,255,255,.3);width:34px;padding:7px;justify-content:center;"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 3a9 9 0 0 0 0 18z" fill="currentColor" stroke="none"/></svg></button><button class="tb-btn refresh" onclick="render()"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 11a8 8 0 0 0-14.9-4M4 13a8 8 0 0 0 14.9 4"/><path d="M4 4v4h4M20 20v-4h-4"/></svg> รีเฟรช</button>
     <button class="tb-btn back" onclick="window.close()">← ปิด</button>
-    <button class="tb-btn print" onclick="window.print()">🖨️ พิมพ์ / บันทึกเป็น PDF</button>
+    <button class="tb-btn print" onclick="window.print()"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M7 8V3h10v5"/><rect x="5" y="8" width="14" height="8" rx="1.5"/><path d="M7 15h10v6H7z"/><circle cx="16.5" cy="11" r=".6" fill="currentColor" stroke="none"/></svg>️ พิมพ์ / บันทึกเป็น PDF</button>
   </div>
 </div>
 
@@ -89,9 +90,9 @@ tfoot td{font-weight:800;background:var(--gll);border-top:2px solid var(--gm);}
   </div>
 
   <div class="date-filter">
-    <label>เลือกวันที่:</label>
+    <label for="dateInput">เลือกวันที่:</label>
     <input type="date" id="dateInput">
-    <button onclick="render()">🔍 ดูข้อมูล</button>
+    <button onclick="render()"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m20 20-4.3-4.3"/></svg> ดูข้อมูล</button>
   </div>
 
   <div id="dataWarn"></div>
@@ -106,6 +107,9 @@ tfoot td{font-weight:800;background:var(--gll);border-top:2px solid var(--gm);}
 </div>
 
 <script>
+function toggleDark(){const h=document.documentElement,d=h.getAttribute('data-theme')==='dark';h.setAttribute('data-theme',d?'light':'dark');localStorage.setItem('pmthu-t',d?'light':'dark');}
+(()=>{const s=localStorage.getItem('pmthu-t');if(s)document.documentElement.setAttribute('data-theme',s);else if(window.matchMedia('(prefers-color-scheme:dark)').matches)document.documentElement.setAttribute('data-theme','dark');})();
+
 const MONS=['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
 function nowTH(){const n=new Date();return n.getDate()+' '+MONS[n.getMonth()]+' '+(n.getFullYear()+543);}
 function dateToTH(dateStr){

@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>ระบบค่าไฟฟ้า — แพไม้มินิ วันพฤหัสบดี</title>
-<style>
+<style>a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible,[tabindex]:focus-visible,.lk:focus-visible,.zone-tab:focus-visible{outline:2.5px solid var(--green-m) !important;outline-offset:2px;}.ico{width:1em;height:1em;display:inline-block;vertical-align:-0.15em;flex-shrink:0}
 :root {
   --green:      #c2410c;
   --green-m:    #ea580c;
@@ -31,7 +31,7 @@
 
   --text-hi:    #0f172a;
   --text-md:    #475569;
-  --text-lo:    #94a3b8;
+  --text-lo:    #5b6b82;
   --text-inv:   #ffffff;
 
   --shadow-sm:  0 1px 3px rgba(0,0,0,.06);
@@ -51,7 +51,7 @@
   --border2:    #484f58;
   --text-hi:    #e6edf3;
   --text-md:    #8b949e;
-  --text-lo:    #484f58;
+  --text-lo:    #7d8590;
   --green-l:    #132a1d;
   --green-ll:   #0d1f14;
   --yellow-l:   #2d2000;
@@ -353,20 +353,20 @@ body {
 <!-- TOPBAR -->
 <div class="topbar">
   <div>
-    <h1>⚡ ระบบค่าไฟฟ้า — แพไม้มินิ วันพฤหัสบดี</h1>
+    <h1><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2 4 14h6l-1 8 9-13h-6l1-7z"/></svg> ระบบค่าไฟฟ้า — แพไม้มินิ วันพฤหัสบดี</h1>
     <p>Electric Utility Management · คำนวณรวมค่าล็อคประจำเดือน</p>
   </div>
   <div class="topbar-right">
-    <button class="dm-btn" onclick="toggleDark()" title="Dark/Light mode">🌓</button>
+    <button class="dm-btn" onclick="toggleDark()" title="Dark/Light mode" aria-label="สลับโหมดมืด/สว่าง"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 3a9 9 0 0 0 0 18z" fill="currentColor" stroke="none"/></svg></button>
   </div>
 </div>
 
 <!-- TABS -->
 <div class="main-tabs">
-  <button class="tab-btn active" onclick="showTab('tab-vendors',this)">📋 รายชื่อผู้ค้า + ค่าไฟ</button>
-  <button class="tab-btn" onclick="showTab('tab-update',this)">✏️ แก้ไขค่าไฟรายล็อค</button>
-  <button class="tab-btn" onclick="showTab('tab-billing',this)">💰 สรุปบิลประจำเดือน</button>
-  <button class="tab-btn" onclick="showTab('tab-history',this)">📊 ประวัติค่าไฟ</button>
+  <button class="tab-btn active" onclick="showTab('tab-vendors',this)"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="4" width="12" height="17" rx="2"/><rect x="9" y="2.5" width="6" height="3" rx="1"/><path d="M9 11h6M9 15h6"/></svg> รายชื่อผู้ค้า + ค่าไฟ</button>
+  <button class="tab-btn" onclick="showTab('tab-update',this)"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h4L19.5 8.5a2.1 2.1 0 0 0-3-3L5.5 16 4 20z"/><path d="M14.5 6.5l3 3"/></svg>️ แก้ไขค่าไฟรายล็อค</button>
+  <button class="tab-btn" onclick="showTab('tab-billing',this)"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v10M9.5 9.2c0-1.2 1.1-2.2 2.5-2.2s2.5.9 2.5 2c0 2.8-5 1.6-5 4.3 0 1.1 1.1 2 2.5 2s2.5-.9 2.5-2"/></svg> สรุปบิลประจำเดือน</button>
+  <button class="tab-btn" onclick="showTab('tab-history',this)"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20V10M11 20V4M18 20v-7"/><path d="M2.5 20h19"/></svg> ประวัติค่าไฟ</button>
 </div>
 
 <!-- ═══════════════════ TAB 1: VENDORS ═══════════════════ -->
@@ -393,12 +393,12 @@ body {
   </div>
 
   <div class="card">
-    <div class="card-title">📋 รายชื่อผู้ค้าพร้อมค่าไฟฟ้า
-      <span><button class="btn btn-primary" style="padding:6px 14px;font-size:.74rem" onclick="openAddModal()">➕ เพิ่มผู้ค้า</button></span>
+    <div class="card-title"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="4" width="12" height="17" rx="2"/><rect x="9" y="2.5" width="6" height="3" rx="1"/><path d="M9 11h6M9 15h6"/></svg> รายชื่อผู้ค้าพร้อมค่าไฟฟ้า
+      <span><button class="btn btn-primary" style="padding:6px 14px;font-size:.74rem" onclick="openAddModal()"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg> เพิ่มผู้ค้า</button></span>
     </div>
     <div class="search-row">
-      <input class="search-input" id="searchInput" placeholder="🔍 ค้นหาชื่อร้าน / ล็อค / สินค้า..." oninput="renderTable()">
-      <select class="filter-sel" id="zoneFilter" onchange="renderTable()">
+      <input class="search-input" id="searchInput" aria-label="ค้นหาชื่อร้าน / ล็อค / สินค้า" placeholder="🔍 ค้นหาชื่อร้าน / ล็อค / สินค้า..." oninput="renderTable()">
+      <select class="filter-sel" id="zoneFilter" aria-label="กรองโซน" onchange="renderTable()">
         <option value="">ทุกโซน</option>
         <option value="A">A</option><option value="B">B</option><option value="C">C</option>
         <option value="D">D</option><option value="E">E</option><option value="F">F</option>
@@ -408,7 +408,7 @@ body {
         <option value="L">L</option><option value="T">T</option><option value="AB">AB</option>
         <option value="TA">TA</option><option value="TB">TB</option><option value="TC">TC</option>
       </select>
-      <select class="filter-sel" id="statusFilter" onchange="renderTable()">
+      <select class="filter-sel" id="statusFilter" aria-label="กรองสถานะ" onchange="renderTable()">
         <option value="">ทุกสถานะ</option>
         <option value="paid">ชำระแล้ว</option>
         <option value="unpaid">ค้างชำระ</option>
@@ -439,12 +439,12 @@ body {
   <div class="two-col">
     <div>
       <div class="card">
-        <div class="card-title">⚡ แก้ไขอุปกรณ์ไฟฟ้าประจำล็อค</div>
+        <div class="card-title"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2 4 14h6l-1 8 9-13h-6l1-7z"/></svg> แก้ไขอุปกรณ์ไฟฟ้าประจำล็อค</div>
         <div class="field-row-2">
           <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px">
             <div>
-              <label style="font-size:.72rem;font-weight:700;color:var(--text-lo);text-transform:uppercase;letter-spacing:.4px;display:block;margin-bottom:5px">เลือกล็อค <span style="color:var(--red)">*</span></label>
-              <select id="editLockSel" class="filter-sel" style="width:100%;padding:9px 12px;font-size:.84rem" onchange="loadLockElec()">
+              <label for="editLockSel" style="font-size:.72rem;font-weight:700;color:var(--text-lo);text-transform:uppercase;letter-spacing:.4px;display:block;margin-bottom:5px">เลือกล็อค <span style="color:var(--red)">*</span></label>
+              <select id="editLockSel" aria-label="เลือกล็อค" class="filter-sel" style="width:100%;padding:9px 12px;font-size:.84rem" onchange="loadLockElec()">
                 <option value="">-- เลือกล็อค --</option>
               </select>
             </div>
@@ -459,10 +459,10 @@ body {
         <div class="section-div"><span>ประเภทอุปกรณ์ไฟฟ้า</span></div>
 
         <div class="elec-icon-legend">
-          <div class="eil">💡 = หลอดไฟ ฿10/ดวง</div>
-          <div class="eil">🌀 = พัดลม ฿20/ตัว</div>
-          <div class="eil">🔌 = อุปกรณ์เล็ก ฿50/ชิ้น</div>
-          <div class="eil">⚙️ = อุปกรณ์ใหญ่ ฿100/ชิ้น</div>
+          <div class="eil"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18h6M10 21h4"/><path d="M12 3a6 6 0 0 0-3.5 10.9c.6.5 1 1.2 1 2.1h5c0-.9.4-1.6 1-2.1A6 6 0 0 0 12 3z"/></svg> = หลอดไฟ ฿10/ดวง</div>
+          <div class="eil"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><g><ellipse cx="12" cy="7.3" rx="2.6" ry="4" transform="rotate(0 12 12)"/><ellipse cx="12" cy="7.3" rx="2.6" ry="4" transform="rotate(120 12 12)"/><ellipse cx="12" cy="7.3" rx="2.6" ry="4" transform="rotate(240 12 12)"/><circle cx="12" cy="12" r="1.5" fill="currentColor" stroke="none"/></g></svg> = พัดลม ฿20/ตัว</div>
+          <div class="eil"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 2v6M15 2v6M7 8h10v4a5 5 0 0 1-10 0V8z"/><path d="M12 17v5"/></svg> = อุปกรณ์เล็ก ฿50/ชิ้น</div>
+          <div class="eil"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M12 3v2.2M12 18.8V21M4.2 12H2M22 12h-2.2M5.8 5.8l1.5 1.5M16.7 16.7l1.5 1.5M18.2 5.8l-1.5 1.5M7.3 16.7l-1.5 1.5"/></svg>️ = อุปกรณ์ใหญ่ ฿100/ชิ้น</div>
           <div class="eil">⭐ = พิเศษ (ระบุราคา)</div>
         </div>
 
@@ -476,7 +476,7 @@ body {
         </button>
 
         <button class="btn btn-primary" style="width:100%" onclick="saveElectric()">
-          💾 บันทึกค่าไฟประจำล็อค
+          <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 3h13l3 3v15H4z"/><path d="M8 3v6h8V3M7 14h10v7H7z"/></svg> บันทึกค่าไฟประจำล็อค
         </button>
       </div>
     </div>
@@ -490,7 +490,7 @@ body {
       </div>
 
       <div class="card">
-        <div class="card-title">🧾 ตัวอย่างบิลประจำเดือน</div>
+        <div class="card-title"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2.5h12v19l-2-1.5-2 1.5-2-1.5-2 1.5-2-1.5-2 1.5v-19z"/><path d="M9 7h6M9 11h6M9 15h4"/></svg> ตัวอย่างบิลประจำเดือน</div>
         <div class="bill-preview" id="billPreview">
           <div class="bp-title">บิลรวมประจำเดือน</div>
           <div style="color:var(--text-lo);font-size:.78rem;text-align:center">เลือกล็อคเพื่อดูตัวอย่าง</div>
@@ -498,13 +498,13 @@ body {
       </div>
 
       <div class="card">
-        <div class="card-title">📊 อัตราค่าไฟอ้างอิง</div>
+        <div class="card-title"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20V10M11 20V4M18 20v-7"/><path d="M2.5 20h19"/></svg> อัตราค่าไฟอ้างอิง</div>
         <table class="history-table">
           <tr><th>ประเภท</th><th>ราคา/ชิ้น</th></tr>
-          <tr><td>💡 หลอดไฟ</td><td style="font-weight:700;color:var(--yellow)">฿10</td></tr>
-          <tr><td>🌀 พัดลม</td><td style="font-weight:700;color:var(--blue)">฿20</td></tr>
-          <tr><td>🔌 เครื่องเล็ก</td><td style="font-weight:700;color:var(--orange)">฿50</td></tr>
-          <tr><td>⚙️ เครื่องใหญ่</td><td style="font-weight:700;color:var(--purple)">฿100</td></tr>
+          <tr><td><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18h6M10 21h4"/><path d="M12 3a6 6 0 0 0-3.5 10.9c.6.5 1 1.2 1 2.1h5c0-.9.4-1.6 1-2.1A6 6 0 0 0 12 3z"/></svg> หลอดไฟ</td><td style="font-weight:700;color:var(--yellow)">฿10</td></tr>
+          <tr><td><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><g><ellipse cx="12" cy="7.3" rx="2.6" ry="4" transform="rotate(0 12 12)"/><ellipse cx="12" cy="7.3" rx="2.6" ry="4" transform="rotate(120 12 12)"/><ellipse cx="12" cy="7.3" rx="2.6" ry="4" transform="rotate(240 12 12)"/><circle cx="12" cy="12" r="1.5" fill="currentColor" stroke="none"/></g></svg> พัดลม</td><td style="font-weight:700;color:var(--blue)">฿20</td></tr>
+          <tr><td><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 2v6M15 2v6M7 8h10v4a5 5 0 0 1-10 0V8z"/><path d="M12 17v5"/></svg> เครื่องเล็ก</td><td style="font-weight:700;color:var(--orange)">฿50</td></tr>
+          <tr><td><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M12 3v2.2M12 18.8V21M4.2 12H2M22 12h-2.2M5.8 5.8l1.5 1.5M16.7 16.7l1.5 1.5M18.2 5.8l-1.5 1.5M7.3 16.7l-1.5 1.5"/></svg>️ เครื่องใหญ่</td><td style="font-weight:700;color:var(--purple)">฿100</td></tr>
           <tr><td>⭐ พิเศษ</td><td style="font-weight:700;color:var(--green-m)">ระบุเอง</td></tr>
         </table>
       </div>
@@ -517,7 +517,7 @@ body {
   <div class="month-bar">
     <div class="month-select" id="billMonth" style="display:flex;align-items:center;font-weight:700"></div>
     <div class="zone-filter-row" id="zoneFilterBill"></div>
-    <button class="btn btn-primary" style="margin-left:auto;padding:7px 16px;font-size:.78rem" onclick="exportBill()">📥 Export Excel</button>
+    <button class="btn btn-primary" style="margin-left:auto;padding:7px 16px;font-size:.78rem" onclick="exportBill()"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 4h12v10M4 14h5l1.5 2h3L15 14h5v6H4z"/></svg> Export Excel</button>
   </div>
 
   <div class="kpi-row">
@@ -528,7 +528,7 @@ body {
   </div>
 
   <div class="card">
-    <div class="card-title">💰 บิลรวมค่าเช่า + ค่าไฟ ประจำเดือน
+    <div class="card-title"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v10M9.5 9.2c0-1.2 1.1-2.2 2.5-2.2s2.5.9 2.5 2c0 2.8-5 1.6-5 4.3 0 1.1 1.1 2 2.5 2s2.5-.9 2.5-2"/></svg> บิลรวมค่าเช่า + ค่าไฟ ประจำเดือน
       <span style="font-size:.72rem;color:var(--text-lo);font-weight:400">ค่าไฟฟ้ารวมอยู่ในยอดเรียกเก็บเดียวกัน</span>
     </div>
     <div style="overflow-x:auto">
@@ -553,12 +553,12 @@ body {
 <!-- ═══════════════════ TAB 4: HISTORY ═══════════════════ -->
 <div id="tab-history" class="page">
   <div class="card">
-    <div class="card-title">📊 ประวัติค่าไฟฟ้ารายล็อค</div>
+    <div class="card-title"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20V10M11 20V4M18 20v-7"/><path d="M2.5 20h19"/></svg> ประวัติค่าไฟฟ้ารายล็อค</div>
     <div class="search-row">
-      <select class="filter-sel" id="histLockSel" onchange="renderHistory()" style="min-width:130px">
+      <select class="filter-sel" id="histLockSel" aria-label="เลือกล็อคดูประวัติ" onchange="renderHistory()" style="min-width:130px">
         <option value="">ทุกล็อค</option>
       </select>
-      <select class="filter-sel" id="histMonths" onchange="renderHistory()">
+      <select class="filter-sel" id="histMonths" aria-label="เลือกช่วงเดือน" onchange="renderHistory()">
         <option value="3">3 เดือนล่าสุด</option>
         <option value="6">6 เดือนล่าสุด</option>
         <option value="12">12 เดือนล่าสุด</option>
@@ -578,13 +578,13 @@ body {
 <!-- ═══════ MODAL: EDIT VENDOR ELEC (from table) ═══════ -->
 <div class="overlay" id="editModal">
   <div class="modal">
-    <button class="modal-close" onclick="closeModal('editModal')">✕</button>
+    <button class="modal-close" onclick="closeModal('editModal')" aria-label="ปิดหน้าต่าง"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 5l14 14M19 5 5 19"/></svg></button>
     <div class="modal-title" id="editModalTitle">แก้ไขค่าไฟ</div>
     <div class="modal-sub" id="editModalSub">ปรับอุปกรณ์ไฟฟ้าสำหรับล็อคนี้</div>
     <div id="editModalContent"></div>
     <div class="modal-btns">
       <button class="btn btn-secondary" onclick="closeModal('editModal')">ยกเลิก</button>
-      <button class="btn btn-primary" onclick="saveFromModal()">💾 บันทึก</button>
+      <button class="btn btn-primary" onclick="saveFromModal()"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 3h13l3 3v15H4z"/><path d="M8 3v6h8V3M7 14h10v7H7z"/></svg> บันทึก</button>
     </div>
   </div>
 </div>
@@ -592,13 +592,13 @@ body {
 <!-- MODAL: PAY CONFIRM -->
 <div class="overlay" id="payModal">
   <div class="modal" style="max-width:420px">
-    <button class="modal-close" onclick="closeModal('payModal')">✕</button>
-    <div class="modal-title">💰 บันทึกรับชำระ</div>
+    <button class="modal-close" onclick="closeModal('payModal')" aria-label="ปิดหน้าต่าง"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 5l14 14M19 5 5 19"/></svg></button>
+    <div class="modal-title"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v10M9.5 9.2c0-1.2 1.1-2.2 2.5-2.2s2.5.9 2.5 2c0 2.8-5 1.6-5 4.3 0 1.1 1.1 2 2.5 2s2.5-.9 2.5-2"/></svg> บันทึกรับชำระ</div>
     <div class="modal-sub" id="payModalSub">ยืนยันการรับชำระเงิน</div>
     <div id="payModalContent"></div>
     <div class="modal-btns">
       <button class="btn btn-secondary" onclick="closeModal('payModal')">ยกเลิก</button>
-      <button class="btn btn-primary" onclick="confirmPay()">✅ ยืนยันรับชำระ</button>
+      <button class="btn btn-primary" onclick="confirmPay()"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="m8 12 3 3 5-6"/></svg> ยืนยันรับชำระ</button>
     </div>
   </div>
 </div>
@@ -1138,8 +1138,8 @@ function openPayModal(lid) {
     </div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
       <div>
-        <label style="font-size:.72rem;font-weight:700;color:var(--text-lo);text-transform:uppercase;letter-spacing:.4px;display:block;margin-bottom:5px">ช่องทางชำระ</label>
-        <select id="payMethodSel" style="width:100%;padding:8px 10px;border:1.5px solid var(--border);border-radius:8px;background:var(--surface2);color:var(--text-hi);font-size:.82rem;font-family:inherit;outline:none">
+        <label for="payMethodSel" style="font-size:.72rem;font-weight:700;color:var(--text-lo);text-transform:uppercase;letter-spacing:.4px;display:block;margin-bottom:5px">ช่องทางชำระ</label>
+        <select id="payMethodSel" aria-label="เลือกช่องทางชำระ" style="width:100%;padding:8px 10px;border:1.5px solid var(--border);border-radius:8px;background:var(--surface2);color:var(--text-hi);font-size:.82rem;font-family:inherit;outline:none">
           <option>💵 เงินสด</option><option>📱 โอนเงิน</option><option>📷 QR Code</option>
         </select>
       </div>

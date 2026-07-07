@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>ลงทะเบียนผู้ค้าใหม่ — แพไม้มินิ วันพฤหัสบดี</title>
-<style>
+<style>a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible,[tabindex]:focus-visible,.lk:focus-visible,.zone-tab:focus-visible{outline:2.5px solid var(--green-m) !important;outline-offset:2px;}.ico{width:1em;height:1em;display:inline-block;vertical-align:-0.15em;flex-shrink:0}
 /* ══════════════════════════════════════════
    DESIGN TOKENS — Light & Dark
 ══════════════════════════════════════════ */
@@ -32,7 +32,7 @@
   /* Text */
   --text-hi:    #1a202c;
   --text-md:    #4a5568;
-  --text-lo:    #718096;
+  --text-lo:    #566a8c;
   --text-inv:   #ffffff;
 
   /* Topbar */
@@ -59,7 +59,7 @@
 
   --text-hi:    #f0f4ff;
   --text-md:    #a8b4d0;
-  --text-lo:    #6b7a99;
+  --text-lo:    #909cbc;
   --text-inv:   #ffffff;
 
   --top-from:   #0d2618;
@@ -575,13 +575,13 @@ textarea { resize: vertical; min-height: 70px; }
   <div class="topbar-left">
     <button class="btn-back" onclick="history.back()">← กลับ</button>
     <div class="topbar-brand">
-      <h1>🏪 ลงทะเบียนผู้ค้าประจำใหม่</h1>
+      <h1><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 10h16v9a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1v-9z"/><path d="M3 6l1.5-3h15L21 6M3 6l.8 3.2A1.7 1.7 0 0 0 8 9.4M8 9.4a1.7 1.7 0 0 0 3.3 0M11.3 9.4a1.7 1.7 0 0 0 3.4 0M14.7 9.4a1.7 1.7 0 0 0 3.3 0M18 9.4A1.7 1.7 0 0 0 21.2 9.2L22 6"/></svg> ลงทะเบียนผู้ค้าประจำใหม่</h1>
       <p>แพไม้มินิ วันพฤหัสบดี · บันทึกข้อมูลและรับชำระค่าธรรมเนียมแรกเข้า</p>
     </div>
   </div>
-  <button class="dm-toggle" onclick="toggleDark()" title="เปลี่ยน Dark/Light mode">
-    <span class="dm-icon sun">☀️</span>
-    <span class="dm-icon moon">🌙</span>
+  <button class="dm-toggle" onclick="toggleDark()" title="เปลี่ยน Dark/Light mode" aria-label="สลับโหมดมืด/สว่าง">
+    <span class="dm-icon sun"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4.5"/><path d="M12 2.5v2M12 19.5v2M4.2 4.2l1.4 1.4M18.4 18.4l1.4 1.4M2.5 12h2M19.5 12h2M4.2 19.8l1.4-1.4M18.4 5.6l1.4-1.4"/></svg>️</span>
+    <span class="dm-icon moon"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 14.5A8.5 8.5 0 1 1 9.5 4a7 7 0 0 0 10.5 10.5z"/></svg></span>
   </button>
 </div>
 
@@ -605,55 +605,55 @@ textarea { resize: vertical; min-height: 70px; }
     <!-- STEP 1 -->
     <div id="step1" class="step-content visible">
       <div class="card">
-        <div class="card-title">👤 ข้อมูลผู้ค้า <span class="badge-section badge badge-blue">ขั้นตอน 1 / 4</span></div>
+        <div class="card-title"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4.5 20a7.5 7.5 0 0 1 15 0"/></svg> ข้อมูลผู้ค้า <span class="badge-section badge badge-blue">ขั้นตอน 1 / 4</span></div>
         <div class="field-row">
           <div class="field">
-            <label>ชื่อ-นามสกุล <span class="req">*</span></label>
+            <label for="vendorName">ชื่อ-นามสกุล <span class="req">*</span></label>
             <input type="text" id="vendorName" placeholder="ชื่อผู้ค้า" oninput="livePreview()">
             <span class="err-msg" id="errName">กรุณากรอกชื่อ</span>
           </div>
           <div class="field">
-            <label>ชื่อเรียก / ชื่อร้าน</label>
+            <label for="vendorNick">ชื่อเรียก / ชื่อร้าน</label>
             <input type="text" id="vendorNick" placeholder="เช่น พี่ปุ้ย / ร้านแม่มาลี" oninput="livePreview()">
           </div>
         </div>
         <div class="field-row">
           <div class="field">
-            <label>เบอร์โทรศัพท์ <span class="req">*</span></label>
+            <label for="vendorPhone">เบอร์โทรศัพท์ <span class="req">*</span></label>
             <input type="tel" id="vendorPhone" placeholder="0xx-xxx-xxxx" oninput="livePreview()">
             <span class="err-msg" id="errPhone">กรุณากรอกเบอร์โทร</span>
           </div>
           <div class="field">
-            <label>LINE ID</label>
+            <label for="vendorLine">LINE ID</label>
             <input type="text" id="vendorLine" placeholder="@lineid หรือ ชื่อ LINE">
           </div>
         </div>
         <div class="field-row">
           <div class="field">
-            <label>เลขบัตรประชาชน</label>
+            <label for="vendorCid">เลขบัตรประชาชน</label>
             <input type="text" id="vendorCid" placeholder="x-xxxx-xxxxx-xx-x" maxlength="17">
             <span class="hint">ใช้สำหรับออกใบเสร็จ (ไม่บังคับ)</span>
           </div>
           <div class="field">
-            <label>ที่อยู่</label>
+            <label for="vendorAddr">ที่อยู่</label>
             <input type="text" id="vendorAddr" placeholder="ที่อยู่โดยย่อ">
           </div>
         </div>
         <div class="section-divider"><span>สินค้าที่จำหน่าย</span></div>
         <div class="field-row">
           <div class="field">
-            <label>ประเภทสินค้า <span class="req">*</span></label>
+            <label for="vendorProduct">ประเภทสินค้า <span class="req">*</span></label>
             <input type="text" id="vendorProduct" placeholder="เช่น ส้มตำ, ผลไม้, ของสด..." oninput="livePreview()">
             <span class="err-msg" id="errProduct">กรุณาระบุสินค้า</span>
           </div>
           <div class="field">
-            <label>รายละเอียดเพิ่มเติม</label>
+            <label for="vendorProductDetail">รายละเอียดเพิ่มเติม</label>
             <input type="text" id="vendorProductDetail" placeholder="ของสด / ปรุงสำเร็จ / เครื่องดื่ม...">
           </div>
         </div>
         <div class="field-row col1">
           <div class="field">
-            <label>หมายเหตุ</label>
+            <label for="vendorNote">หมายเหตุ</label>
             <textarea id="vendorNote" placeholder="ข้อมูลเพิ่มเติม เงื่อนไขพิเศษ ฯลฯ"></textarea>
           </div>
         </div>
@@ -666,10 +666,10 @@ textarea { resize: vertical; min-height: 70px; }
     <!-- STEP 2 -->
     <div id="step2" class="step-content">
       <div class="card">
-        <div class="card-title">🔑 เลือกล็อค <span class="badge-section badge badge-blue">ขั้นตอน 2 / 4</span></div>
+        <div class="card-title"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="14.5" r="4"/><path d="M11 11.5 20 2.5M17 6l2 2M14 9l2 2"/></svg> เลือกล็อค <span class="badge-section badge badge-blue">ขั้นตอน 2 / 4</span></div>
         <div class="field-row col3" style="margin-bottom:16px">
           <div class="field">
-            <label>ผู้จัดรับผิดชอบ <span class="req">*</span></label>
+            <label for="managerSelect">ผู้จัดรับผิดชอบ <span class="req">*</span></label>
             <select id="managerSelect">
               <option value="">-- เลือกผู้จัด --</option>
               <option value="tony">โทนี่ (082-581-1144)</option>
@@ -679,12 +679,12 @@ textarea { resize: vertical; min-height: 70px; }
             </select>
           </div>
           <div class="field">
-            <label>วันเริ่มเช่า <span class="req">*</span></label>
+            <label for="startDate">วันเริ่มเช่า <span class="req">*</span></label>
             <input type="date" id="startDate">
             <span class="err-msg" id="errDate">กรุณาเลือกวันที่</span>
           </div>
           <div class="field">
-            <label>ค่าเช่า/วัน (฿) <span class="req">*</span></label>
+            <label for="rentPrice">ค่าเช่า/วัน (฿) <span class="req">*</span></label>
             <input type="number" id="rentPrice" placeholder="150" min="0" oninput="livePreview();recalc()">
             <span class="err-msg" id="errRent">กรุณากรอกราคา</span>
           </div>
@@ -710,34 +710,34 @@ textarea { resize: vertical; min-height: 70px; }
     <!-- STEP 3 -->
     <div id="step3" class="step-content">
       <div class="card">
-        <div class="card-title">💰 ค่าธรรมเนียม <span class="badge-section badge badge-red">ต้องชำระทันที</span></div>
+        <div class="card-title"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v10M9.5 9.2c0-1.2 1.1-2.2 2.5-2.2s2.5.9 2.5 2c0 2.8-5 1.6-5 4.3 0 1.1 1.1 2 2.5 2s2.5-.9 2.5-2"/></svg> ค่าธรรมเนียม <span class="badge-section badge badge-red">ต้องชำระทันที</span></div>
 
         <!-- แรกเข้า -->
         <div class="fee-block required-fee">
-          <div class="fee-header"><span class="fee-label">📋 ค่าธรรมเนียมแรกเข้า</span><span class="badge-req">บังคับ</span></div>
+          <div class="fee-header"><span class="fee-label"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="4" width="12" height="17" rx="2"/><rect x="9" y="2.5" width="6" height="3" rx="1"/><path d="M9 11h6M9 15h6"/></svg> ค่าธรรมเนียมแรกเข้า</span><span class="badge-req">บังคับ</span></div>
           <div class="fee-row">
-            <label>จำนวนเงิน (฿)</label>
+            <label for="feeEntryAmt">จำนวนเงิน (฿)</label>
             <input type="number" id="feeEntryAmt" placeholder="0" min="0" oninput="recalc()" style="width:130px;flex:none">
-            <input type="text" id="feeEntryNote" placeholder="หมายเหตุ..." style="flex:1">
+            <input type="text" id="feeEntryNote" aria-label="หมายเหตุ" placeholder="หมายเหตุ..." style="flex:1">
           </div>
         </div>
 
         <!-- รายปี -->
         <div class="fee-block required-fee">
-          <div class="fee-header"><span class="fee-label">📅 ค่าธรรมเนียมรายปี</span><span class="badge-req">บังคับ</span></div>
+          <div class="fee-header"><span class="fee-label"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="5" width="17" height="16" rx="2"/><path d="M3.5 9.5h17M8 3v4M16 3v4"/></svg> ค่าธรรมเนียมรายปี</span><span class="badge-req">บังคับ</span></div>
           <div class="fee-row" style="margin-bottom:8px">
-            <label>จำนวนเงิน (฿)</label>
+            <label for="feeAnnualAmt">จำนวนเงิน (฿)</label>
             <input type="number" id="feeAnnualAmt" placeholder="0" min="0" oninput="recalc()" style="width:130px;flex:none">
-            <input type="number" id="feeAnnualYear" placeholder="2568" style="width:90px;flex:none">
-            <input type="text" id="feeAnnualNote" placeholder="หมายเหตุ..." style="flex:1">
+            <input type="number" id="feeAnnualYear" aria-label="ปี" placeholder="2568" style="width:90px;flex:none">
+            <input type="text" id="feeAnnualNote" aria-label="หมายเหตุ" placeholder="หมายเหตุ..." style="flex:1">
           </div>
         </div>
 
         <!-- เช่าเดือนแรก -->
         <div class="fee-block required-fee">
-          <div class="fee-header"><span class="fee-label">🏠 ค่าเช่าเดือนแรก</span><span class="badge-req">บังคับ</span></div>
+          <div class="fee-header"><span class="fee-label"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 11 12 4l8 7"/><path d="M6 10v10h12V10"/><path d="M10 20v-6h4v6"/></svg> ค่าเช่าเดือนแรก</span><span class="badge-req">บังคับ</span></div>
           <div class="fee-row">
-            <label>จำนวนเงิน (฿)</label>
+            <label for="feeFirstRentAmt">จำนวนเงิน (฿)</label>
             <input type="number" id="feeFirstRentAmt" placeholder="0" min="0" oninput="recalc()" style="width:130px;flex:none;background:var(--surface2)" readonly>
             <span class="hint" style="flex:1">← คำนวณอัตโนมัติ = ค่าเช่า/วัน × จำนวนวันพฤหัสฯ ในเดือนนี้</span>
           </div>
@@ -747,33 +747,33 @@ textarea { resize: vertical; min-height: 70px; }
 
         <!-- ค่าไฟ -->
         <div class="fee-block">
-          <div class="fee-header"><span class="fee-label">⚡ ค่าไฟฟ้าเริ่มต้น</span><span class="badge-opt">ไม่บังคับ</span></div>
+          <div class="fee-header"><span class="fee-label"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2 4 14h6l-1 8 9-13h-6l1-7z"/></svg> ค่าไฟฟ้าเริ่มต้น</span><span class="badge-opt">ไม่บังคับ</span></div>
           <div class="field-row col3">
             <div class="field">
-              <label>หลอดไฟเล็ก (ดวง)</label>
+              <label for="bulbSmall">หลอดไฟเล็ก (ดวง)</label>
               <input type="number" id="bulbSmall" placeholder="0" min="0" oninput="calcElectric()">
               <span class="hint">10 ฿/ดวง</span>
             </div>
             <div class="field">
-              <label>ไฟกระจาย (ดวง)</label>
+              <label for="bulbSpread">ไฟกระจาย (ดวง)</label>
               <input type="number" id="bulbSpread" placeholder="0" min="0" oninput="calcElectric()">
               <span class="hint">10 ฿/ดวง</span>
             </div>
             <div class="field">
-              <label>พัดลม (ตัว)</label>
+              <label for="fanCount">พัดลม (ตัว)</label>
               <input type="number" id="fanCount" placeholder="0" min="0" oninput="calcElectric()">
               <span class="hint">20 ฿/ตัว</span>
             </div>
           </div>
           <div class="elec-display" id="elecDisplay">
-            ⚡ <span id="elecPerThu" class="elec-num">฿0</span>/พฤหัสบดี &nbsp;|&nbsp;
-            📅 <span id="elecPerMonth" class="elec-num">฿0</span>/เดือน (5 พฤหัสบดี)
+            <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2 4 14h6l-1 8 9-13h-6l1-7z"/></svg> <span id="elecPerThu" class="elec-num">฿0</span>/พฤหัสบดี &nbsp;|&nbsp;
+            <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="5" width="17" height="16" rx="2"/><path d="M3.5 9.5h17M8 3v4M16 3v4"/></svg> <span id="elecPerMonth" class="elec-num">฿0</span>/เดือน (5 พฤหัสบดี)
           </div>
         </div>
 
         <!-- ค่าอื่นๆ -->
         <div class="fee-block">
-          <div class="fee-header"><span class="fee-label">📌 ค่าอื่น ๆ / ค่าปรับ</span><span class="badge-opt">เพิ่มได้หลายรายการ</span></div>
+          <div class="fee-header"><span class="fee-label"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 3.5 20.5 9.5 17 13l-1.5 6-2-2-4.5 4.5-1-1L12.5 16l-2-2 3.5-1.5z"/></svg> ค่าอื่น ๆ / ค่าปรับ</span><span class="badge-opt">เพิ่มได้หลายรายการ</span></div>
           <div id="extrasList"></div>
           <button class="btn-add-extra" onclick="addExtra()">＋ เพิ่มรายการ</button>
           <div class="preset-chips" style="margin-top:10px">
@@ -789,19 +789,19 @@ textarea { resize: vertical; min-height: 70px; }
         <div class="section-divider"><span>ช่องทางชำระเงิน</span></div>
         <div class="field-row col3">
           <div class="field">
-            <label>ช่องทาง <span class="req">*</span></label>
+            <label for="payMethod">ช่องทาง <span class="req">*</span></label>
             <select id="payMethod" onchange="recalc()">
-              <option value="cash">💵 เงินสด</option>
-              <option value="transfer">📱 โอนเงิน</option>
-              <option value="qr">📷 QR Code</option>
+              <option value="cash"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2.5" y="6" width="19" height="12" rx="2"/><circle cx="12" cy="12" r="3"/><path d="M6 9v6M18 9v6"/></svg> เงินสด</option>
+              <option value="transfer"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="6.5" y="2.5" width="11" height="19" rx="2"/><path d="M11 19h2"/></svg> โอนเงิน</option>
+              <option value="qr"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2.5" y="7" width="19" height="13" rx="2"/><path d="M8 7l1.5-2.5h5L16 7"/><circle cx="12" cy="13.5" r="3.5"/></svg> QR Code</option>
             </select>
           </div>
           <div class="field">
-            <label>วันที่ชำระ</label>
+            <label for="payDate">วันที่ชำระ</label>
             <input type="date" id="payDate">
           </div>
           <div class="field">
-            <label>ผู้รับเงิน</label>
+            <label for="payCollector">ผู้รับเงิน</label>
             <input type="text" id="payCollector" placeholder="ชื่อผู้รับเงิน">
           </div>
         </div>
@@ -816,11 +816,11 @@ textarea { resize: vertical; min-height: 70px; }
     <!-- STEP 4 -->
     <div id="step4" class="step-content">
       <div class="card">
-        <div class="card-title">✅ ตรวจสอบและยืนยัน <span class="badge-section badge badge-green">ขั้นตอนสุดท้าย</span></div>
+        <div class="card-title"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="m8 12 3 3 5-6"/></svg> ตรวจสอบและยืนยัน <span class="badge-section badge badge-green">ขั้นตอนสุดท้าย</span></div>
         <div id="confirmContent"></div>
         <div style="display:flex;justify-content:space-between;margin-top:18px;gap:12px">
           <button class="btn btn-secondary" onclick="nextStep(3,this,true)">← แก้ไข</button>
-          <button class="btn btn-primary" onclick="submitForm(this)">✅ ยืนยันลงทะเบียน & รับชำระ</button>
+          <button class="btn btn-primary" onclick="submitForm(this)"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="m8 12 3 3 5-6"/></svg> ยืนยันลงทะเบียน & รับชำระ</button>
         </div>
       </div>
     </div>
@@ -830,7 +830,7 @@ textarea { resize: vertical; min-height: 70px; }
   <!-- ── RIGHT: SUMMARY ── -->
   <div class="summary-sticky">
     <div class="summary-card">
-      <div class="sum-title">💳 สรุปยอดชำระ</div>
+      <div class="sum-title"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2.5" y="5.5" width="19" height="13" rx="2"/><path d="M2.5 9.5h19M6 14.5h4"/></svg> สรุปยอดชำระ</div>
       <div class="sum-row"><span class="sum-label">ค่าธรรมเนียมแรกเข้า</span><span class="sum-val" id="s-entry">฿0</span></div>
       <div class="sum-row"><span class="sum-label">ค่าธรรมเนียมรายปี</span><span class="sum-val" id="s-annual">฿0</span></div>
       <div class="sum-row"><span class="sum-label">ค่าเช่าเดือนแรก</span><span class="sum-val" id="s-rent">฿0</span></div>
@@ -839,14 +839,14 @@ textarea { resize: vertical; min-height: 70px; }
       <div class="total-bar">
         <div>
           <div class="total-label">ยอดรวมทั้งหมด</div>
-          <div class="total-method" id="s-method">💵 เงินสด</div>
+          <div class="total-method" id="s-method"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2.5" y="6" width="19" height="12" rx="2"/><circle cx="12" cy="12" r="3"/><path d="M6 9v6M18 9v6"/></svg> เงินสด</div>
         </div>
         <div class="total-amount" id="s-grand">฿0</div>
       </div>
     </div>
 
     <div class="vendor-preview" id="vendorPreviewCard" style="display:none">
-      <div class="vp-avatar" id="vpAvatar">🏪</div>
+      <div class="vp-avatar" id="vpAvatar"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 10h16v9a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1v-9z"/><path d="M3 6l1.5-3h15L21 6M3 6l.8 3.2A1.7 1.7 0 0 0 8 9.4M8 9.4a1.7 1.7 0 0 0 3.3 0M11.3 9.4a1.7 1.7 0 0 0 3.4 0M14.7 9.4a1.7 1.7 0 0 0 3.3 0M18 9.4A1.7 1.7 0 0 0 21.2 9.2L22 6"/></svg></div>
       <div class="sum-title" style="margin-bottom:10px" id="vpName">ผู้ค้าใหม่</div>
       <div class="sum-row"><span class="sum-label">เบอร์</span><span class="sum-val" id="vpPhone">—</span></div>
       <div class="sum-row"><span class="sum-label">สินค้า</span><span class="sum-val" id="vpProduct">—</span></div>
@@ -859,13 +859,13 @@ textarea { resize: vertical; min-height: 70px; }
 
 <!-- SUCCESS -->
 <div class="success-wrap" id="successScreen">
-  <div class="success-circle">✅</div>
+  <div class="success-circle"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="m8 12 3 3 5-6"/></svg></div>
   <div class="success-title">ลงทะเบียนสำเร็จ!</div>
   <div class="success-sub">บันทึกข้อมูลและรับชำระค่าธรรมเนียมเรียบร้อย</div>
   <div class="success-receipt" id="successReceipt"></div>
   <div class="success-btns">
-    <button class="btn btn-secondary" onclick="showToast('กำลังส่งไปยังเครื่องพิมพ์...','info')">🖨️ พิมพ์ใบเสร็จ</button>
-    <button class="btn btn-primary" onclick="resetAll()">➕ ลงทะเบียนรายใหม่</button>
+    <button class="btn btn-secondary" onclick="showToast('กำลังส่งไปยังเครื่องพิมพ์...','info')"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M7 8V3h10v5"/><rect x="5" y="8" width="14" height="8" rx="1.5"/><path d="M7 15h10v6H7z"/><circle cx="16.5" cy="11" r=".6" fill="currentColor" stroke="none"/></svg>️ พิมพ์ใบเสร็จ</button>
+    <button class="btn btn-primary" onclick="resetAll()"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg> ลงทะเบียนรายใหม่</button>
   </div>
 </div>
 
@@ -1118,7 +1118,7 @@ function addExtra(label='') {
   div.innerHTML = `
     <input type="text" placeholder="รายการ เช่น ค่าปรับ, ค่าป้าย..." value="${label}" oninput="recalc()" id="exl-${id}">
     <input type="number" placeholder="฿ จำนวน" min="0" oninput="recalc()" id="exa-${id}" style="text-align:right">
-    <button class="btn-rm" onclick="removeExtra(${id})" title="ลบ">✕</button>`;
+    <button class="btn-rm" onclick="removeExtra(${id})" title="ลบ" aria-label="ลบรายการนี้">✕</button>`;
   document.getElementById('extrasList').appendChild(div);
   document.getElementById(`exl-${id}`).focus();
   recalc();
