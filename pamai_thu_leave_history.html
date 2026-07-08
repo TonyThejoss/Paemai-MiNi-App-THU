@@ -245,6 +245,27 @@ function matchSearch(row,q,fields){
 }
 function nowClock(){const n=new Date();return String(n.getHours()).padStart(2,'0')+':'+String(n.getMinutes()).padStart(2,'0');}
 
+// Google Sheets บางครั้งจะแปลงค่าวันที่/เวลาที่บันทึกเป็นข้อความ (เช่น "7 ก.ค. 2569")
+// ให้กลายเป็น Date object แล้วส่งกลับมาเป็น ISO string (เช่น "2569-07-07T07:00:00.000Z")
+// ฟังก์ชันนี้รองรับทั้งสองแบบ เพื่อไม่ให้ตารางแสดงผลเป็น ISO ดิบๆ
+const MONS=['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
+function fmtDate(v){
+  if(!v) return '—';
+  if(/^\d{4}-\d{2}-\d{2}T/.test(v)){
+    const d=new Date(v);
+    return d.getUTCDate()+' '+MONS[d.getUTCMonth()]+' '+d.getUTCFullYear();
+  }
+  return v;
+}
+function fmtTime(v){
+  if(!v) return '—';
+  if(/^\d{4}-\d{2}-\d{2}T/.test(v)){
+    const d=new Date(v);
+    return String(d.getUTCHours()).padStart(2,'0')+':'+String(d.getUTCMinutes()).padStart(2,'0');
+  }
+  return v;
+}
+
 // ประเภทรายการจริงจากระบบ (leave_log.type) — ต้องตรงกับผังตลาด (pamai_thu_market_map.html)
 const CANCEL_TYPES=['leave_cancel','absent_cancel','lease_cancel'];
 const TYPE_BADGE={
@@ -308,7 +329,7 @@ function renderLeave(){
   if(!getApiUrl()) return;
   if(!rows.length){ tbody.innerHTML=emptyRow('ไม่พบข้อมูลตามเงื่อนไขที่เลือก',7); return; }
   tbody.innerHTML=rows.map(r=>'<tr>'
-    +'<td>'+esc(r.date)+' · '+esc(r.time)+'</td>'
+    +'<td>'+esc(fmtDate(r.date))+' · '+esc(fmtTime(r.time))+'</td>'
     +'<td><b>'+esc(r.lock_id)+'</b></td>'
     +'<td>'+esc(r.zone||'—')+'</td>'
     +'<td>'+esc(r.shop||'—')+'</td>'
@@ -337,7 +358,7 @@ function renderDaily(){
   if(!getApiUrl()) return;
   if(!rows.length){ tbody.innerHTML=emptyRow('ไม่พบข้อมูลตามเงื่อนไขที่เลือก',7); return; }
   tbody.innerHTML=rows.map(r=>'<tr>'
-    +'<td>'+esc(r.date)+' · '+esc(r.time)+'</td>'
+    +'<td>'+esc(fmtDate(r.date))+' · '+esc(fmtTime(r.time))+'</td>'
     +'<td><b>'+esc(r.lock_id)+'</b></td>'
     +'<td>'+esc(r.zone||'—')+'</td>'
     +'<td>'+esc(r.vendor_name||'—')+'</td>'
