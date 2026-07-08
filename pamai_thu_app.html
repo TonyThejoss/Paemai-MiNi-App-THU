@@ -381,6 +381,7 @@ input:focus,select:focus,textarea:focus{border-color:var(--gm);box-shadow:0 0 0 
     <div class="sb-sec">
       <div class="sb-lbl">ผู้ค้า</div>
       <button class="ni" id="ni-register" onclick="goTab('register')"><span class="ico">🆕</span>ลงทะเบียนผู้ค้าใหม่</button>
+      <button class="ni" id="ni-leavehist" onclick="goTab('leavehist')"><span class="ico"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="18" rx="2"/><path d="M9 3h6a1 1 0 0 1 1 1v1H8V4a1 1 0 0 1 1-1Z"/></svg></span>ประวัติลา และขาดล็อค</button>
     </div>
     <div class="sb-div"></div>
     <div class="sb-sec">
@@ -522,6 +523,7 @@ input:focus,select:focus,textarea:focus{border-color:var(--gm);box-shadow:0 0 0 
     <div id="install"  class="pane" data-src="pamai_thu_installment.html"><div class="module-loading">⏳ กำลังโหลด ผ่อนชำระ...</div></div>
     <div id="electric" class="pane" data-src="pamai_thu_electric_system.html"><div class="module-loading">⏳ กำลังโหลด ค่าไฟฟ้า...</div></div>
     <div id="register" class="pane" data-src="pamai_thu_vendor_registration.html"><div class="module-loading">⏳ กำลังโหลด ผู้ค้าใหม่...</div></div>
+    <div id="leavehist" class="pane" data-src="pamai_thu_leave_history.html"><div class="module-loading">⏳ กำลังโหลด ประวัติลา และขาดล็อค...</div></div>
     <div id="reports"  class="pane" data-src="pamai_thu_reports_launcher.html"><div class="module-loading">⏳ กำลังโหลด รายงาน...</div></div>
   </main>
 </div>
@@ -586,7 +588,7 @@ let curTab='dash';
 
 function goTab(id){
   // Viewer role check
-  const viewerAllowed=['dash','reports','actlog'];
+  const viewerAllowed=['dash','reports','actlog','leavehist'];
   if(window._viewerRole && !viewerAllowed.includes(id)){
     showToast('⛔ คุณไม่มีสิทธิ์เข้าถึงส่วนนี้ (ดูได้อย่างเดียว)','e');
     return;
@@ -609,10 +611,11 @@ function goTab(id){
   // Log
   const names={dash:'หน้าหลัก',map:'ผังตลาด',vdb:'ข้อมูลผู้ค้า',payment:'รับชำระ',
                install:'ผ่อนชำระ',electric:'ค่าไฟฟ้า',register:'ผู้ค้าใหม่',
+               leavehist:'ประวัติลา และขาดล็อค',
                reports:'รายงาน',actlog:'บันทึกกิจกรรม'};
   if(id!=='actlog') logAct('nav','เปิดหน้า: '+(names[id]||id));
   // Lazy load iframe module when first accessed
-  const moduleIds=['map','payment','install','electric','register','reports'];
+  const moduleIds=['map','payment','install','electric','register','leavehist','reports'];
   if(moduleIds.includes(id)){
     setTimeout(()=>loadModule(id),50);
   }

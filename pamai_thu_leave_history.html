@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="th" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ประวัติแจ้งลา/ขาดล็อค/ผู้ค้าจร — แพไม้มินิ วันพฤหัสบดี</title>
+<style>
+:root {
+  --g:#7c2d12;--gm:#c2410c;--gb:#ea580c;--gl:#ffedd5;--gll:#fff7ed;
+  --r:#b91c1c;--rl:#fee2e2;--o:#c2410c;--ol:#fff7ed;
+  --b:#1d4ed8;--bl:#eff6ff;--pu:#6d28d9;--pul:#f5f3ff;
+  --y:#92400e;--yl:#fffbeb;
+  --bg:#eef2f0;--sf:#fff;--sf2:#f4f8f5;--sf3:#e8f0eb;
+  --bd:#d0ddd5;--bd2:#a8c0b0;
+  --tx:#0a1a10;--txm:#2e4a38;--txl:#4d6854;
+  --shadow:0 2px 12px rgba(10,26,16,.08);
+  --ease:cubic-bezier(.4,0,.2,1);
+  --rad:10px;
+}
+[data-theme="dark"]{
+  --bg:#090f0b;--sf:#0f1a13;--sf2:#141f17;--sf3:#1a2b1e;
+  --bd:#243028;--bd2:#364d3c;
+  --tx:#d8ead0;--txm:#8aab8e;--txl:#8ca696;
+  --gl:#2d1200;--gll:#1a0f06;--rl:#1f0a0a;--ol:#1a0f06;
+  --bl:#091228;--pul:#12092a;--yl:#120f06;
+  --shadow:0 4px 20px rgba(0,0,0,.45);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;}
+body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--tx);font-size:13px;min-height:100vh;transition:background .3s,color .3s;}
+
+.topbar{background:linear-gradient(135deg,var(--g) 0%,var(--gm) 60%,var(--gb));color:#fff;padding:12px 24px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:300;box-shadow:0 2px 16px rgba(0,0,0,.35);flex-wrap:wrap;gap:8px;}
+.topbar h1{font-size:.92rem;font-weight:800;letter-spacing:-.2px;display:flex;align-items:center;gap:6px;}
+.topbar p{font-size:.90rem;opacity:.72;margin-top:1px;}
+.topbar-right{display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+.dm-btn{width:44px;height:44px;border-radius:50%;border:1.5px solid rgba(255,255,255,.3);background:rgba(255,255,255,.1);color:#fff;cursor:pointer;font-size:.82rem;display:flex;align-items:center;justify-content:center;transition:all .2s;}
+.dm-btn:hover{background:rgba(255,255,255,.22);transform:rotate(18deg);}
+.conn-badge{font-size:.84rem;font-weight:700;padding:5px 10px;border-radius:20px;background:rgba(255,255,255,.14);border:1.5px solid rgba(255,255,255,.28);color:#fff;}
+.conn-badge.on{background:rgba(134,239,172,.18);border-color:#86efac;color:#dcfce7;}
+.conn-badge.off{background:rgba(252,165,165,.18);border-color:#fca5a5;color:#fee2e2;}
+.rf-btn{padding:5px 12px;border-radius:8px;border:1.5px solid rgba(255,255,255,.3);background:rgba(255,255,255,.1);color:#fff;font-size:.90rem;font-weight:700;cursor:pointer;font-family:inherit;transition:all .18s;}
+.rf-btn:hover{background:rgba(255,255,255,.22);}
+
+.tabs{background:var(--sf);border-bottom:1px solid var(--bd);display:flex;overflow-x:auto;position:sticky;top:54px;z-index:200;transition:background .3s,border-color .3s;}
+.tabs::-webkit-scrollbar{display:none;}
+.tab{padding:11px 18px;border:none;background:none;cursor:pointer;font-size:.75rem;font-weight:700;color:var(--txl);border-bottom:2.5px solid transparent;white-space:nowrap;transition:all .2s;font-family:inherit;}
+.tab:hover{color:var(--txm);}
+.tab.active{color:var(--gm);border-bottom-color:var(--gm);}
+
+.page{display:none;max-width:1150px;margin:18px auto;padding:0 18px 48px;}
+.page.active{display:block;animation:fadeUp .25s var(--ease);}
+@keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+
+.card{background:var(--sf);border-radius:var(--rad);border:1px solid var(--bd);box-shadow:var(--shadow);padding:16px 18px;margin-bottom:14px;transition:background .3s,border-color .3s;}
+.card-title{font-size:.84rem;font-weight:800;color:var(--tx);margin-bottom:12px;padding-bottom:9px;border-bottom:1.5px solid var(--bd);display:flex;align-items:center;gap:8px;}
+
+.kpi-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:14px;}
+.kpi{background:var(--sf);border:1px solid var(--bd);border-left:3px solid var(--gm);border-radius:8px;padding:10px 12px;transition:all .2s;}
+.kpi.kp-purple{border-left-color:var(--pu);}
+.kpi.kp-red{border-left-color:var(--r);}
+.kpi.kp-gray{border-left-color:var(--txl);}
+.kpi-num{font-size:1.25rem;font-weight:800;}
+.kpi-label{font-size:.86rem;color:var(--txl);margin-top:2px;}
+
+.search-row{display:flex;gap:8px;margin-bottom:0;flex-wrap:wrap;align-items:center;}
+.sbox{flex:1;min-width:170px;padding:7px 11px;border:1.5px solid var(--bd);border-radius:7px;font-size:.76rem;background:var(--sf);color:var(--tx);outline:none;transition:all .18s;font-family:inherit;}
+.sbox:focus{border-color:var(--gm);box-shadow:0 0 0 3px rgba(194,65,12,.15);}
+.fsel,.dinput{padding:7px 9px;border:1.5px solid var(--bd);border-radius:7px;font-size:.72rem;background:var(--sf2);color:var(--tx);outline:none;cursor:pointer;font-family:inherit;}
+.fsel:focus,.dinput:focus{border-color:var(--gm);box-shadow:0 0 0 3px rgba(194,65,12,.15);}
+.dlabel{font-size:.84rem;color:var(--txl);font-weight:700;white-space:nowrap;}
+label.dlabel{display:inline-block;}
+.visually-hidden{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0;}
+.btn{padding:7px 14px;border:none;border-radius:8px;font-size:.72rem;font-weight:700;cursor:pointer;transition:all .18s;font-family:inherit;display:inline-flex;align-items:center;justify-content:center;gap:4px;}
+.btn-secondary{background:var(--sf2);border:1.5px solid var(--bd);color:var(--txm);}
+.btn-secondary:hover{background:var(--bd);transform:translateY(-1px);}
+
+.tbl-wrap{overflow-x:auto;}
+.tbl{width:100%;border-collapse:collapse;font-size:.76rem;}
+.tbl th{background:var(--g);color:#fff;padding:7px 9px;text-align:left;font-weight:700;font-size:.87rem;text-transform:uppercase;letter-spacing:.4px;border-bottom:none;white-space:nowrap;}
+.tbl td{padding:7px 9px;border-bottom:1px solid var(--bd);color:var(--tx);vertical-align:middle;}
+.tbl tbody tr:nth-child(even) td{background:var(--sf2);}
+.tbl tbody tr:hover td{background:var(--gll);}
+
+.badge{display:inline-flex;align-items:center;gap:3px;padding:2px 7px;border-radius:12px;font-size:.84rem;font-weight:800;white-space:nowrap;}
+.b-purple{background:var(--pul);color:var(--pu);}
+.b-red{background:var(--rl);color:var(--r);}
+.b-orange{background:var(--ol);color:var(--o);}
+.b-gray{background:var(--sf3);color:var(--txm);}
+
+.filter-note{font-size:.84rem;color:var(--txl);margin-top:6px;}
+
+.ic{width:1em;height:1em;vertical-align:-.15em;display:inline-block;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0}
+.ic-dot{stroke:none}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: .01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: .01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div>
+    <h1><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="4" width="16" height="18" rx="2"/><path d="M9 3h6a1 1 0 0 1 1 1v1H8V4a1 1 0 0 1 1-1Z"/></svg> ประวัติแจ้งลา / ขาดล็อค / ผู้ค้าจร</h1>
+    <p>ดึงข้อมูลจริงจาก Google Sheets (leave_log, daily_bookings) — ไม่ใช่ค่าจำลอง</p>
+  </div>
+  <div class="topbar-right">
+    <span class="conn-badge" id="conn-badge">⏳ กำลังตรวจสอบ...</span>
+    <button class="rf-btn" onclick="loadAll()"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 12a9 9 0 0 1-15.3 6.4L3 16"/><path d="M3 12a9 9 0 0 1 15.3-6.4L21 8"/><polyline points="3 20 3 16 7 16"/><polyline points="21 4 21 8 17 8"/></svg> รีเฟรช</button>
+    <button class="dm-btn" onclick="toggleDark()" aria-label="สลับโหมดมืด/สว่าง" title="โหมดมืด"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3 7 7 0 0 0 21 12.8Z"/></svg></button>
+  </div>
+</div>
+
+<div class="tabs">
+  <button class="tab active" data-tab="leave" onclick="switchSub('leave')"><svg class="ic ic-dot" viewBox="0 0 24 24" aria-hidden="true" style="color:var(--pu)"><circle cx="12" cy="12" r="8" fill="currentColor"/></svg> ลา / ขาด / ยกเลิก</button>
+  <button class="tab" data-tab="daily" onclick="switchSub('daily')"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 10 12 2H4v8l8 8 8-8Z" transform="translate(0 2)"/><circle cx="7.5" cy="7.5" r="1" transform="translate(0 2)"/></svg> ผู้ค้าจร</button>
+</div>
+
+<!-- ═══ TAB: LEAVE / ABSENT / CANCEL ═══ -->
+<div class="page active" id="page-leave">
+  <div class="kpi-grid">
+    <div class="kpi"><div class="kpi-num" id="lv-kpi-total">0</div><div class="kpi-label">รายการทั้งหมด</div></div>
+    <div class="kpi kp-purple"><div class="kpi-num" id="lv-kpi-leave" style="color:var(--pu)">0</div><div class="kpi-label"><svg class="ic ic-dot" viewBox="0 0 24 24" aria-hidden="true" style="color:var(--pu)"><circle cx="12" cy="12" r="8" fill="currentColor"/></svg> แจ้งลา</div></div>
+    <div class="kpi kp-red"><div class="kpi-num" id="lv-kpi-absent" style="color:var(--r)">0</div><div class="kpi-label"><svg class="ic ic-dot" viewBox="0 0 24 24" aria-hidden="true" style="color:var(--r)"><circle cx="12" cy="12" r="8" fill="currentColor"/></svg> ขาดล็อค (ไม่แจ้ง)</div></div>
+    <div class="kpi kp-gray"><div class="kpi-num" id="lv-kpi-cancel" style="color:var(--txm)">0</div><div class="kpi-label"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><polyline points="9 14 4 9 9 4"/><path d="M20 20v-7a4 4 0 0 0-4-4H4"/></svg> ยกเลิก/สิ้นสุดสัญญา</div></div>
+  </div>
+
+  <div class="card">
+    <div class="search-row">
+      <label for="lv-search" class="visually-hidden">ค้นหาประวัติแจ้งลา/ขาด</label>
+      <input class="sbox" id="lv-search" placeholder="ค้นหา: เลขล็อค / ชื่อร้าน / โซน / ผู้บันทึก" oninput="renderLeave()">
+      <label for="lv-type" class="visually-hidden">กรองตามประเภท</label>
+      <select class="fsel" id="lv-type" onchange="renderLeave()">
+        <option value="">ทุกประเภท</option>
+        <option value="leave">แจ้งลา</option>
+        <option value="absent">ขาดล็อค (ไม่แจ้ง)</option>
+        <option value="leave_cancel">ยกเลิกการแจ้งลา</option>
+        <option value="absent_cancel">ยกเลิกบันทึกขาดล็อค</option>
+        <option value="lease_cancel">ยกเลิกการเช่า</option>
+      </select>
+      <label for="lv-from" class="dlabel">จาก</label>
+      <input class="dinput" type="date" id="lv-from" onchange="renderLeave()">
+      <label for="lv-to" class="dlabel">ถึง</label>
+      <input class="dinput" type="date" id="lv-to" onchange="renderLeave()">
+      <button class="btn btn-secondary" onclick="resetLeaveFilters()"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg> ล้างตัวกรอง</button>
+    </div>
+    <div class="filter-note">แสดงผลเรียงจากล่าสุดไปเก่าสุด · กรองช่วงวันที่อ้างอิงเวลาที่บันทึกจริงเข้าระบบ</div>
+  </div>
+
+  <div class="card" style="padding:0;overflow:hidden">
+    <div class="tbl-wrap">
+      <table class="tbl">
+        <thead><tr>
+          <th>วันที่ · เวลา</th><th>ล็อค</th><th>โซน</th><th>ร้าน/ผู้ค้า</th><th>ประเภท</th><th>หมายเหตุ</th><th>ผู้บันทึก</th>
+        </tr></thead>
+        <tbody id="leave-tbody"><tr><td colspan="7" style="text-align:center;padding:24px;color:var(--txl)">กำลังโหลด...</td></tr></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ TAB: DAILY / CASUAL VENDORS ═══ -->
+<div class="page" id="page-daily">
+  <div class="kpi-grid" style="grid-template-columns:repeat(3,1fr)">
+    <div class="kpi"><div class="kpi-num" id="dl-kpi-total">0</div><div class="kpi-label">จำนวนครั้งที่ขายจร</div></div>
+    <div class="kpi"><div class="kpi-num" id="dl-kpi-revenue" style="color:var(--gm)">฿0</div><div class="kpi-label">รวมรายได้จากผู้ค้าจร</div></div>
+    <div class="kpi"><div class="kpi-num" id="dl-kpi-locks">0</div><div class="kpi-label">ล็อคที่เคยใช้ขายจร</div></div>
+  </div>
+
+  <div class="card">
+    <div class="search-row">
+      <label for="dl-search" class="visually-hidden">ค้นหาประวัติผู้ค้าจร</label>
+      <input class="sbox" id="dl-search" placeholder="ค้นหา: เลขล็อค / ชื่อผู้ค้า / สินค้า / โซน" oninput="renderDaily()">
+      <label for="dl-from" class="dlabel">จาก</label>
+      <input class="dinput" type="date" id="dl-from" onchange="renderDaily()">
+      <label for="dl-to" class="dlabel">ถึง</label>
+      <input class="dinput" type="date" id="dl-to" onchange="renderDaily()">
+      <button class="btn btn-secondary" onclick="resetDailyFilters()"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg> ล้างตัวกรอง</button>
+    </div>
+    <div class="filter-note">รายการที่ถูกยกเลิกจะไม่แสดงในประวัตินี้ (ตามการตั้งค่าของระบบหลังบ้าน)</div>
+  </div>
+
+  <div class="card" style="padding:0;overflow:hidden">
+    <div class="tbl-wrap">
+      <table class="tbl">
+        <thead><tr>
+          <th>วันที่ · เวลา</th><th>ล็อค</th><th>โซน</th><th>ผู้ค้า</th><th>สินค้า</th><th>ยอดรวม</th><th>ช่องทางชำระ</th>
+        </tr></thead>
+        <tbody id="daily-tbody"><tr><td colspan="7" style="text-align:center;padding:24px;color:var(--txl)">กำลังโหลด...</td></tr></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<script>
+// ════════════════════════════════════════════════════
+// THEME — ใช้ key เดียวกับหน้าอื่นในระบบ (pm-t)
+// ════════════════════════════════════════════════════
+function toggleDark(){const h=document.documentElement,d=h.getAttribute('data-theme')==='dark';h.setAttribute('data-theme',d?'light':'dark');localStorage.setItem('pm-t',d?'light':'dark');}
+(()=>{const s=localStorage.getItem('pm-t');if(s)document.documentElement.setAttribute('data-theme',s);else if(window.matchMedia('(prefers-color-scheme:dark)').matches)document.documentElement.setAttribute('data-theme','dark');})();
+
+// ════════════════════════════════════════════════════
+// GOOGLE SHEETS API — ใช้ key เดียวกับหน้าอื่น (pm-api-url)
+// ════════════════════════════════════════════════════
+function getApiUrl(){return localStorage.getItem('pm-api-url')||'';}
+async function apiGet(action,params={}){
+  const url=getApiUrl(); if(!url) return null;
+  try{
+    const r=await fetch(url+'?'+new URLSearchParams({action,...params}));
+    const j=await r.json();
+    return j.status==='ok'?j.data:null;
+  }catch(e){ console.error('apiGet error:',action,e); return null; }
+}
+
+// ════════════════════════════════════════════════════
+// TABS
+// ════════════════════════════════════════════════════
+function switchSub(tab){
+  document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('active',t.dataset.tab===tab));
+  document.getElementById('page-leave').classList.toggle('active',tab==='leave');
+  document.getElementById('page-daily').classList.toggle('active',tab==='daily');
+}
+
+// ════════════════════════════════════════════════════
+// HELPERS
+// ════════════════════════════════════════════════════
+function esc(s){return String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));}
+function emptyRow(msg,cols){return '<tr><td colspan="'+cols+'" style="text-align:center;padding:24px;color:var(--txl)">'+msg+'</td></tr>';}
+function sortByCreated(rows){return [...rows].sort((a,b)=>String(b.created_at||'').localeCompare(String(a.created_at||'')));}
+function inRange(row,from,to){
+  const d=String(row.created_at||'').slice(0,10);
+  if(from && d && d<from) return false;
+  if(to && d && d>to) return false;
+  return true;
+}
+function matchSearch(row,q,fields){
+  if(!q) return true;
+  q=q.toLowerCase();
+  return fields.some(f=>String(row[f]||'').toLowerCase().includes(q));
+}
+function nowClock(){const n=new Date();return String(n.getHours()).padStart(2,'0')+':'+String(n.getMinutes()).padStart(2,'0');}
+
+// ประเภทรายการจริงจากระบบ (leave_log.type) — ต้องตรงกับผังตลาด (pamai_thu_market_map.html)
+const CANCEL_TYPES=['leave_cancel','absent_cancel','lease_cancel'];
+const TYPE_BADGE={
+  leave:      {cls:'b-purple', label:'แจ้งลา',              dot:true,  color:'var(--pu)'},
+  absent:     {cls:'b-red',    label:'ขาดล็อค',              dot:true,  color:'var(--r)'},
+  leave_cancel:{cls:'b-gray',  label:'ยกเลิกการแจ้งลา',      dot:false},
+  absent_cancel:{cls:'b-gray', label:'ยกเลิกบันทึกขาดล็อค',   dot:false},
+  lease_cancel:{cls:'b-orange',label:'ยกเลิกการเช่า',        dot:false},
+};
+function typeBadgeHtml(type){
+  const t=TYPE_BADGE[type];
+  if(!t) return '<span class="badge b-gray">'+esc(type||'—')+'</span>';
+  const icon=t.dot
+    ? '<svg class="ic ic-dot" viewBox="0 0 24 24" aria-hidden="true" style="color:'+t.color+'"><circle cx="12" cy="12" r="8" fill="currentColor"/></svg>'
+    : '<svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><polyline points="9 14 4 9 9 4"/><path d="M20 20v-7a4 4 0 0 0-4-4H4"/></svg>';
+  return '<span class="badge '+t.cls+'">'+icon+' '+t.label+'</span>';
+}
+
+// ════════════════════════════════════════════════════
+// DATA
+// ════════════════════════════════════════════════════
+let ALL_LEAVE=[], ALL_DAILY=[];
+
+async function loadAll(){
+  const badge=document.getElementById('conn-badge');
+  if(!getApiUrl()){
+    badge.innerHTML='<svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2v6"/><path d="M8 8h8v4a4 4 0 0 1-8 0V8Z"/><line x1="9" y1="18" x2="9" y2="22"/><line x1="15" y1="18" x2="15" y2="22"/></svg> ยังไม่เชื่อมต่อ Google Sheets';
+    badge.className='conn-badge off';
+    document.getElementById('leave-tbody').innerHTML=emptyRow('ยังไม่ได้เชื่อมต่อ Google Sheets — ตั้งค่าที่หน้าหลักก่อน (ปุ่มมุมล่างซ้าย)',7);
+    document.getElementById('daily-tbody').innerHTML=emptyRow('ยังไม่ได้เชื่อมต่อ Google Sheets — ตั้งค่าที่หน้าหลักก่อน (ปุ่มมุมล่างซ้าย)',7);
+    return;
+  }
+  badge.textContent='⏳ กำลังโหลดข้อมูล...';
+  badge.className='conn-badge';
+  const [leave,daily]=await Promise.all([apiGet('getLeaveLog'),apiGet('getDailyBookings')]);
+  ALL_LEAVE=Array.isArray(leave)?leave:[];
+  ALL_DAILY=Array.isArray(daily)?daily:[];
+  badge.innerHTML='<svg class="ic ic-dot" viewBox="0 0 24 24" aria-hidden="true" style="color:var(--gm)"><circle cx="12" cy="12" r="8" fill="currentColor"/></svg> เชื่อมต่อแล้ว · ล่าสุด '+nowClock();
+  badge.className='conn-badge on';
+  renderLeave();
+  renderDaily();
+}
+
+// ════════════════════════════════════════════════════
+// RENDER: LEAVE / ABSENT / CANCEL
+// ════════════════════════════════════════════════════
+function renderLeave(){
+  const q=document.getElementById('lv-search').value.trim();
+  const type=document.getElementById('lv-type').value;
+  const from=document.getElementById('lv-from').value;
+  const to=document.getElementById('lv-to').value;
+  let rows=ALL_LEAVE.filter(r=>matchSearch(r,q,['lock_id','zone','shop','manager','note'])&&inRange(r,from,to)&&(!type||r.type===type));
+  rows=sortByCreated(rows);
+
+  document.getElementById('lv-kpi-total').textContent=rows.length;
+  document.getElementById('lv-kpi-leave').textContent=rows.filter(r=>r.type==='leave').length;
+  document.getElementById('lv-kpi-absent').textContent=rows.filter(r=>r.type==='absent').length;
+  document.getElementById('lv-kpi-cancel').textContent=rows.filter(r=>CANCEL_TYPES.includes(r.type)).length;
+
+  const tbody=document.getElementById('leave-tbody');
+  if(!getApiUrl()) return;
+  if(!rows.length){ tbody.innerHTML=emptyRow('ไม่พบข้อมูลตามเงื่อนไขที่เลือก',7); return; }
+  tbody.innerHTML=rows.map(r=>'<tr>'
+    +'<td>'+esc(r.date)+' · '+esc(r.time)+'</td>'
+    +'<td><b>'+esc(r.lock_id)+'</b></td>'
+    +'<td>'+esc(r.zone||'—')+'</td>'
+    +'<td>'+esc(r.shop||'—')+'</td>'
+    +'<td>'+typeBadgeHtml(r.type)+'</td>'
+    +'<td>'+esc(r.note||'—')+'</td>'
+    +'<td>'+esc(r.manager||'—')+'</td>'
+    +'</tr>').join('');
+}
+
+// ════════════════════════════════════════════════════
+// RENDER: DAILY / CASUAL VENDORS
+// ════════════════════════════════════════════════════
+function renderDaily(){
+  const q=document.getElementById('dl-search').value.trim();
+  const from=document.getElementById('dl-from').value;
+  const to=document.getElementById('dl-to').value;
+  let rows=ALL_DAILY.filter(r=>matchSearch(r,q,['lock_id','zone','vendor_name','product'])&&inRange(r,from,to));
+  rows=sortByCreated(rows);
+
+  document.getElementById('dl-kpi-total').textContent=rows.length;
+  const totalRevenue=rows.reduce((s,r)=>s+(parseFloat(r.total)||0),0);
+  document.getElementById('dl-kpi-revenue').textContent='฿'+Math.round(totalRevenue).toLocaleString();
+  document.getElementById('dl-kpi-locks').textContent=new Set(rows.map(r=>r.lock_id)).size;
+
+  const tbody=document.getElementById('daily-tbody');
+  if(!getApiUrl()) return;
+  if(!rows.length){ tbody.innerHTML=emptyRow('ไม่พบข้อมูลตามเงื่อนไขที่เลือก',7); return; }
+  tbody.innerHTML=rows.map(r=>'<tr>'
+    +'<td>'+esc(r.date)+' · '+esc(r.time)+'</td>'
+    +'<td><b>'+esc(r.lock_id)+'</b></td>'
+    +'<td>'+esc(r.zone||'—')+'</td>'
+    +'<td>'+esc(r.vendor_name||'—')+'</td>'
+    +'<td>'+esc(r.product||'—')+'</td>'
+    +'<td>฿'+Math.round(parseFloat(r.total)||0).toLocaleString()+'</td>'
+    +'<td>'+esc(r.method||'—')+'</td>'
+    +'</tr>').join('');
+}
+
+// ════════════════════════════════════════════════════
+// FILTER RESET
+// ════════════════════════════════════════════════════
+function resetLeaveFilters(){
+  document.getElementById('lv-search').value='';
+  document.getElementById('lv-type').value='';
+  document.getElementById('lv-from').value='';
+  document.getElementById('lv-to').value='';
+  renderLeave();
+}
+function resetDailyFilters(){
+  document.getElementById('dl-search').value='';
+  document.getElementById('dl-from').value='';
+  document.getElementById('dl-to').value='';
+  renderDaily();
+}
+
+// ════════════════════════════════════════════════════
+// INIT — รับ ?lock=XXX จากผังตลาด เพื่อกรองประวัติของล็อคนั้นทันที
+// ════════════════════════════════════════════════════
+window.onload=()=>{
+  const params=new URLSearchParams(window.location.search);
+  const preLock=(params.get('lock')||'').toUpperCase().trim();
+  if(preLock){
+    document.getElementById('lv-search').value=preLock;
+    document.getElementById('dl-search').value=preLock;
+  }
+  loadAll();
+};
+</script>
+</body>
+</html>
