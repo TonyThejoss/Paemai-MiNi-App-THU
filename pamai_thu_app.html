@@ -312,7 +312,7 @@ input:focus,select:focus,textarea:focus{border-color:var(--gm);box-shadow:0 0 0 
       </div>
     </div>
     <button class="login-btn" onclick="doLogin()">เข้าสู่ระบบ</button>
-    <div class="login-footer">แพไม้มินิ วันพฤหัสบดี v1.0 · ติดต่อ 082-581-1144</div>
+    <div class="login-footer">แพไม้มินิ วันพฤหัสบดี v1.1 · ติดต่อ 082-581-1144</div>
   </div>
 </div>
 
@@ -394,7 +394,7 @@ input:focus,select:focus,textarea:focus{border-color:var(--gm);box-shadow:0 0 0 
       <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="4" width="12" height="17" rx="2"/><rect x="9" y="2.5" width="6" height="3" rx="1"/><path d="M9 11h6M9 15h6"/></svg> Local — คลิกเชื่อมต่อ Google Sheets
     </button>
     <div style="padding:8px 10px;font-size:.60rem;color:var(--txl);text-align:center">
-      แพไม้มินิ วันพฤหัสบดี v1.0 · 082-581-1144
+      แพไม้มินิ วันพฤหัสบดี v1.1 · 082-581-1144
     </div>
   </aside>
 
@@ -449,7 +449,7 @@ input:focus,select:focus,textarea:focus{border-color:var(--gm);box-shadow:0 0 0 
             </div>
           </div>
         </div>
-        <div style="text-align:center;font-size:.60rem;color:var(--txl)">แพไม้มินิ วันพฤหัสบดี v1.0 · ติดต่อ 082-581-1144</div>
+        <div style="text-align:center;font-size:.60rem;color:var(--txl)">แพไม้มินิ วันพฤหัสบดี v1.1 · ติดต่อ 082-581-1144</div>
       </div>
     </div>
 
@@ -544,6 +544,7 @@ input:focus,select:focus,textarea:focus{border-color:var(--gm);box-shadow:0 0 0 
 
 <div class="toast" id="toast"></div>
 
+<script src="pamai_thu_config.js"></script>
 <script>
 // ════════════════════════════════════════════════════
 // CORE — Clock, Dark mode, Sidebar, Navigation
@@ -842,20 +843,7 @@ function currentThursdayCount(){
 // ════════════════════════════════════════════════════
 let VENDORS=[];
 
-// ── ข้อมูลจำนวนล็อคจริงต่อโซน (อิงจากผังตลาดจริง — ใช้ชุดเดียวกับรายงาน) ──
-const ZONE_TOTALS = {
-  'A':20,'B':20,'C':21,'D':22,'E':11,'F':16,
-  'G':28,'J':4,'K':12,'N':8,'U':5,
-  'O':13,'M':12,'H':12,'L':28,'T':2,'AB':3,
-  'TA':20,'TB':20,'TC':20
-};
-const ZONE_GROUPS = {
-  'โซนด้านนอก': ['A','B','C','D','E','F'],
-  'ข้าง 7-Eleven': ['G','J','K','N','U'],
-  'ข้างโลตัส': ['O','M','H','L','T','AB'],
-  'เปิดท้าย': ['TA','TB','TC'],
-};
-const TOTAL_LOCKS = Object.values(ZONE_TOTALS).reduce((a,b)=>a+b,0);
+// ZONE_TOTALS / ZONE_GROUPS / TOTAL_LOCKS ย้ายไปที่ pamai_thu_config.js แล้ว (14 ก.ค. 2569, แก้ B-15 บางส่วน)
 
 function calcElec(e){if(!e)return 0;return(e.bulb||0)*10+(e.fan||0)*20+(e.small||0)*50+(e.large||0)*100+(e.special||[]).reduce((s,x)=>s+(x.price||0),0);}
 function elecStr(e){if(!e)return'—';const p=[];if(e.bulb)p.push('💡×'+e.bulb);if(e.fan)p.push('🌀×'+e.fan);if(e.small)p.push('🔌×'+e.small);if(e.large)p.push('⚙️×'+e.large);(e.special||[]).forEach(x=>{if(x.price>0)p.push('⭐'+x.name);});return p.join(' ')||'—';}
@@ -1361,7 +1349,7 @@ window.onload=function(){
   checkSession();
   renderVDB();
   updateDbStatus();
-  logAct('system','ระบบเริ่มทำงาน — แพไม้มินิ วันพฤหัสบดี v1.0');
+  logAct('system','ระบบเริ่มทำงาน — แพไม้มินิ วันพฤหัสบดี v1.1');
 };
 </script>
 </body>

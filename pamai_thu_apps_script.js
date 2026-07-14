@@ -1,6 +1,11 @@
 // ═══════════════════════════════════════════════════════════════
 // แพไม้มินิ วันพฤหัสบดี — Google Apps Script (Backend API)
 // วางโค้ดนี้ใน Google Apps Script แล้ว Deploy as Web App
+//
+// อัปเดต 14 ก.ค. 2569:
+//  - เพิ่ม validation ใน saveVendor() กันข้อมูลไม่สมบูรณ์เข้าฐานข้อมูลจริง (แก้ B-10 ไม่ให้เกิดซ้ำ)
+//  - เปลี่ยนรหัสผ่านผู้ใช้จาก plain text เป็น SHA-256 hash พร้อม auto-upgrade ตอน login ครั้งถัดไป (แก้ B-12)
+//  - เพิ่มฟังก์ชัน migrateAllPasswordsNow() สำหรับแปลงรหัสผ่านเดิมทั้งหมดเป็น hash ทันทีโดยไม่ต้องรอ login
 // ═══════════════════════════════════════════════════════════════
 
 const SHEET_ID = '1o-pBCouIVr2d8UEI33rVXOZf1Ij3b2JxcjrbgBmpMN8'; // Paemai Market Database (Thursday) — สร้างแยกต่างหากจากตลาดวันอังคารแล้ว
@@ -88,6 +93,41 @@ function ensureHeaders(sheet, headers) {
 }
 
 // ════════════════════════════════════════
+// PASSWORD HASHING (B-12) — SHA-256
+// ════════════════════════════════════════
+// แปลงข้อความเป็น SHA-256 hash แบบ hex string 64 ตัวอักษร
+function sha256(str) {
+  const raw = Utilities.computeDigest(Utilities.DigestAlgorithm.SHA_256, String(str), Utilities.Charset.UTF_8);
+  return raw.map(b => (b < 0 ? b + 256 : b).toString(16).padStart(2, '0')).join('');
+}
+
+// ตรวจว่าข้อความมีรูปแบบเป็น SHA-256 hash แล้วหรือยัง (hex 64 ตัวอักษร) — ใช้แยกบัญชีเก่า (plain text) จากบัญชีที่ผ่านการ hash แล้ว
+function looksHashed(str) {
+  return /^[0-9a-f]{64}$/i.test(String(str));
+}
+
+// เรียกฟังก์ชันนี้เอง "ครั้งเดียว" จาก Apps Script editor (เลือกฟังก์ชัน migrateAllPasswordsNow แล้วกด Run)
+// เพื่อแปลงรหัสผ่าน plain text ที่เหลืออยู่ทั้งหมดในชีต users ให้เป็น SHA-256 hash ทันที
+// โดยไม่ต้องรอให้ผู้ใช้แต่ละคน login ผ่านระบบก่อน (ซึ่งจะ auto-upgrade ให้เองอยู่แล้วผ่าน verifyUser)
+function migrateAllPasswordsNow() {
+  const sheet   = getSheet(S.USERS);
+  const rows    = sheet.getDataRange().getValues();
+  if (rows.length <= 1) { Logger.log('ไม่มีผู้ใช้ในระบบ'); return 0; }
+  const headers = rows[0];
+  const pwIdx   = headers.indexOf('password');
+  let migrated = 0;
+  for (let i = 1; i < rows.length; i++) {
+    const stored = rows[i][pwIdx];
+    if (stored && !looksHashed(stored)) {
+      sheet.getRange(i + 1, pwIdx + 1).setValue(sha256(stored));
+      migrated++;
+    }
+  }
+  Logger.log('แปลงรหัสผ่านเป็น SHA-256 hash แล้ว ' + migrated + ' บัญชี');
+  return migrated;
+}
+
+// ════════════════════════════════════════
 // INIT — สร้าง headers ทุก sheet
 // ════════════════════════════════════════
 function initSheets() {
@@ -151,6 +191,13 @@ function getVendors() {
 }
 
 function saveVendor(data) {
+  // ── Validation (กัน B-10: ข้อมูลไม่สมบูรณ์/ทดสอบเข้าฐานข้อมูลจริงซ้ำ) ──
+  // เหตุผล: เคยพบข้อมูลผู้ค้า 16 รายการที่ไม่มีเลขล็อครูปแบบถูกต้อง หรือไม่มีทั้งชื่อและสินค้าเลย
+  // ปนอยู่ในฐานข้อมูลจริง (ดูหัวข้อ 12 กรณี B-10 ในคู่มือ) จึงเพิ่มการตรวจสอบขั้นต่ำนี้ก่อนบันทึกทุกครั้ง
+  if (!data || data.lock === undefined || data.lock === null || String(data.lock).trim() === '') {
+    return makeErr('ต้องระบุเลขล็อค (lock) ก่อนบันทึกข้อมูลผู้ค้า');
+  }
+
   const sheet   = getSheet(S.VENDORS);
   const rows    = sheet.getDataRange().getValues();
   const headers = rows[0];
@@ -166,6 +213,16 @@ function saveVendor(data) {
       foundRow = i + 1;
       headers.forEach((h, idx) => existing[h] = rows[i][idx]);
       break;
+    }
+  }
+
+  // สำหรับการ "สร้างผู้ค้าใหม่" เท่านั้น (ไม่ใช่การอัปเดตข้อมูลบางส่วน เช่นจากหน้ารับชำระ)
+  // ต้องมีอย่างน้อยชื่อผู้ค้า หรือ สินค้า อย่างใดอย่างหนึ่ง มิฉะนั้นถือว่าเป็นข้อมูลไม่สมบูรณ์
+  if (foundRow === -1) {
+    const hasName    = data.name    !== undefined && String(data.name).trim()    !== '';
+    const hasProduct = data.product !== undefined && String(data.product).trim() !== '';
+    if (!hasName && !hasProduct) {
+      return makeErr('ต้องระบุชื่อผู้ค้าหรือสินค้าอย่างน้อยหนึ่งอย่างสำหรับการลงทะเบียนผู้ค้าใหม่');
     }
   }
 
@@ -338,6 +395,9 @@ function getUsers() {
   return makeRes(users.map(u=>({...u, password:'***'})));
 }
 
+// B-12: รหัสผ่านในชีตอาจเป็น plain text (บัญชีเก่า) หรือ SHA-256 hash (บัญชีที่ผ่านการ login/migrate แล้ว)
+// ตรวจสอบทั้งสองแบบ แล้ว "auto-upgrade" เป็น hash ทันทีเมื่อ login สำเร็จด้วยรหัสผ่าน plain text เดิม
+// เพื่อค่อยๆ ลดจำนวนรหัสผ่าน plain text ที่เหลือในระบบโดยไม่ต้องบังคับผู้ใช้เปลี่ยนรหัสเอง
 function verifyUser(username, password) {
   const sheet = getSheet(S.USERS);
   const rows  = sheet.getDataRange().getValues();
@@ -347,8 +407,20 @@ function verifyUser(username, password) {
   const roleIdx = headers.indexOf('role');
   const nameIdx = headers.indexOf('display_name');
   const rlIdx   = headers.indexOf('role_label');
+  const hashedInput = sha256(password);
+
   for (let i = 1; i < rows.length; i++) {
-    if (rows[i][userIdx] === username && rows[i][pwIdx] === password) {
+    if (rows[i][userIdx] !== username) continue;
+
+    const stored      = rows[i][pwIdx];
+    const isHashMatch  = stored === hashedInput;
+    const isPlainMatch = !looksHashed(stored) && stored === password;
+
+    if (isHashMatch || isPlainMatch) {
+      if (isPlainMatch) {
+        // auto-upgrade: แปลงรหัสผ่าน plain text เดิมเป็น SHA-256 hash ทันทีที่ login สำเร็จ
+        sheet.getRange(i + 1, pwIdx + 1).setValue(hashedInput);
+      }
       return makeRes({
         username:    rows[i][userIdx],
         role:        rows[i][roleIdx],
@@ -356,6 +428,8 @@ function verifyUser(username, password) {
         roleLabel:   rows[i][rlIdx],
       });
     }
+    // username ตรงแต่รหัสผ่านไม่ตรง — usernames ในระบบถือว่าไม่ซ้ำกัน จึงหยุดค้นหาต่อได้เลย
+    break;
   }
   return makeRes(null, 'invalid');
 }
@@ -366,10 +440,13 @@ function changePassword(username, oldPw, newPw) {
   const headers = rows[0];
   const userIdx = headers.indexOf('username');
   const pwIdx   = headers.indexOf('password');
+  const hashedOld = sha256(oldPw);
   for (let i = 1; i < rows.length; i++) {
     if (rows[i][userIdx] === username) {
-      if (rows[i][pwIdx] !== oldPw) return makeErr('Wrong current password');
-      sheet.getRange(i+1, pwIdx+1).setValue(newPw);
+      const stored = rows[i][pwIdx];
+      const oldMatches = stored === hashedOld || (!looksHashed(stored) && stored === oldPw);
+      if (!oldMatches) return makeErr('Wrong current password');
+      sheet.getRange(i+1, pwIdx+1).setValue(sha256(newPw));
       return makeRes({ changed: true });
     }
   }

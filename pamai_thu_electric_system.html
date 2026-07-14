@@ -613,10 +613,10 @@ function toggleDark() {
   const h = document.documentElement;
   const isDark = h.getAttribute('data-theme') === 'dark';
   h.setAttribute('data-theme', isDark ? 'light' : 'dark');
-  localStorage.setItem('pamai-theme', isDark ? 'light' : 'dark');
+  localStorage.setItem('pm-t', isDark ? 'light' : 'dark');
 }
 (()=>{
-  const s = localStorage.getItem('pamai-theme');
+  const s = localStorage.getItem('pm-t');
   if (s) document.documentElement.setAttribute('data-theme',s);
   else if (window.matchMedia('(prefers-color-scheme:dark)').matches) document.documentElement.setAttribute('data-theme','dark');
 })();
@@ -624,11 +624,16 @@ function toggleDark() {
 // ══════════════════════════════════════
 //  ELECTRIC TYPE DEFINITIONS
 // ══════════════════════════════════════
+const ICO_BULB = '<svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18h6M10 21h4M12 3a6 6 0 0 0-3.5 10.9c.6.5 1 1.2 1 2.1h5c0-.9.4-1.6 1-2.1A6 6 0 0 0 12 3z"/></svg>';
+const ICO_FAN = '<svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="1.6"/><path d="M12 10.5c1.5-3 1-6-1.5-7-2 3 0 5.5 1.5 7zM12 13.5c-1.5 3-1 6 1.5 7 2-3 0-5.5-1.5-7zM10.5 12c-3-1.5-6-1-7 1.5 3 2 5.5 0 7-1.5zM13.5 12c3 1.5 6 1 7-1.5-3-2-5.5 0-7 1.5z"/></svg>';
+const ICO_PLUG = '<svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 3v5M15 3v5M7 8h10v4a5 5 0 0 1-10 0V8z"/><path d="M12 17v4"/></svg>';
+const ICO_GEAR = '<svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M12 3v2.2M12 18.8V21M4.2 12H2M22 12h-2.2M5.8 5.8l1.5 1.5M16.7 16.7l1.5 1.5M18.2 5.8l-1.5 1.5M7.3 16.7l-1.5 1.5"/></svg>';
+const ICO_STAR = '<svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3.5l2.4 5 5.5.6-4 3.8 1 5.5L12 15.9l-4.9 2.5 1-5.5-4-3.8 5.5-.6z"/></svg>';
 const ELEC_TYPES = [
-  { id:'bulb',    icon:'💡', name:'หลอดไฟ',           price:10,  unit:'ดวง' },
-  { id:'fan',     icon:'🌀', name:'พัดลม',            price:20,  unit:'ตัว' },
-  { id:'small',   icon:'🔌', name:'เครื่องใช้ไฟฟ้าเล็ก', price:50,  unit:'ชิ้น' },
-  { id:'large',   icon:'⚙️', name:'เครื่องใช้ไฟฟ้าใหญ่', price:100, unit:'ชิ้น' },
+  { id:'bulb',    icon:ICO_BULB, name:'หลอดไฟ',           price:10,  unit:'ดวง' },
+  { id:'fan',     icon:ICO_FAN,  name:'พัดลม',            price:20,  unit:'ตัว' },
+  { id:'small',   icon:ICO_PLUG, name:'เครื่องใช้ไฟฟ้าเล็ก', price:50,  unit:'ชิ้น' },
+  { id:'large',   icon:ICO_GEAR, name:'เครื่องใช้ไฟฟ้าใหญ่', price:100, unit:'ชิ้น' },
 ];
 
 // ══════════════════════════════════════
@@ -649,11 +654,11 @@ function calcElec(elec) {
 
 function elecBreakdown(elec) {
   const parts = [];
-  if (elec.bulb)  parts.push(`💡×${elec.bulb}`);
-  if (elec.fan)   parts.push(`🌀×${elec.fan}`);
-  if (elec.small) parts.push(`🔌×${elec.small}`);
-  if (elec.large) parts.push(`⚙️×${elec.large}`);
-  (elec.special||[]).forEach(s=>parts.push(`⭐${s.name||''}`));
+  if (elec.bulb)  parts.push(`${ICO_BULB}×${elec.bulb}`);
+  if (elec.fan)   parts.push(`${ICO_FAN}×${elec.fan}`);
+  if (elec.small) parts.push(`${ICO_PLUG}×${elec.small}`);
+  if (elec.large) parts.push(`${ICO_GEAR}×${elec.large}`);
+  (elec.special||[]).forEach(s=>parts.push(`${ICO_STAR}${s.name||''}`));
   return parts.join(' ') || '—';
 }
 
@@ -762,7 +767,7 @@ function buildElecTypeCards(counts={}) {
       <div class="etc-price">฿${t.price}/${t.unit}</div>
       <div class="etc-count">
         <button class="count-btn" onclick="changeCount('${t.id}',-1)">−</button>
-        <input class="count-num" type="number" id="cnt-${t.id}" value="${editCounts[t.id]||0}" min="0" oninput="editCounts['${t.id}']=parseInt(this.value)||0;updateEditTotal()">
+        <input class="count-num" type="number" id="cnt-${t.id}" value="${editCounts[t.id]||0}" min="0" aria-label="จำนวน${t.name}" oninput="editCounts['${t.id}']=parseInt(this.value)||0;updateEditTotal()">
         <button class="count-btn" onclick="changeCount('${t.id}',1)">＋</button>
       </div>
     </div>`).join('');
@@ -789,13 +794,13 @@ function addSpecialItem(name='', price='') {
   div.style.cssText = 'display:grid;grid-template-columns:1fr 100px 32px;gap:8px;align-items:center;margin-bottom:8px;animation:fadeUp .2s var(--ease)';
   div.innerHTML = `
     <input type="text" placeholder="ชื่ออุปกรณ์ เช่น เครื่องชงกาแฟ, ตู้เย็น..." value="${name}"
-      id="sp-name-${id}" oninput="updateEditTotal()"
+      id="sp-name-${id}" aria-label="ชื่ออุปกรณ์พิเศษ" oninput="updateEditTotal()"
       style="padding:8px 10px;border:1.5px solid var(--border);border-radius:8px;background:var(--surface2);color:var(--text-hi);font-size:.80rem;font-family:inherit;outline:none;transition:border-color .2s;"
       onfocus="this.style.borderColor='var(--green-m)'" onblur="this.style.borderColor='var(--border)'">
     <div class="special-price-row" style="margin:0">
       <span style="font-size:.76rem;color:var(--text-lo)">฿</span>
       <input type="number" placeholder="ราคา" value="${price}" min="0"
-        id="sp-price-${id}" oninput="updateEditTotal()"
+        id="sp-price-${id}" aria-label="ราคาอุปกรณ์พิเศษ" oninput="updateEditTotal()"
         style="width:100%;padding:8px;border:1.5px solid var(--border);border-radius:8px;background:var(--surface2);color:var(--text-hi);font-size:.80rem;font-family:inherit;outline:none;text-align:right;transition:border-color .2s;"
         onfocus="this.style.borderColor='var(--green-m)'" onblur="this.style.borderColor='var(--border)'">
     </div>
@@ -920,7 +925,7 @@ function openEditFromTable(lid) {
       </div>
       <div style="display:flex;align-items:center;gap:5px">
         <button class="count-btn" onclick="modalChange('${t.id}',-1)">−</button>
-        <input class="count-num" id="mcnt-${t.id}" type="number" value="${v.elec[t.id]||0}" min="0" oninput="modalCounts['${t.id}']=parseInt(this.value)||0">
+        <input class="count-num" id="mcnt-${t.id}" type="number" value="${v.elec[t.id]||0}" min="0" aria-label="จำนวน${t.name}" oninput="modalCounts['${t.id}']=parseInt(this.value)||0">
         <button class="count-btn" onclick="modalChange('${t.id}',1)">＋</button>
       </div>
     </div>`;
@@ -949,9 +954,9 @@ function addModalSpecial(name='', price='') {
   div.id = `msp-${id}`;
   div.style.cssText = 'display:grid;grid-template-columns:1fr 90px 28px;gap:7px;align-items:center;margin-bottom:7px';
   div.innerHTML = `
-    <input type="text" placeholder="ชื่ออุปกรณ์..." value="${name}" id="mspn-${id}"
+    <input type="text" placeholder="ชื่ออุปกรณ์..." value="${name}" id="mspn-${id}" aria-label="ชื่ออุปกรณ์พิเศษ"
       style="padding:7px 10px;border:1.5px solid var(--border);border-radius:7px;font-size:.78rem;background:var(--surface2);color:var(--text-hi);outline:none;font-family:inherit">
-    <input type="number" placeholder="ราคา" value="${price}" min="0" id="mspp-${id}"
+    <input type="number" placeholder="ราคา" value="${price}" min="0" id="mspp-${id}" aria-label="ราคาอุปกรณ์พิเศษ"
       style="padding:7px;border:1.5px solid var(--border);border-radius:7px;font-size:.78rem;text-align:right;background:var(--surface2);color:var(--text-hi);outline:none;font-family:inherit">
     <button onclick="this.parentElement.remove();modalSpecials=modalSpecials.filter(i=>i!=${id})"
       style="width:28px;height:28px;border-radius:6px;border:none;background:var(--red-l);color:var(--red);cursor:pointer">✕</button>`;
@@ -1144,8 +1149,8 @@ function openPayModal(lid) {
         </select>
       </div>
       <div>
-        <label style="font-size:.72rem;font-weight:700;color:var(--text-lo);text-transform:uppercase;letter-spacing:.4px;display:block;margin-bottom:5px">วันที่รับเงิน</label>
-        <input type="date" value="${new Date().toISOString().split('T')[0]}"
+        <label for="payDateInput" style="font-size:.72rem;font-weight:700;color:var(--text-lo);text-transform:uppercase;letter-spacing:.4px;display:block;margin-bottom:5px">วันที่รับเงิน</label>
+        <input type="date" id="payDateInput" aria-label="วันที่รับเงิน" value="${new Date().toISOString().split('T')[0]}"
           style="width:100%;padding:8px 10px;border:1.5px solid var(--border);border-radius:8px;background:var(--surface2);color:var(--text-hi);font-size:.82rem;font-family:inherit;outline:none">
       </div>
     </div>`;
