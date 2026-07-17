@@ -3,21 +3,10 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>รับชำระเงินหลายล็อค — แพไม้มินิ วันพฤหัสบดี</title>
-<style>a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible,[tabindex]:focus-visible,.lk:focus-visible,.zone-tab:focus-visible{outline:2.5px solid #ea580c !important;outline-offset:2px;}.ico{width:1em;height:1em;display:inline-block;vertical-align:-0.15em;flex-shrink:0}
+<title>รับชำระเงินหลายล็อค — แพไม้มินิ</title>
+<style>
 * { box-sizing: border-box; margin: 0; padding: 0; }
-
-/* ── DARK MODE TOKENS (เพิ่ม 14 ก.ค. 2569 — เดิมไฟล์นี้ยังไม่มีโหมดมืด) ── */
-:root{
-  --bg:#f0f4f8; --sf:#ffffff; --sf2:#fafafa; --sf3:#f7fafc;
-  --bd:#e2e8f0; --tx:#1a202c; --txh:#2d3748; --txm:#4a5568; --txl:#5b6b82;
-}
-[data-theme="dark"]{
-  --bg:#090f0b; --sf:#0f1a13; --sf2:#141f17; --sf3:#1a2b1e;
-  --bd:#243028; --tx:#d8ead0; --txh:#e8f5e2; --txm:#a8c2ac; --txl:#8ca696;
-}
-
-body { font-family: 'Segoe UI', Tahoma, sans-serif; background: var(--bg); color: var(--tx); font-size: 14px; transition: background .3s,color .3s; }
+body { font-family: 'Segoe UI', Tahoma, sans-serif; background: #f0f4f8; color: #1a202c; font-size: 14px; }
 
 /* ── TOP BAR ── */
 .topbar {
@@ -33,40 +22,34 @@ body { font-family: 'Segoe UI', Tahoma, sans-serif; background: var(--bg); color
   font-weight: 600;
 }
 .btn-back:hover { background: rgba(255,255,255,0.3); }
-.btn-darkmode {
-  background: rgba(255,255,255,0.2); border: none; color: white;
-  width: 34px; height: 34px; border-radius: 8px; cursor: pointer;
-  display: flex; align-items: center; justify-content: center; flex-shrink: 0;
-}
-.btn-darkmode:hover { background: rgba(255,255,255,0.3); }
 
 /* ── LAYOUT ── */
 .layout { display: flex; height: calc(100vh - 58px); overflow: hidden; }
 
 /* ── LEFT: Filter + Lock List ── */
 .left-panel {
-  width: 420px; flex-shrink: 0; background: var(--sf);
-  border-right: 1px solid var(--bd);
+  width: 420px; flex-shrink: 0; background: white;
+  border-right: 1px solid #e2e8f0;
   display: flex; flex-direction: column; overflow: hidden;
 }
 
 .panel-header {
-  padding: 14px 16px; border-bottom: 1px solid var(--bd); background: var(--sf2);
+  padding: 14px 16px; border-bottom: 1px solid #e2e8f0; background: #fafafa;
 }
-.panel-title { font-weight: 700; font-size: 0.95rem; color: var(--txh); margin-bottom: 10px; }
+.panel-title { font-weight: 700; font-size: 0.95rem; color: #2d3748; margin-bottom: 10px; }
 
 .filter-row { display: flex; gap: 8px; margin-bottom: 8px; flex-wrap: wrap; }
 
 .search-box {
-  flex: 1; min-width: 150px; padding: 8px 12px; border: 1.5px solid var(--bd);
+  flex: 1; min-width: 150px; padding: 8px 12px; border: 1.5px solid #e2e8f0;
   border-radius: 8px; font-size: 0.82rem; outline: none;
-  transition: border-color 0.2s; background: var(--sf); color: var(--tx);
+  transition: border-color 0.2s;
 }
 .search-box:focus { border-color: #ea580c; }
 
 select.filter-select {
-  padding: 8px 10px; border: 1.5px solid var(--bd); border-radius: 8px;
-  font-size: 0.8rem; background: var(--sf); color: var(--tx); cursor: pointer; outline: none;
+  padding: 8px 10px; border: 1.5px solid #e2e8f0; border-radius: 8px;
+  font-size: 0.8rem; background: white; cursor: pointer; outline: none;
 }
 select.filter-select:focus { border-color: #ea580c; }
 
@@ -84,8 +67,8 @@ select.filter-select:focus { border-color: #ea580c; }
 .lock-item {
   display: flex; align-items: center; gap: 10px;
   padding: 10px 12px; border-radius: 10px; margin-bottom: 6px;
-  border: 1.5px solid var(--bd); cursor: pointer; transition: all 0.15s;
-  background: var(--sf); user-select: none;
+  border: 1.5px solid #e2e8f0; cursor: pointer; transition: all 0.15s;
+  background: white; user-select: none;
 }
 .lock-item:hover { border-color: #9ae6b4; background: #fff7ed; }
 .lock-item.selected { border-color: #38a169; background: #fff7ed; }
@@ -96,13 +79,13 @@ select.filter-select:focus { border-color: #ea580c; }
 .lock-item input[type=checkbox] { width: 17px; height: 17px; flex-shrink: 0; accent-color: #c2410c; cursor: pointer; }
 
 .lock-info { flex: 1; min-width: 0; }
-.lock-id { font-weight: 700; font-size: 0.88rem; color: var(--txh); }
-.lock-product { font-size: 0.75rem; color: var(--txl); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-top: 1px; }
-.lock-vendor { font-size: 0.72rem; color: var(--txl); margin-top: 1px; }
+.lock-id { font-weight: 700; font-size: 0.88rem; color: #2d3748; }
+.lock-product { font-size: 0.75rem; color: #718096; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-top: 1px; }
+.lock-vendor { font-size: 0.72rem; color: #a0aec0; margin-top: 1px; }
 
 .lock-amount { text-align: right; flex-shrink: 0; }
-.amount-due { font-weight: 700; font-size: 0.9rem; color: var(--txh); }
-.amount-label { font-size: 0.68rem; color: var(--txl); margin-top: 2px; }
+.amount-due { font-weight: 700; font-size: 0.9rem; color: #2d3748; }
+.amount-label { font-size: 0.68rem; color: #a0aec0; margin-top: 2px; }
 
 .badge-status {
   font-size: 0.65rem; font-weight: 700; padding: 2px 7px; border-radius: 10px;
@@ -121,20 +104,20 @@ select.filter-select:focus { border-color: #ea580c; }
 
 /* summary box */
 .summary-box {
-  background: var(--sf); border-radius: 14px; padding: 18px 20px;
+  background: white; border-radius: 14px; padding: 18px 20px;
   box-shadow: 0 2px 10px rgba(0,0,0,0.06); margin-bottom: 18px;
 }
-.summary-title { font-weight: 700; font-size: 1rem; color: var(--txh); margin-bottom: 14px; display: flex; align-items: center; gap: 8px; }
+.summary-title { font-weight: 700; font-size: 1rem; color: #2d3748; margin-bottom: 14px; display: flex; align-items: center; gap: 8px; }
 
 .summary-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 16px; }
 .stat-card {
-  background: var(--sf3); border-radius: 10px; padding: 12px;
-  text-align: center; border: 1.5px solid var(--bd);
+  background: #f7fafc; border-radius: 10px; padding: 12px;
+  text-align: center; border: 1.5px solid #e2e8f0;
 }
-.stat-num { font-size: 1.5rem; font-weight: 800; color: var(--txh); }
+.stat-num { font-size: 1.5rem; font-weight: 800; color: #2d3748; }
 .stat-num.green { color: #276749; }
 .stat-num.red { color: #9b2c2c; }
-.stat-label { font-size: 0.72rem; color: var(--txl); margin-top: 2px; }
+.stat-label { font-size: 0.72rem; color: #718096; margin-top: 2px; }
 
 .total-bar {
   background: linear-gradient(135deg, #c2410c, #ea580c);
@@ -146,34 +129,32 @@ select.filter-select:focus { border-color: #ea580c; }
 
 /* selected items table */
 .items-box {
-  background: var(--sf); border-radius: 14px; padding: 18px 20px;
+  background: white; border-radius: 14px; padding: 18px 20px;
   box-shadow: 0 2px 10px rgba(0,0,0,0.06); margin-bottom: 18px;
 }
-.items-title { font-weight: 700; font-size: 0.95rem; color: var(--txh); margin-bottom: 14px; display: flex; align-items: center; justify-content: space-between; }
+.items-title { font-weight: 700; font-size: 0.95rem; color: #2d3748; margin-bottom: 14px; display: flex; align-items: center; justify-content: space-between; }
 
 .items-table { width: 100%; border-collapse: collapse; font-size: 0.8rem; }
 .items-table th {
-  background: var(--sf3); padding: 9px 10px; text-align: left;
-  font-weight: 700; color: var(--txm); border-bottom: 2px solid var(--bd);
+  background: #f7fafc; padding: 9px 10px; text-align: left;
+  font-weight: 700; color: #4a5568; border-bottom: 2px solid #e2e8f0;
   font-size: 0.78rem;
 }
-.items-table td { padding: 9px 10px; border-bottom: 1px solid var(--bd); color: var(--txh); vertical-align: middle; }
-.items-table tr:hover td { background: var(--sf2); }
+.items-table td { padding: 9px 10px; border-bottom: 1px solid #f0f4f8; color: #2d3748; vertical-align: middle; }
+.items-table tr:hover td { background: #fafafa; }
 .items-table tr.row-paid td { background: #fff7ed; color: #276749; }
 
 .input-amount {
-  width: 90px; padding: 5px 8px; border: 1.5px solid var(--bd); border-radius: 6px;
+  width: 90px; padding: 5px 8px; border: 1.5px solid #e2e8f0; border-radius: 6px;
   font-size: 0.8rem; text-align: right; outline: none; transition: border-color 0.2s;
-  background: var(--sf); color: var(--tx);
 }
 .input-amount:focus { border-color: #ea580c; }
 .input-amount.overpaid { border-color: #dd6b20; background: #fffaf0; }
 .input-amount.exact { border-color: #38a169; background: #fff7ed; }
 
 .note-input {
-  width: 100%; padding: 5px 8px; border: 1.5px solid var(--bd); border-radius: 6px;
+  width: 100%; padding: 5px 8px; border: 1.5px solid #e2e8f0; border-radius: 6px;
   font-size: 0.78rem; outline: none; transition: border-color 0.2s;
-  background: var(--sf); color: var(--tx);
 }
 .note-input:focus { border-color: #ea580c; }
 
@@ -186,37 +167,36 @@ select.filter-select:focus { border-color: #ea580c; }
 
 /* payment options */
 .options-box {
-  background: var(--sf); border-radius: 14px; padding: 18px 20px;
+  background: white; border-radius: 14px; padding: 18px 20px;
   box-shadow: 0 2px 10px rgba(0,0,0,0.06); margin-bottom: 18px;
 }
-.options-title { font-weight: 700; font-size: 0.95rem; color: var(--txh); margin-bottom: 14px; }
+.options-title { font-weight: 700; font-size: 0.95rem; color: #2d3748; margin-bottom: 14px; }
 
 .option-row { display: flex; gap: 12px; margin-bottom: 12px; flex-wrap: wrap; }
-.option-label { font-size: 0.8rem; color: var(--txm); font-weight: 600; width: 110px; flex-shrink: 0; padding-top: 8px; }
+.option-label { font-size: 0.8rem; color: #4a5568; font-weight: 600; width: 110px; flex-shrink: 0; padding-top: 8px; }
 
 .method-btn {
-  padding: 7px 16px; border: 2px solid var(--bd); border-radius: 8px;
-  cursor: pointer; font-size: 0.8rem; font-weight: 600; color: var(--txm);
-  background: var(--sf); transition: all 0.15s;
+  padding: 7px 16px; border: 2px solid #e2e8f0; border-radius: 8px;
+  cursor: pointer; font-size: 0.8rem; font-weight: 600; color: #4a5568;
+  background: white; transition: all 0.15s;
 }
 .method-btn:hover { border-color: #9ae6b4; color: #276749; }
 .method-btn.active { border-color: #c2410c; background: #fff7ed; color: #c2410c; }
 
 .form-input {
-  flex: 1; padding: 8px 12px; border: 1.5px solid var(--bd); border-radius: 8px;
+  flex: 1; padding: 8px 12px; border: 1.5px solid #e2e8f0; border-radius: 8px;
   font-size: 0.82rem; outline: none; transition: border-color 0.2s;
-  background: var(--sf); color: var(--tx);
 }
 .form-input:focus { border-color: #ea580c; }
 
 /* footer action bar */
 .action-bar {
-  padding: 14px 24px; background: var(--sf); border-top: 1px solid var(--bd);
+  padding: 14px 24px; background: white; border-top: 1px solid #e2e8f0;
   display: flex; align-items: center; justify-content: space-between;
   box-shadow: 0 -4px 12px rgba(0,0,0,0.05);
 }
-.action-info { font-size: 0.82rem; color: var(--txl); }
-.action-info strong { color: var(--txh); }
+.action-info { font-size: 0.82rem; color: #718096; }
+.action-info strong { color: #2d3748; }
 
 .action-btns { display: flex; gap: 10px; }
 
@@ -224,14 +204,14 @@ select.filter-select:focus { border-color: #ea580c; }
   padding: 10px 22px; border: none; border-radius: 10px;
   font-size: 0.85rem; font-weight: 700; cursor: pointer; transition: all 0.2s;
 }
-.btn-outline { background: var(--sf); border: 2px solid var(--bd); color: var(--txm); }
-.btn-outline:hover { border-color: var(--txl); }
+.btn-outline { background: white; border: 2px solid #e2e8f0; color: #4a5568; }
+.btn-outline:hover { border-color: #a0aec0; }
 .btn-primary {
   background: linear-gradient(135deg, #c2410c, #ea580c); color: white;
   box-shadow: 0 4px 12px rgba(45,106,79,0.35);
 }
 .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 6px 16px rgba(45,106,79,0.45); }
-.btn-primary:disabled { background: var(--txl); transform: none; box-shadow: none; cursor: not-allowed; }
+.btn-primary:disabled { background: #a0aec0; transform: none; box-shadow: none; cursor: not-allowed; }
 .btn-danger { background: #e53e3e; color: white; }
 .btn-danger:hover { background: #c53030; }
 
@@ -242,22 +222,22 @@ select.filter-select:focus { border-color: #ea580c; }
 }
 .modal-overlay.show { display: flex; }
 .modal {
-  background: var(--sf); border-radius: 16px; padding: 28px 32px;
+  background: white; border-radius: 16px; padding: 28px 32px;
   max-width: 500px; width: 90%; box-shadow: 0 20px 60px rgba(0,0,0,0.25);
   animation: slideUp 0.25s ease;
 }
 @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
 
-.modal-title { font-size: 1.1rem; font-weight: 800; color: var(--txh); margin-bottom: 6px; }
-.modal-sub { font-size: 0.82rem; color: var(--txl); margin-bottom: 20px; }
-.modal-receipt { background: var(--sf3); border-radius: 10px; padding: 16px; margin-bottom: 20px; }
-.receipt-row { display: flex; justify-content: space-between; padding: 5px 0; font-size: 0.82rem; border-bottom: 1px solid var(--bd); }
+.modal-title { font-size: 1.1rem; font-weight: 800; color: #2d3748; margin-bottom: 6px; }
+.modal-sub { font-size: 0.82rem; color: #718096; margin-bottom: 20px; }
+.modal-receipt { background: #f7fafc; border-radius: 10px; padding: 16px; margin-bottom: 20px; }
+.receipt-row { display: flex; justify-content: space-between; padding: 5px 0; font-size: 0.82rem; border-bottom: 1px solid #edf2f7; }
 .receipt-row:last-child { border: none; font-weight: 700; font-size: 0.9rem; color: #276749; margin-top: 4px; }
 .modal-btns { display: flex; gap: 10px; justify-content: flex-end; }
 
 /* ── EMPTY STATE ── */
 .empty-state {
-  text-align: center; padding: 48px 24px; color: var(--txl);
+  text-align: center; padding: 48px 24px; color: #a0aec0;
 }
 .empty-icon { font-size: 3rem; margin-bottom: 12px; }
 .empty-text { font-size: 0.88rem; }
@@ -275,6 +255,9 @@ select.filter-select:focus { border-color: #ea580c; }
 ::-webkit-scrollbar { width: 6px; }
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb { background: #cbd5e0; border-radius: 3px; }
+
+.ic{width:1em;height:1em;vertical-align:-.15em;display:inline-block;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0}
+.ic-dot{stroke:none}
 </style>
 </head>
 <body>
@@ -283,28 +266,25 @@ select.filter-select:focus { border-color: #ea580c; }
 <div class="topbar">
   <div>
     <div style="display:flex;align-items:center;gap:10px">
-      <button class="btn-back">← กลับ</button>
+      <button class="btn-back"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><line x1="20" y1="12" x2="4" y2="12"/><polyline points="10 6 4 12 10 18"/></svg> กลับ</button>
       <div>
-        <h1><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v10M9.5 9.2c0-1.2 1.1-2.2 2.5-2.2s2.5.9 2.5 2c0 2.8-5 1.6-5 4.3 0 1.1 1.1 2 2.5 2s2.5-.9 2.5-2"/></svg> รับชำระเงินรวม — แพไม้มินิ วันพฤหัสบดี</h1>
+        <h1><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M9.5 9.5c0-1.1 1.1-2 2.5-2s2.5.9 2.5 2-1.1 1.6-2.5 2-2.5.9-2.5 2 1.1 2 2.5 2 2.5-.9 2.5-2"/></svg> รับชำระเงินรวม — แพไม้มินิ</h1>
         <div class="meta" id="metaDate">วันพฤหัสบดีที่ — · เดือน — · รอบการเก็บเงิน</div>
       </div>
     </div>
   </div>
-  <div style="display:flex;gap:8px;align-items:center">
-    <select class="filter-select" id="monthSelect" aria-label="เลือกเดือน" style="background:rgba(255,255,255,0.15);color:white;border-color:rgba(255,255,255,0.3)" onchange="filterChanged()">
+  <div style="display:flex;gap:8px">
+    <select class="filter-select" id="monthSelect" style="background:rgba(255,255,255,0.15);color:white;border-color:rgba(255,255,255,0.3)" onchange="filterChanged()">
       <option value="2025-06">มิ.ย. 2568</option>
       <option value="2025-07" selected>ก.ค. 2568</option>
       <option value="2025-08">ส.ค. 2568</option>
     </select>
-    <select class="filter-select" id="roundSelect" aria-label="เลือกรอบการเก็บเงิน" style="background:rgba(255,255,255,0.15);color:white;border-color:rgba(255,255,255,0.3)">
+    <select class="filter-select" id="roundSelect" style="background:rgba(255,255,255,0.15);color:white;border-color:rgba(255,255,255,0.3)">
       <option>รายเดือน</option>
       <option>รายวัน (จร)</option>
       <option>ค่าไฟ</option>
       <option>ค่าธรรมเนียมรายปี</option>
     </select>
-    <button class="btn-darkmode" onclick="toggleDark()" aria-label="สลับโหมดมืด/สว่าง" title="สลับโหมดมืด/สว่าง">
-      <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5z"/></svg>
-    </button>
   </div>
 </div>
 
@@ -313,11 +293,12 @@ select.filter-select:focus { border-color: #ea580c; }
   <!-- ════ LEFT PANEL ════ -->
   <div class="left-panel">
     <div class="panel-header">
-      <div class="panel-title"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="4" width="12" height="17" rx="2"/><rect x="9" y="2.5" width="6" height="3" rx="1"/><path d="M9 11h6M9 15h6"/></svg> รายการล็อค</div>
+      <div class="panel-title"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="4" width="16" height="18" rx="2"/><path d="M9 3h6a1 1 0 0 1 1 1v1H8V4a1 1 0 0 1 1-1Z"/></svg> รายการล็อค</div>
       <div class="filter-row">
-        <input class="search-box" id="searchInput" aria-label="ค้นหาล็อค / ร้านค้า" placeholder="🔍 ค้นหาล็อค / ร้านค้า..." oninput="filterLocks()">
-        <select class="filter-select" id="zoneFilter" aria-label="กรองโซน" onchange="filterLocks()">
+        <input class="search-box" id="searchInput" placeholder="🔍 ค้นหาล็อค / ร้านค้า..." oninput="filterLocks()">
+        <select class="filter-select" id="zoneFilter" onchange="filterLocks()">
           <option value="">ทุกโซน</option>
+<!--== MARKET_BLOCK:ZONE_OPT ==-->
           <option value="A">A</option><option value="B">B</option><option value="C">C</option>
           <option value="D">D</option><option value="E">E</option><option value="F">F</option>
           <option value="G">G</option><option value="J">J</option><option value="K">K</option>
@@ -325,8 +306,9 @@ select.filter-select:focus { border-color: #ea580c; }
           <option value="O">O</option><option value="M">M</option><option value="H">H</option>
           <option value="L">L</option><option value="T">T</option><option value="AB">AB</option>
           <option value="TA">TA</option><option value="TB">TB</option><option value="TC">TC</option>
+<!--== END_MARKET_BLOCK ==-->
         </select>
-        <select class="filter-select" id="statusFilter" aria-label="กรองสถานะ" onchange="filterLocks()">
+        <select class="filter-select" id="statusFilter" onchange="filterLocks()">
           <option value="">ทุกสถานะ</option>
           <option value="unpaid">ค้างชำระ</option>
           <option value="partial">ชำระบางส่วน</option>
@@ -334,7 +316,7 @@ select.filter-select:focus { border-color: #ea580c; }
         </select>
       </div>
       <div class="check-all-row" onclick="toggleAll()">
-        <input type="checkbox" id="checkAll" aria-label="เลือกทั้งหมด" onclick="event.stopPropagation();toggleAll()">
+        <input type="checkbox" id="checkAll" onclick="event.stopPropagation();toggleAll()">
         <span id="checkAllLabel">เลือกทั้งหมดที่แสดง</span>
       </div>
     </div>
@@ -348,7 +330,7 @@ select.filter-select:focus { border-color: #ea580c; }
 
       <!-- SUMMARY -->
       <div class="summary-box">
-        <div class="summary-title"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20V10M11 20V4M18 20v-7"/><path d="M2.5 20h19"/></svg> สรุปรายการที่เลือก</div>
+        <div class="summary-title"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><line x1="6" y1="20" x2="6" y2="12"/><line x1="12" y1="20" x2="12" y2="6"/><line x1="18" y1="20" x2="18" y2="15"/></svg> สรุปรายการที่เลือก</div>
         <div class="summary-grid">
           <div class="stat-card">
             <div class="stat-num" id="statSelected">0</div>
@@ -375,12 +357,12 @@ select.filter-select:focus { border-color: #ea580c; }
       <!-- SELECTED ITEMS TABLE -->
       <div class="items-box">
         <div class="items-title">
-          <span><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h4L19.5 8.5a2.1 2.1 0 0 0-3-3L5.5 16 4 20z"/><path d="M14.5 6.5l3 3"/></svg>️ กรอกจำนวนที่รับมา</span>
-          <span style="font-size:0.75rem;color:var(--txl);font-weight:400">* กรอก 0 หมายถึงยังไม่ได้รับชำระ</span>
+          <span><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M17 3a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>️ กรอกจำนวนที่รับมา</span>
+          <span style="font-size:0.75rem;color:#718096;font-weight:400">* กรอก 0 หมายถึงยังไม่ได้รับชำระ</span>
         </div>
         <div id="selectedTableWrap">
           <div class="empty-state">
-            <div class="empty-icon"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 12h11M9 12l4-4M9 12l4 4"/></svg></div>
+            <div class="empty-icon"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><line x1="20" y1="12" x2="4" y2="12"/><polyline points="10 6 4 12 10 18"/></svg></div>
             <div class="empty-text">เลือกล็อคจากรายการด้านซ้ายก่อน<br>สามารถเลือกได้พร้อมกันหลายล็อค</div>
           </div>
         </div>
@@ -388,25 +370,25 @@ select.filter-select:focus { border-color: #ea580c; }
 
       <!-- OPTIONS -->
       <div class="options-box">
-        <div class="options-title"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M12 3v2.2M12 18.8V21M4.2 12H2M22 12h-2.2M5.8 5.8l1.5 1.5M16.7 16.7l1.5 1.5M18.2 5.8l-1.5 1.5M7.3 16.7l-1.5 1.5"/></svg>️ ตั้งค่าการบันทึก</div>
+        <div class="options-title"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .34 1.87l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.7 1.7 0 0 0-1.87-.34 1.7 1.7 0 0 0-1.04 1.56V21a2 2 0 0 1-4 0v-.09A1.7 1.7 0 0 0 9 19.37a1.7 1.7 0 0 0-1.87.34l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.7 1.7 0 0 0 4.63 15a1.7 1.7 0 0 0-1.56-1.04H3a2 2 0 0 1 0-4h.09A1.7 1.7 0 0 0 4.63 9a1.7 1.7 0 0 0-.34-1.87l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.7 1.7 0 0 0 9 4.63a1.7 1.7 0 0 0 1.04-1.56V3a2 2 0 0 1 4 0v.09a1.7 1.7 0 0 0 1.04 1.56 1.7 1.7 0 0 0 1.87-.34l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.7 1.7 0 0 0 19.37 9a1.7 1.7 0 0 0 1.56 1.04H21a2 2 0 0 1 0 4h-.09A1.7 1.7 0 0 0 19.4 15Z"/></svg>️ ตั้งค่าการบันทึก</div>
         <div class="option-row">
-          <span class="option-label" id="methodLabel">ช่องทางชำระ</span>
-          <div style="display:flex;gap:8px;flex-wrap:wrap" role="group" aria-labelledby="methodLabel">
-            <button class="method-btn active" onclick="setMethod(this,'เงินสด')"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2.5" y="6" width="19" height="12" rx="2"/><circle cx="12" cy="12" r="3"/><path d="M6 9v6M18 9v6"/></svg> เงินสด</button>
-            <button class="method-btn" onclick="setMethod(this,'โอนเงิน')"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="6.5" y="2.5" width="11" height="19" rx="2"/><path d="M11 19h2"/></svg> โอนเงิน</button>
-            <button class="method-btn" onclick="setMethod(this,'QR Code')"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2.5" y="7" width="19" height="13" rx="2"/><path d="M8 7l1.5-2.5h5L16 7"/><circle cx="12" cy="13.5" r="3.5"/></svg> QR Code</button>
+          <span class="option-label">ช่องทางชำระ</span>
+          <div style="display:flex;gap:8px;flex-wrap:wrap">
+            <button class="method-btn active" onclick="setMethod(this,'เงินสด')"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="12" cy="12" r="3"/></svg> เงินสด</button>
+            <button class="method-btn" onclick="setMethod(this,'โอนเงิน')"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><rect x="6" y="2" width="12" height="20" rx="2"/><line x1="11" y1="18" x2="13" y2="18"/></svg> โอนเงิน</button>
+            <button class="method-btn" onclick="setMethod(this,'QR Code')"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 8h3l2-2h6l2 2h3v11H4Z"/><circle cx="12" cy="13.5" r="3.5"/></svg> QR Code</button>
           </div>
         </div>
         <div class="option-row">
-          <label class="option-label" for="payDate">วันที่รับเงิน</label>
+          <span class="option-label">วันที่รับเงิน</span>
           <input class="form-input" type="date" id="payDate" style="max-width:200px">
         </div>
         <div class="option-row">
-          <label class="option-label" for="collector">ผู้รับเงิน</label>
+          <span class="option-label">ผู้รับเงิน</span>
           <input class="form-input" type="text" id="collector" placeholder="ชื่อพนักงานผู้เก็บเงิน" style="max-width:260px">
         </div>
         <div class="option-row">
-          <label class="option-label" for="globalNote">หมายเหตุรวม</label>
+          <span class="option-label">หมายเหตุรวม</span>
           <input class="form-input" type="text" id="globalNote" placeholder="หมายเหตุสำหรับรอบนี้ (ถ้ามี)">
         </div>
       </div>
@@ -421,10 +403,10 @@ select.filter-select:focus { border-color: #ea580c; }
         ยอดรวม <strong id="footerTotal">฿0</strong>
       </div>
       <div class="action-btns">
-        <button class="btn btn-outline" onclick="clearAll()"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 7h14M9 7V4.5h6V7M7 7l1 13.5h8L17 7"/><path d="M10 11v6M14 11v6"/></svg>️ ล้างทั้งหมด</button>
-        <button class="btn btn-outline" onclick="fillAllFull()"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="m8 12 3 3 5-6"/></svg> กรอกเต็มทุกล็อค</button>
+        <button class="btn btn-outline" onclick="clearAll()"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>️ ล้างทั้งหมด</button>
+        <button class="btn btn-outline" onclick="fillAllFull()"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg> กรอกเต็มทุกล็อค</button>
         <button class="btn btn-primary" id="saveBtn" disabled onclick="openConfirm()">
-          <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 3h13l3 3v15H4z"/><path d="M8 3v6h8V3M7 14h10v7H7z"/></svg> บันทึกการรับเงิน
+          <svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2Z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg> บันทึกการรับเงิน
         </button>
       </div>
     </div>
@@ -434,12 +416,12 @@ select.filter-select:focus { border-color: #ea580c; }
 <!-- ═══════════ CONFIRM MODAL ═══════════ -->
 <div class="modal-overlay" id="confirmModal">
   <div class="modal">
-    <div class="modal-title"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="m8 12 3 3 5-6"/></svg> ยืนยันการบันทึกรับเงิน</div>
+    <div class="modal-title"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg> ยืนยันการบันทึกรับเงิน</div>
     <div class="modal-sub">ตรวจสอบรายการก่อนกดยืนยัน</div>
     <div class="modal-receipt" id="receiptContent"></div>
     <div class="modal-btns">
       <button class="btn btn-outline" onclick="closeModal()">ยกเลิก</button>
-      <button class="btn btn-primary" onclick="confirmSave()"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="m8 12 3 3 5-6"/></svg> ยืนยันบันทึก</button>
+      <button class="btn btn-primary" onclick="confirmSave()"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg> ยืนยันบันทึก</button>
     </div>
   </div>
 </div>
@@ -448,40 +430,44 @@ select.filter-select:focus { border-color: #ea580c; }
 
 <!-- ═══════════ SCRIPT ═══════════ -->
 <script>
-// ── DARK MODE (เพิ่ม 14 ก.ค. 2569 — ใช้คีย์ localStorage มาตรฐานเดียวกันทั้งระบบ: 'pm-t') ──
-function toggleDark(){
-  const h=document.documentElement, d=h.getAttribute('data-theme')==='dark';
-  h.setAttribute('data-theme', d?'light':'dark');
-  localStorage.setItem('pm-t', d?'light':'dark');
-}
-(()=>{
-  const s=localStorage.getItem('pm-t');
-  if(s) document.documentElement.setAttribute('data-theme', s);
-  else if(window.matchMedia('(prefers-color-scheme:dark)').matches) document.documentElement.setAttribute('data-theme','dark');
-})();
-
 // ════════════════════════════════════════════════════
 // GOOGLE SHEETS API — เชื่อมกับฐานข้อมูลกลางเดียวกับทั้งระบบ
 // ════════════════════════════════════════════════════
-function getApiUrl(){return localStorage.getItem('pm-api-url')||'';}
+// ═══ AUTO-CONNECT v1.3: เชื่อมต่อ Google Sheets อัตโนมัติผ่านลิงก์ตั้งค่า (ตั้งครั้งเดียวต่อเครื่อง/เบราว์เซอร์) ═══
+// เปิดผ่านลิงก์พิเศษที่มี ?api=URL ต่อท้าย (ส่งให้พนักงานทางแชทภายใน ไม่เผยแพร่ในซอร์สโค้ดสาธารณะ)
+// ระบบจะบันทึกอัตโนมัติแล้วลบพารามิเตอร์ออกจาก URL ทันที ครั้งต่อไปไม่ต้องกดซ้ำ (อ่านจาก localStorage เหมือนเดิม)
+(function(){
+  try{
+    var p=new URLSearchParams(location.search);
+    var apiParam=p.get('api');
+    if(apiParam){
+      localStorage.setItem('pm-thu-api-url',decodeURIComponent(apiParam));
+      p.delete('api');
+      var clean=location.pathname+(p.toString()?('?'+p.toString()):'')+location.hash;
+      history.replaceState(null,'',clean);
+    }
+  }catch(e){}
+})();
+function getApiUrl(){return (localStorage.getItem('pm-thu-api-url')||localStorage.getItem('pm-api-url'))||'';}
+function getApiToken(){return (localStorage.getItem('pm-thu-api-token')||localStorage.getItem('pm-api-token'))||'';}
 async function apiPost(action,data={}){
   const url=getApiUrl(); if(!url) return null;
   try{
-    const r=await fetch(url,{method:'POST',body:JSON.stringify({action,...data})});
+    const r=await fetch(url,{method:'POST',body:JSON.stringify({action,token:getApiToken(),...data})});
     return await r.json();
   }catch(e){ console.error('apiPost error:',action,e); return null; }
 }
 async function apiGet(action,params={}){
   const url=getApiUrl(); if(!url) return null;
   try{
-    const r=await fetch(url+'?'+new URLSearchParams({action,...params}));
+    const r=await fetch(url+'?'+new URLSearchParams({action,token:getApiToken(),...params}));
     const j=await r.json();
     return j.status==='ok'?j.data:null;
   }catch(e){ console.error('apiGet error:',action,e); return null; }
 }
 function getCurrentUserName(){
   try{
-    const sess=sessionStorage.getItem('pm-session');
+    const sess=sessionStorage.getItem('pmthu-session');
     if(sess){ const u=JSON.parse(sess); return u.username||'ผู้ใช้'; }
   }catch(e){}
   return 'ผู้ใช้';
@@ -496,8 +482,9 @@ function countThursdaysInMonth(year, month){
   return count;
 }
 function thisMonthThursdays(){ const n=new Date(); return countThursdaysInMonth(n.getFullYear(), n.getMonth()); }
-function calcElecFromVendor(v){
-  return (parseInt(v.elec_bulb)||0)*10 + (parseInt(v.elec_fan)||0)*20 + (parseInt(v.elec_small)||0)*50 + (parseInt(v.elec_large)||0)*100;
+function calcElecFromVendor(v){ // ราคา/อังคาร 1 วัน — เพิ่ม elec_special ที่เดิมตกหล่น (แก้ 2026-07-17 บั๊ก #27)
+  const sp = (Array.isArray(v.elec_special)?v.elec_special:[]).reduce((s,x)=>s+(parseFloat(x.price)||0),0);
+  return (parseInt(v.elec_bulb)||0)*10 + (parseInt(v.elec_fan)||0)*20 + (parseInt(v.elec_small)||0)*50 + (parseInt(v.elec_large)||0)*100 + sp;
 }
 
 // ── DATA — โหลดจาก Google Sheets จริง (แทน mock data เดิม) ──
@@ -506,13 +493,13 @@ let ALL_LOCKS = [];
 async function loadLocksFromSheets(){
   const wrap=document.getElementById('lockList');
   if(!getApiUrl()){
-    if(wrap) wrap.innerHTML='<div class="empty-state"><div class="empty-icon">⚠️</div><div class="empty-text">ยังไม่ได้เชื่อมต่อ Google Sheets<br>กรุณาตั้งค่าที่หน้าหลักก่อนใช้งานหน้านี้</div></div>';
+    if(wrap) wrap.innerHTML='<div class="empty-state"><div class="empty-icon"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0Z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></div><div class="empty-text">ยังไม่ได้เชื่อมต่อ Google Sheets<br>กรุณาตั้งค่าที่หน้าหลักก่อนใช้งานหน้านี้</div></div>';
     return;
   }
   if(wrap) wrap.innerHTML='<div class="empty-state"><div class="empty-icon">⏳</div><div class="empty-text">กำลังโหลดข้อมูลผู้ค้าจาก Google Sheets...</div></div>';
   const vendors = await apiGet('getVendors');
   if(!Array.isArray(vendors)){
-    if(wrap) wrap.innerHTML='<div class="empty-state"><div class="empty-icon">❌</div><div class="empty-text">โหลดข้อมูลผู้ค้าไม่สำเร็จ<br>ตรวจสอบการเชื่อมต่อ Google Sheets</div></div>';
+    if(wrap) wrap.innerHTML='<div class="empty-state"><div class="empty-icon"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg></div><div class="empty-text">โหลดข้อมูลผู้ค้าไม่สำเร็จ<br>ตรวจสอบการเชื่อมต่อ Google Sheets</div></div>';
     return;
   }
   const tuesdays = thisMonthThursdays();
@@ -523,7 +510,7 @@ async function loadLocksFromSheets(){
     vendor: v.name || '(ยังไม่ระบุชื่อ)',
     status: v.status==='unpaid' ? 'unpaid' : 'paid', // ใช้สถานะจาก Sheets เป็นจุดเริ่มต้น
     due: Math.round((parseFloat(v.dailyRate)||0) * tuesdays),
-    electric: calcElecFromVendor(v),
+    electric: Math.round(calcElecFromVendor(v) * tuesdays), // ค่าไฟรายเดือน = ราคา/อังคาร × จำนวนอังคาร (บั๊ก #27)
   }));
   filteredLocks=[...ALL_LOCKS];
   renderLockList();
@@ -569,7 +556,7 @@ function renderLockList() {
     const selectedClass = selectedIds.has(l.id) ? 'selected' : '';
 
     return `<div class="lock-item ${itemClass[l.status]} ${selectedClass}" id="item-${l.id}" onclick="toggleLock('${l.id}')">
-      <input type="checkbox" ${checked} aria-label="เลือกล็อค ${l.id}" onclick="event.stopPropagation();toggleLock('${l.id}')">
+      <input type="checkbox" ${checked} onclick="event.stopPropagation();toggleLock('${l.id}')">
       <div class="lock-info">
         <div class="lock-id">${l.id}</div>
         <div class="lock-product">${l.product}</div>
@@ -583,7 +570,7 @@ function renderLockList() {
     </div>`;
   }).join('');
 
-  document.getElementById('lockList').innerHTML = html || '<div class="empty-state"><div class="empty-icon">🔍</div><div class="empty-text">ไม่พบล็อคที่ตรงกัน</div></div>';
+  document.getElementById('lockList').innerHTML = html || '<div class="empty-state"><div class="empty-icon"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></div><div class="empty-text">ไม่พบล็อคที่ตรงกัน</div></div>';
   updateCheckAll();
 }
 
@@ -641,7 +628,7 @@ function renderTable() {
   if (selected.length === 0) {
     document.getElementById('selectedTableWrap').innerHTML = `
       <div class="empty-state">
-        <div class="empty-icon">👈</div>
+        <div class="empty-icon"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><line x1="20" y1="12" x2="4" y2="12"/><polyline points="10 6 4 12 10 18"/></svg></div>
         <div class="empty-text">เลือกล็อคจากรายการด้านซ้ายก่อน<br>สามารถเลือกได้พร้อมกันหลายล็อค</div>
       </div>`;
     return;
@@ -670,32 +657,32 @@ function renderTable() {
       <td style="text-align:right">฿${l.due.toLocaleString()}</td>
       <td style="text-align:right">${l.electric ? '฿'+l.electric : '—'}</td>
       <td style="text-align:right">
-        <input type="number" placeholder="0" value="${penalty||''}" min="0" aria-label="ค่าปรับล็อค ${l.id}"
+        <input type="number" placeholder="0" value="${penalty||''}" min="0"
           style="width:72px;padding:4px 7px;border:1.5px solid #fbd38d;border-radius:6px;font-size:.78rem;text-align:right;background:#fffaf0;display:block;margin-left:auto"
           oninput="setPenalty('${l.id}',this.value)">
       </td>
       <td style="text-align:right">
-        <input type="number" placeholder="0" value="${other||''}" min="0" aria-label="ค่าใช้จ่ายอื่นล็อค ${l.id}"
+        <input type="number" placeholder="0" value="${other||''}" min="0"
           style="width:72px;padding:4px 7px;border:1.5px solid #bee3f8;border-radius:6px;font-size:.78rem;text-align:right;background:#ebf8ff;display:block;margin-left:auto"
           oninput="setOther('${l.id}',this.value)">
       </td>
       <td>
-        <input type="text" placeholder="ระบุ..." value="${otherLbl}" aria-label="ระบุรายการค่าใช้จ่ายอื่นล็อค ${l.id}"
+        <input type="text" placeholder="ระบุ..." value="${otherLbl}"
           style="width:100%;padding:4px 7px;border:1.5px solid #bee3f8;border-radius:6px;font-size:.72rem;background:#ebf8ff"
           oninput="setOtherLabel('${l.id}',this.value)">
       </td>
       <td style="text-align:right;font-weight:800;color:${penalty||other?'#c05621':'inherit'}">฿${totalDue.toLocaleString()}</td>
       <td style="text-align:right">
-        <input class="input-amount ${amtClass}" type="number" value="${amt}" min="0" aria-label="จำนวนเงินที่รับล็อค ${l.id}"
+        <input class="input-amount ${amtClass}" type="number" value="${amt}" min="0"
           style="width:90px;text-align:right"
           oninput="setAmount('${l.id}', this.value)">
       </td>
       <td>
-        <input class="note-input" type="text" value="${note}" placeholder="หมายเหตุ..." aria-label="หมายเหตุล็อค ${l.id}"
+        <input class="note-input" type="text" value="${note}" placeholder="หมายเหตุ..."
           oninput="setNote('${l.id}', this.value)" style="width:85px">
       </td>
       <td>
-        <button class="remove-btn" onclick="removeLock('${l.id}')" title="ลบออก" aria-label="ลบล็อค ${l.id} ออกจากรายการ">✕</button>
+        <button class="remove-btn" onclick="removeLock('${l.id}')" title="ลบออก"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
       </td>
     </tr>`;
   }).join('');
@@ -708,9 +695,9 @@ function renderTable() {
           <th style="min-width:90px">สินค้า</th>
           <th style="text-align:right;min-width:72px">ค่าเช่า</th>
           <th style="text-align:right;min-width:58px">ค่าไฟ</th>
-          <th style="text-align:right;min-width:80px">⚠️ ค่าปรับ (฿)</th>
-          <th style="text-align:right;min-width:80px">📌 ค่าอื่น (฿)</th>
-          <th style="min-width:90px">📌 ระบุรายการ</th>
+          <th style="text-align:right;min-width:80px"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0Z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg> ค่าปรับ (฿)</th>
+          <th style="text-align:right;min-width:80px"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2a5 5 0 0 0-5 5c0 3 2 4.6 3.5 8.2L12 22l1.5-6.8C15 11.6 17 10 17 7a5 5 0 0 0-5-5Z"/><circle cx="12" cy="7" r="1.6" fill="currentColor" stroke="none"/></svg> ค่าอื่น (฿)</th>
+          <th style="min-width:90px"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2a5 5 0 0 0-5 5c0 3 2 4.6 3.5 8.2L12 22l1.5-6.8C15 11.6 17 10 17 7a5 5 0 0 0-5-5Z"/><circle cx="12" cy="7" r="1.6" fill="currentColor" stroke="none"/></svg> ระบุรายการ</th>
           <th style="text-align:right;min-width:88px">รวมที่ต้องชำระ</th>
           <th style="text-align:right;min-width:96px">จำนวนที่รับ (฿)</th>
           <th style="min-width:85px">หมายเหตุ</th>
@@ -820,12 +807,12 @@ function openConfirm() {
     <div class="receipt-row"><span class="modal-label">จำนวนล็อคที่บันทึก</span><span>${paid.length} ล็อค</span></div>`;
 
   if (zero.length > 0) {
-    html += `<div class="receipt-row" style="color:#dd6b20"><span class="modal-label">⚠️ ยอด 0 (ข้าม)</span><span>${zero.map(l => l.id).join(', ')}</span></div>`;
+    html += `<div class="receipt-row" style="color:#dd6b20"><span class="modal-label"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0Z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg> ยอด 0 (ข้าม)</span><span>${zero.map(l => l.id).join(', ')}</span></div>`;
   }
 
   const top5 = paid.slice(0, 5).map(l => `<div class="receipt-row"><span>${l.id} ${l.product}</span><span>฿${(parseFloat(payAmounts[l.id])||0).toLocaleString()}</span></div>`).join('');
   html += top5;
-  if (paid.length > 5) html += `<div class="receipt-row"><span style="color:var(--txl)">...และอีก ${paid.length - 5} ล็อค</span><span></span></div>`;
+  if (paid.length > 5) html += `<div class="receipt-row"><span style="color:#718096">...และอีก ${paid.length - 5} ล็อค</span><span></span></div>`;
   html += `<div class="receipt-row"><span>ยอดรวมทั้งหมด</span><span>฿${totalPaid.toLocaleString()}</span></div>`;
 
   document.getElementById('receiptContent').innerHTML = html;
@@ -839,7 +826,7 @@ function closeModal() {
 async function confirmSave() {
   closeModal();
   if(!getApiUrl()){
-    showToast('⚠️ ยังไม่ได้เชื่อมต่อ Google Sheets — บันทึกไม่สำเร็จ');
+    showToast('<svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0Z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg> ยังไม่ได้เชื่อมต่อ Google Sheets — บันทึกไม่สำเร็จ');
     return;
   }
   const selected = ALL_LOCKS.filter(l => selectedIds.has(l.id) && (parseFloat(payAmounts[l.id]) || 0) > 0);
@@ -876,12 +863,12 @@ async function confirmSave() {
     }
   }
 
-  if(saveBtn){ saveBtn.disabled=false; saveBtn.textContent='💾 บันทึกการรับชำระ'; }
+  if(saveBtn){ saveBtn.disabled=false; saveBtn.innerHTML='<svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2Z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg> บันทึกการรับชำระ'; }
 
   if(failCount===0){
-    showToast(`✅ บันทึกสำเร็จ ${okCount} ล็อค · รวม ฿${total.toLocaleString()}`);
+    showToast(`<svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg> บันทึกสำเร็จ ${okCount} ล็อค · รวม ฿${total.toLocaleString()}`);
   } else {
-    showToast(`⚠️ บันทึกสำเร็จ ${okCount} ล็อค · ล้มเหลว ${failCount} ล็อค กรุณาตรวจสอบ`);
+    showToast(`<svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0Z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg> บันทึกสำเร็จ ${okCount} ล็อค · ล้มเหลว ${failCount} ล็อค กรุณาตรวจสอบ`);
   }
   clearAll();
   renderLockList();
@@ -891,7 +878,7 @@ function filterChanged() { renderLockList(); }
 
 function showToast(msg) {
   const t = document.getElementById('toast');
-  t.textContent = msg;
+  t.innerHTML = msg;
   t.classList.add('show');
   setTimeout(() => t.classList.remove('show'), 3500);
 }

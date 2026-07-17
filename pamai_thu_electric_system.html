@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ระบบค่าไฟฟ้า — แพไม้มินิ วันพฤหัสบดี</title>
-<style>a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible,[tabindex]:focus-visible,.lk:focus-visible,.zone-tab:focus-visible{outline:2.5px solid var(--green-m) !important;outline-offset:2px;}.ico{width:1em;height:1em;display:inline-block;vertical-align:-0.15em;flex-shrink:0}
+<title>ระบบค่าไฟฟ้า — แพไม้มินิ</title>
+<style>
 :root {
   --green:      #c2410c;
   --green-m:    #ea580c;
@@ -31,7 +31,7 @@
 
   --text-hi:    #0f172a;
   --text-md:    #475569;
-  --text-lo:    #5b6b82;
+  --text-lo:    #94a3b8;
   --text-inv:   #ffffff;
 
   --shadow-sm:  0 1px 3px rgba(0,0,0,.06);
@@ -51,7 +51,7 @@
   --border2:    #484f58;
   --text-hi:    #e6edf3;
   --text-md:    #8b949e;
-  --text-lo:    #7d8590;
+  --text-lo:    #484f58;
   --green-l:    #132a1d;
   --green-ll:   #0d1f14;
   --yellow-l:   #2d2000;
@@ -346,6 +346,9 @@ body {
 
 @media (max-width:900px) { .two-col { grid-template-columns: 1fr; } .kpi-row { grid-template-columns: repeat(2,1fr); } }
 @media (max-width:520px) { .elec-types { grid-template-columns: repeat(2,1fr); } }
+
+.ic{width:1em;height:1em;vertical-align:-.15em;display:inline-block;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0}
+.ic-dot{stroke:none}
 </style>
 </head>
 <body>
@@ -353,20 +356,20 @@ body {
 <!-- TOPBAR -->
 <div class="topbar">
   <div>
-    <h1><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2 4 14h6l-1 8 9-13h-6l1-7z"/></svg> ระบบค่าไฟฟ้า — แพไม้มินิ วันพฤหัสบดี</h1>
+    <h1><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><polygon points="13 2 3 14 11 14 10 22 21 10 13 10 13 2"/></svg> ระบบค่าไฟฟ้า — แพไม้มินิ</h1>
     <p>Electric Utility Management · คำนวณรวมค่าล็อคประจำเดือน</p>
   </div>
   <div class="topbar-right">
-    <button class="dm-btn" onclick="toggleDark()" title="Dark/Light mode" aria-label="สลับโหมดมืด/สว่าง"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 3a9 9 0 0 0 0 18z" fill="currentColor" stroke="none"/></svg></button>
+    <button class="dm-btn" onclick="toggleDark()" aria-label="สลับโหมดมืด/สว่าง" title="Dark/Light mode"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3a9 9 0 1 0 0 18Z" fill="currentColor" stroke="none"/><circle cx="12" cy="12" r="9"/></svg></button>
   </div>
 </div>
 
 <!-- TABS -->
 <div class="main-tabs">
-  <button class="tab-btn active" onclick="showTab('tab-vendors',this)"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="4" width="12" height="17" rx="2"/><rect x="9" y="2.5" width="6" height="3" rx="1"/><path d="M9 11h6M9 15h6"/></svg> รายชื่อผู้ค้า + ค่าไฟ</button>
-  <button class="tab-btn" onclick="showTab('tab-update',this)"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h4L19.5 8.5a2.1 2.1 0 0 0-3-3L5.5 16 4 20z"/><path d="M14.5 6.5l3 3"/></svg>️ แก้ไขค่าไฟรายล็อค</button>
-  <button class="tab-btn" onclick="showTab('tab-billing',this)"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v10M9.5 9.2c0-1.2 1.1-2.2 2.5-2.2s2.5.9 2.5 2c0 2.8-5 1.6-5 4.3 0 1.1 1.1 2 2.5 2s2.5-.9 2.5-2"/></svg> สรุปบิลประจำเดือน</button>
-  <button class="tab-btn" onclick="showTab('tab-history',this)"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20V10M11 20V4M18 20v-7"/><path d="M2.5 20h19"/></svg> ประวัติค่าไฟ</button>
+  <button class="tab-btn active" onclick="showTab('tab-vendors',this)"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="4" width="16" height="18" rx="2"/><path d="M9 3h6a1 1 0 0 1 1 1v1H8V4a1 1 0 0 1 1-1Z"/></svg> รายชื่อผู้ค้า + ค่าไฟ</button>
+  <button class="tab-btn" onclick="showTab('tab-update',this)"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M17 3a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>️ แก้ไขค่าไฟรายล็อค</button>
+  <button class="tab-btn" onclick="showTab('tab-billing',this)"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M9.5 9.5c0-1.1 1.1-2 2.5-2s2.5.9 2.5 2-1.1 1.6-2.5 2-2.5.9-2.5 2 1.1 2 2.5 2 2.5-.9 2.5-2"/></svg> สรุปบิลประจำเดือน</button>
+  <button class="tab-btn" onclick="showTab('tab-history',this)"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><line x1="6" y1="20" x2="6" y2="12"/><line x1="12" y1="20" x2="12" y2="6"/><line x1="18" y1="20" x2="18" y2="15"/></svg> ประวัติค่าไฟ</button>
 </div>
 
 <!-- ═══════════════════ TAB 1: VENDORS ═══════════════════ -->
@@ -393,13 +396,14 @@ body {
   </div>
 
   <div class="card">
-    <div class="card-title"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="4" width="12" height="17" rx="2"/><rect x="9" y="2.5" width="6" height="3" rx="1"/><path d="M9 11h6M9 15h6"/></svg> รายชื่อผู้ค้าพร้อมค่าไฟฟ้า
-      <span><button class="btn btn-primary" style="padding:6px 14px;font-size:.74rem" onclick="openAddModal()"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg> เพิ่มผู้ค้า</button></span>
+    <div class="card-title"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="4" width="16" height="18" rx="2"/><path d="M9 3h6a1 1 0 0 1 1 1v1H8V4a1 1 0 0 1 1-1Z"/></svg> รายชื่อผู้ค้าพร้อมค่าไฟฟ้า
+      <span><button class="btn btn-primary" style="padding:6px 14px;font-size:.74rem" onclick="openAddModal()"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg> เพิ่มผู้ค้า</button></span>
     </div>
     <div class="search-row">
-      <input class="search-input" id="searchInput" aria-label="ค้นหาชื่อร้าน / ล็อค / สินค้า" placeholder="🔍 ค้นหาชื่อร้าน / ล็อค / สินค้า..." oninput="renderTable()">
-      <select class="filter-sel" id="zoneFilter" aria-label="กรองโซน" onchange="renderTable()">
+      <input class="search-input" id="searchInput" placeholder="🔍 ค้นหาชื่อร้าน / ล็อค / สินค้า..." oninput="renderTable()">
+      <select class="filter-sel" id="zoneFilter" onchange="renderTable()">
         <option value="">ทุกโซน</option>
+<!--== MARKET_BLOCK:ZONE_OPT ==-->
         <option value="A">A</option><option value="B">B</option><option value="C">C</option>
         <option value="D">D</option><option value="E">E</option><option value="F">F</option>
         <option value="G">G</option><option value="J">J</option><option value="K">K</option>
@@ -407,8 +411,9 @@ body {
         <option value="O">O</option><option value="M">M</option><option value="H">H</option>
         <option value="L">L</option><option value="T">T</option><option value="AB">AB</option>
         <option value="TA">TA</option><option value="TB">TB</option><option value="TC">TC</option>
+<!--== END_MARKET_BLOCK ==-->
       </select>
-      <select class="filter-sel" id="statusFilter" aria-label="กรองสถานะ" onchange="renderTable()">
+      <select class="filter-sel" id="statusFilter" onchange="renderTable()">
         <option value="">ทุกสถานะ</option>
         <option value="paid">ชำระแล้ว</option>
         <option value="unpaid">ค้างชำระ</option>
@@ -439,12 +444,12 @@ body {
   <div class="two-col">
     <div>
       <div class="card">
-        <div class="card-title"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2 4 14h6l-1 8 9-13h-6l1-7z"/></svg> แก้ไขอุปกรณ์ไฟฟ้าประจำล็อค</div>
+        <div class="card-title"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><polygon points="13 2 3 14 11 14 10 22 21 10 13 10 13 2"/></svg> แก้ไขอุปกรณ์ไฟฟ้าประจำล็อค</div>
         <div class="field-row-2">
           <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px">
             <div>
-              <label for="editLockSel" style="font-size:.72rem;font-weight:700;color:var(--text-lo);text-transform:uppercase;letter-spacing:.4px;display:block;margin-bottom:5px">เลือกล็อค <span style="color:var(--red)">*</span></label>
-              <select id="editLockSel" aria-label="เลือกล็อค" class="filter-sel" style="width:100%;padding:9px 12px;font-size:.84rem" onchange="loadLockElec()">
+              <label style="font-size:.72rem;font-weight:700;color:var(--text-lo);text-transform:uppercase;letter-spacing:.4px;display:block;margin-bottom:5px">เลือกล็อค <span style="color:var(--red)">*</span></label>
+              <select id="editLockSel" class="filter-sel" style="width:100%;padding:9px 12px;font-size:.84rem" onchange="loadLockElec()">
                 <option value="">-- เลือกล็อค --</option>
               </select>
             </div>
@@ -459,11 +464,11 @@ body {
         <div class="section-div"><span>ประเภทอุปกรณ์ไฟฟ้า</span></div>
 
         <div class="elec-icon-legend">
-          <div class="eil"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18h6M10 21h4"/><path d="M12 3a6 6 0 0 0-3.5 10.9c.6.5 1 1.2 1 2.1h5c0-.9.4-1.6 1-2.1A6 6 0 0 0 12 3z"/></svg> = หลอดไฟ ฿10/ดวง</div>
-          <div class="eil"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><g><ellipse cx="12" cy="7.3" rx="2.6" ry="4" transform="rotate(0 12 12)"/><ellipse cx="12" cy="7.3" rx="2.6" ry="4" transform="rotate(120 12 12)"/><ellipse cx="12" cy="7.3" rx="2.6" ry="4" transform="rotate(240 12 12)"/><circle cx="12" cy="12" r="1.5" fill="currentColor" stroke="none"/></g></svg> = พัดลม ฿20/ตัว</div>
-          <div class="eil"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 2v6M15 2v6M7 8h10v4a5 5 0 0 1-10 0V8z"/><path d="M12 17v5"/></svg> = อุปกรณ์เล็ก ฿50/ชิ้น</div>
-          <div class="eil"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M12 3v2.2M12 18.8V21M4.2 12H2M22 12h-2.2M5.8 5.8l1.5 1.5M16.7 16.7l1.5 1.5M18.2 5.8l-1.5 1.5M7.3 16.7l-1.5 1.5"/></svg>️ = อุปกรณ์ใหญ่ ฿100/ชิ้น</div>
-          <div class="eil">⭐ = พิเศษ (ระบุราคา)</div>
+          <div class="eil"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 18h6"/><path d="M10 22h4"/><path d="M12 2a7 7 0 0 0-4 12.7c.5.4.8 1 .8 1.6V17h6.4v-.7c0-.6.3-1.2.8-1.6A7 7 0 0 0 12 2Z"/></svg> = หลอดไฟ ฿10/ดวง</div>
+          <div class="eil"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3a9 9 0 1 0 9 9"/><path d="M12 7a5 5 0 1 0 5 5"/></svg> = พัดลม ฿20/ตัว</div>
+          <div class="eil"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2v6"/><path d="M8 8h8v4a4 4 0 0 1-8 0V8Z"/><line x1="9" y1="18" x2="9" y2="22"/><line x1="15" y1="18" x2="15" y2="22"/></svg> = อุปกรณ์เล็ก ฿50/ชิ้น</div>
+          <div class="eil"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .34 1.87l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.7 1.7 0 0 0-1.87-.34 1.7 1.7 0 0 0-1.04 1.56V21a2 2 0 0 1-4 0v-.09A1.7 1.7 0 0 0 9 19.37a1.7 1.7 0 0 0-1.87.34l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.7 1.7 0 0 0 4.63 15a1.7 1.7 0 0 0-1.56-1.04H3a2 2 0 0 1 0-4h.09A1.7 1.7 0 0 0 4.63 9a1.7 1.7 0 0 0-.34-1.87l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.7 1.7 0 0 0 9 4.63a1.7 1.7 0 0 0 1.04-1.56V3a2 2 0 0 1 4 0v.09a1.7 1.7 0 0 0 1.04 1.56 1.7 1.7 0 0 0 1.87-.34l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.7 1.7 0 0 0 19.37 9a1.7 1.7 0 0 0 1.56 1.04H21a2 2 0 0 1 0 4h-.09A1.7 1.7 0 0 0 19.4 15Z"/></svg>️ = อุปกรณ์ใหญ่ ฿100/ชิ้น</div>
+          <div class="eil"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><polygon points="12 2 15 9 22 9.3 16.5 14 18.2 21 12 17.3 5.8 21 7.5 14 2 9.3 9 9"/></svg> = พิเศษ (ระบุราคา)</div>
         </div>
 
         <div class="elec-types" id="elecTypeCards"></div>
@@ -472,11 +477,11 @@ body {
         <div class="section-div"><span>อุปกรณ์พิเศษ (ระบุราคาเอง)</span></div>
         <div id="specialItems"></div>
         <button class="btn btn-secondary" style="width:100%;margin-bottom:14px;border-style:dashed" onclick="addSpecialItem()">
-          ⭐ เพิ่มอุปกรณ์พิเศษ
+          <svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><polygon points="12 2 15 9 22 9.3 16.5 14 18.2 21 12 17.3 5.8 21 7.5 14 2 9.3 9 9"/></svg> เพิ่มอุปกรณ์พิเศษ
         </button>
 
         <button class="btn btn-primary" style="width:100%" onclick="saveElectric()">
-          <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 3h13l3 3v15H4z"/><path d="M8 3v6h8V3M7 14h10v7H7z"/></svg> บันทึกค่าไฟประจำล็อค
+          <svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2Z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg> บันทึกค่าไฟประจำล็อค
         </button>
       </div>
     </div>
@@ -490,7 +495,7 @@ body {
       </div>
 
       <div class="card">
-        <div class="card-title"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2.5h12v19l-2-1.5-2 1.5-2-1.5-2 1.5-2-1.5-2 1.5v-19z"/><path d="M9 7h6M9 11h6M9 15h4"/></svg> ตัวอย่างบิลประจำเดือน</div>
+        <div class="card-title"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 2h12v20l-3-2-3 2-3-2-3 2Z"/><line x1="9" y1="7" x2="15" y2="7"/><line x1="9" y1="11" x2="15" y2="11"/></svg> ตัวอย่างบิลประจำเดือน</div>
         <div class="bill-preview" id="billPreview">
           <div class="bp-title">บิลรวมประจำเดือน</div>
           <div style="color:var(--text-lo);font-size:.78rem;text-align:center">เลือกล็อคเพื่อดูตัวอย่าง</div>
@@ -498,14 +503,14 @@ body {
       </div>
 
       <div class="card">
-        <div class="card-title"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20V10M11 20V4M18 20v-7"/><path d="M2.5 20h19"/></svg> อัตราค่าไฟอ้างอิง</div>
+        <div class="card-title"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><line x1="6" y1="20" x2="6" y2="12"/><line x1="12" y1="20" x2="12" y2="6"/><line x1="18" y1="20" x2="18" y2="15"/></svg> อัตราค่าไฟอ้างอิง</div>
         <table class="history-table">
           <tr><th>ประเภท</th><th>ราคา/ชิ้น</th></tr>
-          <tr><td><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18h6M10 21h4"/><path d="M12 3a6 6 0 0 0-3.5 10.9c.6.5 1 1.2 1 2.1h5c0-.9.4-1.6 1-2.1A6 6 0 0 0 12 3z"/></svg> หลอดไฟ</td><td style="font-weight:700;color:var(--yellow)">฿10</td></tr>
-          <tr><td><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><g><ellipse cx="12" cy="7.3" rx="2.6" ry="4" transform="rotate(0 12 12)"/><ellipse cx="12" cy="7.3" rx="2.6" ry="4" transform="rotate(120 12 12)"/><ellipse cx="12" cy="7.3" rx="2.6" ry="4" transform="rotate(240 12 12)"/><circle cx="12" cy="12" r="1.5" fill="currentColor" stroke="none"/></g></svg> พัดลม</td><td style="font-weight:700;color:var(--blue)">฿20</td></tr>
-          <tr><td><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 2v6M15 2v6M7 8h10v4a5 5 0 0 1-10 0V8z"/><path d="M12 17v5"/></svg> เครื่องเล็ก</td><td style="font-weight:700;color:var(--orange)">฿50</td></tr>
-          <tr><td><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M12 3v2.2M12 18.8V21M4.2 12H2M22 12h-2.2M5.8 5.8l1.5 1.5M16.7 16.7l1.5 1.5M18.2 5.8l-1.5 1.5M7.3 16.7l-1.5 1.5"/></svg>️ เครื่องใหญ่</td><td style="font-weight:700;color:var(--purple)">฿100</td></tr>
-          <tr><td>⭐ พิเศษ</td><td style="font-weight:700;color:var(--green-m)">ระบุเอง</td></tr>
+          <tr><td><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 18h6"/><path d="M10 22h4"/><path d="M12 2a7 7 0 0 0-4 12.7c.5.4.8 1 .8 1.6V17h6.4v-.7c0-.6.3-1.2.8-1.6A7 7 0 0 0 12 2Z"/></svg> หลอดไฟ</td><td style="font-weight:700;color:var(--yellow)">฿10</td></tr>
+          <tr><td><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3a9 9 0 1 0 9 9"/><path d="M12 7a5 5 0 1 0 5 5"/></svg> พัดลม</td><td style="font-weight:700;color:var(--blue)">฿20</td></tr>
+          <tr><td><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2v6"/><path d="M8 8h8v4a4 4 0 0 1-8 0V8Z"/><line x1="9" y1="18" x2="9" y2="22"/><line x1="15" y1="18" x2="15" y2="22"/></svg> เครื่องเล็ก</td><td style="font-weight:700;color:var(--orange)">฿50</td></tr>
+          <tr><td><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .34 1.87l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.7 1.7 0 0 0-1.87-.34 1.7 1.7 0 0 0-1.04 1.56V21a2 2 0 0 1-4 0v-.09A1.7 1.7 0 0 0 9 19.37a1.7 1.7 0 0 0-1.87.34l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.7 1.7 0 0 0 4.63 15a1.7 1.7 0 0 0-1.56-1.04H3a2 2 0 0 1 0-4h.09A1.7 1.7 0 0 0 4.63 9a1.7 1.7 0 0 0-.34-1.87l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.7 1.7 0 0 0 9 4.63a1.7 1.7 0 0 0 1.04-1.56V3a2 2 0 0 1 4 0v.09a1.7 1.7 0 0 0 1.04 1.56 1.7 1.7 0 0 0 1.87-.34l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.7 1.7 0 0 0 19.37 9a1.7 1.7 0 0 0 1.56 1.04H21a2 2 0 0 1 0 4h-.09A1.7 1.7 0 0 0 19.4 15Z"/></svg>️ เครื่องใหญ่</td><td style="font-weight:700;color:var(--purple)">฿100</td></tr>
+          <tr><td><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><polygon points="12 2 15 9 22 9.3 16.5 14 18.2 21 12 17.3 5.8 21 7.5 14 2 9.3 9 9"/></svg> พิเศษ</td><td style="font-weight:700;color:var(--green-m)">ระบุเอง</td></tr>
         </table>
       </div>
     </div>
@@ -515,9 +520,13 @@ body {
 <!-- ═══════════════════ TAB 3: BILLING ═══════════════════ -->
 <div id="tab-billing" class="page">
   <div class="month-bar">
-    <div class="month-select" id="billMonth" style="display:flex;align-items:center;font-weight:700"></div>
+    <select class="month-select" id="billMonth" onchange="renderBilling()">
+      <option value="2568-06">มิถุนายน 2568</option>
+      <option value="2568-07" selected>กรกฎาคม 2568</option>
+      <option value="2568-08">สิงหาคม 2568</option>
+    </select>
     <div class="zone-filter-row" id="zoneFilterBill"></div>
-    <button class="btn btn-primary" style="margin-left:auto;padding:7px 16px;font-size:.78rem" onclick="exportBill()"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 4h12v10M4 14h5l1.5 2h3L15 14h5v6H4z"/></svg> Export Excel</button>
+    <button class="btn btn-primary" style="margin-left:auto;padding:7px 16px;font-size:.78rem" onclick="exportBill()"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> Export Excel</button>
   </div>
 
   <div class="kpi-row">
@@ -528,7 +537,7 @@ body {
   </div>
 
   <div class="card">
-    <div class="card-title"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v10M9.5 9.2c0-1.2 1.1-2.2 2.5-2.2s2.5.9 2.5 2c0 2.8-5 1.6-5 4.3 0 1.1 1.1 2 2.5 2s2.5-.9 2.5-2"/></svg> บิลรวมค่าเช่า + ค่าไฟ ประจำเดือน
+    <div class="card-title"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M9.5 9.5c0-1.1 1.1-2 2.5-2s2.5.9 2.5 2-1.1 1.6-2.5 2-2.5.9-2.5 2 1.1 2 2.5 2 2.5-.9 2.5-2"/></svg> บิลรวมค่าเช่า + ค่าไฟ ประจำเดือน
       <span style="font-size:.72rem;color:var(--text-lo);font-weight:400">ค่าไฟฟ้ารวมอยู่ในยอดเรียกเก็บเดียวกัน</span>
     </div>
     <div style="overflow-x:auto">
@@ -553,12 +562,12 @@ body {
 <!-- ═══════════════════ TAB 4: HISTORY ═══════════════════ -->
 <div id="tab-history" class="page">
   <div class="card">
-    <div class="card-title"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20V10M11 20V4M18 20v-7"/><path d="M2.5 20h19"/></svg> ประวัติค่าไฟฟ้ารายล็อค</div>
+    <div class="card-title"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><line x1="6" y1="20" x2="6" y2="12"/><line x1="12" y1="20" x2="12" y2="6"/><line x1="18" y1="20" x2="18" y2="15"/></svg> ประวัติค่าไฟฟ้ารายล็อค</div>
     <div class="search-row">
-      <select class="filter-sel" id="histLockSel" aria-label="เลือกล็อคดูประวัติ" onchange="renderHistory()" style="min-width:130px">
+      <select class="filter-sel" id="histLockSel" onchange="renderHistory()" style="min-width:130px">
         <option value="">ทุกล็อค</option>
       </select>
-      <select class="filter-sel" id="histMonths" aria-label="เลือกช่วงเดือน" onchange="renderHistory()">
+      <select class="filter-sel" id="histMonths" onchange="renderHistory()">
         <option value="3">3 เดือนล่าสุด</option>
         <option value="6">6 เดือนล่าสุด</option>
         <option value="12">12 เดือนล่าสุด</option>
@@ -578,13 +587,13 @@ body {
 <!-- ═══════ MODAL: EDIT VENDOR ELEC (from table) ═══════ -->
 <div class="overlay" id="editModal">
   <div class="modal">
-    <button class="modal-close" onclick="closeModal('editModal')" aria-label="ปิดหน้าต่าง"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 5l14 14M19 5 5 19"/></svg></button>
+    <button class="modal-close" onclick="closeModal('editModal')" aria-label="ปิดหน้าต่าง"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
     <div class="modal-title" id="editModalTitle">แก้ไขค่าไฟ</div>
     <div class="modal-sub" id="editModalSub">ปรับอุปกรณ์ไฟฟ้าสำหรับล็อคนี้</div>
     <div id="editModalContent"></div>
     <div class="modal-btns">
-      <button class="btn btn-secondary" onclick="closeModal('editModal')">ยกเลิก</button>
-      <button class="btn btn-primary" onclick="saveFromModal()"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 3h13l3 3v15H4z"/><path d="M8 3v6h8V3M7 14h10v7H7z"/></svg> บันทึก</button>
+      <button class="btn btn-secondary" onclick="closeModal('editModal')" aria-label="ปิดหน้าต่าง">ยกเลิก</button>
+      <button class="btn btn-primary" onclick="saveFromModal()"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2Z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg> บันทึก</button>
     </div>
   </div>
 </div>
@@ -592,13 +601,13 @@ body {
 <!-- MODAL: PAY CONFIRM -->
 <div class="overlay" id="payModal">
   <div class="modal" style="max-width:420px">
-    <button class="modal-close" onclick="closeModal('payModal')" aria-label="ปิดหน้าต่าง"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 5l14 14M19 5 5 19"/></svg></button>
-    <div class="modal-title"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v10M9.5 9.2c0-1.2 1.1-2.2 2.5-2.2s2.5.9 2.5 2c0 2.8-5 1.6-5 4.3 0 1.1 1.1 2 2.5 2s2.5-.9 2.5-2"/></svg> บันทึกรับชำระ</div>
+    <button class="modal-close" onclick="closeModal('payModal')" aria-label="ปิดหน้าต่าง"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+    <div class="modal-title"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M9.5 9.5c0-1.1 1.1-2 2.5-2s2.5.9 2.5 2-1.1 1.6-2.5 2-2.5.9-2.5 2 1.1 2 2.5 2 2.5-.9 2.5-2"/></svg> บันทึกรับชำระ</div>
     <div class="modal-sub" id="payModalSub">ยืนยันการรับชำระเงิน</div>
     <div id="payModalContent"></div>
     <div class="modal-btns">
-      <button class="btn btn-secondary" onclick="closeModal('payModal')">ยกเลิก</button>
-      <button class="btn btn-primary" onclick="confirmPay()"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="m8 12 3 3 5-6"/></svg> ยืนยันรับชำระ</button>
+      <button class="btn btn-secondary" onclick="closeModal('payModal')" aria-label="ปิดหน้าต่าง">ยกเลิก</button>
+      <button class="btn btn-primary" onclick="confirmPay()"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg> ยืนยันรับชำระ</button>
     </div>
   </div>
 </div>
@@ -613,10 +622,10 @@ function toggleDark() {
   const h = document.documentElement;
   const isDark = h.getAttribute('data-theme') === 'dark';
   h.setAttribute('data-theme', isDark ? 'light' : 'dark');
-  localStorage.setItem('pm-t', isDark ? 'light' : 'dark');
+  localStorage.setItem('pamai-thu-theme', isDark ? 'light' : 'dark');
 }
 (()=>{
-  const s = localStorage.getItem('pm-t');
+  const s = localStorage.getItem('pamai-thu-theme');
   if (s) document.documentElement.setAttribute('data-theme',s);
   else if (window.matchMedia('(prefers-color-scheme:dark)').matches) document.documentElement.setAttribute('data-theme','dark');
 })();
@@ -624,41 +633,41 @@ function toggleDark() {
 // ══════════════════════════════════════
 //  ELECTRIC TYPE DEFINITIONS
 // ══════════════════════════════════════
-const ICO_BULB = '<svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18h6M10 21h4M12 3a6 6 0 0 0-3.5 10.9c.6.5 1 1.2 1 2.1h5c0-.9.4-1.6 1-2.1A6 6 0 0 0 12 3z"/></svg>';
-const ICO_FAN = '<svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="1.6"/><path d="M12 10.5c1.5-3 1-6-1.5-7-2 3 0 5.5 1.5 7zM12 13.5c-1.5 3-1 6 1.5 7 2-3 0-5.5-1.5-7zM10.5 12c-3-1.5-6-1-7 1.5 3 2 5.5 0 7-1.5zM13.5 12c3 1.5 6 1 7-1.5-3-2-5.5 0-7 1.5z"/></svg>';
-const ICO_PLUG = '<svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 3v5M15 3v5M7 8h10v4a5 5 0 0 1-10 0V8z"/><path d="M12 17v4"/></svg>';
-const ICO_GEAR = '<svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M12 3v2.2M12 18.8V21M4.2 12H2M22 12h-2.2M5.8 5.8l1.5 1.5M16.7 16.7l1.5 1.5M18.2 5.8l-1.5 1.5M7.3 16.7l-1.5 1.5"/></svg>';
-const ICO_STAR = '<svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3.5l2.4 5 5.5.6-4 3.8 1 5.5L12 15.9l-4.9 2.5 1-5.5-4-3.8 5.5-.6z"/></svg>';
 const ELEC_TYPES = [
-  { id:'bulb',    icon:ICO_BULB, name:'หลอดไฟ',           price:10,  unit:'ดวง' },
-  { id:'fan',     icon:ICO_FAN,  name:'พัดลม',            price:20,  unit:'ตัว' },
-  { id:'small',   icon:ICO_PLUG, name:'เครื่องใช้ไฟฟ้าเล็ก', price:50,  unit:'ชิ้น' },
-  { id:'large',   icon:ICO_GEAR, name:'เครื่องใช้ไฟฟ้าใหญ่', price:100, unit:'ชิ้น' },
+  { id:'bulb',    icon:'<svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 18h6"/><path d="M10 22h4"/><path d="M12 2a7 7 0 0 0-4 12.7c.5.4.8 1 .8 1.6V17h6.4v-.7c0-.6.3-1.2.8-1.6A7 7 0 0 0 12 2Z"/></svg>', name:'หลอดไฟ',           price:10,  unit:'ดวง' },
+  { id:'fan',     icon:'<svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3a9 9 0 1 0 9 9"/><path d="M12 7a5 5 0 1 0 5 5"/></svg>', name:'พัดลม',            price:20,  unit:'ตัว' },
+  { id:'small',   icon:'<svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2v6"/><path d="M8 8h8v4a4 4 0 0 1-8 0V8Z"/><line x1="9" y1="18" x2="9" y2="22"/><line x1="15" y1="18" x2="15" y2="22"/></svg>', name:'เครื่องใช้ไฟฟ้าเล็ก', price:50,  unit:'ชิ้น' },
+  { id:'large',   icon:'<svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .34 1.87l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.7 1.7 0 0 0-1.87-.34 1.7 1.7 0 0 0-1.04 1.56V21a2 2 0 0 1-4 0v-.09A1.7 1.7 0 0 0 9 19.37a1.7 1.7 0 0 0-1.87.34l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.7 1.7 0 0 0 4.63 15a1.7 1.7 0 0 0-1.56-1.04H3a2 2 0 0 1 0-4h.09A1.7 1.7 0 0 0 4.63 9a1.7 1.7 0 0 0-.34-1.87l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.7 1.7 0 0 0 9 4.63a1.7 1.7 0 0 0 1.04-1.56V3a2 2 0 0 1 4 0v.09a1.7 1.7 0 0 0 1.04 1.56 1.7 1.7 0 0 0 1.87-.34l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.7 1.7 0 0 0 19.37 9a1.7 1.7 0 0 0 1.56 1.04H21a2 2 0 0 1 0 4h-.09A1.7 1.7 0 0 0 19.4 15Z"/></svg>', name:'เครื่องใช้ไฟฟ้าใหญ่', price:100, unit:'ชิ้น' },
 ];
 
 // ══════════════════════════════════════
-//  VENDOR DATABASE — โหลดจาก Google Sheets จริงเท่านั้น (ไม่มีข้อมูลตัวอย่าง)
+//  VENDOR DATABASE (mock — อิงจาก Excel)
 // ══════════════════════════════════════
-let vendors = [];
+//== MARKET_BLOCK:SEED ==//
+let vendors = []; // โหลดจาก Google Sheets จริงเท่านั้น
 const ALL_ZONES = ['A','B','C','D','E','F','G','J','K','N','U','O','M','H','L','T','AB','TA','TB','TC'];
+//== END_MARKET_BLOCK ==//
 
 // ══════════════════════════════════════
 //  HELPERS
 // ══════════════════════════════════════
-function calcElec(elec) {
+function calcElec(elec) { // ราคาต่อวันพฤหัสบดี 1 วัน (อัตรา: หลอด10/พัดลม20/เล็ก50/ใหญ่100/พิเศษตามระบุ)
   const base = (elec.bulb||0)*10 + (elec.fan||0)*20 +
                (elec.small||0)*50 + (elec.large||0)*100;
   const sp = (elec.special||[]).reduce((s,i)=>s+(i.price||0),0);
   return base + sp;
 }
+// ค่าไฟรายเดือน = ราคา/อังคาร × จำนวนวันพฤหัสบดีของเดือนนี้ (เหมือนสูตรค่าเช่า)
+// แก้ 2026-07-17 บั๊ก #27 — เดิมแสดง/เก็บเงินค่าไฟ 1 อังคารเป็น "ต่อเดือน" ทำให้เก็บเงินขาดไป
+function calcElecMonthly(elec) { return Math.round(calcElec(elec) * thisMonthThursdays()); }
 
 function elecBreakdown(elec) {
   const parts = [];
-  if (elec.bulb)  parts.push(`${ICO_BULB}×${elec.bulb}`);
-  if (elec.fan)   parts.push(`${ICO_FAN}×${elec.fan}`);
-  if (elec.small) parts.push(`${ICO_PLUG}×${elec.small}`);
-  if (elec.large) parts.push(`${ICO_GEAR}×${elec.large}`);
-  (elec.special||[]).forEach(s=>parts.push(`${ICO_STAR}${s.name||''}`));
+  if (elec.bulb)  parts.push(`<svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 18h6"/><path d="M10 22h4"/><path d="M12 2a7 7 0 0 0-4 12.7c.5.4.8 1 .8 1.6V17h6.4v-.7c0-.6.3-1.2.8-1.6A7 7 0 0 0 12 2Z"/></svg>×${elec.bulb}`);
+  if (elec.fan)   parts.push(`<svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3a9 9 0 1 0 9 9"/><path d="M12 7a5 5 0 1 0 5 5"/></svg>×${elec.fan}`);
+  if (elec.small) parts.push(`<svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2v6"/><path d="M8 8h8v4a4 4 0 0 1-8 0V8Z"/><line x1="9" y1="18" x2="9" y2="22"/><line x1="15" y1="18" x2="15" y2="22"/></svg>×${elec.small}`);
+  if (elec.large) parts.push(`<svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .34 1.87l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.7 1.7 0 0 0-1.87-.34 1.7 1.7 0 0 0-1.04 1.56V21a2 2 0 0 1-4 0v-.09A1.7 1.7 0 0 0 9 19.37a1.7 1.7 0 0 0-1.87.34l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.7 1.7 0 0 0 4.63 15a1.7 1.7 0 0 0-1.56-1.04H3a2 2 0 0 1 0-4h.09A1.7 1.7 0 0 0 4.63 9a1.7 1.7 0 0 0-.34-1.87l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.7 1.7 0 0 0 9 4.63a1.7 1.7 0 0 0 1.04-1.56V3a2 2 0 0 1 4 0v.09a1.7 1.7 0 0 0 1.04 1.56 1.7 1.7 0 0 0 1.87-.34l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.7 1.7 0 0 0 19.37 9a1.7 1.7 0 0 0 1.56 1.04H21a2 2 0 0 1 0 4h-.09A1.7 1.7 0 0 0 19.4 15Z"/></svg>×${elec.large}`);
+  (elec.special||[]).forEach(s=>parts.push(`<svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><polygon points="12 2 15 9 22 9.3 16.5 14 18.2 21 12 17.3 5.8 21 7.5 14 2 9.3 9 9"/></svg>${s.name||''}`));
   return parts.join(' ') || '—';
 }
 
@@ -694,21 +703,12 @@ function renderTable() {
   });
 
   const tbody = document.getElementById('vendorTbody');
-  if (!getApiUrl()) {
-    tbody.innerHTML = '<tr><td colspan="9" style="text-align:center;padding:16px;color:var(--text-lo)">⚠️ ยังไม่ได้เชื่อมต่อ Google Sheets — กรุณาตั้งค่าที่หน้าหลักก่อนใช้งานหน้านี้</td></tr>';
-    document.getElementById('tableCount').textContent = 'แสดง 0 จาก 0 ราย';
-    animKpi('kpi-total-vendors', 0);
-    document.getElementById('kpi-total-elec').textContent = fmt(0);
-    document.getElementById('kpi-total-rent').textContent = fmt(0);
-    document.getElementById('kpi-grand').textContent      = fmt(0);
-    return;
-  }
   tbody.innerHTML = filtered.map(v => {
-    const elec = calcElec(v.elec);
+    const elec = calcElecMonthly(v.elec); // คอลัมน์นี้คือ ค่าไฟ/เดือน (บั๊ก #27)
     const total = v.rent + elec;
     const sBadge = v.status==='paid'
-      ? '<span class="status-badge s-paid">✅ ชำระแล้ว</span>'
-      : '<span class="status-badge s-unpaid">❌ ค้างชำระ</span>';
+      ? '<span class="status-badge s-paid"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg> ชำระแล้ว</span>'
+      : '<span class="status-badge s-unpaid"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg> ค้างชำระ</span>';
     return `<tr class="${v.status==='unpaid'?'unpaid-item':''}">
       <td><span class="lock-badge">${v.id}</span></td>
       <td style="max-width:140px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${v.shop}</td>
@@ -719,8 +719,8 @@ function renderTable() {
       <td class="tbl-amount" style="text-align:right;font-size:.9rem">${fmt(total)}</td>
       <td>${sBadge}</td>
       <td style="text-align:center;white-space:nowrap">
-        <button class="tbl-action btn-edit" onclick="openEditFromTable('${v.id}')">✏️ ไฟ</button>
-        <button class="tbl-action btn-pay" onclick="openPayModal('${v.id}')" style="margin-left:4px">💰 รับเงิน</button>
+        <button class="tbl-action btn-edit" onclick="openEditFromTable('${v.id}')"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M17 3a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg> ไฟ</button>
+        <button class="tbl-action btn-pay" onclick="openPayModal('${v.id}')" style="margin-left:4px"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M9.5 9.5c0-1.1 1.1-2 2.5-2s2.5.9 2.5 2-1.1 1.6-2.5 2-2.5.9-2.5 2 1.1 2 2.5 2 2.5-.9 2.5-2"/></svg> รับเงิน</button>
       </td>
     </tr>`;
   }).join('');
@@ -728,7 +728,7 @@ function renderTable() {
   document.getElementById('tableCount').textContent = `แสดง ${filtered.length} จาก ${vendors.length} ราย`;
 
   // KPIs
-  const totalElec = vendors.reduce((s,v)=>s+calcElec(v.elec),0);
+  const totalElec = vendors.reduce((s,v)=>s+calcElecMonthly(v.elec),0); // KPI ค่าไฟรวม/เดือน (บั๊ก #27)
   const totalRent = vendors.reduce((s,v)=>s+v.rent,0);
   animKpi('kpi-total-vendors', vendors.length);
   document.getElementById('kpi-total-elec').textContent = fmt(totalElec);
@@ -767,7 +767,7 @@ function buildElecTypeCards(counts={}) {
       <div class="etc-price">฿${t.price}/${t.unit}</div>
       <div class="etc-count">
         <button class="count-btn" onclick="changeCount('${t.id}',-1)">−</button>
-        <input class="count-num" type="number" id="cnt-${t.id}" value="${editCounts[t.id]||0}" min="0" aria-label="จำนวน${t.name}" oninput="editCounts['${t.id}']=parseInt(this.value)||0;updateEditTotal()">
+        <input class="count-num" type="number" id="cnt-${t.id}" value="${editCounts[t.id]||0}" min="0" oninput="editCounts['${t.id}']=parseInt(this.value)||0;updateEditTotal()">
         <button class="count-btn" onclick="changeCount('${t.id}',1)">＋</button>
       </div>
     </div>`).join('');
@@ -794,20 +794,20 @@ function addSpecialItem(name='', price='') {
   div.style.cssText = 'display:grid;grid-template-columns:1fr 100px 32px;gap:8px;align-items:center;margin-bottom:8px;animation:fadeUp .2s var(--ease)';
   div.innerHTML = `
     <input type="text" placeholder="ชื่ออุปกรณ์ เช่น เครื่องชงกาแฟ, ตู้เย็น..." value="${name}"
-      id="sp-name-${id}" aria-label="ชื่ออุปกรณ์พิเศษ" oninput="updateEditTotal()"
+      id="sp-name-${id}" oninput="updateEditTotal()"
       style="padding:8px 10px;border:1.5px solid var(--border);border-radius:8px;background:var(--surface2);color:var(--text-hi);font-size:.80rem;font-family:inherit;outline:none;transition:border-color .2s;"
       onfocus="this.style.borderColor='var(--green-m)'" onblur="this.style.borderColor='var(--border)'">
     <div class="special-price-row" style="margin:0">
       <span style="font-size:.76rem;color:var(--text-lo)">฿</span>
       <input type="number" placeholder="ราคา" value="${price}" min="0"
-        id="sp-price-${id}" aria-label="ราคาอุปกรณ์พิเศษ" oninput="updateEditTotal()"
+        id="sp-price-${id}" oninput="updateEditTotal()"
         style="width:100%;padding:8px;border:1.5px solid var(--border);border-radius:8px;background:var(--surface2);color:var(--text-hi);font-size:.80rem;font-family:inherit;outline:none;text-align:right;transition:border-color .2s;"
         onfocus="this.style.borderColor='var(--green-m)'" onblur="this.style.borderColor='var(--border)'">
     </div>
     <button onclick="removeSpecial(${id})"
       style="width:32px;height:32px;border-radius:7px;border:none;background:var(--red-l);color:var(--red);cursor:pointer;font-size:.85rem;transition:all .15s;"
       onmouseover="this.style.background='var(--red)';this.style.color='white'"
-      onmouseout="this.style.background='var(--red-l)';this.style.color='var(--red)'">✕</button>`;
+      onmouseout="this.style.background='var(--red-l)';this.style.color='var(--red)'"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>`;
   document.getElementById('specialItems').appendChild(div);
   updateEditTotal();
 }
@@ -824,40 +824,43 @@ function updateEditTotal() {
                (editCounts.small||0)*50 + (editCounts.large||0)*100;
   let spTotal = 0;
   editSpecials.forEach(id => { spTotal += parseFloat(document.getElementById(`sp-price-${id}`)?.value)||0; });
-  const total = base + spTotal;
+  const total = base + spTotal;                       // ราคา/อังคาร
+  const monthly = Math.round(total * thisMonthThursdays()); // ค่าไฟ/เดือน (บั๊ก #27)
 
-  document.getElementById('editElecTotal').textContent = fmt(total);
+  document.getElementById('editElecTotal').textContent = fmt(monthly);
   const parts = [];
-  if (editCounts.bulb)  parts.push(`💡 ${editCounts.bulb}ดวง = ${fmt(editCounts.bulb*10)}`);
-  if (editCounts.fan)   parts.push(`🌀 ${editCounts.fan}ตัว = ${fmt(editCounts.fan*20)}`);
-  if (editCounts.small) parts.push(`🔌 ${editCounts.small}ชิ้น = ${fmt(editCounts.small*50)}`);
-  if (editCounts.large) parts.push(`⚙️ ${editCounts.large}ชิ้น = ${fmt(editCounts.large*100)}`);
+  if (editCounts.bulb)  parts.push(`<svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 18h6"/><path d="M10 22h4"/><path d="M12 2a7 7 0 0 0-4 12.7c.5.4.8 1 .8 1.6V17h6.4v-.7c0-.6.3-1.2.8-1.6A7 7 0 0 0 12 2Z"/></svg> ${editCounts.bulb}ดวง = ${fmt(editCounts.bulb*10)}`);
+  if (editCounts.fan)   parts.push(`<svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3a9 9 0 1 0 9 9"/><path d="M12 7a5 5 0 1 0 5 5"/></svg> ${editCounts.fan}ตัว = ${fmt(editCounts.fan*20)}`);
+  if (editCounts.small) parts.push(`<svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2v6"/><path d="M8 8h8v4a4 4 0 0 1-8 0V8Z"/><line x1="9" y1="18" x2="9" y2="22"/><line x1="15" y1="18" x2="15" y2="22"/></svg> ${editCounts.small}ชิ้น = ${fmt(editCounts.small*50)}`);
+  if (editCounts.large) parts.push(`<svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .34 1.87l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.7 1.7 0 0 0-1.87-.34 1.7 1.7 0 0 0-1.04 1.56V21a2 2 0 0 1-4 0v-.09A1.7 1.7 0 0 0 9 19.37a1.7 1.7 0 0 0-1.87.34l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.7 1.7 0 0 0 4.63 15a1.7 1.7 0 0 0-1.56-1.04H3a2 2 0 0 1 0-4h.09A1.7 1.7 0 0 0 4.63 9a1.7 1.7 0 0 0-.34-1.87l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.7 1.7 0 0 0 9 4.63a1.7 1.7 0 0 0 1.04-1.56V3a2 2 0 0 1 4 0v.09a1.7 1.7 0 0 0 1.04 1.56 1.7 1.7 0 0 0 1.87-.34l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.7 1.7 0 0 0 19.37 9a1.7 1.7 0 0 0 1.56 1.04H21a2 2 0 0 1 0 4h-.09A1.7 1.7 0 0 0 19.4 15Z"/></svg> ${editCounts.large}ชิ้น = ${fmt(editCounts.large*100)}`);
   editSpecials.forEach(id=>{
     const nm = document.getElementById(`sp-name-${id}`)?.value||'พิเศษ';
     const pr = parseFloat(document.getElementById(`sp-price-${id}`)?.value)||0;
-    if(pr>0) parts.push(`⭐ ${nm} = ${fmt(pr)}`);
+    if(pr>0) parts.push(`<svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><polygon points="12 2 15 9 22 9.3 16.5 14 18.2 21 12 17.3 5.8 21 7.5 14 2 9.3 9 9"/></svg> ${nm} = ${fmt(pr)}`);
   });
-  document.getElementById('editElecBreakdown').textContent = parts.join(' · ') || 'ยังไม่มีอุปกรณ์';
+  // แก้ 2026-07-14 (audit .textContent= ทั้งโปรเจกต์): parts[] มี raw SVG markup อยู่ข้างใน
+  // เดิมใช้ .textContent ทำให้เห็นโค้ด <svg...> เป็นข้อความดิบแทนไอคอน — บั๊กรูปแบบเดิมที่เกิดซ้ำ (ดู Bug Registry #14-#17)
+  document.getElementById('editElecBreakdown').innerHTML = parts.join(' · ') || 'ยังไม่มีอุปกรณ์';
 
   // Update bill preview
   const lockSel = document.getElementById('editLockSel').value;
   const v = vendors.find(v=>v.id===lockSel);
   if (v) {
     const rent = v.rent;
-    const grandTotal = rent + total;
+    const grandTotal = rent + monthly; // บั๊ก #27: บิลเดือน = ค่าเช่าเดือน + ค่าไฟเดือน
     let rows = `<div class="bp-row"><span>ค่าเช่า</span><span style="font-weight:700">${fmt(rent)}</span></div>`;
-    if (editCounts.bulb)  rows += `<div class="bp-row bp-indent"><span>💡 หลอดไฟ ×${editCounts.bulb}</span><span>${fmt(editCounts.bulb*10)}</span></div>`;
-    if (editCounts.fan)   rows += `<div class="bp-row bp-indent"><span>🌀 พัดลม ×${editCounts.fan}</span><span>${fmt(editCounts.fan*20)}</span></div>`;
-    if (editCounts.small) rows += `<div class="bp-row bp-indent"><span>🔌 เครื่องเล็ก ×${editCounts.small}</span><span>${fmt(editCounts.small*50)}</span></div>`;
-    if (editCounts.large) rows += `<div class="bp-row bp-indent"><span>⚙️ เครื่องใหญ่ ×${editCounts.large}</span><span>${fmt(editCounts.large*100)}</span></div>`;
+    if (editCounts.bulb)  rows += `<div class="bp-row bp-indent"><span><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 18h6"/><path d="M10 22h4"/><path d="M12 2a7 7 0 0 0-4 12.7c.5.4.8 1 .8 1.6V17h6.4v-.7c0-.6.3-1.2.8-1.6A7 7 0 0 0 12 2Z"/></svg> หลอดไฟ ×${editCounts.bulb}</span><span>${fmt(editCounts.bulb*10)}</span></div>`;
+    if (editCounts.fan)   rows += `<div class="bp-row bp-indent"><span><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3a9 9 0 1 0 9 9"/><path d="M12 7a5 5 0 1 0 5 5"/></svg> พัดลม ×${editCounts.fan}</span><span>${fmt(editCounts.fan*20)}</span></div>`;
+    if (editCounts.small) rows += `<div class="bp-row bp-indent"><span><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2v6"/><path d="M8 8h8v4a4 4 0 0 1-8 0V8Z"/><line x1="9" y1="18" x2="9" y2="22"/><line x1="15" y1="18" x2="15" y2="22"/></svg> เครื่องเล็ก ×${editCounts.small}</span><span>${fmt(editCounts.small*50)}</span></div>`;
+    if (editCounts.large) rows += `<div class="bp-row bp-indent"><span><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .34 1.87l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.7 1.7 0 0 0-1.87-.34 1.7 1.7 0 0 0-1.04 1.56V21a2 2 0 0 1-4 0v-.09A1.7 1.7 0 0 0 9 19.37a1.7 1.7 0 0 0-1.87.34l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.7 1.7 0 0 0 4.63 15a1.7 1.7 0 0 0-1.56-1.04H3a2 2 0 0 1 0-4h.09A1.7 1.7 0 0 0 4.63 9a1.7 1.7 0 0 0-.34-1.87l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.7 1.7 0 0 0 9 4.63a1.7 1.7 0 0 0 1.04-1.56V3a2 2 0 0 1 4 0v.09a1.7 1.7 0 0 0 1.04 1.56 1.7 1.7 0 0 0 1.87-.34l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.7 1.7 0 0 0 19.37 9a1.7 1.7 0 0 0 1.56 1.04H21a2 2 0 0 1 0 4h-.09A1.7 1.7 0 0 0 19.4 15Z"/></svg> เครื่องใหญ่ ×${editCounts.large}</span><span>${fmt(editCounts.large*100)}</span></div>`;
     editSpecials.forEach(id=>{
       const nm = document.getElementById(`sp-name-${id}`)?.value||'พิเศษ';
       const pr = parseFloat(document.getElementById(`sp-price-${id}`)?.value)||0;
-      if(pr>0) rows += `<div class="bp-row bp-indent"><span>⭐ ${nm}</span><span>${fmt(pr)}</span></div>`;
+      if(pr>0) rows += `<div class="bp-row bp-indent"><span><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><polygon points="12 2 15 9 22 9.3 16.5 14 18.2 21 12 17.3 5.8 21 7.5 14 2 9.3 9 9"/></svg> ${nm}</span><span>${fmt(pr)}</span></div>`;
     });
-    if (total > 0) rows += `<div class="bp-row"><span>ค่าไฟรวม</span><span style="color:var(--yellow);font-weight:700">${fmt(total)}</span></div>`;
+    if (total > 0) rows += `<div class="bp-row"><span>ค่าไฟรวม/เดือน (${fmt(total)}/อังคาร × ${thisMonthThursdays()})</span><span style="color:var(--yellow);font-weight:700">${fmt(monthly)}</span></div>`;
     rows += `<div class="bp-row"><span>ยอดรวมที่ต้องชำระ</span><span>${fmt(grandTotal)}</span></div>`;
-    document.getElementById('billPreview').innerHTML = `<div class="bp-title">🧾 ล็อค ${v.id} — ${v.shop}</div>${rows}`;
+    document.getElementById('billPreview').innerHTML = `<div class="bp-title"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 2h12v20l-3-2-3 2-3-2-3 2Z"/><line x1="9" y1="7" x2="15" y2="7"/><line x1="9" y1="11" x2="15" y2="11"/></svg> ล็อค ${v.id} — ${v.shop}</div>${rows}`;
   }
 
   // highlight active cards
@@ -893,7 +896,7 @@ function saveElectric() {
   })).filter(s=>s.price>0);
   v.elec = { ...editCounts, special: spData };
   persistVendorElec(v);
-  showToast(getApiUrl()?`☁️ บันทึกค่าไฟล็อค ${lid} ขึ้น Sheets แล้ว`:`✅ บันทึกค่าไฟล็อค ${lid} เรียบร้อย`, 'success');
+  showToast(getApiUrl()?`<svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M17.5 19H9a5 5 0 1 1 1.6-9.7A6 6 0 0 1 22 11.5 4.5 4.5 0 0 1 17.5 19Z"/></svg> บันทึกค่าไฟล็อค ${lid} ขึ้น Sheets แล้ว`:`<svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg> บันทึกค่าไฟล็อค ${lid} เรียบร้อย`, 'success');
   renderTable();
 }
 
@@ -912,7 +915,7 @@ function openEditFromTable(lid) {
   modalCounts = {...v.elec};
   modalSpecials = [];
   modalSpCnt = 0;
-  document.getElementById('editModalTitle').textContent = `⚡ แก้ไขค่าไฟ — ${lid}`;
+  document.getElementById('editModalTitle').innerHTML = `<svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><polygon points="13 2 3 14 11 14 10 22 21 10 13 10 13 2"/></svg> แก้ไขค่าไฟ — ${lid}`;
   document.getElementById('editModalSub').textContent   = `${v.shop} | ค่าเช่า ${fmt(v.rent)}/เดือน`;
 
   let html = '<div style="display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:12px">';
@@ -925,7 +928,7 @@ function openEditFromTable(lid) {
       </div>
       <div style="display:flex;align-items:center;gap:5px">
         <button class="count-btn" onclick="modalChange('${t.id}',-1)">−</button>
-        <input class="count-num" id="mcnt-${t.id}" type="number" value="${v.elec[t.id]||0}" min="0" aria-label="จำนวน${t.name}" oninput="modalCounts['${t.id}']=parseInt(this.value)||0">
+        <input class="count-num" id="mcnt-${t.id}" type="number" value="${v.elec[t.id]||0}" min="0" oninput="modalCounts['${t.id}']=parseInt(this.value)||0">
         <button class="count-btn" onclick="modalChange('${t.id}',1)">＋</button>
       </div>
     </div>`;
@@ -933,7 +936,7 @@ function openEditFromTable(lid) {
   html += '</div>';
   html += `<div style="font-size:.76rem;font-weight:700;color:var(--text-lo);text-transform:uppercase;letter-spacing:.4px;margin-bottom:8px">อุปกรณ์พิเศษ</div>`;
   html += `<div id="modalSpecialItems"></div>`;
-  html += `<button onclick="addModalSpecial()" class="btn btn-secondary" style="width:100%;border-style:dashed;margin-bottom:10px">⭐ เพิ่มอุปกรณ์พิเศษ</button>`;
+  html += `<button onclick="addModalSpecial()" class="btn btn-secondary" style="width:100%;border-style:dashed;margin-bottom:10px"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><polygon points="12 2 15 9 22 9.3 16.5 14 18.2 21 12 17.3 5.8 21 7.5 14 2 9.3 9 9"/></svg> เพิ่มอุปกรณ์พิเศษ</button>`;
 
   document.getElementById('editModalContent').innerHTML = html;
   // load existing specials
@@ -954,12 +957,12 @@ function addModalSpecial(name='', price='') {
   div.id = `msp-${id}`;
   div.style.cssText = 'display:grid;grid-template-columns:1fr 90px 28px;gap:7px;align-items:center;margin-bottom:7px';
   div.innerHTML = `
-    <input type="text" placeholder="ชื่ออุปกรณ์..." value="${name}" id="mspn-${id}" aria-label="ชื่ออุปกรณ์พิเศษ"
+    <input type="text" placeholder="ชื่ออุปกรณ์..." value="${name}" id="mspn-${id}"
       style="padding:7px 10px;border:1.5px solid var(--border);border-radius:7px;font-size:.78rem;background:var(--surface2);color:var(--text-hi);outline:none;font-family:inherit">
-    <input type="number" placeholder="ราคา" value="${price}" min="0" id="mspp-${id}" aria-label="ราคาอุปกรณ์พิเศษ"
+    <input type="number" placeholder="ราคา" value="${price}" min="0" id="mspp-${id}"
       style="padding:7px;border:1.5px solid var(--border);border-radius:7px;font-size:.78rem;text-align:right;background:var(--surface2);color:var(--text-hi);outline:none;font-family:inherit">
     <button onclick="this.parentElement.remove();modalSpecials=modalSpecials.filter(i=>i!=${id})"
-      style="width:28px;height:28px;border-radius:6px;border:none;background:var(--red-l);color:var(--red);cursor:pointer">✕</button>`;
+      style="width:28px;height:28px;border-radius:6px;border:none;background:var(--red-l);color:var(--red);cursor:pointer"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>`;
   document.getElementById('modalSpecialItems').appendChild(div);
 }
 
@@ -976,7 +979,7 @@ function saveFromModal() {
   persistVendorElec(v);
   closeModal('editModal');
   renderTable();
-  showToast(getApiUrl()?`☁️ บันทึกค่าไฟล็อค ${editModalLockId} ขึ้น Sheets แล้ว`:`✅ บันทึกค่าไฟล็อค ${editModalLockId} เรียบร้อย`, 'success');
+  showToast(getApiUrl()?`<svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M17.5 19H9a5 5 0 1 1 1.6-9.7A6 6 0 0 1 22 11.5 4.5 4.5 0 0 1 17.5 19Z"/></svg> บันทึกค่าไฟล็อค ${editModalLockId} ขึ้น Sheets แล้ว`:`<svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg> บันทึกค่าไฟล็อค ${editModalLockId} เรียบร้อย`, 'success');
 }
 
 // ══════════════════════════════════════
@@ -988,29 +991,18 @@ function renderBilling() {
   const tbody = document.getElementById('billingTbody');
   const foot  = document.getElementById('billingFoot');
 
-  if (!getApiUrl()) {
-    tbody.innerHTML = '<tr><td colspan="9" style="text-align:center;padding:16px;color:var(--text-lo)">⚠️ ยังไม่ได้เชื่อมต่อ Google Sheets — กรุณาตั้งค่าที่หน้าหลักก่อนใช้งานหน้านี้</td></tr>';
-    foot.innerHTML = '';
-    document.getElementById('b-total').textContent  = fmt(0);
-    document.getElementById('b-rent').textContent   = fmt(0);
-    document.getElementById('b-elec').textContent   = fmt(0);
-    document.getElementById('b-unpaid').textContent = 0;
-    document.getElementById('zoneFilterBill').innerHTML = '';
-    return;
-  }
-
   let fv = vendors;
   if (zoneFilterBillActive) fv = fv.filter(v=>v.zone===zoneFilterBillActive);
 
   let tRent=0, tElec=0, tUnpaid=0;
   tbody.innerHTML = fv.map((v,i) => {
-    const elec  = calcElec(v.elec);
+    const elec  = calcElecMonthly(v.elec); // บิลรายเดือน (บั๊ก #27)
     const total = v.rent + elec;
     tRent += v.rent; tElec += elec;
     if (v.status!=='paid') tUnpaid++;
     const sBadge = v.status==='paid'
-      ? '<span class="status-badge s-paid">✅ ชำระ</span>'
-      : '<span class="status-badge s-unpaid">❌ ค้าง</span>';
+      ? '<span class="status-badge s-paid"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg> ชำระ</span>'
+      : '<span class="status-badge s-unpaid"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg> ค้าง</span>';
     return `<tr class="${v.status==='unpaid'?'unpaid-item':''}">
       <td style="color:var(--text-lo)">${i+1}</td>
       <td><span class="lock-badge">${v.id}</span></td>
@@ -1020,7 +1012,7 @@ function renderBilling() {
       <td class="tbl-amount" style="text-align:right;color:var(--yellow)">${elec>0?fmt(elec):'—'}</td>
       <td class="tbl-amount" style="text-align:right;font-size:.9rem;font-weight:800">${fmt(total)}</td>
       <td>${sBadge}</td>
-      <td style="text-align:center"><button class="tbl-action btn-pay" onclick="openPayModal('${v.id}')">💰 รับเงิน</button></td>
+      <td style="text-align:center"><button class="tbl-action btn-pay" onclick="openPayModal('${v.id}')"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M9.5 9.5c0-1.1 1.1-2 2.5-2s2.5.9 2.5 2-1.1 1.6-2.5 2-2.5.9-2.5 2 1.1 2 2.5 2 2.5-.9 2.5-2"/></svg> รับเงิน</button></td>
     </tr>`;
   }).join('');
 
@@ -1038,10 +1030,12 @@ function renderBilling() {
   document.getElementById('b-elec').textContent   = fmt(tElec);
   document.getElementById('b-unpaid').textContent = tUnpaid;
 
-  // build zone filter buttons — เฉพาะโซนที่มีผู้ค้าจริงเท่านั้น
-  const zones = [...new Set(vendors.map(v=>v.zone).filter(Boolean))].sort();
+  // build zone filter buttons
+  const zones = [...new Set(vendors.map(v=>v.zone))];
   document.getElementById('zoneFilterBill').innerHTML =
-    ['',...zones].map(z=>
+//== MARKET_BLOCK:EXPORT_ZONES ==//
+    ['','A','B','C','D','E','F','G','J','K','N','U','O','M','H','L','T','AB','TA','TB','TC'].map(z=>
+//== END_MARKET_BLOCK ==//
       `<button class="zf-btn ${zoneFilterBillActive===z?'active':''}" onclick="setBillZone('${z}')">${z||'ทั้งหมด'}</button>`
     ).join('');
 }
@@ -1052,69 +1046,33 @@ function setBillZone(z) {
 }
 
 // ══════════════════════════════════════
-//  TAB 4: HISTORY — จากข้อมูลรับชำระจริงใน Google Sheets (payments) เท่านั้น
+//  TAB 4: HISTORY (mock data)
 // ══════════════════════════════════════
-function parsePayDate(dstr){
-  // รูปแบบวันที่จริงที่บันทึกไว้: "6 ก.ค. 2569" (วัน เดือนย่อ ปี พ.ศ.)
-  const parts = (dstr||'').trim().split(/\s+/);
-  if (parts.length < 3) return null;
-  const mIdx = MONS.indexOf(parts[1]);
-  const year = parseInt(parts[2]) || 0;
-  if (mIdx < 0 || !year) return null;
-  return { key: parts[1]+' '+year, sortKey: year*12+mIdx };
-}
+const MONTHS = ['มิ.ย. 2568','พ.ค. 2568','เม.ย. 2568','มี.ค. 2568','ก.พ. 2568','ม.ค. 2568'];
 
-async function renderHistory() {
-  const tbody = document.getElementById('historyTbody');
-  tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:16px;color:var(--text-lo)">⏳ กำลังโหลดข้อมูล...</td></tr>';
-  if (!getApiUrl()) {
-    tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:16px;color:var(--text-lo)">ยังไม่ได้เชื่อมต่อ Google Sheets</td></tr>';
-    return;
-  }
+function renderHistory() {
   const lid = document.getElementById('histLockSel')?.value||'';
   const mth = parseInt(document.getElementById('histMonths')?.value||3);
-  const payments = await apiGet('getPayments');
-  if (!Array.isArray(payments)) {
-    tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:16px;color:var(--text-lo)">โหลดข้อมูลไม่สำเร็จ</td></tr>';
-    return;
-  }
-  let recs = payments.filter(p=>p.type==='ค่าเช่าประจำเดือน'||p.type==='ค่าไฟฟ้า');
-  if (lid) recs = recs.filter(p=>p.lock_id===lid);
-  recs = recs.map(p=>({...p, _pd:parsePayDate(p.date)})).filter(p=>p._pd);
-  if (!recs.length) {
-    tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:16px;color:var(--text-lo)">ยังไม่มีประวัติการชำระ</td></tr>';
-    return;
-  }
-  const monthKeys = [...new Set(recs.map(p=>p._pd.key))]
-    .sort((a,b)=>{
-      const pa = recs.find(x=>x._pd.key===a)._pd.sortKey;
-      const pb = recs.find(x=>x._pd.key===b)._pd.sortKey;
-      return pb-pa;
-    }).slice(0, mth);
+  const months = MONTHS.slice(0, mth);
 
-  const groups = {};
-  recs.forEach(p=>{
-    if (!monthKeys.includes(p._pd.key)) return;
-    const gk = p.lock_id+'|'+p._pd.key;
-    if (!groups[gk]) groups[gk] = { lock:p.lock_id, vendor:p.vendor_name||p.product||'—', month:p._pd.key, sortKey:p._pd.sortKey, rent:0, elec:0 };
-    const amt = parseFloat(p.amount)||0;
-    if (p.type==='ค่าเช่าประจำเดือน') groups[gk].rent += amt;
-    else groups[gk].elec += amt;
+  let rows = '';
+  vendors.filter(v=>!lid||v.id===lid).forEach(v => {
+    months.forEach((m,mi) => {
+      const elec = calcElecMonthly(v.elec) * (0.9 + Math.random()*0.2); // slight variation (ประวัติจำลอง — รายเดือน, บั๊ก #27)
+      const elecR = Math.round(elec/10)*10;
+      const total = v.rent + elecR;
+      rows += `<tr>
+        <td>${m}</td>
+        <td><span class="lock-badge">${v.id}</span></td>
+        <td>${v.shop}</td>
+        <td style="font-size:.72rem;color:var(--text-lo)">${elecBreakdown(v.elec)}</td>
+        <td class="tbl-amount" style="text-align:right;color:var(--yellow)">${elecR>0?fmt(elecR):'—'}</td>
+        <td class="tbl-amount" style="text-align:right">${fmt(v.rent)}</td>
+        <td class="tbl-amount" style="text-align:right;font-weight:800">${fmt(total)}</td>
+      </tr>`;
+    });
   });
-  const rows = Object.values(groups).sort((a,b)=>b.sortKey-a.sortKey || a.lock.localeCompare(b.lock));
-  if (!rows.length) {
-    tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:16px;color:var(--text-lo)">ยังไม่มีประวัติการชำระ</td></tr>';
-    return;
-  }
-  tbody.innerHTML = rows.map(r=>`<tr>
-    <td>${r.month}</td>
-    <td><span class="lock-badge">${r.lock}</span></td>
-    <td>${r.vendor}</td>
-    <td style="font-size:.72rem;color:var(--text-lo)">—</td>
-    <td class="tbl-amount" style="text-align:right;color:var(--yellow)">${r.elec>0?fmt(r.elec):'—'}</td>
-    <td class="tbl-amount" style="text-align:right">${r.rent>0?fmt(r.rent):'—'}</td>
-    <td class="tbl-amount" style="text-align:right;font-weight:800">${fmt(r.rent+r.elec)}</td>
-  </tr>`).join('');
+  document.getElementById('historyTbody').innerHTML = rows;
 }
 
 // ══════════════════════════════════════
@@ -1126,7 +1084,7 @@ function openPayModal(lid) {
   const v = vendors.find(v=>v.id===lid);
   if (!v) return;
   payLockId = lid;
-  const elec  = calcElec(v.elec);
+  const elec  = calcElecMonthly(v.elec); // ยอดเรียกเก็บรายเดือน (บั๊ก #27)
   const total = v.rent + elec;
   document.getElementById('payModalSub').textContent = `${v.id} — ${v.shop}`;
   document.getElementById('payModalContent').innerHTML = `
@@ -1143,14 +1101,14 @@ function openPayModal(lid) {
     </div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
       <div>
-        <label for="payMethodSel" style="font-size:.72rem;font-weight:700;color:var(--text-lo);text-transform:uppercase;letter-spacing:.4px;display:block;margin-bottom:5px">ช่องทางชำระ</label>
-        <select id="payMethodSel" aria-label="เลือกช่องทางชำระ" style="width:100%;padding:8px 10px;border:1.5px solid var(--border);border-radius:8px;background:var(--surface2);color:var(--text-hi);font-size:.82rem;font-family:inherit;outline:none">
-          <option>💵 เงินสด</option><option>📱 โอนเงิน</option><option>📷 QR Code</option>
+        <label style="font-size:.72rem;font-weight:700;color:var(--text-lo);text-transform:uppercase;letter-spacing:.4px;display:block;margin-bottom:5px">ช่องทางชำระ</label>
+        <select id="payMethodSel" style="width:100%;padding:8px 10px;border:1.5px solid var(--border);border-radius:8px;background:var(--surface2);color:var(--text-hi);font-size:.82rem;font-family:inherit;outline:none">
+          <option>เงินสด</option><option>โอนเงิน</option><option>QR Code</option>
         </select>
       </div>
       <div>
-        <label for="payDateInput" style="font-size:.72rem;font-weight:700;color:var(--text-lo);text-transform:uppercase;letter-spacing:.4px;display:block;margin-bottom:5px">วันที่รับเงิน</label>
-        <input type="date" id="payDateInput" aria-label="วันที่รับเงิน" value="${new Date().toISOString().split('T')[0]}"
+        <label style="font-size:.72rem;font-weight:700;color:var(--text-lo);text-transform:uppercase;letter-spacing:.4px;display:block;margin-bottom:5px">วันที่รับเงิน</label>
+        <input type="date" value="${new Date().toISOString().split('T')[0]}"
           style="width:100%;padding:8px 10px;border:1.5px solid var(--border);border-radius:8px;background:var(--surface2);color:var(--text-hi);font-size:.82rem;font-family:inherit;outline:none">
       </div>
     </div>`;
@@ -1162,30 +1120,64 @@ function confirmPay() {
   if (v) {
     v.status = 'paid';
     if (getApiUrl()) {
-      const elec = calcElec(v.elec);
+      const elec = calcElecMonthly(v.elec); // บันทึกรับชำระค่าไฟทั้งเดือน (บั๊ก #27)
       // อัปเดตสถานะผู้ค้าเป็นปกติ + บันทึกรายการค่าไฟลงชีต payments (วันที่แบบไทย ให้ตรงกับรายงาน)
       apiPost('saveVendor', { data: { lock: v.id, status: 'active' } });
       if (elec > 0) apiPost('savePayment', { data: {
         lock_id: v.id, vendor_name: v.shop, product: v.shop,
         type: 'ค่าไฟฟ้า', amount: elec, penalty: 0, other_fee: 0, other_label: '',
-        method: '💵 เงินสด', note: 'รับชำระค่าไฟ (โมดูลค่าไฟฟ้า)', date: nowTH(), time: nowTime(),
+        method: '<svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="12" cy="12" r="3"/></svg> เงินสด', note: 'รับชำระค่าไฟ (โมดูลค่าไฟฟ้า)', date: nowTH(), time: nowTime(),
       }});
     }
   }
   closeModal('payModal');
   renderTable();
   if (document.getElementById('tab-billing').classList.contains('active')) renderBilling();
-  showToast(getApiUrl()?`☁️ บันทึกรับชำระล็อค ${payLockId} ขึ้น Sheets แล้ว`:`✅ บันทึกรับชำระล็อค ${payLockId} เรียบร้อย`, 'success');
+  showToast(getApiUrl()?`<svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M17.5 19H9a5 5 0 1 1 1.6-9.7A6 6 0 0 1 22 11.5 4.5 4.5 0 0 1 17.5 19Z"/></svg> บันทึกรับชำระล็อค ${payLockId} ขึ้น Sheets แล้ว`:`<svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg> บันทึกรับชำระล็อค ${payLockId} เรียบร้อย`, 'success');
 }
 
 // ══════════════════════════════════════
 //  ADD NEW VENDOR (stub)
 // ══════════════════════════════════════
 function openAddModal() {
-  showToast('💡 ใช้หน้า "ลงทะเบียนผู้ค้าใหม่" เพื่อเพิ่มผู้ค้า', 'info');
+  showToast('<svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 18h6"/><path d="M10 22h4"/><path d="M12 2a7 7 0 0 0-4 12.7c.5.4.8 1 .8 1.6V17h6.4v-.7c0-.6.3-1.2.8-1.6A7 7 0 0 0 12 2Z"/></svg> ใช้หน้า "ลงทะเบียนผู้ค้าใหม่" เพื่อเพิ่มผู้ค้า', 'info');
 }
 
-function exportBill() { showToast('📥 กำลังสร้างไฟล์ Excel...', 'info'); }
+// แก้ 2026-07-14 (บั๊ก #22): เดิมปุ่มนี้แค่โชว์ toast ไม่มีไฟล์จริง
+// ส่งออกเป็น CSV (UTF-8 + BOM กันภาษาไทยเพี้ยน) แทน .xlsx จริง — เปิดได้ปกติทั้งใน Excel/Google Sheets
+// เลือก CSV เพราะไม่ต้องพึ่งไลบรารีภายนอก (สอดคล้องกับสถาปัตยกรรม vanilla JS ไม่มี build step ของระบบนี้)
+function exportBill() {
+  let fv = vendors;
+  if (zoneFilterBillActive) fv = fv.filter(v=>v.zone===zoneFilterBillActive);
+  if (!fv.length) { showToast('ไม่มีข้อมูลให้ส่งออกในตัวกรองนี้', 'error'); return; }
+
+  const monthSel   = document.getElementById('billMonth');
+  const monthLabel = monthSel.selectedOptions[0]?.textContent || monthSel.value;
+
+  const header = ['ลำดับ','ล็อค','ร้าน','โซน','ค่าเช่า','ค่าไฟ','รวม','สถานะ'];
+  let tRent=0, tElec=0;
+  const rows = fv.map((v,i) => {
+    const elec  = calcElecMonthly(v.elec); // ส่งออกบิลรายเดือน (บั๊ก #27)
+    const total = v.rent + elec;
+    tRent += v.rent; tElec += elec;
+    return [i+1, v.id, v.shop, v.zone, v.rent, elec, total, v.status==='paid'?'ชำระแล้ว':'ค้างชำระ'];
+  });
+  rows.push(['','','','รวม', tRent, tElec, tRent+tElec, '']);
+
+  const csvEscape = val => {
+    const s = String(val ?? '');
+    return /[",\r\n]/.test(s) ? '"' + s.replace(/"/g,'""') + '"' : s;
+  };
+  const csv = [header, ...rows].map(r => r.map(csvEscape).join(',')).join('\r\n');
+  const blob = new Blob(['﻿' + csv], { type: 'text/csv;charset=utf-8;' });
+  const url  = URL.createObjectURL(blob);
+  const a    = document.createElement('a');
+  a.href = url;
+  a.download = `บิลค่าไฟ_${monthLabel}${zoneFilterBillActive ? '_โซน' + zoneFilterBillActive : ''}.csv`;
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+  showToast(`<svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg> ส่งออก ${fv.length} รายการเรียบร้อย (เปิดได้ด้วย Excel)`, 'success');
+}
 
 // ══════════════════════════════════════
 //  MODAL HELPERS
@@ -1199,7 +1191,7 @@ document.querySelectorAll('.overlay').forEach(o=>o.addEventListener('click',e=>{
 // ══════════════════════════════════════
 function showToast(msg, type='info') {
   const t = document.getElementById('toast');
-  t.textContent = msg; t.className = `toast ${type} show`;
+  t.innerHTML = msg; t.className = `toast ${type} show`;
   clearTimeout(t._t);
   t._t = setTimeout(()=>t.classList.remove('show'), 3200);
 }
@@ -1214,15 +1206,31 @@ function nowTH(){const n=new Date();return n.getDate()+' '+MONS[n.getMonth()]+' 
 function nowTime(){const n=new Date();return String(n.getHours()).padStart(2,'0')+':'+String(n.getMinutes()).padStart(2,'0');}
 function countThursdaysInMonth(y,m){let c=0;const d=new Date(y,m,1);while(d.getMonth()===m){if(d.getDay()===4)c++;d.setDate(d.getDate()+1);}return c;}
 function thisMonthThursdays(){const n=new Date();return countThursdaysInMonth(n.getFullYear(),n.getMonth())||4;}
-function getApiUrl(){ return localStorage.getItem('pm-api-url')||''; }
+// ═══ AUTO-CONNECT v1.3: เชื่อมต่อ Google Sheets อัตโนมัติผ่านลิงก์ตั้งค่า (ตั้งครั้งเดียวต่อเครื่อง/เบราว์เซอร์) ═══
+// เปิดผ่านลิงก์พิเศษที่มี ?api=URL ต่อท้าย (ส่งให้พนักงานทางแชทภายใน ไม่เผยแพร่ในซอร์สโค้ดสาธารณะ)
+// ระบบจะบันทึกอัตโนมัติแล้วลบพารามิเตอร์ออกจาก URL ทันที ครั้งต่อไปไม่ต้องกดซ้ำ (อ่านจาก localStorage เหมือนเดิม)
+(function(){
+  try{
+    var p=new URLSearchParams(location.search);
+    var apiParam=p.get('api');
+    if(apiParam){
+      localStorage.setItem('pm-thu-api-url',decodeURIComponent(apiParam));
+      p.delete('api');
+      var clean=location.pathname+(p.toString()?('?'+p.toString()):'')+location.hash;
+      history.replaceState(null,'',clean);
+    }
+  }catch(e){}
+})();
+function getApiUrl(){ return (localStorage.getItem('pm-thu-api-url')||localStorage.getItem('pm-api-url'))||''; }
+function getApiToken(){return (localStorage.getItem('pm-thu-api-token')||localStorage.getItem('pm-api-token'))||'';}
 async function apiGet(action,params={}){
   const url=getApiUrl(); if(!url) return null;
-  try{ const r=await fetch(url+'?'+new URLSearchParams({action,...params})); const j=await r.json(); return j.status==='ok'?j.data:null; }
+  try{ const r=await fetch(url+'?'+new URLSearchParams({action,token:getApiToken(),...params})); const j=await r.json(); return j.status==='ok'?j.data:null; }
   catch(e){ console.error('apiGet error:',action,e); return null; }
 }
 async function apiPost(action,data={}){
   const url=getApiUrl(); if(!url) return null;
-  try{ const r=await fetch(url,{method:'POST',body:JSON.stringify({action,...data})}); return await r.json(); }
+  try{ const r=await fetch(url,{method:'POST',body:JSON.stringify({action,token:getApiToken(),...data})}); return await r.json(); }
   catch(e){ console.error('apiPost error:',action,e); return null; }
 }
 
@@ -1251,7 +1259,7 @@ async function loadVendorsFromSheets(){
     const active = document.querySelector('.page.active')?.id;
     if(active==='tab-billing') renderBilling();
     if(active==='tab-history') renderHistory();
-    showToast(`☁️ โหลดผู้ค้า ${vendors.length} รายจาก Google Sheets`, 'success');
+    showToast(`<svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M17.5 19H9a5 5 0 1 1 1.6-9.7A6 6 0 0 1 22 11.5 4.5 4.5 0 0 1 17.5 19Z"/></svg> โหลดผู้ค้า ${vendors.length} รายจาก Google Sheets`, 'success');
   }
 }
 
@@ -1269,12 +1277,7 @@ async function persistVendorElec(v){
 // ══════════════════════════════════════
 //  INIT
 // ══════════════════════════════════════
-window.onload = () => {
-  const n=new Date();
-  const bm=document.getElementById('billMonth');
-  if(bm) bm.textContent = '🗓️ '+MONS[n.getMonth()]+' '+(n.getFullYear()+543);
-  renderTable(); initUpdateTab(); loadVendorsFromSheets();
-};
+window.onload = () => { renderTable(); initUpdateTab(); loadVendorsFromSheets(); };
 </script>
 </body>
 </html>

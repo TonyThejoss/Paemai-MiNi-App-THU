@@ -108,8 +108,8 @@ const MONS=['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ
 function nowTH(){const n=new Date();return n.getDate()+' '+MONS[n.getMonth()]+' '+(n.getFullYear()+543);}
 function baht(n){return '฿'+Math.round(n||0).toLocaleString();}
 
-function getApiUrl(){return localStorage.getItem('pm-api-url')||'';}
-function getApiToken(){return localStorage.getItem('pm-api-token')||'';}
+function getApiUrl(){return (localStorage.getItem('pm-thu-api-url')||localStorage.getItem('pm-api-url'))||'';}
+function getApiToken(){return (localStorage.getItem('pm-thu-api-token')||localStorage.getItem('pm-api-token'))||'';}
 async function apiGet(action,params={}){
   const url=getApiUrl(); if(!url) return null;
   try{
@@ -120,6 +120,7 @@ async function apiGet(action,params={}){
 }
 
 // ลำดับโซนตามผังตลาดจริง: โรงหน้า → โรงใหญ่ → โซนด้านนอก
+//== MARKET_BLOCK:ZONES ==//
 const ZONE_ORDER = ['A','B','C','D','E','F','G','J','K','N','U','O','M','H','L','T','AB','TA','TB','TC'];
 const ZONE_GROUP_NAME = {
   A:'โซนด้านนอก', B:'โซนด้านนอก', C:'โซนด้านนอก', D:'โซนด้านนอก', E:'โซนด้านนอก', F:'โซนด้านนอก',
@@ -127,6 +128,7 @@ const ZONE_GROUP_NAME = {
   O:'ข้างโลตัส', M:'ข้างโลตัส', H:'ข้างโลตัส', L:'ข้างโลตัส', T:'ข้างโลตัส', AB:'ข้างโลตัส',
   TA:'เปิดท้าย', TB:'เปิดท้าย', TC:'เปิดท้าย',
 };
+//== END_MARKET_BLOCK ==//
 
 // รูปแบบวันที่จริงที่บันทึกไว้: "6 ก.ค. 2569" (วัน เดือนย่อ ปี พ.ศ.)
 function parsePayDate(dstr){

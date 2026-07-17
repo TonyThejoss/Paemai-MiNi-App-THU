@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ระบบผ่อนชำระ & ยอดคงค้าง — แพไม้มินิ วันพฤหัสบดี</title>
-<style>a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible,[tabindex]:focus-visible,.lk:focus-visible,.zone-tab:focus-visible{outline:2.5px solid var(--gm) !important;outline-offset:2px;}.ico{width:1em;height:1em;display:inline-block;vertical-align:-0.15em;flex-shrink:0}
+<title>ระบบผ่อนชำระ & ยอดคงค้าง — แพไม้มินิ</title>
+<style>
 :root {
   --g:#7c2d12;--gm:#c2410c;--gb:#ea580c;--gl:#ffedd5;--gll:#fff7ed;
   --r:#b91c1c;--rl:#fef2f2;--o:#c2410c;--ol:#fff7ed;
@@ -12,7 +12,7 @@
   --y:#92400e;--yl:#fffbeb;
   --bg:#f4f6f4;--sf:#fff;--sf2:#f8faf9;--sf3:#f1f5f2;
   --bd:#c8d8cf;--bd2:#9bb5a5;
-  --tx:#0f1e14;--txm:#3d5247;--txl:#4d6854;
+  --tx:#0f1e14;--txm:#3d5247;--txl:#7a9184;
   --shadow:0 2px 12px rgba(15,30,20,.07);
   --ease:cubic-bezier(.4,0,.2,1);
   --rad:10px;
@@ -20,7 +20,7 @@
 [data-theme="dark"]{
   --bg:#0a0f0c;--sf:#111a14;--sf2:#162019;--sf3:#1c2a20;
   --bd:#2a3d30;--bd2:#3d5a46;
-  --tx:#d4e8d8;--txm:#8aab8f;--txl:#8ca696;
+  --tx:#d4e8d8;--txm:#8aab8f;--txl:#4a6350;
   --gl:#112318;--gll:#0b170f;--rl:#1f0a0a;--ol:#1f1008;
   --bl:#0a1228;--pul:#170f28;--yl:#1a1208;
   --shadow:0 4px 20px rgba(0,0,0,.45);
@@ -214,23 +214,31 @@ textarea{resize:vertical;min-height:56px;}
 ::-webkit-scrollbar-thumb{background:var(--bd2);border-radius:2px;}
 @media(max-width:900px){.two-col{grid-template-columns:1fr;}.kpi-grid{grid-template-columns:repeat(3,1fr);}}
 @media(max-width:580px){.field-row{grid-template-columns:1fr;}.kpi-grid{grid-template-columns:repeat(2,1fr);}}
+
+.ic{width:1em;height:1em;vertical-align:-.15em;display:inline-block;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0}
+.ic-dot{stroke:none}
 </style>
 </head>
 <body>
 
 <div class="topbar">
   <div>
-    <h1><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2.5" y="5.5" width="19" height="13" rx="2"/><path d="M2.5 9.5h19M6 14.5h4"/></svg> ระบบผ่อนชำระ & ยอดคงค้าง — แพไม้มินิ วันพฤหัสบดี</h1>
-    <p>งวดแรก = พฤหัสบดีสุดท้ายของเดือน · ชำระให้ครบภายในพฤหัสบดีต้นเดือนถัดไป</p>
+    <h1><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg> ระบบผ่อนชำระ & ยอดคงค้าง — แพไม้มินิ</h1>
+    <p>งวดแรก = อังคารสุดท้ายของเดือน · ชำระให้ครบภายในอังคารต้นเดือนถัดไป</p>
   </div>
-  <button class="dm-btn" onclick="toggleDark()" title="Dark/Light" aria-label="สลับโหมดมืด/สว่าง"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 3a9 9 0 0 0 0 18z" fill="currentColor" stroke="none"/></svg></button>
+  <button class="dm-btn" onclick="toggleDark()" aria-label="สลับโหมดมืด/สว่าง" title="Dark/Light"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3a9 9 0 1 0 0 18Z" fill="currentColor" stroke="none"/><circle cx="12" cy="12" r="9"/></svg></button>
 </div>
 
 <div class="tabs">
-  <button class="tab active" onclick="showTab('t1',this)"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20V10M11 20V4M18 20v-7"/><path d="M2.5 20h19"/></svg> ภาพรวมค้างชำระ</button>
-  <button class="tab"       onclick="showTab('t2',this)"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="4" width="12" height="17" rx="2"/><rect x="9" y="2.5" width="6" height="3" rx="1"/><path d="M9 11h6M9 15h6"/></svg> ตั้งแผนผ่อนชำระ</button>
-  <button class="tab"       onclick="showTab('t3',this)"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m20 20-4.3-4.3"/></svg> ติดตามการผ่อน</button>
-  <button class="tab"       onclick="showTab('t4',this)"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 4 3 6.5v14L9 18l6 2.5L21 18V4l-6 2.5L9 4z"/><path d="M9 4v14M15 6.5v14"/></svg>️ แผนที่สถานะ</button>
+  <button class="tab active" onclick="showTab('t1',this)"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><line x1="6" y1="20" x2="6" y2="12"/><line x1="12" y1="20" x2="12" y2="6"/><line x1="18" y1="20" x2="18" y2="15"/></svg> ภาพรวมค้างชำระ</button>
+  <button class="tab"       onclick="showTab('t2',this)"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="4" width="16" height="18" rx="2"/><path d="M9 3h6a1 1 0 0 1 1 1v1H8V4a1 1 0 0 1 1-1Z"/></svg> ตั้งแผนผ่อนชำระ</button>
+  <button class="tab"       onclick="showTab('t3',this)"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg> ติดตามการผ่อน</button>
+  <button class="tab"       onclick="showTab('t4',this)"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><polygon points="3 6 9 3 15 6 21 3 21 18 15 21 9 18 3 21"/><line x1="9" y1="3" x2="9" y2="18"/><line x1="15" y1="6" x2="15" y2="21"/></svg>️ แผนที่สถานะ</button>
+</div>
+
+<div id="no-db-banner" style="display:none;background:var(--rl);border-bottom:2px solid var(--r);color:var(--r);text-align:center;font-weight:700;font-size:.78rem;padding:8px 14px">
+  <svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+  ยังไม่ได้เชื่อมต่อฐานข้อมูล (pm-tue-api-url) — หน้านี้จะไม่แสดงข้อมูลจนกว่าจะตั้งค่าการเชื่อมต่อจากหน้าหลัก
 </div>
 
 <!-- ═══ TAB 1 ═══ -->
@@ -244,28 +252,27 @@ textarea{resize:vertical;min-height:56px;}
   </div>
 
   <div class="card">
-    <div class="card-title"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 2 20h20L12 3z"/><path d="M12 10v4"/><circle cx="12" cy="17" r=".6" fill="currentColor" stroke="none"/></svg>️ รายชื่อผู้ค้าค้างชำระทั้งหมด
-      <span><button class="btn btn-primary btn-sm" onclick="switchTab('t2')"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg> ตั้งแผนผ่อน</button></span>
+    <div class="card-title"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0Z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>️ รายชื่อผู้ค้าค้างชำระทั้งหมด
+      <span><button class="btn btn-primary btn-sm" onclick="switchTab('t2')"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg> ตั้งแผนผ่อน</button></span>
     </div>
     <div class="search-row">
-      <input class="sbox" id="s1q" aria-label="ค้นหาล็อค / ร้าน" placeholder="🔍 ค้นหาล็อค / ร้าน..." oninput="renderOv()">
-      <select class="fsel" id="s1z" aria-label="กรองโซน" onchange="renderOv()">
+      <input class="sbox" id="s1q" placeholder="🔍 ค้นหาล็อค / ร้าน..." oninput="renderOv()">
+      <select class="fsel" id="s1z" onchange="renderOv()">
         <option value="">ทุกโซน</option>
-        <option>A</option><option>B</option><option>C</option><option>D</option><option>E</option><option>F</option>
-        <option>G</option><option>J</option><option>K</option><option>N</option><option>U</option>
-        <option>O</option><option>M</option><option>H</option><option>L</option><option>T</option><option>AB</option>
-        <option>TA</option><option>TB</option><option>TC</option>
+        <option>SA</option><option>SB</option><option>SC</option>
+        <option>SD</option><option>SE</option><option>SF</option>
+        <option>A</option><option>B</option><option>C</option>
+        <option>D</option><option>F</option>
       </select>
-      <select class="fsel" id="s1s" aria-label="กรองสถานะ" onchange="renderOv()">
+      <select class="fsel" id="s1s" onchange="renderOv()">
         <option value="">ทุกสถานะ</option>
         <option value="no_plan">ยังไม่มีแผน</option>
         <option value="paying">กำลังผ่อน</option>
         <option value="overdue_term">ค้างงวด</option>
         <option value="near_deadline">ใกล้หมดสิทธิ์</option>
       </select>
-      <select class="fsel" id="s1o" aria-label="เรียงลำดับ" onchange="renderOv()">
-        <option value="remain_desc">คงเหลือมาก→น้อย</option>
-        <option value="months_desc">ค้างนาน→สั้น</option>
+      <select class="fsel" id="s1o" onchange="renderOv()">
+        <option value="remain_desc">คงเหลือมากน้อย</option>
         <option value="lock">เลขล็อค</option>
       </select>
     </div>
@@ -291,11 +298,11 @@ textarea{resize:vertical;min-height:56px;}
   <div class="two-col">
     <div>
       <div class="card">
-        <div class="card-title"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="4" width="12" height="17" rx="2"/><rect x="9" y="2.5" width="6" height="3" rx="1"/><path d="M9 11h6M9 15h6"/></svg> ตั้งแผนผ่อนชำระ</div>
+        <div class="card-title"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="4" width="16" height="18" rx="2"/><path d="M9 3h6a1 1 0 0 1 1 1v1H8V4a1 1 0 0 1 1-1Z"/></svg> ตั้งแผนผ่อนชำระ</div>
 
         <div class="field-row">
           <div class="field">
-            <label for="ins-lock">เลือกล็อค <span class="req">*</span></label>
+            <label>เลือกล็อค <span class="req">*</span></label>
             <select id="ins-lock" onchange="loadDebt()">
               <option value="">-- เลือกล็อคที่มียอดค้าง --</option>
             </select>
@@ -315,17 +322,17 @@ textarea{resize:vertical;min-height:56px;}
 
         <!-- วันที่อิงอัตโนมัติ -->
         <div id="date-info-box" style="display:none;background:var(--gll);border:1.5px solid var(--gm);border-radius:8px;padding:9px 13px;margin-bottom:10px;font-size:.76rem">
-          <div style="font-weight:800;color:var(--gm);margin-bottom:5px"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="5" width="17" height="16" rx="2"/><path d="M3.5 9.5h17M8 3v4M16 3v4"/></svg> กำหนดการผ่อนชำระ (อิงวันพฤหัสบดี)</div>
+          <div style="font-weight:800;color:var(--gm);margin-bottom:5px"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg> กำหนดการผ่อนชำระ (อิงวันพฤหัสบดี)</div>
           <div style="display:flex;gap:16px;flex-wrap:wrap">
-            <div><span style="color:var(--txl)">งวดแรก (พฤหัสบดีสุดท้ายเดือนนี้):</span> <strong id="date-first" style="color:var(--gm)">—</strong></div>
+            <div><span style="color:var(--txl)">งวดแรก (อังคารสุดท้ายเดือนนี้):</span> <strong id="date-first" style="color:var(--gm)">—</strong></div>
             <div><span style="color:var(--txl)">ชำระให้ครบภายใน:</span> <strong id="date-deadline" style="color:var(--r)">—</strong></div>
           </div>
           <div style="margin-top:5px;font-size:.70rem;color:var(--r);font-weight:600" id="date-warning"></div>
         </div>
 
-        <div class="field-row c3" style="margin-bottom:10px">
+        <div class="field-row" style="margin-bottom:10px">
           <div class="field">
-            <label for="ins-terms">จำนวนงวด <span class="req">*</span></label>
+            <label>จำนวนงวด <span class="req">*</span></label>
             <select id="ins-terms" onchange="calcPlan()">
               <option value="2">2 งวด</option>
               <option value="3" selected>3 งวด (แนะนำ)</option>
@@ -333,24 +340,21 @@ textarea{resize:vertical;min-height:56px;}
             </select>
           </div>
           <div class="field">
-            <label for="ins-first">งวดแรก (฿)</label>
+            <label>งวดแรก (฿)</label>
             <input type="number" id="ins-first" placeholder="0 = เฉลี่ย" min="0" oninput="calcPlan()">
           </div>
-          <div class="field">
-            <label for="ins-rate">ดอกเบี้ย (%/เดือน)</label>
-            <input type="number" id="ins-rate" value="0" min="0" step="0.1" oninput="calcPlan()">
-          </div>
+          <!-- ดอกเบี้ยถูกตัดออกจากระบบจริง 2026-07-14 (ตกลงกับผู้ดูแลระบบ — ตลาดไม่มีนโยบายคิดดอกเบี้ยผ่อนชำระ) -->
         </div>
 
         <!-- กฎระเบียบ -->
         <div class="rule-box">
-          <div class="rule-title"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 3.5 20.5 9.5 17 13l-1.5 6-2-2-4.5 4.5-1-1L12.5 16l-2-2 3.5-1.5z"/></svg> กฎการผ่อนชำระ</div>
+          <div class="rule-title"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2a5 5 0 0 0-5 5c0 3 2 4.6 3.5 8.2L12 22l1.5-6.8C15 11.6 17 10 17 7a5 5 0 0 0-5-5Z"/><circle cx="12" cy="7" r="1.6" fill="currentColor" stroke="none"/></svg> กฎการผ่อนชำระ</div>
           <ul>
             <li>งวดแรก ชำระ <strong>วันพฤหัสบดีสุดท้าย</strong>ของเดือนที่ตั้งแผน</li>
             <li>ต้องชำระให้ครบภายใน <strong>วันพฤหัสบดีต้นเดือน</strong>ของเดือนถัดจากงวดสุดท้าย</li>
             <li class="warn">หากค้างชำระเกินกำหนด สิทธิ์ผู้ค้าประจำจะสิ้นสุดทันที</li>
             <li class="warn">ต้องเข้ากระบวนการสมัครผู้ค้าประจำใหม่ + ชำระค่าแรกเข้า + รายปีอีกครั้ง</li>
-            <li>ผ่อนสูงสุด 4 งวด (4 พฤหัสบดี)</li>
+            <li>ผ่อนสูงสุด 4 งวด (4 อังคาร)</li>
           </ul>
         </div>
 
@@ -361,8 +365,8 @@ textarea{resize:vertical;min-height:56px;}
         </div>
 
         <div style="display:flex;gap:9px;margin-top:14px">
-          <button class="btn btn-secondary" style="flex:1" onclick="resetForm()"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 7h14M9 7V4.5h6V7M7 7l1 13.5h8L17 7"/><path d="M10 11v6M14 11v6"/></svg>️ ล้าง</button>
-          <button class="btn btn-primary" style="flex:1" onclick="savePlan()"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 3h13l3 3v15H4z"/><path d="M8 3v6h8V3M7 14h10v7H7z"/></svg> บันทึกแผนผ่อน</button>
+          <button class="btn btn-secondary" style="flex:1" onclick="resetForm()"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>️ ล้าง</button>
+          <button class="btn btn-primary" style="flex:1" onclick="savePlan()"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2Z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg> บันทึกแผนผ่อน</button>
         </div>
       </div>
     </div>
@@ -377,17 +381,16 @@ textarea{resize:vertical;min-height:56px;}
         </div>
 
         <div class="sum-rows">
-          <div style="font-size:.78rem;font-weight:800;margin-bottom:8px"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="5" width="17" height="16" rx="2"/><path d="M3.5 9.5h17M8 3v4M16 3v4"/><rect x="7" y="12.5" width="3" height="3" fill="currentColor" stroke="none"/></svg> สรุปแผน</div>
+          <div style="font-size:.78rem;font-weight:800;margin-bottom:8px"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/><path d="M8 14h.01M12 14h.01M16 14h.01M8 18h.01M12 18h.01"/></svg> สรุปแผน</div>
           <div class="sum-row"><span class="sum-lbl">จำนวนงวด</span><span class="sum-val" id="p-terms">—</span></div>
           <div class="sum-row"><span class="sum-lbl">งวดแรก (ครั้ง/วัน)</span><span class="sum-val" id="p-d1">—</span></div>
           <div class="sum-row"><span class="sum-lbl">ค่างวดเฉลี่ย</span><span class="sum-val" id="p-avg">—</span></div>
           <div class="sum-row"><span class="sum-lbl">วันครบกำหนด</span><span class="sum-val" style="color:var(--r)" id="p-deadline">—</span></div>
-          <div class="sum-row"><span class="sum-lbl">ดอกเบี้ยรวม</span><span class="sum-val" style="color:var(--o)" id="p-interest">฿0</span></div>
           <div class="sum-row"><span class="sum-lbl">ยอดรวม</span><span class="sum-val" style="color:var(--r)" id="p-grand">—</span></div>
         </div>
 
         <div class="deadline-info" id="p-deadline-box" style="display:none">
-          <div class="dl-title"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 2 20h20L12 3z"/><path d="M12 10v4"/><circle cx="12" cy="17" r=".6" fill="currentColor" stroke="none"/></svg>️ ผลหากไม่ชำระตามกำหนด</div>
+          <div class="dl-title"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0Z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>️ ผลหากไม่ชำระตามกำหนด</div>
           <div class="dl-row"><span>สิทธิ์ผู้ค้าประจำ</span><span class="dl-val">สิ้นสุดทันที</span></div>
           <div class="dl-row"><span>ต้องสมัครใหม่</span><span class="dl-val">ค่าแรกเข้า + รายปี</span></div>
         </div>
@@ -399,14 +402,14 @@ textarea{resize:vertical;min-height:56px;}
 <!-- ═══ TAB 3 ═══ -->
 <div id="t3" class="page">
   <div class="card">
-    <div class="card-title"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m20 20-4.3-4.3"/></svg> ติดตามแผนผ่อนชำระ
+    <div class="card-title"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg> ติดตามแผนผ่อนชำระ
       <span style="font-size:.68rem;font-weight:400;color:var(--txl)">กด "รับงวด" เพื่อบันทึกชำระ</span>
     </div>
     <div class="search-row">
-      <input class="sbox" id="s3q" aria-label="ค้นหา" placeholder="🔍 ค้นหา..." oninput="renderTracking()">
-      <select class="fsel" id="s3s" aria-label="กรองสถานะ" onchange="renderTracking()">
+      <input class="sbox" id="s3q" placeholder="🔍 ค้นหา..." oninput="renderTracking()">
+      <select class="fsel" id="s3s" onchange="renderTracking()">
         <option value="">ทุกสถานะ</option>
-        <option value="active">กำลังผ่อน</option>
+        <option value="paying">กำลังผ่อน</option>
         <option value="overdue_term">ค้างงวด</option>
         <option value="near_deadline">ใกล้หมดสิทธิ์</option>
       </select>
@@ -418,21 +421,23 @@ textarea{resize:vertical;min-height:56px;}
 <!-- ═══ TAB 4 ═══ -->
 <div id="t4" class="page">
   <div class="card">
-    <div class="card-title"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 4 3 6.5v14L9 18l6 2.5L21 18V4l-6 2.5L9 4z"/><path d="M9 4v14M15 6.5v14"/></svg>️ แผนที่สถานะการชำระ — ทุกโซน
+    <div class="card-title"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><polygon points="3 6 9 3 15 6 21 3 21 18 15 21 9 18 3 21"/><line x1="9" y1="3" x2="9" y2="18"/><line x1="15" y1="6" x2="15" y2="21"/></svg>️ แผนที่สถานะการชำระ — ทุกโซน
       <span style="display:flex;gap:6px;flex-wrap:wrap;margin-left:auto">
-        <span class="badge b-green"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="m8 12 3 3 5-6"/></svg> ชำระครบ</span>
-        <span class="badge b-orange"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 11a8 8 0 0 0-14.9-4M4 13a8 8 0 0 0 14.9 4"/><path d="M4 4v4h4M20 20v-4h-4"/></svg> กำลังผ่อน</span>
-        <span class="badge b-red"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="m9 9 6 6M15 9l-6 6"/></svg> ค้างชำระ</span>
-        <span class="badge b-yellow"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8" fill="currentColor" stroke="none"/></svg> ว่าง</span>
+        <span class="badge b-green"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg> ชำระครบ</span>
+        <span class="badge b-orange"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 12a9 9 0 0 1-15.3 6.4L3 16"/><path d="M3 12a9 9 0 0 1 15.3-6.4L21 8"/><polyline points="3 20 3 16 7 16"/><polyline points="21 4 21 8 17 8"/></svg> กำลังผ่อน</span>
+        <span class="badge b-red"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg> ค้างชำระ</span>
+        <span class="badge b-yellow"><svg class="ic ic-dot" viewBox="0 0 24 24" aria-hidden="true" style="color:var(--o)"><circle cx="12" cy="12" r="8" fill="currentColor"/></svg> ว่าง</span>
       </span>
     </div>
     <div style="font-size:.68rem;color:var(--txl);margin-bottom:8px">ตัวเลขแดงมุมบนขวา = ยอดคงค้าง (หน่วยพัน) · กดล็อคเพื่อดูรายละเอียด</div>
     <!-- Zone tabs -->
     <div style="display:flex;gap:6px;margin-bottom:10px;flex-wrap:wrap">
-      <button id="mztab-out" class="btn btn-primary btn-sm" style="padding:5px 12px;font-size:.68rem" onclick="switchMapZone('out')"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2 7 9h3l-4 6h4v6h4v-6h4l-4-6h3z"/></svg> โซนด้านนอก A–F</button>
-      <button id="mztab-b7" class="btn btn-secondary btn-sm" style="padding:5px 12px;font-size:.68rem" onclick="switchMapZone('b7')"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 10h16v9a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1v-9z"/><path d="M3 6l1.5-3h15L21 6M3 6l.8 3.2A1.7 1.7 0 0 0 8 9.4M8 9.4a1.7 1.7 0 0 0 3.3 0M11.3 9.4a1.7 1.7 0 0 0 3.4 0M14.7 9.4a1.7 1.7 0 0 0 3.3 0M18 9.4A1.7 1.7 0 0 0 21.2 9.2L22 6"/></svg> ข้าง 7-Eleven</button>
-      <button id="mztab-lt" class="btn btn-secondary btn-sm" style="padding:5px 12px;font-size:.68rem" onclick="switchMapZone('lt')"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="20" r="1.3" fill="currentColor" stroke="none"/><circle cx="17" cy="20" r="1.3" fill="currentColor" stroke="none"/><path d="M2.5 3h2.5L8 14h9l2.5-8H6.5"/></svg> ข้างโลตัส</button>
-      <button id="mztab-tg" class="btn btn-secondary btn-sm" style="padding:5px 12px;font-size:.68rem" onclick="switchMapZone('tg')"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="12" height="9" rx="1"/><path d="M14 10h4l3 3v3h-7z"/><circle cx="7" cy="18.5" r="1.6"/><circle cx="17.5" cy="18.5" r="1.6"/></svg> เปิดท้าย TA–TC</button>
+<!--== MARKET_BLOCK:MAP_TABS ==-->
+      <button id="mztab-out" class="btn btn-primary btn-sm" style="padding:5px 12px;font-size:.68rem" onclick="switchMapZone('out')"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2 6 12h4l-4 8h12l-4-8h4Z"/><line x1="12" y1="22" x2="12" y2="20"/></svg> โซนด้านนอก A–F</button>
+      <button id="mztab-b7" class="btn btn-secondary btn-sm" style="padding:5px 12px;font-size:.68rem" onclick="switchMapZone('b7')"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="2" width="16" height="20"/><line x1="9" y1="6" x2="9" y2="6.01"/><line x1="15" y1="6" x2="15" y2="6.01"/></svg> ข้าง 7-Eleven</button>
+      <button id="mztab-lt" class="btn btn-secondary btn-sm" style="padding:5px 12px;font-size:.68rem" onclick="switchMapZone('lt')"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 9 4 4h16l1 5"/><path d="M4 9v11h16V9"/></svg> ข้างโลตัส</button>
+      <button id="mztab-tg" class="btn btn-secondary btn-sm" style="padding:5px 12px;font-size:.68rem" onclick="switchMapZone('tg')"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><rect x="1" y="6" width="15" height="12" rx="2"/><path d="M16 10h4l3 4v4h-7"/></svg> เปิดท้าย</button>
+<!--== END_MARKET_BLOCK ==-->
     </div>
     <div class="map-grid" id="map-grid"></div>
   </div>
@@ -442,13 +447,13 @@ textarea{resize:vertical;min-height:56px;}
 <!-- MODAL PAY -->
 <div class="overlay" id="pay-modal">
   <div class="modal">
-    <button class="modal-close" onclick="closeModal()" aria-label="ปิดหน้าต่าง"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 5l14 14M19 5 5 19"/></svg></button>
+    <button class="modal-close" onclick="closeModal()" aria-label="ปิดหน้าต่าง"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
     <div class="modal-title" id="pm-title">รับชำระงวด</div>
     <div class="modal-sub" id="pm-sub">—</div>
     <div id="pm-body"></div>
     <div class="modal-footer">
       <button class="btn btn-secondary" onclick="closeModal()">ยกเลิก</button>
-      <button class="btn btn-primary" onclick="doPayInstallment()"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="m8 12 3 3 5-6"/></svg> บันทึก</button>
+      <button class="btn btn-primary" onclick="doPayInstallment()"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg> บันทึก</button>
     </div>
   </div>
 </div>
@@ -456,8 +461,8 @@ textarea{resize:vertical;min-height:56px;}
 
 <script>
 // ─── Dark mode ───────────────────────────────────────────────────────────────
-function toggleDark(){const h=document.documentElement,d=h.getAttribute('data-theme')==='dark';h.setAttribute('data-theme',d?'light':'dark');localStorage.setItem('pm-t',d?'light':'dark');}
-(()=>{const s=localStorage.getItem('pm-t');if(s)document.documentElement.setAttribute('data-theme',s);else if(window.matchMedia('(prefers-color-scheme:dark)').matches)document.documentElement.setAttribute('data-theme','dark');})();
+function toggleDark(){const h=document.documentElement,d=h.getAttribute('data-theme')==='dark';h.setAttribute('data-theme',d?'light':'dark');localStorage.setItem('pmthu-t',d?'light':'dark');}
+(()=>{const s=localStorage.getItem('pmthu-t');if(s)document.documentElement.setAttribute('data-theme',s);else if(window.matchMedia('(prefers-color-scheme:dark)').matches)document.documentElement.setAttribute('data-theme','dark');})();
 
 // ─── Thursday helpers ─────────────────────────────────────────────────────────
 const MONTH_TH=['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
@@ -465,21 +470,15 @@ function fmtDate(d){return `${d.getDate()} ${MONTH_TH[d.getMonth()]} ${d.getFull
 function fmtDateShort(d){return `${d.getDate()}/${d.getMonth()+1}/${String(d.getFullYear()+543).slice(2)}`;}
 
 function lastThursdayOf(year,month){
-  // month = 0-based; 4 = Thursday
+  // month = 0-based
   const last = new Date(year, month+1, 0); // last day of month
-  while(last.getDay()!==4) last.setDate(last.getDate()-1);
+  while(last.getDay()!==2) last.setDate(last.getDate()-1);
   return new Date(last);
 }
 function firstThursdayOf(year,month){
   const d = new Date(year,month,1);
-  while(d.getDay()!==4) d.setDate(d.getDate()+1);
+  while(d.getDay()!==2) d.setDate(d.getDate()+1);
   return new Date(d);
-}
-function thisMonthThursdays(){
-  const n=new Date();
-  let c=0; const d=new Date(n.getFullYear(),n.getMonth(),1);
-  while(d.getMonth()===n.getMonth()){ if(d.getDay()===4) c++; d.setDate(d.getDate()+1); }
-  return c||4;
 }
 function addThursdaysFrom(startDate, count){
   // generate `count` consecutive Thursdays starting from startDate (must be Thursday)
@@ -520,56 +519,116 @@ function computeSchedule(terms, debtRemain, firstAmt, interestRate, refDate=null
   return {schedule, deadline, firstPayDate, totalWithInt, first, restAmt};
 }
 
-// ─── DATA — โหลดจาก Google Sheets จริงเท่านั้น (ไม่มีข้อมูลตัวอย่าง) ──────────────
-let VENDORS = [];
-
-function getApiUrl(){ return localStorage.getItem('pm-api-url')||''; }
+// ─── DATA (เชื่อมข้อมูลจริงจาก Google Sheets — แก้ 2026-07-14, บั๊ก #19: เดิมเป็น mock data ทั้งหมด) ──
+// ยอดหนี้ (total_debt) = vendors.unpaid_penalty + vendors.unpaid_other (ตกลงกับผู้ดูแลระบบแล้ว)
+// ไม่มีดอกเบี้ย (ตัดออกจากระบบจริง — ตลาดไม่มีนโยบายคิดดอกเบี้ยผ่อนชำระ)
+// เงินที่รับตามแผนผ่อนบันทึกที่ชีต payments เดิม (type='installment') ไม่ใช่ชีตแยก
+// ═══ AUTO-CONNECT v1.3: เชื่อมต่อ Google Sheets อัตโนมัติผ่านลิงก์ตั้งค่า (ตั้งครั้งเดียวต่อเครื่อง/เบราว์เซอร์) ═══
+// เปิดผ่านลิงก์พิเศษที่มี ?api=URL ต่อท้าย (ส่งให้พนักงานทางแชทภายใน ไม่เผยแพร่ในซอร์สโค้ดสาธารณะ)
+// ระบบจะบันทึกอัตโนมัติแล้วลบพารามิเตอร์ออกจาก URL ทันที ครั้งต่อไปไม่ต้องกดซ้ำ (อ่านจาก localStorage เหมือนเดิม)
+(function(){
+  try{
+    var p=new URLSearchParams(location.search);
+    var apiParam=p.get('api');
+    if(apiParam){
+      localStorage.setItem('pm-thu-api-url',decodeURIComponent(apiParam));
+      p.delete('api');
+      var clean=location.pathname+(p.toString()?('?'+p.toString()):'')+location.hash;
+      history.replaceState(null,'',clean);
+    }
+  }catch(e){}
+})();
+function getApiUrl(){return (localStorage.getItem('pm-thu-api-url')||localStorage.getItem('pm-api-url'))||'';}
+function getApiToken(){return (localStorage.getItem('pm-thu-api-token')||localStorage.getItem('pm-api-token'))||'';}
 async function apiGet(action,params={}){
-  const url=getApiUrl(); if(!url) return null;
-  try{ const r=await fetch(url+'?'+new URLSearchParams({action,...params})); const j=await r.json(); return j.status==='ok'?j.data:null; }
-  catch(e){ return null; }
+  const url=getApiUrl(); if(!url)return null;
+  try{const r=await fetch(url+'?'+new URLSearchParams({action,token:getApiToken(),...params}));const j=await r.json();return j.status==='ok'?j.data:null;}catch(e){return null;}
 }
 async function apiPost(action,data={}){
-  const url=getApiUrl(); if(!url) return null;
-  try{ const r=await fetch(url,{method:'POST',body:JSON.stringify({action,...data})}); return await r.json(); }
-  catch(e){ return null; }
-}
-function calcElecFromVendor(v){
-  const base=(parseInt(v.elec_bulb)||0)*10+(parseInt(v.elec_fan)||0)*20+(parseInt(v.elec_small)||0)*50+(parseInt(v.elec_large)||0)*100;
-  let sp=0; try{ (JSON.parse(v.elec_special||'[]')||[]).forEach(x=>sp+=(x.price||0)); }catch(e){}
-  return base+sp;
-}
-// แปลงผู้ค้าที่ "ค้างชำระ" จริงจาก Sheets → ยอดค้างของรอบปัจจุบัน (ไม่มีการสมมติจำนวนเดือนย้อนหลัง)
-function mapUnpaidVendor(sv){
-  const monthlyRent = Math.round((parseFloat(sv.dailyRate)||0) * thisMonthThursdays());
-  const elecAmt = calcElecFromVendor(sv);
-  const debt = [{t:'ค่าเช่าเดือนนี้', a:monthlyRent}];
-  if (elecAmt>0) debt.push({t:'ค่าไฟฟ้า', a:elecAmt});
-  const otherPenalty = parseFloat(sv.unpaid_penalty)||0;
-  const otherFee = parseFloat(sv.unpaid_other)||0;
-  if (otherPenalty>0) debt.push({t:'ค่าปรับ', a:otherPenalty});
-  if (otherFee>0) debt.push({t:sv.unpaid_other_label||'ค่าอื่นๆ', a:otherFee});
-  return {
-    lock: sv.lock, zone: sv.zone||'',
-    shop: (sv.name && sv.name!=='(ยังไม่ระบุ)') ? sv.name : (sv.product||'(ไม่ระบุ)'),
-    months: 1, total_debt: monthlyRent+elecAmt+otherPenalty+otherFee, collected: 0,
-    debt, plan: null,
-  };
-}
-async function loadVendorsFromSheets(){
-  if (!getApiUrl()) return;
-  const data = await apiGet('getVendors');
-  if (!Array.isArray(data)) return;
-  VENDORS = data.filter(v=>v.lock && v.status==='unpaid').map(mapUnpaidVendor);
-  renderOv(); renderTracking(); buildMap(); updateKPI();
+  const url=getApiUrl(); if(!url)return null;
+  try{const r=await fetch(url,{method:'POST',body:JSON.stringify({action,token:getApiToken(),...data})});return await r.json();}catch(e){return null;}
 }
 
-const OUT_LOCKS=[{id:'A1',shop:'ว่าง',st:'vacant'},{id:'A2',shop:'ว่าง',st:'vacant'},{id:'A3',shop:'ว่าง',st:'vacant'},{id:'A4',shop:'ว่าง',st:'vacant'},{id:'A5',shop:'ว่าง',st:'vacant'},{id:'A6',shop:'ว่าง',st:'vacant'},{id:'A7',shop:'ว่าง',st:'vacant'},{id:'A8',shop:'ว่าง',st:'vacant'},{id:'A9',shop:'ว่าง',st:'vacant'},{id:'A10',shop:'ว่าง',st:'vacant'},{id:'A11',shop:'ว่าง',st:'vacant'},{id:'A12',shop:'ว่าง',st:'vacant'},{id:'A13',shop:'ว่าง',st:'vacant'},{id:'A14',shop:'ว่าง',st:'vacant'},{id:'A15',shop:'ว่าง',st:'vacant'},{id:'A16',shop:'ว่าง',st:'vacant'},{id:'A17',shop:'ว่าง',st:'vacant'},{id:'A18',shop:'ว่าง',st:'vacant'},{id:'A19',shop:'ว่าง',st:'vacant'},{id:'A20',shop:'ว่าง',st:'vacant'},{id:'B1',shop:'ว่าง',st:'vacant'},{id:'B2',shop:'ว่าง',st:'vacant'},{id:'B3',shop:'ว่าง',st:'vacant'},{id:'B4',shop:'ว่าง',st:'vacant'},{id:'B5',shop:'ว่าง',st:'vacant'},{id:'B6',shop:'ว่าง',st:'vacant'},{id:'B7',shop:'ว่าง',st:'vacant'},{id:'B8',shop:'ว่าง',st:'vacant'},{id:'B9',shop:'ว่าง',st:'vacant'},{id:'B10',shop:'ว่าง',st:'vacant'},{id:'B11',shop:'ว่าง',st:'vacant'},{id:'B12',shop:'ว่าง',st:'vacant'},{id:'B13',shop:'ว่าง',st:'vacant'},{id:'B14',shop:'ว่าง',st:'vacant'},{id:'B15',shop:'ว่าง',st:'vacant'},{id:'B16',shop:'ว่าง',st:'vacant'},{id:'B17',shop:'ว่าง',st:'vacant'},{id:'B18',shop:'ว่าง',st:'vacant'},{id:'B19',shop:'ว่าง',st:'vacant'},{id:'B20',shop:'ว่าง',st:'vacant'},{id:'C1',shop:'ว่าง',st:'vacant'},{id:'C2',shop:'ว่าง',st:'vacant'},{id:'C3',shop:'ว่าง',st:'vacant'},{id:'C4',shop:'ว่าง',st:'vacant'},{id:'C5',shop:'ว่าง',st:'vacant'},{id:'C6',shop:'ว่าง',st:'vacant'},{id:'C7',shop:'ว่าง',st:'vacant'},{id:'C8',shop:'ว่าง',st:'vacant'},{id:'C9',shop:'ว่าง',st:'vacant'},{id:'C10',shop:'ว่าง',st:'vacant'},{id:'C11',shop:'ว่าง',st:'vacant'},{id:'C12',shop:'ว่าง',st:'vacant'},{id:'C13',shop:'ว่าง',st:'vacant'},{id:'C14',shop:'ว่าง',st:'vacant'},{id:'C15',shop:'ว่าง',st:'vacant'},{id:'C16',shop:'ว่าง',st:'vacant'},{id:'C17',shop:'ว่าง',st:'vacant'},{id:'C18',shop:'ว่าง',st:'vacant'},{id:'C19',shop:'ว่าง',st:'vacant'},{id:'C20',shop:'ว่าง',st:'vacant'},{id:'C21',shop:'ว่าง',st:'vacant'},{id:'D1',shop:'ว่าง',st:'vacant'},{id:'D2',shop:'ว่าง',st:'vacant'},{id:'D3',shop:'ว่าง',st:'vacant'},{id:'D4',shop:'ว่าง',st:'vacant'},{id:'D5',shop:'ว่าง',st:'vacant'},{id:'D6',shop:'ว่าง',st:'vacant'},{id:'D7',shop:'ว่าง',st:'vacant'},{id:'D8',shop:'ว่าง',st:'vacant'},{id:'D9',shop:'ว่าง',st:'vacant'},{id:'D10',shop:'ว่าง',st:'vacant'},{id:'D11',shop:'ว่าง',st:'vacant'},{id:'D12',shop:'ว่าง',st:'vacant'},{id:'D13',shop:'ว่าง',st:'vacant'},{id:'D14',shop:'ว่าง',st:'vacant'},{id:'D15',shop:'ว่าง',st:'vacant'},{id:'D16',shop:'ว่าง',st:'vacant'},{id:'D17',shop:'ว่าง',st:'vacant'},{id:'D18',shop:'ว่าง',st:'vacant'},{id:'D19',shop:'ว่าง',st:'vacant'},{id:'D20',shop:'ว่าง',st:'vacant'},{id:'D21',shop:'ว่าง',st:'vacant'},{id:'D22',shop:'ว่าง',st:'vacant'},{id:'E1',shop:'ว่าง',st:'vacant'},{id:'E2',shop:'ว่าง',st:'vacant'},{id:'E3',shop:'ว่าง',st:'vacant'},{id:'E4',shop:'ว่าง',st:'vacant'},{id:'E5',shop:'ว่าง',st:'vacant'},{id:'E6',shop:'ว่าง',st:'vacant'},{id:'E7',shop:'ว่าง',st:'vacant'},{id:'E8',shop:'ว่าง',st:'vacant'},{id:'E9',shop:'ว่าง',st:'vacant'},{id:'E10',shop:'ว่าง',st:'vacant'},{id:'E11',shop:'ว่าง',st:'vacant'},{id:'F1',shop:'ว่าง',st:'vacant'},{id:'F2',shop:'ว่าง',st:'vacant'},{id:'F3',shop:'ว่าง',st:'vacant'},{id:'F4',shop:'ว่าง',st:'vacant'},{id:'F5',shop:'ว่าง',st:'vacant'},{id:'F6',shop:'ว่าง',st:'vacant'},{id:'F7',shop:'ว่าง',st:'vacant'},{id:'F8',shop:'ว่าง',st:'vacant'},{id:'F9',shop:'ว่าง',st:'vacant'},{id:'F10',shop:'ว่าง',st:'vacant'},{id:'F11',shop:'ว่าง',st:'vacant'},{id:'F12',shop:'ว่าง',st:'vacant'},{id:'F13',shop:'ว่าง',st:'vacant'},{id:'F14',shop:'ว่าง',st:'vacant'},{id:'F15',shop:'ว่าง',st:'vacant'},{id:'F16',shop:'ว่าง',st:'vacant'}];
-const B7_LOCKS=[{id:'G1',shop:'ว่าง',st:'vacant'},{id:'G2',shop:'ว่าง',st:'vacant'},{id:'G3',shop:'ว่าง',st:'vacant'},{id:'G4',shop:'ว่าง',st:'vacant'},{id:'G5',shop:'ว่าง',st:'vacant'},{id:'G6',shop:'ว่าง',st:'vacant'},{id:'G7',shop:'ว่าง',st:'vacant'},{id:'G8',shop:'ว่าง',st:'vacant'},{id:'G9',shop:'ว่าง',st:'vacant'},{id:'G10',shop:'ว่าง',st:'vacant'},{id:'G11',shop:'ว่าง',st:'vacant'},{id:'G12',shop:'ว่าง',st:'vacant'},{id:'G13',shop:'ว่าง',st:'vacant'},{id:'G14',shop:'ว่าง',st:'vacant'},{id:'G15',shop:'ว่าง',st:'vacant'},{id:'G16',shop:'ว่าง',st:'vacant'},{id:'G17',shop:'ว่าง',st:'vacant'},{id:'G18',shop:'ว่าง',st:'vacant'},{id:'G19',shop:'ว่าง',st:'vacant'},{id:'G20',shop:'ว่าง',st:'vacant'},{id:'G21',shop:'ว่าง',st:'vacant'},{id:'G22',shop:'ว่าง',st:'vacant'},{id:'G23',shop:'ว่าง',st:'vacant'},{id:'G24',shop:'ว่าง',st:'vacant'},{id:'G25',shop:'ว่าง',st:'vacant'},{id:'G26',shop:'ว่าง',st:'vacant'},{id:'G27',shop:'ว่าง',st:'vacant'},{id:'G28',shop:'ว่าง',st:'vacant'},{id:'J1',shop:'ว่าง',st:'vacant'},{id:'J2',shop:'ว่าง',st:'vacant'},{id:'J3',shop:'ว่าง',st:'vacant'},{id:'J4',shop:'ว่าง',st:'vacant'},{id:'K1',shop:'ว่าง',st:'vacant'},{id:'K2',shop:'ว่าง',st:'vacant'},{id:'K3',shop:'ว่าง',st:'vacant'},{id:'K4',shop:'ว่าง',st:'vacant'},{id:'K5',shop:'ว่าง',st:'vacant'},{id:'K6',shop:'ว่าง',st:'vacant'},{id:'K7',shop:'ว่าง',st:'vacant'},{id:'K8',shop:'ว่าง',st:'vacant'},{id:'K9',shop:'ว่าง',st:'vacant'},{id:'K10',shop:'ว่าง',st:'vacant'},{id:'K11',shop:'ว่าง',st:'vacant'},{id:'K12',shop:'ว่าง',st:'vacant'},{id:'N1',shop:'ว่าง',st:'vacant'},{id:'N2',shop:'ว่าง',st:'vacant'},{id:'N3',shop:'ว่าง',st:'vacant'},{id:'N4',shop:'ว่าง',st:'vacant'},{id:'N5',shop:'ว่าง',st:'vacant'},{id:'N6',shop:'ว่าง',st:'vacant'},{id:'N7',shop:'ว่าง',st:'vacant'},{id:'N8',shop:'ว่าง',st:'vacant'},{id:'U1',shop:'ว่าง',st:'vacant'},{id:'U3',shop:'ว่าง',st:'vacant'},{id:'U4',shop:'ว่าง',st:'vacant'},{id:'U5',shop:'ว่าง',st:'vacant'},{id:'U6',shop:'ว่าง',st:'vacant'}];
-const LT_LOCKS=[{id:'O1',shop:'ว่าง',st:'vacant'},{id:'O2',shop:'ว่าง',st:'vacant'},{id:'O3',shop:'ว่าง',st:'vacant'},{id:'O4',shop:'ว่าง',st:'vacant'},{id:'O5',shop:'ว่าง',st:'vacant'},{id:'O6',shop:'ว่าง',st:'vacant'},{id:'O7',shop:'ว่าง',st:'vacant'},{id:'O8',shop:'ว่าง',st:'vacant'},{id:'O9',shop:'ว่าง',st:'vacant'},{id:'O10',shop:'ว่าง',st:'vacant'},{id:'O11',shop:'ว่าง',st:'vacant'},{id:'O12',shop:'ว่าง',st:'vacant'},{id:'O13',shop:'ว่าง',st:'vacant'},{id:'M1',shop:'ว่าง',st:'vacant'},{id:'M2',shop:'ว่าง',st:'vacant'},{id:'M3',shop:'ว่าง',st:'vacant'},{id:'M4',shop:'ว่าง',st:'vacant'},{id:'M5',shop:'ว่าง',st:'vacant'},{id:'M6',shop:'ว่าง',st:'vacant'},{id:'M7',shop:'ว่าง',st:'vacant'},{id:'M8',shop:'ว่าง',st:'vacant'},{id:'M9',shop:'ว่าง',st:'vacant'},{id:'M10',shop:'ว่าง',st:'vacant'},{id:'M11',shop:'ว่าง',st:'vacant'},{id:'M12',shop:'ว่าง',st:'vacant'},{id:'H1',shop:'ว่าง',st:'vacant'},{id:'H2',shop:'ว่าง',st:'vacant'},{id:'H3',shop:'ว่าง',st:'vacant'},{id:'H4',shop:'ว่าง',st:'vacant'},{id:'H5',shop:'ว่าง',st:'vacant'},{id:'H6',shop:'ว่าง',st:'vacant'},{id:'H7',shop:'ว่าง',st:'vacant'},{id:'H8',shop:'ว่าง',st:'vacant'},{id:'H9',shop:'ว่าง',st:'vacant'},{id:'H10',shop:'ว่าง',st:'vacant'},{id:'H11',shop:'ว่าง',st:'vacant'},{id:'H12',shop:'ว่าง',st:'vacant'},{id:'L1',shop:'ว่าง',st:'vacant'},{id:'L2',shop:'ว่าง',st:'vacant'},{id:'L3',shop:'ว่าง',st:'vacant'},{id:'L4',shop:'ว่าง',st:'vacant'},{id:'L5',shop:'ว่าง',st:'vacant'},{id:'L6',shop:'ว่าง',st:'vacant'},{id:'L7',shop:'ว่าง',st:'vacant'},{id:'L8',shop:'ว่าง',st:'vacant'},{id:'L9',shop:'ว่าง',st:'vacant'},{id:'L10',shop:'ว่าง',st:'vacant'},{id:'L11',shop:'ว่าง',st:'vacant'},{id:'L12',shop:'ว่าง',st:'vacant'},{id:'L13',shop:'ว่าง',st:'vacant'},{id:'L14',shop:'ว่าง',st:'vacant'},{id:'L15',shop:'ว่าง',st:'vacant'},{id:'L16',shop:'ว่าง',st:'vacant'},{id:'L17',shop:'ว่าง',st:'vacant'},{id:'L18',shop:'ว่าง',st:'vacant'},{id:'L19',shop:'ว่าง',st:'vacant'},{id:'L20',shop:'ว่าง',st:'vacant'},{id:'L21',shop:'ว่าง',st:'vacant'},{id:'L22',shop:'ว่าง',st:'vacant'},{id:'L23',shop:'ว่าง',st:'vacant'},{id:'L24',shop:'ว่าง',st:'vacant'},{id:'L25',shop:'ว่าง',st:'vacant'},{id:'L26',shop:'ว่าง',st:'vacant'},{id:'L27',shop:'ว่าง',st:'vacant'},{id:'L28',shop:'ว่าง',st:'vacant'},{id:'T1',shop:'ว่าง',st:'vacant'},{id:'T2',shop:'ว่าง',st:'vacant'},{id:'AB4',shop:'ว่าง',st:'vacant'},{id:'AB5',shop:'ว่าง',st:'vacant'},{id:'AB6',shop:'ว่าง',st:'vacant'}];
-const TG_LOCKS=[{id:'TA1',shop:'ว่าง',st:'vacant'},{id:'TA2',shop:'ว่าง',st:'vacant'},{id:'TA3',shop:'ว่าง',st:'vacant'},{id:'TA4',shop:'ว่าง',st:'vacant'},{id:'TA5',shop:'ว่าง',st:'vacant'},{id:'TA6',shop:'ว่าง',st:'vacant'},{id:'TA7',shop:'ว่าง',st:'vacant'},{id:'TA8',shop:'ว่าง',st:'vacant'},{id:'TA9',shop:'ว่าง',st:'vacant'},{id:'TA10',shop:'ว่าง',st:'vacant'},{id:'TA11',shop:'ว่าง',st:'vacant'},{id:'TA12',shop:'ว่าง',st:'vacant'},{id:'TA13',shop:'ว่าง',st:'vacant'},{id:'TA14',shop:'ว่าง',st:'vacant'},{id:'TA15',shop:'ว่าง',st:'vacant'},{id:'TA16',shop:'ว่าง',st:'vacant'},{id:'TA17',shop:'ว่าง',st:'vacant'},{id:'TA18',shop:'ว่าง',st:'vacant'},{id:'TA19',shop:'ว่าง',st:'vacant'},{id:'TA20',shop:'ว่าง',st:'vacant'},{id:'TB1',shop:'ว่าง',st:'vacant'},{id:'TB2',shop:'ว่าง',st:'vacant'},{id:'TB3',shop:'ว่าง',st:'vacant'},{id:'TB4',shop:'ว่าง',st:'vacant'},{id:'TB5',shop:'ว่าง',st:'vacant'},{id:'TB6',shop:'ว่าง',st:'vacant'},{id:'TB7',shop:'ว่าง',st:'vacant'},{id:'TB8',shop:'ว่าง',st:'vacant'},{id:'TB9',shop:'ว่าง',st:'vacant'},{id:'TB10',shop:'ว่าง',st:'vacant'},{id:'TB11',shop:'ว่าง',st:'vacant'},{id:'TB12',shop:'ว่าง',st:'vacant'},{id:'TB13',shop:'ว่าง',st:'vacant'},{id:'TB14',shop:'ว่าง',st:'vacant'},{id:'TB15',shop:'ว่าง',st:'vacant'},{id:'TB16',shop:'ว่าง',st:'vacant'},{id:'TB17',shop:'ว่าง',st:'vacant'},{id:'TB18',shop:'ว่าง',st:'vacant'},{id:'TB19',shop:'ว่าง',st:'vacant'},{id:'TB20',shop:'ว่าง',st:'vacant'},{id:'TC1',shop:'ว่าง',st:'vacant'},{id:'TC2',shop:'ว่าง',st:'vacant'},{id:'TC3',shop:'ว่าง',st:'vacant'},{id:'TC4',shop:'ว่าง',st:'vacant'},{id:'TC5',shop:'ว่าง',st:'vacant'},{id:'TC6',shop:'ว่าง',st:'vacant'},{id:'TC7',shop:'ว่าง',st:'vacant'},{id:'TC8',shop:'ว่าง',st:'vacant'},{id:'TC9',shop:'ว่าง',st:'vacant'},{id:'TC10',shop:'ว่าง',st:'vacant'},{id:'TC11',shop:'ว่าง',st:'vacant'},{id:'TC12',shop:'ว่าง',st:'vacant'},{id:'TC13',shop:'ว่าง',st:'vacant'},{id:'TC14',shop:'ว่าง',st:'vacant'},{id:'TC15',shop:'ว่าง',st:'vacant'},{id:'TC16',shop:'ว่าง',st:'vacant'},{id:'TC17',shop:'ว่าง',st:'vacant'},{id:'TC18',shop:'ว่าง',st:'vacant'},{id:'TC19',shop:'ว่าง',st:'vacant'},{id:'TC20',shop:'ว่าง',st:'vacant'}];
+let VENDORS=[];     // ผู้ค้าที่มียอดค้างชำระ (total_debt>0) เท่านั้น
+let ALL_VENDORS=[];  // ผู้ค้าทั้งหมด (ไม่รวมล็อคที่ยกเลิก) — ใช้วาดแผนที่โซนในแท็บ 4
 
+// จัดกลุ่มโซนสำหรับปุ่มแท็บแผนที่ 3 ปุ่มเดิม (โรงหน้า SA / โรงใหญ่ SB-SF / โซนนอก A-F)
+//== MARKET_BLOCK:ZONE_GROUPS ==//
+const ZONE_GROUPS={out:['A','B','C','D','E','F'],b7:['G','J','K','N','U'],lt:['O','M','H','L','T','AB'],tg:['TA','TB','TC']};
+//== END_MARKET_BLOCK ==//
+
+function buildDebtBreakdown(v){
+  const items=[];
+  const penalty=parseFloat(v.unpaid_penalty)||0;
+  const other=parseFloat(v.unpaid_other)||0;
+  if(penalty>0) items.push({t:'ค่าปรับค้างชำระ',a:penalty});
+  if(other>0)   items.push({t:v.unpaid_other_label||'ค่าอื่นๆ ค้างชำระ',a:other});
+  return items;
+}
+
+// ผสานแผนผ่อน (installment_plans) + ประวัติจ่ายจริง (payments type='installment') เข้ากับยอดหนี้ปัจจุบัน
+// หมายเหตุ: จำนวนงวด/วันที่เริ่ม/deadline ถูกบันทึกไว้ตอนตั้งแผน แต่ "ยอดต่องวด" คำนวณใหม่จาก total_debt
+// ปัจจุบันเสมอ (เพื่อความง่าย ไม่เก็บ snapshot แยก) — ถ้าผู้จัดตลาดแก้ยอดค้างของล็อคนั้นตรงๆ ยอดต่องวดจะขยับตาม
+function mergePlan(v, planRow, installmentPayments){
+  if(!planRow) return null;
+  const terms=parseInt(planRow.terms)||3;
+  const firstAmt=parseFloat(planRow.first_amount)||0;
+  const startDate=planRow.start_date?new Date(planRow.start_date):new Date();
+  const {schedule,deadline}=computeSchedule(terms,v.total_debt,firstAmt,0,startDate);
+
+  const paidList=(installmentPayments||[]).slice().sort((a,b)=>new Date(a.date+' '+(a.time||''))-new Date(b.date+' '+(b.time||'')));
+  let remaining=paidList.reduce((s,p)=>s+(parseFloat(p.amount)||0),0);
+  let paidTerms=0;
+  for(const s of schedule){
+    if(remaining<=0) break;
+    const take=Math.min(remaining,s.amount);
+    s.paid=take; remaining-=take;
+    if(take>=s.amount){ s.status='paid'; s.paid_date=s.due; paidTerms++; }
+  }
+  const today=new Date();
+  schedule.forEach(s=>{ if(s.status!=='paid' && s.due<today) s.status='overdue'; });
+
+  return {terms, paid_terms:paidTerms, schedule, deadline};
+}
+
+async function loadData(){
+  const banner=document.getElementById('no-db-banner');
+  if(!getApiUrl()){
+    if(banner) banner.style.display='block';
+    VENDORS=[]; ALL_VENDORS=[];
+    return;
+  }
+  if(banner) banner.style.display='none';
+  const [vendorsRaw, plansRaw, paymentsRaw]=await Promise.all([
+    apiGet('getVendors'), apiGet('getInstallmentPlans'), apiGet('getPayments')
+  ]);
+  ALL_VENDORS=(vendorsRaw||[]).filter(v=>v.status!=='terminated');
+  const plansByLock={}; (plansRaw||[]).forEach(p=>{plansByLock[p.lock_id]=p;});
+  const paymentsByLock={};
+  (paymentsRaw||[]).filter(p=>p.type==='installment').forEach(p=>{
+    (paymentsByLock[p.lock_id]=paymentsByLock[p.lock_id]||[]).push(p);
+  });
+
+  VENDORS=ALL_VENDORS.map(v=>{
+    const totalDebt=(parseFloat(v.unpaid_penalty)||0)+(parseFloat(v.unpaid_other)||0);
+    const paidList=paymentsByLock[v.lock]||[];
+    const collected=paidList.reduce((s,p)=>s+(parseFloat(p.amount)||0),0);
+    return {
+      lock:v.lock, zone:v.zone, shop:v.name||'(ไม่ระบุชื่อ)',
+      total_debt:totalDebt, collected,
+      debt: buildDebtBreakdown(v),
+      plan:null,
+      _planRow: plansByLock[v.lock]||null,
+      _payments: paidList,
+    };
+  }).filter(v=>v.total_debt>0);
+
+  VENDORS.forEach(v=>{ v.plan=mergePlan(v, v._planRow, v._payments); });
+}
+
+//== MARKET_BLOCK:MAP_DEFAULT ==//
 let curMapZone='out';
+//== END_MARKET_BLOCK ==//
 function switchMapZone(z){
   curMapZone=z;
   document.querySelectorAll('[id^=mztab-]').forEach(b=>{
@@ -582,20 +641,17 @@ function switchMapZone(z){
 let payTarget=null;
 
 // ─── Init ─────────────────────────────────────────────────────────────────────
-function populateInsLockSel(){
+window.onload=async ()=>{
+  await loadData();
   const sel=document.getElementById('ins-lock');
-  sel.innerHTML='<option value="">-- เลือกล็อค --</option>';
-  VENDORS.filter(v=>v.total_debt>0).forEach(v=>{
+  sel.innerHTML='<option value="">-- เลือกล็อคที่มียอดค้าง --</option>';
+  VENDORS.forEach(v=>{
     const o=document.createElement('option');
     o.value=v.lock;
     o.textContent=`${v.lock} — ${v.shop}  (คงค้าง ฿${baht(v.total_debt-v.collected)})`;
     sel.appendChild(o);
   });
-}
-window.onload=()=>{
-  populateInsLockSel();
   renderOv(); renderTracking(); buildMap(); updateKPI();
-  loadVendorsFromSheets().then(populateInsLockSel);
 };
 
 function fmt(n){return `${Math.round(n).toLocaleString()}`;}
@@ -654,17 +710,16 @@ function renderOv(){
     return true;
   });
   if(ord==='remain_desc') list.sort((a,b)=>(b.total_debt-b.collected)-(a.total_debt-a.collected));
-  if(ord==='months_desc') list.sort((a,b)=>b.months-a.months);
   if(ord==='lock') list.sort((a,b)=>a.lock.localeCompare(b.lock));
 
   const tbody=document.getElementById('ov-tbody');
   const tfoot=document.getElementById('ov-tfoot');
   const statusBadge={
-    no_plan:`<span class="badge b-red">❌ ค้างชำระ</span>`,
-    paying:`<span class="badge b-orange">🔄 กำลังผ่อน</span>`,
-    overdue_term:`<span class="badge b-red">⚠️ ค้างงวด</span>`,
-    near_deadline:`<span class="badge b-red" style="animation:pulseDot 1.4s infinite">🔴 ใกล้หมดสิทธิ์</span>`,
-    completed:`<span class="badge b-green">✅ เสร็จสิ้น</span>`,
+    no_plan:`<span class="badge b-red"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg> ค้างชำระ</span>`,
+    paying:`<span class="badge b-orange"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 12a9 9 0 0 1-15.3 6.4L3 16"/><path d="M3 12a9 9 0 0 1 15.3-6.4L21 8"/><polyline points="3 20 3 16 7 16"/><polyline points="21 4 21 8 17 8"/></svg> กำลังผ่อน</span>`,
+    overdue_term:`<span class="badge b-red"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0Z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg> ค้างงวด</span>`,
+    near_deadline:`<span class="badge b-red" style="animation:pulseDot 1.4s infinite"><svg class="ic ic-dot" viewBox="0 0 24 24" aria-hidden="true" style="color:var(--r)"><circle cx="12" cy="12" r="8" fill="currentColor"/></svg> ใกล้หมดสิทธิ์</span>`,
+    completed:`<span class="badge b-green"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg> เสร็จสิ้น</span>`,
   };
   tbody.innerHTML=list.map(v=>{
     const rem=v.total_debt-v.collected;
@@ -683,15 +738,15 @@ function renderOv(){
       <td style="text-align:right;font-weight:800;color:${rem>0?'var(--r)':'var(--gm)'}">${baht(rem)}</td>
       <td>
         <div class="prog"><div class="prog-fill ${progCls}" style="width:${p}%"></div></div>
-        <div style="font-size:.60rem;color:var(--txl);margin-top:2px">${p}% · ${v.months}เดือน</div>
+        <div style="font-size:.60rem;color:var(--txl);margin-top:2px">${p}%</div>
       </td>
       <td style="font-size:.70rem">${firstDate}</td>
       <td style="font-size:.70rem;color:${dl!=='—'?'var(--r)':'var(--txl)'}"><strong>${dl}</strong></td>
       <td>${statusBadge[st]||''}</td>
       <td style="text-align:center;white-space:nowrap">
-        ${!v.plan?`<button class="btn btn-sm b-blue" style="background:var(--bl);color:var(--b);border:none" onclick="openInstFor('${v.lock}')">📋 ตั้งผ่อน</button>`:''}
-        ${v.plan&&rem>0?`<button class="btn btn-sm btn-pay" onclick="openPay('${v.lock}')">💰 รับงวด</button>`:''}
-        <button class="btn btn-sm btn-secondary" style="margin-top:2px" onclick="showMapDetailFor('${v.lock}')">🔍 ดู</button>
+        ${!v.plan?`<button class="btn btn-sm b-blue" style="background:var(--bl);color:var(--b);border:none" onclick="openInstFor('${v.lock}')"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="4" width="16" height="18" rx="2"/><path d="M9 3h6a1 1 0 0 1 1 1v1H8V4a1 1 0 0 1 1-1Z"/></svg> ตั้งผ่อน</button>`:''}
+        ${v.plan&&rem>0?`<button class="btn btn-sm btn-pay" onclick="openPay('${v.lock}')"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M9.5 9.5c0-1.1 1.1-2 2.5-2s2.5.9 2.5 2-1.1 1.6-2.5 2-2.5.9-2.5 2 1.1 2 2.5 2 2.5-.9 2.5-2"/></svg> รับงวด</button>`:''}
+        <button class="btn btn-sm btn-secondary" style="margin-top:2px" onclick="showMapDetailFor('${v.lock}')"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg> ดู</button>
       </td>
     </tr>`;
   }).join('');
@@ -724,7 +779,7 @@ function loadDebt(){
   if(!v){info.style.display='none';bd.innerHTML='<div style="color:var(--txl);text-align:center;font-size:.74rem">เลือกล็อคเพื่อดูรายละเอียด</div>';di.style.display='none';document.getElementById('p-deadline-box').style.display='none';return;}
   info.style.display='block';
   const rem=v.total_debt-v.collected;
-  document.getElementById('ins-name').textContent=`${v.lock} — ${v.shop} · ค้าง ${v.months} เดือน`;
+  document.getElementById('ins-name').textContent=`${v.lock} — ${v.shop}`;
   document.getElementById('ins-det').textContent=`ยอดค้าง ${baht(v.total_debt)} | ชำระแล้ว ${baht(v.collected)} | คงเหลือ ${baht(rem)}`;
   let html=v.debt.map(d=>`<div style="display:flex;justify-content:space-between;padding:3px 0;border-bottom:1px solid var(--bd);font-size:.76rem"><span style="color:var(--txl)">${d.t}</span><span style="font-weight:700">${baht(d.a)}</span></div>`).join('');
   html+=`<div style="display:flex;justify-content:space-between;padding:5px 0 2px;font-weight:800;font-size:.80rem"><span>คงเหลือที่จะผ่อน</span><span style="color:var(--r)">${baht(rem)}</span></div>`;
@@ -743,7 +798,7 @@ function loadDebt(){
   document.getElementById('date-first').textContent=fmtDate(firstPay);
   document.getElementById('date-deadline').textContent=fmtDate(dl);
   const daysLeft=Math.round((dl-today)/(1000*60*60*24));
-  document.getElementById('date-warning').textContent=daysLeft<=14?`⚠️ เหลือเวลาอีก ${daysLeft} วัน — เร่งดำเนินการ`:'';
+  document.getElementById('date-warning').innerHTML=daysLeft<=14?`<svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0Z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg> เหลือเวลาอีก ${daysLeft} วัน — เร่งดำเนินการ`:'';
   document.getElementById('p-deadline-box').style.display='block';
   calcPlan();
 }
@@ -757,9 +812,8 @@ function calcPlan(){
   const rem=v.total_debt-v.collected;
   const terms=parseInt(document.getElementById('ins-terms').value)||3;
   const firstAmt=parseFloat(document.getElementById('ins-first').value)||0;
-  const rate=parseFloat(document.getElementById('ins-rate').value)||0;
-  const {schedule,deadline,firstPayDate,totalWithInt,first,restAmt}=computeSchedule(terms,rem,firstAmt,rate);
-  const interestAmt=totalWithInt-rem;
+  // ไม่มีดอกเบี้ยในระบบจริง (interestRate=0 เสมอ) — ดู comment ที่ DATA ด้านบน
+  const {schedule,deadline,firstPayDate,totalWithInt,first,restAmt}=computeSchedule(terms,rem,firstAmt,0);
 
   document.getElementById('p-total').textContent=baht(rem);
   document.getElementById('p-lock').textContent=`${lock} — ${v.shop}`;
@@ -767,7 +821,6 @@ function calcPlan(){
   document.getElementById('p-d1').textContent=`${baht(first)} / ${fmtDate(firstPayDate)}`;
   document.getElementById('p-avg').textContent=baht(totalWithInt/terms);
   document.getElementById('p-deadline').textContent=fmtDate(deadline);
-  document.getElementById('p-interest').textContent=baht(interestAmt);
   document.getElementById('p-grand').textContent=baht(totalWithInt);
 
   // Preview schedule
@@ -776,28 +829,38 @@ function calcPlan(){
       <div class="plan-num pn-next">${s.term}</div>
       <div style="flex:1">
         <div style="font-size:.76rem;font-weight:700">งวดที่ ${s.term} — ${fmtDate(s.due)}</div>
-        ${s.term===1?'<div style="font-size:.64rem;color:var(--gm)">= พฤหัสบดีสุดท้ายของเดือนนี้</div>':''}
+        ${s.term===1?'<div style="font-size:.64rem;color:var(--gm)">= อังคารสุดท้ายของเดือนนี้</div>':''}
       </div>
       <div style="font-size:.84rem;font-weight:800;color:var(--o)">${baht(s.amount)}</div>
     </div>`).join('');
   document.getElementById('ins-preview').innerHTML=html+
     `<div style="background:var(--rl);border-radius:7px;padding:7px 11px;margin-top:6px;font-size:.70rem;color:var(--r);font-weight:600">
-      ⛔ ต้องชำระให้ครบภายใน: <strong>${fmtDate(deadline)}</strong> (พฤหัสบดีต้นเดือน${deadline.getMonth()>6?MONTH_TH[deadline.getMonth()]:MONTH_TH[deadline.getMonth()]} ${deadline.getFullYear()+543})
+      <svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><line x1="5" y1="12" x2="19" y2="12"/></svg> ต้องชำระให้ครบภายใน: <strong>${fmtDate(deadline)}</strong> (อังคารต้นเดือน${deadline.getMonth()>6?MONTH_TH[deadline.getMonth()]:MONTH_TH[deadline.getMonth()]} ${deadline.getFullYear()+543})
      </div>`;
 }
 
-function savePlan(){
+async function savePlan(){
   const lock=document.getElementById('ins-lock').value;
   if(!lock){showToast('กรุณาเลือกล็อค','error');return;}
   const v=VENDORS.find(v=>v.lock===lock);
   if(!v) return;
+  if(!getApiUrl()){showToast('ยังไม่ได้เชื่อมต่อฐานข้อมูล — ตั้งค่า pm-tue-api-url ก่อน','error');return;}
   const rem=v.total_debt-v.collected;
   const terms=parseInt(document.getElementById('ins-terms').value)||3;
   const firstAmt=parseFloat(document.getElementById('ins-first').value)||0;
-  const rate=parseFloat(document.getElementById('ins-rate').value)||0;
-  const {schedule,deadline}=computeSchedule(terms,rem,firstAmt,rate);
-  v.plan={terms,paid_terms:0,schedule,deadline};
-  showToast(`✅ บันทึกแผนผ่อน ${terms} งวด ล็อค ${lock} — งวดแรก ${fmtDate(schedule[0].due)}`, 'success');
+  const {schedule,deadline}=computeSchedule(terms,rem,firstAmt,0);
+
+  const saveBtn=document.querySelector('button[onclick="savePlan()"]');
+  if(saveBtn) saveBtn.disabled=true;
+  const res=await apiPost('saveInstallmentPlan',{
+    lock_id:lock, terms, first_amount:firstAmt,
+    start_date:schedule[0].due.toISOString(), deadline:deadline.toISOString(), status:'active'
+  });
+  if(saveBtn) saveBtn.disabled=false;
+  if(!res||res.status!=='ok'){showToast('บันทึกแผนผ่อนไม่สำเร็จ ลองใหม่อีกครั้ง','error');return;}
+
+  showToast(`<svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg> บันทึกแผนผ่อน ${terms} งวด ล็อค ${lock} — งวดแรก ${fmtDate(schedule[0].due)}`, 'success');
+  await loadData();
   renderOv();renderTracking();buildMap();updateKPI();resetForm();
   switchTab('t3');
 }
@@ -810,7 +873,6 @@ function resetForm(){
   document.getElementById('date-info-box').style.display='none';
   document.getElementById('p-deadline-box').style.display='none';
   document.getElementById('ins-first').value='';
-  document.getElementById('ins-rate').value='0';
 }
 
 // ─── Tracking ─────────────────────────────────────────────────────────────────
@@ -837,7 +899,7 @@ function renderTracking(){
       const lineCls=s.status==='paid'?'paid':'';
       const lbl=`งวด${s.term}<br>${baht(s.amount)}<br>${s.paid_date?fmtDateShort(new Date(s.paid_date)):fmtDateShort(new Date(s.due))}`;
       return `<div class="step-item">
-        <div class="step-dot ${dotCls}">${s.status==='paid'?'✓':s.status==='overdue'?'!':s.term}</div>
+        <div class="step-dot ${dotCls}">${s.status==='paid'?'<svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>':s.status==='overdue'?'!':s.term}</div>
         <div class="step-label">${lbl}</div>
       </div>${i<v.plan.schedule.length-1?`<div class="step-line ${lineCls}"></div>`:''}`;
     }).join('');
@@ -847,12 +909,12 @@ function renderTracking(){
       <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:10px">
         <div>
           <div style="font-size:.88rem;font-weight:800">${v.lock} — ${v.shop} <span class="badge b-gray">${v.zone}</span></div>
-          <div style="font-size:.68rem;color:var(--txl);margin-top:2px">แผน ${v.plan.terms} งวด · ค้างมา ${v.months} เดือน${overdue>0?` · <span style="color:var(--r);font-weight:700">ค้างงวด ${overdue} งวด</span>`:''}</div>
+          <div style="font-size:.68rem;color:var(--txl);margin-top:2px">แผน ${v.plan.terms} งวด${overdue>0?` · <span style="color:var(--r);font-weight:700">ค้างงวด ${overdue} งวด</span>`:''}</div>
         </div>
         <div style="text-align:right;flex-shrink:0">
           <div style="font-size:.86rem;font-weight:800;color:${rem>0?'var(--r)':'var(--gm)'}">${baht(rem)}</div>
           <div style="font-size:.64rem;color:var(--txl)">คงเหลือ / ${baht(v.total_debt)}</div>
-          ${daysLeft<=14?`<div style="font-size:.62rem;color:var(--r);font-weight:700;margin-top:2px">⚠️ ครบกำหนด ${dl}</div>`:`<div style="font-size:.62rem;color:var(--txl)">ครบกำหนด ${dl}</div>`}
+          ${daysLeft<=14?`<div style="font-size:.62rem;color:var(--r);font-weight:700;margin-top:2px"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0Z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg> ครบกำหนด ${dl}</div>`:`<div style="font-size:.62rem;color:var(--txl)">ครบกำหนด ${dl}</div>`}
         </div>
       </div>
       <div class="prog" style="margin-bottom:5px"><div class="prog-fill ${progCls}" style="width:${p}%"></div></div>
@@ -860,7 +922,7 @@ function renderTracking(){
       <div class="steps">${stepHtml}</div>
       <div style="display:flex;gap:7px;margin-top:10px;flex-wrap:wrap">
         ${unpaid.map(s=>`<button class="btn btn-pay btn-sm" onclick="openPay('${v.lock}',${s.term})">
-          💰 งวด ${s.term} — ${baht(s.amount)} ${s.status==='overdue'?'⚠️':''}
+          <svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M9.5 9.5c0-1.1 1.1-2 2.5-2s2.5.9 2.5 2-1.1 1.6-2.5 2-2.5.9-2.5 2 1.1 2 2.5 2 2.5-.9 2.5-2"/></svg> งวด ${s.term} — ${baht(s.amount)} ${s.status==='overdue'?'<svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0Z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>':''}
         </button>`).join('')}
       </div>
     </div>`;
@@ -874,21 +936,21 @@ function openPay(lock, term){
   const s=term?v.plan.schedule.find(s=>s.term===term):v.plan.schedule.find(s=>s.status!=='paid');
   if(!s) return;
   payTarget={lock,term:s.term};
-  document.getElementById('pm-title').textContent=`💰 รับชำระงวดที่ ${s.term}`;
+  document.getElementById('pm-title').innerHTML=`<svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M9.5 9.5c0-1.1 1.1-2 2.5-2s2.5.9 2.5 2-1.1 1.6-2.5 2-2.5.9-2.5 2 1.1 2 2.5 2 2.5-.9 2.5-2"/></svg> รับชำระงวดที่ ${s.term}`;
   document.getElementById('pm-sub').textContent=`${lock} — ${v.shop}  ·  ครบกำหนด ${fmtDate(s.due)}`;
   const daysLate=Math.round((new Date()-s.due)/(1000*60*60*24));
   document.getElementById('pm-body').innerHTML=`
     <div style="background:var(--sf2);border-radius:8px;padding:11px 14px;margin-bottom:12px;font-size:.78rem">
       <div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid var(--bd)"><span style="color:var(--txl)">งวดที่ ${s.term} / ${v.plan.terms}</span><span style="font-weight:700;color:var(--o)">${baht(s.amount)}</span></div>
       <div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid var(--bd)"><span style="color:var(--txl)">ครบกำหนด</span><span>${fmtDate(s.due)}</span></div>
-      ${daysLate>0?`<div style="background:var(--rl);border-radius:6px;padding:5px 8px;margin-top:7px;font-size:.70rem;color:var(--r);font-weight:700">⚠️ เลยกำหนดชำระแล้ว ${daysLate} วัน</div>`:''}
+      ${daysLate>0?`<div style="background:var(--rl);border-radius:6px;padding:5px 8px;margin-top:7px;font-size:.70rem;color:var(--r);font-weight:700"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0Z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg> เลยกำหนดชำระแล้ว ${daysLate} วัน</div>`:''}
       ${v.plan.deadline?`<div style="margin-top:6px;font-size:.68rem;color:var(--txl)">วันครบกำหนดทั้งแผน: <strong style="color:var(--r)">${fmtDate(v.plan.deadline)}</strong></div>`:''}
     </div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-bottom:10px">
-      <div class="field"><label for="pay-amt">จำนวนที่รับ (฿)</label><input type="number" id="pay-amt" value="${s.amount}" min="0"></div>
-      <div class="field"><label for="pay-method">ช่องทาง</label><select id="pay-method"><option>💵 เงินสด</option><option>📱 โอนเงิน</option><option>📷 QR Code</option></select></div>
+      <div class="field"><label>จำนวนที่รับ (฿)</label><input type="number" id="pay-amt" value="${s.amount}" min="0"></div>
+      <div class="field"><label>ช่องทาง</label><select id="pay-method"><option>เงินสด</option><option>โอนเงิน</option><option>QR Code</option></select></div>
     </div>
-    <div class="field"><label for="pay-note">หมายเหตุ</label><input type="text" id="pay-note" placeholder="—"></div>`;
+    <div class="field"><label>หมายเหตุ</label><input type="text" id="pay-note" placeholder="—"></div>`;
   document.getElementById('pay-modal').classList.add('show');
 }
 function closeModal(){document.getElementById('pay-modal').classList.remove('show');payTarget=null;}
@@ -897,37 +959,38 @@ async function doPayInstallment(){
   const v=VENDORS.find(v=>v.lock===payTarget.lock);
   const s=v.plan.schedule.find(s=>s.term===payTarget.term);
   const amt=parseFloat(document.getElementById('pay-amt').value)||0;
-  const method=document.getElementById('pay-method')?.value||'💵 เงินสด';
-  const note=document.getElementById('pay-note')?.value||`ผ่อนชำระงวดที่ ${payTarget.term}/${v.plan.terms}`;
-  s.paid=amt;s.paid_date=new Date();s.status='paid';v.collected+=amt;v.plan.paid_terms++;
-  if(getApiUrl()){
-    await apiPost('savePayment',{data:{
-      lock_id:v.lock, vendor_name:v.shop, product:v.shop,
-      type:'ค่าเช่าประจำเดือน', amount:amt, penalty:0, other_fee:0, other_label:'',
-      method, note, date:fmtDate(new Date()), time:new Date().toTimeString().slice(0,5),
-    }});
-    if(v.collected>=v.total_debt){
-      await apiPost('saveVendor',{data:{lock:v.lock, status:'active'}});
-    }
-  }
-  closeModal();renderOv();renderTracking();buildMap();updateKPI();
-  showToast(getApiUrl()?`☁️ บันทึกงวดที่ ${payTarget.term} ล็อค ${payTarget.lock} ${baht(amt)} ขึ้น Sheets แล้ว`:`✅ บันทึกงวดที่ ${payTarget.term} ล็อค ${payTarget.lock} ${baht(amt)}`,'success');
+  const method=document.getElementById('pay-method').value;
+  const note=document.getElementById('pay-note').value||'';
+  if(!getApiUrl()){showToast('ยังไม่ได้เชื่อมต่อฐานข้อมูล — ตั้งค่า pm-tue-api-url ก่อน','error');return;}
+  const now=new Date();
+  // บันทึกที่ชีต payments เดิม (type='installment') — ไม่มีชีตแยกสำหรับเงินผ่อนชำระ ตามที่ตกลงกับผู้ดูแลระบบ
+  const res=await apiPost('savePayment',{
+    lock_id:payTarget.lock, vendor_name:v.shop, product:'', type:'installment',
+    amount:amt, method, note, date:now.toISOString().split('T')[0], time:now.toTimeString().slice(0,5)
+  });
+  if(!res||res.status!=='ok'){showToast('บันทึกการชำระไม่สำเร็จ ลองใหม่อีกครั้ง','error');return;}
+  closeModal();
+  await loadData();
+  renderOv();renderTracking();buildMap();updateKPI();
+  showToast(`<svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg> บันทึกงวดที่ ${payTarget.term} ล็อค ${payTarget.lock} ${baht(amt)}`,'success');
 }
 
-// ─── Map ──────────────────────────────────────────────────────────────────────
+// ─── Map (ใช้ข้อมูลผู้ค้าจริงจัดกลุ่มตามโซน — แทน SA_LOCKS/BIG_LOCKS/OUT_LOCKS mock เดิม) ──────
 function buildMap(){
-  const zoneData={out:OUT_LOCKS,b7:B7_LOCKS,lt:LT_LOCKS,tg:TG_LOCKS}[curMapZone]||OUT_LOCKS;
+  const zones=ZONE_GROUPS[curMapZone]||ZONE_GROUPS.sa;
+  const list=ALL_VENDORS.filter(v=>zones.includes(v.zone));
   const grid=document.getElementById('map-grid');
-  grid.innerHTML=zoneData.map(lk=>{
-    const vd=VENDORS.find(v=>v.lock===lk.id);
-    let st=lk.st,owe='';
+  if(!list.length){grid.innerHTML='<div style="color:var(--txl);text-align:center;padding:14px;grid-column:1/-1">ไม่มีข้อมูลผู้ค้าในโซนนี้ (ยังไม่ได้เชื่อมฐานข้อมูล หรือยังไม่มีผู้ค้าในโซน)</div>';return;}
+  grid.innerHTML=list.map(v=>{
+    const vd=VENDORS.find(x=>x.lock===v.lock);
+    let st='full',owe='';
     if(vd&&vd.total_debt>0){
       const rem=vd.total_debt-vd.collected;
       st=vd.plan?'partial':'overdue';
       if(rem>0) owe=`<div class="owe-pill">฿${(rem/1000).toFixed(0)}K</div>`;
     }
     const cls={full:'m-full',partial:'m-partial',overdue:'m-overdue',vacant:'m-vacant'}[st]||'m-full';
-    return `<div class="lk-mini ${cls}" onclick="showMapDetailFor('${lk.id}')">${owe}<div class="lk-id">${lk.id}</div><div class="lk-shop">${lk.shop}</div></div>`;
+    return `<div class="lk-mini ${cls}" onclick="showMapDetailFor('${v.lock}')">${owe}<div class="lk-id">${v.lock}</div><div class="lk-shop">${v.name||'—'}</div></div>`;
   }).join('');
 }
 
@@ -935,12 +998,11 @@ function showMapDetailFor(lockId){
   const inMap=document.getElementById('t4').classList.contains('active');
   if(!inMap){switchTab('t4',document.querySelectorAll('.tab')[3]);setTimeout(()=>showMapDetailFor(lockId),100);return;}
   const vd=VENDORS.find(v=>v.lock===lockId);
-  const allLocks=[...OUT_LOCKS,...B7_LOCKS,...LT_LOCKS,...TG_LOCKS];
-  const lk=allLocks.find(l=>l.id===lockId);
+  const lk=ALL_VENDORS.find(v=>v.lock===lockId);
   const det=document.getElementById('map-detail');
   det.style.display='block';
   if(!vd||vd.total_debt===0){
-    det.innerHTML=`<div class="card"><div class="card-title">${lockId} — ${lk?.shop||lockId}</div><div style="color:var(--gm);font-weight:700">✅ ชำระครบ ไม่มียอดค้าง</div></div>`;
+    det.innerHTML=`<div class="card"><div class="card-title">${lockId} — ${lk?.name||lockId}</div><div style="color:var(--gm);font-weight:700"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg> ชำระครบ ไม่มียอดค้าง</div></div>`;
     det.scrollIntoView({behavior:'smooth',block:'nearest'});return;
   }
   const rem=vd.total_debt-vd.collected;
@@ -954,23 +1016,23 @@ function showMapDetailFor(lockId){
       <div style="background:var(--ol);border-radius:7px;padding:9px;text-align:center"><div style="font-size:1rem;font-weight:800;color:var(--o)">${baht(rem)}</div><div style="font-size:.62rem;color:var(--txl)">คงเหลือ</div></div>
     </div>
     <div class="prog" style="margin-bottom:5px"><div class="prog-fill ${progCls}" style="width:${p}%"></div></div>
-    <div style="font-size:.66rem;color:var(--txl);margin-bottom:10px">${p}% · ค้างมา ${vd.months} เดือน</div>`;
+    <div style="font-size:.66rem;color:var(--txl);margin-bottom:10px">${p}% ชำระแล้ว</div>`;
   vd.debt.forEach(d=>{html+=`<div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid var(--bd);font-size:.74rem"><span style="color:var(--txl)">${d.t}</span><span style="font-weight:700">${baht(d.a)}</span></div>`;});
   if(vd.plan){
-    html+=`<div style="margin-top:10px;margin-bottom:6px"><span class="badge b-orange">🔄 แผนผ่อน ${vd.plan.terms} งวด</span> <span style="font-size:.68rem;color:var(--r);font-weight:700">deadline: ${fmtDate(vd.plan.deadline)}</span></div>`;
+    html+=`<div style="margin-top:10px;margin-bottom:6px"><span class="badge b-orange"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 12a9 9 0 0 1-15.3 6.4L3 16"/><path d="M3 12a9 9 0 0 1 15.3-6.4L21 8"/><polyline points="3 20 3 16 7 16"/><polyline points="21 4 21 8 17 8"/></svg> แผนผ่อน ${vd.plan.terms} งวด</span> <span style="font-size:.68rem;color:var(--r);font-weight:700">deadline: ${fmtDate(vd.plan.deadline)}</span></div>`;
     html+=vd.plan.schedule.map(s=>`
       <div class="plan-row ${s.status==='paid'?'paid-row':s.status==='overdue'?'overdue-row':''}">
-        <div class="plan-num ${s.status==='paid'?'pn-paid':s.status==='overdue'?'pn-over':'pn-next'}">${s.status==='paid'?'✓':s.term}</div>
+        <div class="plan-num ${s.status==='paid'?'pn-paid':s.status==='overdue'?'pn-over':'pn-next'}">${s.status==='paid'?'<svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>':s.term}</div>
         <div style="flex:1;font-size:.74rem"><strong>งวด ${s.term}</strong> — ${fmtDate(s.due)}
-          ${s.status==='paid'?`<span class="badge b-green" style="margin-left:6px">✅ ชำระแล้ว ${fmtDate(s.paid_date)}</span>`:''}
-          ${s.status==='overdue'?`<span class="badge b-red" style="margin-left:6px">⚠️ เลยกำหนด</span>`:''}
+          ${s.status==='paid'?`<span class="badge b-green" style="margin-left:6px"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg> ชำระแล้ว ${fmtDate(s.paid_date)}</span>`:''}
+          ${s.status==='overdue'?`<span class="badge b-red" style="margin-left:6px"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0Z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg> เลยกำหนด</span>`:''}
         </div>
         <div style="font-weight:700;color:${s.status==='paid'?'var(--gm)':s.status==='overdue'?'var(--r)':'var(--txm)'}">${baht(s.amount)}</div>
       </div>`).join('');
-    if(rem>0) html+=`<button class="btn btn-pay" style="width:100%;margin-top:9px" onclick="openPay('${lockId}')">💰 รับชำระงวดถัดไป</button>`;
+    if(rem>0) html+=`<button class="btn btn-pay" style="width:100%;margin-top:9px" onclick="openPay('${lockId}')"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M9.5 9.5c0-1.1 1.1-2 2.5-2s2.5.9 2.5 2-1.1 1.6-2.5 2-2.5.9-2.5 2 1.1 2 2.5 2 2.5-.9 2.5-2"/></svg> รับชำระงวดถัดไป</button>`;
   } else {
-    html+=`<div style="background:var(--rl);border-radius:7px;padding:9px 12px;margin:10px 0;font-size:.74rem;color:var(--r);font-weight:700">❌ ยังไม่มีแผนผ่อน</div>`;
-    html+=`<button class="btn btn-primary" style="width:100%" onclick="openInstFor('${lockId}')">📋 ตั้งแผนผ่อนชำระ</button>`;
+    html+=`<div style="background:var(--rl);border-radius:7px;padding:9px 12px;margin:10px 0;font-size:.74rem;color:var(--r);font-weight:700"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg> ยังไม่มีแผนผ่อน</div>`;
+    html+=`<button class="btn btn-primary" style="width:100%" onclick="openInstFor('${lockId}')"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="4" width="16" height="18" rx="2"/><path d="M9 3h6a1 1 0 0 1 1 1v1H8V4a1 1 0 0 1 1-1Z"/></svg> ตั้งแผนผ่อนชำระ</button>`;
   }
   html+='</div>';
   det.innerHTML=html;
@@ -978,7 +1040,7 @@ function showMapDetailFor(lockId){
 }
 
 // ─── Toast ────────────────────────────────────────────────────────────────────
-function showToast(msg,type='info'){const t=document.getElementById('toast');t.textContent=msg;t.className=`toast ${type} show`;clearTimeout(t._t);t._t=setTimeout(()=>t.classList.remove('show'),3500);}
+function showToast(msg,type='info'){const t=document.getElementById('toast');t.innerHTML=msg;t.className=`toast ${type} show`;clearTimeout(t._t);t._t=setTimeout(()=>t.classList.remove('show'),3500);}
 </script>
 </body>
 </html>

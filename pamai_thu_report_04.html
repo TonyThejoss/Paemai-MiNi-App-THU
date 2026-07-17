@@ -3,69 +3,80 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>รายงานผู้ค้าค้างชำระ + แผนผ่อน — แพไม้มินิ วันพฤหัสบดี</title>
-<style>a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible,[tabindex]:focus-visible,.lk:focus-visible,.zone-tab:focus-visible{outline:2.5px solid var(--gm) !important;outline-offset:2px;}.ico{width:1em;height:1em;display:inline-block;vertical-align:-0.15em;flex-shrink:0}
+<title>รายงานผู้ค้าค้างชำระแยกโซน — แพไม้มินิ</title>
+<style>
 :root{
   --g:#7c2d12;--gm:#c2410c;--gb:#ea580c;--gl:#ffedd5;--gll:#fff7ed;
   --r:#b91c1c;--rl:#fee2e2;--o:#c2410c;--ol:#fff7ed;
   --y:#92400e;--yl:#fffbeb;
   --bg:#eef2f0;--sf:#fff;--sf2:#f4f8f5;--bd:#d0ddd5;--bd2:#a8c0b0;
-  --tx:#0a1a10;--txm:#2e4a38;--txl:#4d6854;
+  --tx:#0a1a10;--txm:#2e4a38;--txl:#6b8c76;
 }
-[data-theme="dark"]{--bg:#090f0b;--sf:#0f1a13;--sf2:#141f17;--bd:#243028;--bd2:#364d3c;--tx:#d8ead0;--txm:#8aab8e;--txl:#8ca696;--gl:#2d1200;--gll:#1a0f06;--rl:#1f0a0a;--ol:#1a0f06;--bl:#091228;--yl:#120f06;}
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
 body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--tx);font-size:13px;}
-.toolbar{position:sticky;top:0;z-index:50;background:linear-gradient(135deg,var(--g),var(--gm));color:#fff;padding:10px 18px;display:flex;align-items:center;justify-content:space-between;box-shadow:0 2px 12px rgba(0,0,0,.25);}
+.toolbar{position:sticky;top:0;z-index:50;background:linear-gradient(135deg,var(--g),var(--gm));color:#fff;padding:10px 18px;display:flex;align-items:center;justify-content:space-between;box-shadow:0 2px 12px rgba(0,0,0,.25);flex-wrap:wrap;gap:8px;}
 .toolbar h1{font-size:.86rem;font-weight:800;}
 .toolbar p{font-size:.62rem;opacity:.75;}
 .tb-actions{display:flex;gap:8px;}
 .tb-btn{padding:7px 14px;border:none;border-radius:8px;font-size:.74rem;font-weight:700;cursor:pointer;font-family:inherit;display:inline-flex;align-items:center;gap:5px;}
 .tb-btn.print{background:#fff;color:var(--gm);}
 .tb-btn.back{background:rgba(255,255,255,.16);color:#fff;border:1px solid rgba(255,255,255,.3);}
-.page{max-width:920px;margin:18px auto;background:#fff;padding:26px 30px;overflow-x:auto;border-radius:10px;box-shadow:0 2px 16px rgba(0,0,0,.08);}
+.tb-btn.refresh{background:rgba(255,255,255,.16);color:#fff;border:1px solid rgba(255,255,255,.3);}
+.page{max-width:1040px;margin:18px auto;background:#fff;padding:26px 30px;border-radius:10px;box-shadow:0 2px 16px rgba(0,0,0,.08);}
 .r-head{display:flex;justify-content:space-between;align-items:flex-start;border-bottom:3px solid var(--gm);padding-bottom:12px;margin-bottom:14px;}
 .r-brand{font-size:1.05rem;font-weight:800;color:var(--g);}
 .r-sub{font-size:.68rem;color:var(--txl);margin-top:1px;}
 .r-meta{text-align:right;font-size:.66rem;color:var(--txl);}
-.kgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:14px 0;}
+.kgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:14px 0;}
 .kc{background:var(--sf2);border:1px solid var(--bd);border-radius:8px;padding:9px 8px;text-align:center;}
-.kc .n{font-size:1.2rem;font-weight:800;color:var(--r);}
+.kc .n{font-size:1.15rem;font-weight:800;color:var(--r);}
 .kc .l{font-size:.6rem;color:var(--txl);margin-top:2px;}
-.r-title{font-size:.86rem;font-weight:800;margin:16px 0 6px;padding-bottom:5px;border-bottom:1.5px solid var(--bd);display:flex;align-items:center;justify-content:space-between;}
-.add-row-btn{padding:4px 10px;background:var(--gll);border:1.5px solid var(--gm);color:var(--gm);border-radius:6px;font-size:.66rem;font-weight:700;cursor:pointer;font-family:inherit;}
-table{width:100%;border-collapse:collapse;font-size:.7rem;margin-bottom:10px;}
-th{background:var(--g);color:#fff;padding:5px 6px;text-align:left;font-size:.6rem;text-transform:uppercase;}
-td{padding:3px 5px;border-bottom:1px solid var(--bd);}
-td input,td select{width:100%;border:1px solid var(--bd);border-radius:4px;padding:3px 5px;font-size:.7rem;font-family:inherit;}
-.del-btn{background:none;border:none;color:var(--r);cursor:pointer;font-size:.78rem;}
+.zone-section{margin-top:18px;}
+.zone-head{display:flex;align-items:center;justify-content:space-between;background:var(--g);color:#fff;padding:7px 12px;border-radius:7px 7px 0 0;font-size:.78rem;font-weight:800;}
+.zone-head .zsub{font-size:.66rem;font-weight:600;opacity:.85;}
+table{width:100%;border-collapse:collapse;font-size:.70rem;margin-bottom:6px;}
+th{background:var(--sf3,#e8f0eb);color:var(--g);padding:5px 6px;text-align:left;font-size:.60rem;text-transform:uppercase;border-bottom:2px solid var(--gm);}
+td{padding:5px 6px;border-bottom:1px solid var(--bd);}
+tbody tr:nth-child(even) td{background:var(--sf2);}
+tfoot.zone-total td{font-weight:800;background:var(--rl);border-top:2px solid var(--r);color:var(--r);}
+.grand-total{margin-top:14px;background:var(--g);color:#fff;border-radius:8px;padding:10px 16px;display:flex;justify-content:space-between;align-items:center;font-size:.84rem;font-weight:800;}
+.phone-link{color:var(--gm);text-decoration:none;font-weight:700;}
+.other-note{font-size:.62rem;color:var(--txl);display:block;margin-top:1px;}
 .foot{text-align:center;font-size:.6rem;color:var(--txl);margin-top:18px;padding-top:10px;border-top:1px solid var(--bd);}
+.warn{background:var(--yl);border:1.5px solid var(--y);border-radius:8px;padding:8px 12px;font-size:.7rem;color:var(--y);font-weight:700;margin-bottom:14px;}
+.empty{text-align:center;padding:24px;color:var(--txl);font-size:.78rem;}
+.loading{text-align:center;padding:40px;color:var(--txl);font-size:.85rem;}
 @media print{
   body{background:#fff;}
-  .toolbar,.add-row-btn,.del-btn{display:none;}
+  .toolbar{display:none;}
   .page{box-shadow:none;margin:0;max-width:100%;padding:0;border-radius:0;}
-  td input,td select{border:none;border-bottom:1px solid var(--bd);border-radius:0;}
-  @page{size:A4 portrait;margin:14mm;}
+  .zone-section{page-break-inside:avoid;}
+  @page{size:A4 landscape;margin:12mm;}
 }
+
+.ic{width:1em;height:1em;vertical-align:-.15em;display:inline-block;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0}
+.ic-dot{stroke:none}
 </style>
 </head>
 <body>
 
 <div class="toolbar">
   <div>
-    <h1><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 2 20h20L12 3z"/><path d="M12 10v4"/><circle cx="12" cy="17" r=".6" fill="currentColor" stroke="none"/></svg>️ รายงานผู้ค้าค้างชำระ + แผนผ่อน</h1>
-    <p>แพไม้มินิ วันพฤหัสบดี · กรอกข้อมูลแล้วพิมพ์เป็น PDF</p>
+    <h1><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0Z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>️ รายงานผู้ค้าค้างชำระแยกโซน</h1>
+    <p>แพไม้มินิ วันพฤหัสบดี · ข้อมูลสด จาก Google Sheets</p>
   </div>
   <div class="tb-actions">
-    <button class="tb-btn dm-toggle" onclick="toggleDark()" aria-label="สลับโหมดสว่าง/มืด" style="background:rgba(255,255,255,.16);color:#fff;border:1px solid rgba(255,255,255,.3);width:34px;padding:7px;justify-content:center;"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 3a9 9 0 0 0 0 18z" fill="currentColor" stroke="none"/></svg></button><button class="tb-btn back" onclick="window.close()">← ปิด</button>
-    <button class="tb-btn print" onclick="window.print()"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M7 8V3h10v5"/><rect x="5" y="8" width="14" height="8" rx="1.5"/><path d="M7 15h10v6H7z"/><circle cx="16.5" cy="11" r=".6" fill="currentColor" stroke="none"/></svg>️ พิมพ์ / บันทึกเป็น PDF</button>
+    <button class="tb-btn refresh" onclick="render()"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 12a9 9 0 0 1-15.3 6.4L3 16"/><path d="M3 12a9 9 0 0 1 15.3-6.4L21 8"/><polyline points="3 20 3 16 7 16"/><polyline points="21 4 21 8 17 8"/></svg> รีเฟรช</button>
+    <button class="tb-btn back" onclick="window.close()"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><line x1="20" y1="12" x2="4" y2="12"/><polyline points="10 6 4 12 10 18"/></svg> ปิด</button>
+    <button class="tb-btn print" onclick="window.print()"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>️ พิมพ์ / บันทึกเป็น PDF</button>
   </div>
 </div>
 
 <div class="page">
   <div class="r-head">
     <div>
-      <div class="r-brand">แพไม้มินิ — Pamai Mini Thursday</div>
-      <div class="r-sub">โทร 082-581-1144 · รายงานผู้ค้าค้างชำระ + แผนผ่อน</div>
+      <div class="r-brand">แพไม้มินิ — Pamai Market</div>
+      <div class="r-sub">โทร 082-581-1144 · รายงานผู้ค้าค้างชำระ แยกตามโซน</div>
     </div>
     <div class="r-meta">
       <div>วันที่ออกรายงาน: <strong id="r-date">—</strong></div>
@@ -73,63 +84,168 @@ td input,td select{width:100%;border:1px solid var(--bd);border-radius:4px;paddi
     </div>
   </div>
 
-  <div class="kgrid">
-    <div class="kc"><div class="n" id="k-count">0</div><div class="l">ค้างชำระ (ทั้งหมด)</div></div>
-    <div class="kc"><div class="n" id="k-total">฿0</div><div class="l">ยอดค้างรวม</div></div>
-    <div class="kc"><div class="n" id="k-remain">฿0</div><div class="l">คงค้างสุทธิ</div></div>
-  </div>
+  <div id="dataWarn"></div>
+  <div id="reportBody" class="loading">⏳ กำลังโหลดข้อมูลจาก Google Sheets...</div>
 
-  <div class="r-title">รายการค้างชำระ <button class="add-row-btn" onclick="addRow()"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg> เพิ่มแถว</button></div>
-  <table>
-    <thead><tr><th style="width:24px">#</th><th>ล็อค</th><th>โซน</th><th>ร้านค้า</th><th style="width:80px">ยอดค้าง (฿)</th><th style="width:80px">ชำระแล้ว (฿)</th><th style="width:80px">คงเหลือ (฿)</th><th>แผนผ่อน</th><th style="width:90px">ครบกำหนด</th><th style="width:24px"></th></tr></thead>
-    <tbody id="rowsBody"></tbody>
-  </table>
-
-  <div class="foot">จัดทำโดย: ระบบบริหารจัดการแพไม้มินิ วันพฤหัสบดี</div>
+  <div class="foot">จัดทำโดย: ระบบบริหารจัดการแพไม้มินิ · พิมพ์เมื่อ <span id="r-stamp">—</span></div>
 </div>
 
 <script>
-function toggleDark(){const h=document.documentElement,d=h.getAttribute('data-theme')==='dark';h.setAttribute('data-theme',d?'light':'dark');localStorage.setItem('pmthu-t',d?'light':'dark');}
-(()=>{const s=localStorage.getItem('pmthu-t');if(s)document.documentElement.setAttribute('data-theme',s);else if(window.matchMedia('(prefers-color-scheme:dark)').matches)document.documentElement.setAttribute('data-theme','dark');})();
-
 const MONS=['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
 function nowTH(){const n=new Date();return n.getDate()+' '+MONS[n.getMonth()]+' '+(n.getFullYear()+543);}
-document.getElementById('r-date').textContent = nowTH();
+function baht(n){return '฿'+Math.round(n||0).toLocaleString();}
 
-let rowId=0;
-function addRow(){
-  rowId++;
-  const tr=document.createElement('tr');
-  tr.id='row-'+rowId;
-  tr.innerHTML = `
-    <td>${rowId}</td>
-    <td><input type="text" class="f-lock" placeholder="เช่น A7"></td>
-    <td><input type="text" class="f-zone" placeholder="A"></td>
-    <td><input type="text" class="f-shop" placeholder="ชื่อร้านค้า"></td>
-    <td><input type="number" class="f-debt" placeholder="0" oninput="recalc()"></td>
-    <td><input type="number" class="f-paid" placeholder="0" oninput="recalc()"></td>
-    <td><input type="number" class="f-remain" placeholder="0" readonly></td>
-    <td><select class="f-plan"><option value="">ยังไม่มีแผน</option><option value="2">2 งวด</option><option value="3">3 งวด</option><option value="4">4 งวด</option></select></td>
-    <td><input type="text" class="f-due" placeholder="วว/ดด/ปปปป"></td>
-    <td><button class="del-btn" onclick="this.closest('tr').remove();recalc()" aria-label="ลบแถวนี้">✕</button></td>
-  `;
-  document.getElementById('rowsBody').appendChild(tr);
+// ═══ AUTO-CONNECT v1.3: เชื่อมต่อ Google Sheets อัตโนมัติผ่านลิงก์ตั้งค่า (ตั้งครั้งเดียวต่อเครื่อง/เบราว์เซอร์) ═══
+// เปิดผ่านลิงก์พิเศษที่มี ?api=URL ต่อท้าย (ส่งให้พนักงานทางแชทภายใน ไม่เผยแพร่ในซอร์สโค้ดสาธารณะ)
+// ระบบจะบันทึกอัตโนมัติแล้วลบพารามิเตอร์ออกจาก URL ทันที ครั้งต่อไปไม่ต้องกดซ้ำ (อ่านจาก localStorage เหมือนเดิม)
+(function(){
+  try{
+    var p=new URLSearchParams(location.search);
+    var apiParam=p.get('api');
+    if(apiParam){
+      localStorage.setItem('pm-thu-api-url',decodeURIComponent(apiParam));
+      p.delete('api');
+      var clean=location.pathname+(p.toString()?('?'+p.toString()):'')+location.hash;
+      history.replaceState(null,'',clean);
+    }
+  }catch(e){}
+})();
+function getApiUrl(){return (localStorage.getItem('pm-thu-api-url')||localStorage.getItem('pm-api-url'))||'';}
+function getApiToken(){return (localStorage.getItem('pm-thu-api-token')||localStorage.getItem('pm-api-token'))||'';}
+async function apiGet(action,params={}){
+  const url=getApiUrl(); if(!url) return null;
+  try{
+    const r=await fetch(url+'?'+new URLSearchParams({action,token:getApiToken(),...params}));
+    const j=await r.json();
+    return j.status==='ok'?j.data:null;
+  }catch(e){ console.error('apiGet error:',action,e); return null; }
 }
-function recalc(){
-  const rows=[...document.querySelectorAll('#rowsBody tr')];
-  let totalDebt=0, totalPaid=0;
-  rows.forEach(tr=>{
-    const debt = parseFloat(tr.querySelector('.f-debt').value)||0;
-    const paid = parseFloat(tr.querySelector('.f-paid').value)||0;
-    const remain = Math.max(0, debt-paid);
-    tr.querySelector('.f-remain').value = remain || '';
-    totalDebt += debt; totalPaid += paid;
+function countThursdaysInMonth(year, month){
+  let count=0; const d=new Date(year, month, 1);
+  while(d.getMonth()===month){ if(d.getDay()===4) count++; d.setDate(d.getDate()+1); }
+  return count;
+}
+function thisMonthThursdays(){ const n=new Date(); return countThursdaysInMonth(n.getFullYear(), n.getMonth()); }
+function calcElec(v){ // ค่าไฟรายเดือน = ราคา/อังคาร × จำนวนอังคาร + รวม elec_special ที่เดิมตกหล่น (แก้ 2026-07-17 บั๊ก #27)
+  const sp = (Array.isArray(v.elec_special)?v.elec_special:[]).reduce((s,x)=>s+(parseFloat(x.price)||0),0);
+  const perTue = (parseInt(v.elec_bulb)||0)*10+(parseInt(v.elec_fan)||0)*20+(parseInt(v.elec_small)||0)*50+(parseInt(v.elec_large)||0)*100+sp;
+  return Math.round(perTue * thisMonthThursdays());
+}
+function monthlyRent(v){ return (parseFloat(v.dailyRate)||0) * thisMonthThursdays(); }
+
+// ลำดับโซนตามผังตลาดจริง: โรงหน้า → โรงใหญ่ → โซนด้านนอก
+//== MARKET_BLOCK:ZONES ==//
+const ZONE_ORDER = ['A','B','C','D','E','F','G','J','K','N','U','O','M','H','L','T','AB','TA','TB','TC'];
+const ZONE_GROUP_NAME = {
+  A:'โซนด้านนอก', B:'โซนด้านนอก', C:'โซนด้านนอก', D:'โซนด้านนอก', E:'โซนด้านนอก', F:'โซนด้านนอก',
+  G:'ข้าง 7-Eleven', J:'ข้าง 7-Eleven', K:'ข้าง 7-Eleven', N:'ข้าง 7-Eleven', U:'ข้าง 7-Eleven',
+  O:'ข้างโลตัส', M:'ข้างโลตัส', H:'ข้างโลตัส', L:'ข้างโลตัส', T:'ข้างโลตัส', AB:'ข้างโลตัส',
+  TA:'เปิดท้าย', TB:'เปิดท้าย', TC:'เปิดท้าย',
+};
+//== END_MARKET_BLOCK ==//
+
+async function render(){
+  document.getElementById('r-date').textContent = nowTH();
+  document.getElementById('r-stamp').textContent = nowTH() + ' ' + new Date().toLocaleTimeString('th-TH',{hour:'2-digit',minute:'2-digit'});
+  document.getElementById('reportBody').innerHTML = '<div class="loading">⏳ กำลังโหลดข้อมูลจาก Google Sheets...</div>';
+  document.getElementById('dataWarn').innerHTML = '';
+
+  if(!getApiUrl()){
+    document.getElementById('dataWarn').innerHTML =
+      '<div class="warn"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0Z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg> ยังไม่ได้เชื่อมต่อ Google Sheets — กรุณาตั้งค่าที่หน้าหลักของระบบก่อน</div>';
+    document.getElementById('reportBody').innerHTML = '';
+    return;
+  }
+
+  const vendors = await apiGet('getVendors') || [];
+  const unpaid = vendors.filter(v=>v.status==='unpaid');
+  const tuesdays = thisMonthThursdays();
+
+  // คำนวณยอดค้างแต่ละล็อค: ค่าเช่ารายเดือน + ค่าไฟ + ค่าปรับค้างจ่าย + ค่าอื่นค้างจ่าย
+  const withDebt = unpaid.map(v=>{
+    const rent = monthlyRent(v);
+    const elec = calcElec(v);
+    const penalty = parseFloat(v.unpaid_penalty)||0;
+    const other = parseFloat(v.unpaid_other)||0;
+    const otherLabel = v.unpaid_other_label||'';
+    const total = rent + elec + penalty + other;
+    return {...v, rent, elec, penalty, other, otherLabel, total};
   });
-  document.getElementById('k-count').textContent = rows.length;
-  document.getElementById('k-total').textContent = '฿'+totalDebt.toLocaleString();
-  document.getElementById('k-remain').textContent = '฿'+Math.max(0,totalDebt-totalPaid).toLocaleString();
+
+  const totalDebt = withDebt.reduce((s,v)=>s+v.total,0);
+  const zonesWithDebt = [...new Set(withDebt.map(v=>v.zone))].length;
+
+  let html = `
+  <div class="kgrid">
+    <div class="kc"><div class="n">${withDebt.length}</div><div class="l">ผู้ค้าค้างชำระ</div></div>
+    <div class="kc"><div class="n">${zonesWithDebt}</div><div class="l">โซนที่มีค้างชำระ</div></div>
+    <div class="kc"><div class="n">${tuesdays}</div><div class="l">วันพฤหัสบดีเดือนนี้</div></div>
+    <div class="kc"><div class="n" style="font-size:.95rem">${baht(totalDebt)}</div><div class="l">ยอดค้างรวมทั้งหมด</div></div>
+  </div>`;
+
+  if(withDebt.length===0){
+    html += '<div class="empty"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg> ไม่มีผู้ค้าค้างชำระในขณะนี้</div>';
+  } else {
+    // จัดกลุ่มตามโซน
+    const byZone = {};
+    withDebt.forEach(v=>{
+      if(!byZone[v.zone]) byZone[v.zone]=[];
+      byZone[v.zone].push(v);
+    });
+    // เรียงโซนตามลำดับผังตลาดจริง ตามด้วยโซนที่ไม่อยู่ใน list (กันเหนียว)
+    const zoneKeys = Object.keys(byZone).sort((a,b)=>{
+      const ia = ZONE_ORDER.indexOf(a), ib = ZONE_ORDER.indexOf(b);
+      return (ia<0?999:ia) - (ib<0?999:ib);
+    });
+
+    zoneKeys.forEach(zone=>{
+      const list = byZone[zone].sort((a,b)=>a.lock.localeCompare(b.lock,undefined,{numeric:true}));
+      const zoneTotal = list.reduce((s,v)=>s+v.total,0);
+      const groupName = ZONE_GROUP_NAME[zone] || '—';
+
+      html += `<div class="zone-section">
+        <div class="zone-head"><span><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 22s7-6.5 7-12a7 7 0 1 0-14 0c0 5.5 7 12 7 12Z"/><circle cx="12" cy="10" r="2.5"/></svg> โซน ${zone} (${groupName})</span><span class="zsub">${list.length} ล็อคค้างชำระ · รวม ${baht(zoneTotal)}</span></div>
+        <table>
+          <thead><tr>
+            <th style="width:22px">#</th><th>ล็อค</th><th>ร้านค้า</th><th>เบอร์โทร</th>
+            <th style="text-align:right">ค่าเช่า/เดือน</th>
+            <th style="text-align:right">ค่าไฟ</th>
+            <th style="text-align:right">ค่าปรับค้าง</th>
+            <th>ค่าอื่นค้าง</th>
+            <th style="text-align:right">ยอดค้างรวม</th>
+          </tr></thead>
+          <tbody>`;
+
+      list.forEach((v,i)=>{
+        const phoneHtml = v.phone && v.phone!=='—' ? `<a class="phone-link" href="tel:${v.phone}">${v.phone}</a>` : '—';
+        const otherCell = v.other>0
+          ? `${baht(v.other)}${v.otherLabel?`<span class="other-note">${v.otherLabel}</span>`:''}`
+          : '—';
+        html += `<tr>
+          <td>${i+1}</td>
+          <td><strong>${v.lock}</strong></td>
+          <td>${v.name||'(ยังไม่ระบุ)'}</td>
+          <td>${phoneHtml}</td>
+          <td style="text-align:right">${baht(v.rent)}</td>
+          <td style="text-align:right">${v.elec>0?baht(v.elec):'—'}</td>
+          <td style="text-align:right">${v.penalty>0?baht(v.penalty):'—'}</td>
+          <td>${otherCell}</td>
+          <td style="text-align:right;font-weight:800;color:var(--r)">${baht(v.total)}</td>
+        </tr>`;
+      });
+
+      html += `</tbody>
+          <tfoot class="zone-total"><tr><td colspan="8">รวมโซน ${zone}</td><td style="text-align:right">${baht(zoneTotal)}</td></tr></tfoot>
+        </table>
+      </div>`;
+    });
+
+    html += `<div class="grand-total"><span><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M9.5 9.5c0-1.1 1.1-2 2.5-2s2.5.9 2.5 2-1.1 1.6-2.5 2-2.5.9-2.5 2 1.1 2 2.5 2 2.5-.9 2.5-2"/></svg> ยอดค้างชำระรวมทั้งหมดทุกโซน</span><span>${baht(totalDebt)}</span></div>`;
+  }
+
+  document.getElementById('reportBody').innerHTML = html;
 }
-addRow(); addRow(); addRow();
+render();
 </script>
 </body>
 </html>
