@@ -596,6 +596,7 @@ function toggleDark(){
   else if(window.matchMedia('(prefers-color-scheme:dark)').matches) document.documentElement.setAttribute('data-theme','dark');
 })();
 
+const APP_BUILD='20260718-0100'; // cache-buster — build.py แทนค่าอัตโนมัติ
 const DAYS=['อาทิตย์','จันทร์','อังคาร','พุธ','พฤหัสบดี','ศุกร์','เสาร์'];
 const MONS=['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
 function tick(){
@@ -1361,7 +1362,7 @@ function openRegisterForLock(lockId) {
   goTab('register');
   const pane = document.getElementById('register');
   if (!pane) return;
-  const src = 'pamai_thu_vendor_registration.html?lock=' + encodeURIComponent(lockId);
+  const src = 'pamai_thu_vendor_registration.html?lock=' + encodeURIComponent(lockId) + '&v=' + encodeURIComponent(APP_BUILD);
   const existingFrame = pane.querySelector('iframe');
   if (existingFrame) {
     // โมดูลเคยโหลดแล้ว — สั่งให้ไปที่ URL ใหม่พร้อมล็อคที่เลือก
@@ -1417,7 +1418,7 @@ function loadModule(id) {
   // navigates to the real src, firing onload a second time. That spurious
   // first firing was being read as "failed to load" and triggering the
   // fallback message even though the module was about to load fine.
-  iframe.src = src;
+  iframe.src = src + (src.includes('?')?'&':'?') + 'v=' + encodeURIComponent(APP_BUILD); // กันเบราว์เซอร์ใช้ไฟล์เก่าจาก cache
 
   const loadingEl = document.createElement('div');
   loadingEl.className = 'module-loading';
