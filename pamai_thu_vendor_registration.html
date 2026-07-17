@@ -1381,7 +1381,7 @@ async function submitForm(btn) {
     const time = nowTime();
     const collector = document.getElementById('payCollector').value || getCurrentUserName();
     const mMap = {cash:'<svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="12" cy="12" r="3"/></svg> เงินสด', transfer:'<svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><rect x="6" y="2" width="12" height="20" rx="2"/><line x1="11" y1="18" x2="13" y2="18"/></svg> โอนเงิน', qr:'<svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 8h3l2-2h6l2 2h3v11H4Z"/><circle cx="12" cy="13.5" r="3.5"/></svg> QR Code'};
-    const method = mMap[document.getElementById('payMethod').value] || 'เงินสด';
+    const method = ({cash:'เงินสด',transfer:'โอนเงิน',qr:'QR Code'})[document.getElementById('payMethod').value] || 'เงินสด'; // บันทึกเป็นข้อความล้วน ไม่เอา svg
     const fullName = name + (nick ? ` (${nick})` : '');
     const fullProduct = product + (detail ? ` · ${detail}` : '');
 
