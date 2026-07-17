@@ -904,27 +904,28 @@ textarea { resize: vertical; min-height: 70px; }
 //  DATA
 // ══════════════════════════════════
 //== MARKET_BLOCK:LOCKS ==//
+function thuArr(n,p){ return Array.from({length:n},(_,i)=>({id:`${p}${i+1}`,o:0})); }
 const LOCKS = {
-  A:{label:'โซนด้านนอก A', data: arr(20,'A')},
-  B:{label:'โซนด้านนอก B', data: arr(20,'B')},
-  C:{label:'โซนด้านนอก C', data: arr(21,'C')},
-  D:{label:'โซนด้านนอก D', data: arr(22,'D')},
-  E:{label:'โซนด้านนอก E', data: arr(11,'E')},
-  F:{label:'โซนด้านนอก F', data: arr(16,'F')},
-  G:{label:'ข้าง 7-Eleven G', data: arr(28,'G')},
-  J:{label:'ข้าง 7-Eleven J', data: arr(4,'J')},
-  K:{label:'ข้าง 7-Eleven K', data: arr(12,'K')},
-  N:{label:'ข้าง 7-Eleven N', data: arr(8,'N')},
+  A:{label:'โซนด้านนอก A', data: thuArr(20,'A')},
+  B:{label:'โซนด้านนอก B', data: thuArr(20,'B')},
+  C:{label:'โซนด้านนอก C', data: thuArr(21,'C')},
+  D:{label:'โซนด้านนอก D', data: thuArr(22,'D')},
+  E:{label:'โซนด้านนอก E', data: thuArr(11,'E')},
+  F:{label:'โซนด้านนอก F', data: thuArr(16,'F')},
+  G:{label:'ข้าง 7-Eleven G', data: thuArr(28,'G')},
+  J:{label:'ข้าง 7-Eleven J', data: thuArr(4,'J')},
+  K:{label:'ข้าง 7-Eleven K', data: thuArr(12,'K')},
+  N:{label:'ข้าง 7-Eleven N', data: thuArr(8,'N')},
   U:{label:'ข้าง 7-Eleven U', data:[{id:'U1',o:0},{id:'U3',o:0},{id:'U4',o:0},{id:'U5',o:0},{id:'U6',o:0}]},
-  O:{label:'ข้างโลตัส O', data: arr(13,'O')},
-  M:{label:'ข้างโลตัส M', data: arr(12,'M')},
-  H:{label:'ข้างโลตัส H', data: arr(12,'H')},
+  O:{label:'ข้างโลตัส O', data: thuArr(13,'O')},
+  M:{label:'ข้างโลตัส M', data: thuArr(12,'M')},
+  H:{label:'ข้างโลตัส H', data: thuArr(12,'H')},
   L:{label:'ข้างโลตัส L', data: Array.from({length:28},(_,i)=>i+1).map(n=>({id:`L${n}`,o:0}))},
   T:{label:'ข้างโลตัส T', data:[{id:'T1',o:0},{id:'T2',o:0}]},
   AB:{label:'ข้างโลตัส AB', data:[{id:'AB4',o:0},{id:'AB5',o:0},{id:'AB6',o:0}]},
-  TA:{label:'โซนเปิดท้าย TA', data: arr(20,'TA')},
-  TB:{label:'โซนเปิดท้าย TB', data: arr(20,'TB')},
-  TC:{label:'โซนเปิดท้าย TC', data: arr(20,'TC')},
+  TA:{label:'โซนเปิดท้าย TA', data: thuArr(20,'TA')},
+  TB:{label:'โซนเปิดท้าย TB', data: thuArr(20,'TB')},
+  TC:{label:'โซนเปิดท้าย TC', data: thuArr(20,'TC')},
 };
 //== END_MARKET_BLOCK ==//
 function arr(n,p,vacant){ return Array.from({length:n},(_,i)=>({id:`${p}${i+1}`,o:!vacant.includes(i+1)?1:0})); }

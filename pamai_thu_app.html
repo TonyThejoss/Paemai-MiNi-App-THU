@@ -1352,6 +1352,11 @@ function showToast(msg,type='i'){
 // CROSS-MODULE NAVIGATION — เรียกจาก iframe อื่น (เช่น ผังตลาด)
 // เพื่อเปิดหน้า "ลงทะเบียนผู้ค้าใหม่" พร้อมเลือกล็อคที่กดมาให้อัตโนมัติ
 // ════════════════════════════════════════════════════
+// รองรับสัญญาณจาก iframe ผังตลาด (ปุ่มเพิ่มผู้ค้าใน popup)
+window.addEventListener('message', function(e){
+  if(e && e.data && e.data.type==='pm-open-register' && e.data.lock) openRegisterForLock(e.data.lock);
+});
+
 function openRegisterForLock(lockId) {
   goTab('register');
   const pane = document.getElementById('register');
