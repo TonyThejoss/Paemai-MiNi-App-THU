@@ -289,6 +289,30 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(
     </div>
   </div>
 </div>
+<div class="modal-bg" id="editVendorModal">
+  <div class="modal-box" style="max-width:440px">
+    <div class="m-title" id="ev-title"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.12 2.12 0 0 1 3 3L12 15l-4 1 1-4Z"/></svg> แก้ไขข้อมูลผู้ค้า</div>
+    <div class="m-sub" id="ev-sub">—</div>
+    <div class="m-row"><div class="m-field"><label for="ev-name">ชื่อร้าน/ผู้ค้า</label><input type="text" id="ev-name" placeholder="ชื่อร้านหรือผู้ค้า"></div><div class="m-field"><label for="ev-phone">เบอร์โทร</label><input type="tel" id="ev-phone" placeholder="0xx-xxx-xxxx"></div></div>
+    <div class="m-row"><div class="m-field"><label for="ev-product">สินค้า</label><input type="text" id="ev-product" placeholder="ประเภทสินค้า"></div><div class="m-field"><label for="ev-rate">ค่าเช่า/วัน (฿)</label><input type="number" id="ev-rate" min="0" oninput="emUpdateHint()"></div></div>
+    <div class="m-sub" style="margin:10px 0 4px;font-weight:800;color:var(--txm)"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><polygon points="13 2 3 14 11 14 10 22 21 10 13 10 13 2"/></svg> ค่าไฟฟ้า</div>
+    <div class="m-row">
+      <div class="m-field"><label for="ev-bulb">หลอดไฟ (ดวง)</label><input type="number" id="ev-bulb" min="0" oninput="emUpdateHint()"></div>
+      <div class="m-field"><label for="ev-fan">พัดลม (ตัว)</label><input type="number" id="ev-fan" min="0" oninput="emUpdateHint()"></div>
+    </div>
+    <div class="m-row">
+      <div class="m-field"><label for="ev-small">เครื่องเล็ก</label><input type="number" id="ev-small" min="0" oninput="emUpdateHint()"></div>
+      <div class="m-field"><label for="ev-large">เครื่องใหญ่</label><input type="number" id="ev-large" min="0" oninput="emUpdateHint()"></div>
+    </div>
+    <div id="ev-specialList" style="margin-top:6px;display:flex;flex-direction:column;gap:5px"></div>
+    <button type="button" onclick="emAddSpecial()" style="margin-top:6px;padding:6px 10px;border:1.5px dashed var(--bd2);border-radius:7px;background:none;color:var(--txl);font-size:.78rem;font-weight:700;cursor:pointer;font-family:inherit;width:100%">＋ เพิ่มอุปกรณ์พิเศษ (ราคากำหนดเอง)</button>
+    <div class="m-summary" style="margin-top:10px">
+      <div class="ms-row"><span>ค่าเช่า ≈ /เดือน</span><span id="ev-s-rent">—</span></div>
+      <div class="ms-row"><span>ค่าไฟ ≈ /เดือน</span><span id="ev-s-elec">—</span></div>
+    </div>
+    <div class="m-footer"><button class="m-btn secondary" onclick="document.getElementById('editVendorModal').classList.remove('show')">ยกเลิก</button><button class="m-btn primary" onclick="confirmEditVendor()"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg> บันทึกการแก้ไข</button></div>
+  </div>
+</div>
 <div class="toast" id="toast"></div>
 <script>
 // ════════════════════════════════════════════════════
@@ -786,6 +810,7 @@ function showPopup(el,ev){
   if(isDaily) acts+='<button class="pp-btn b-cancel" onclick="cancelDaily(\''+lockId+'\')">✕ ยกเลิกจร</button>';
   if(isVacant) acts+='<button class="pp-btn" style="background:#dcfce7;color:#15803d" onclick="goRegisterLock(\''+lockId+'\',\''+(d.zone||'')+'\')">➕ เพิ่มผู้ค้าประจำ</button>';
   if(isOccupied||isDaily){
+    acts+='<button class="pp-btn" style="background:var(--gll);color:var(--gm);flex-basis:100%" onclick="openEditVendorModal(\''+lockId+'\')">✏️ แก้ไขข้อมูลผู้ค้า</button>';
     acts+='<button class="pp-btn" style="background:var(--bl);color:var(--b)" onclick="openMoveModal(\''+lockId+'\')">🔄 ย้ายล็อค</button>';
     acts+='<button class="pp-btn" style="background:var(--rl);color:var(--r)" onclick="openCancelLeaseModal(\''+lockId+'\')">🚫 ยกเลิกเช่า</button>';
   }
@@ -835,6 +860,122 @@ function renderHistChips(list){
 // (บั๊กเดิม: ผังตลาดสร้างล็อคเริ่มต้นเป็น "ว่าง" ทุกล็อคเสมอ ไม่เคยดึงสถานะ
 //  ผู้เช่าจริงจาก getVendors มาแสดง ทำให้ล็อคที่มีผู้เช่าอยู่จริงก็ยังโชว์ว่าง)
 // ════════════════════════════════════════════════════
+
+// ── helpers สำหรับ Edit Vendor (ฉบับผังวันพฤหัสฯ) ──
+let REAL_VENDORS=[];
+async function refreshRealVendorsTHU(){ const l=await apiGet('getVendors'); if(Array.isArray(l)) REAL_VENDORS=l; }
+function calcMonthlyRentMap(dailyRate){ return (dailyRate||0)*thisMonthThursdays(); }
+function getVendorForEdit(lockId){
+  const real=REAL_VENDORS.find(v=>v.lock===lockId);
+  if(real) return real;
+  const el=document.querySelector('.lk[data-id="'+lockId+'"]');
+  const d=el?el.dataset:{};
+  return {
+    lock:lockId, zone:d.zone||'', name:'', phone:'',
+    product:(d.shop&&d.shop!=='ว่าง'&&d.shop!=='ไม่มีข้อมูล')?d.shop:'',
+    dailyRate:0, status:'active',
+    elec_bulb:0, elec_fan:0, elec_small:0, elec_large:0, elec_special:[],
+  };
+}
+
+// EDIT VENDOR — แก้ไขข้อมูลผู้ค้าเดิม (ชื่อ/เบอร์/สินค้า/ค่าเช่า/ค่าไฟ) จากป๊อปอัพผังตลาด
+// ใช้ saveVendor API เดิม (merge แบบ partial update) จึงไม่กระทบยอดค้างชำระ/สถานะอื่น ๆ
+// ════════════════════════════════════════════════════
+let evSpecials=[], evSpecialCnt=0, evLockId=null;
+
+function emGetElecInputs(){
+  const bulb=parseInt(document.getElementById('ev-bulb').value)||0;
+  const fan=parseInt(document.getElementById('ev-fan').value)||0;
+  const small=parseInt(document.getElementById('ev-small').value)||0;
+  const large=parseInt(document.getElementById('ev-large').value)||0;
+  const special=evSpecials.map(id=>({
+    name:document.getElementById('esn-'+id)?.value||'อุปกรณ์พิเศษ',
+    price:parseFloat(document.getElementById('esp-'+id)?.value)||0,
+  })).filter(s=>s.price>0);
+  const specialSum=special.reduce((s,x)=>s+x.price,0);
+  const total=bulb*10+fan*20+small*50+large*100+specialSum;
+  return {bulb,fan,small,large,special,total};
+}
+function emAddSpecial(item){
+  const id=++evSpecialCnt;
+  evSpecials.push(id);
+  const div=document.createElement('div');
+  div.id='es-'+id; div.style.cssText='display:flex;gap:5px';
+  div.innerHTML='<input type="text" placeholder="ชื่ออุปกรณ์ เช่น ตู้แช่ไอศกรีม..." id="esn-'+id+'" oninput="emUpdateHint()" style="flex:2;min-width:0;box-sizing:border-box;padding:6px 8px;border:1.5px solid var(--bd);border-radius:6px;font-size:.78rem;background:var(--sf2);color:var(--tx);font-family:inherit">'
+    +'<input type="number" placeholder="฿/พฤหัสบดี" min="0" id="esp-'+id+'" oninput="emUpdateHint()" style="flex:1;min-width:0;box-sizing:border-box;padding:6px 8px;border:1.5px solid var(--bd);border-radius:6px;font-size:.78rem;background:var(--sf2);color:var(--tx);font-family:inherit;text-align:right">'
+    +'<button type="button" onclick="emRemoveSpecial('+id+')" style="border:none;background:var(--rl);color:var(--r);border-radius:6px;width:30px;flex-shrink:0;cursor:pointer" title="ลบ"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>';
+  document.getElementById('ev-specialList').appendChild(div);
+  if(item){document.getElementById('esn-'+id).value=item.name||'';document.getElementById('esp-'+id).value=item.price||'';}
+  emUpdateHint();
+}
+function emRemoveSpecial(id){
+  const el=document.getElementById('es-'+id); if(el) el.remove();
+  evSpecials=evSpecials.filter(i=>i!==id);
+  emUpdateHint();
+}
+function emUpdateHint(){
+  const rate=parseFloat(document.getElementById('ev-rate').value)||0;
+  document.getElementById('ev-s-rent').textContent=fmt(calcMonthlyRentMap(rate));
+  const {total}=emGetElecInputs();
+  const n=new Date();
+  document.getElementById('ev-s-elec').textContent=fmt(Math.round(total*thisMonthThursdays())); // ค่าไฟ/เดือน = ราคา/พฤหัสบดี × จำนวนพฤหัสบดีจริงของเดือน (แก้ 2026-07-17 บั๊ก #27 — เดิม hardcode ×5)
+}
+
+async function openEditVendorModal(lockId){
+  closePopup();
+  await refreshRealVendorsTHU();
+  evLockId=lockId;
+  evSpecials=[]; evSpecialCnt=0;
+  document.getElementById('ev-specialList').innerHTML='';
+  const v=getVendorForEdit(lockId);
+  const el=document.querySelector('.lk[data-id="'+lockId+'"]');
+  document.getElementById('ev-sub').textContent='ล็อค '+lockId+' · โซน '+(v.zone||el?.dataset.zone||'—');
+  document.getElementById('ev-name').value=(v.name&&v.name!=='(ยังไม่ระบุ)')?v.name:'';
+  document.getElementById('ev-phone').value=(v.phone&&v.phone!=='—')?v.phone:'';
+  document.getElementById('ev-product').value=(v.product&&v.product!=='—')?v.product:'';
+  document.getElementById('ev-rate').value=v.dailyRate||'';
+  document.getElementById('ev-bulb').value=v.elec_bulb||'';
+  document.getElementById('ev-fan').value=v.elec_fan||'';
+  document.getElementById('ev-small').value=v.elec_small||'';
+  document.getElementById('ev-large').value=v.elec_large||'';
+  let _sp=v.elec_special; if(typeof _sp==='string'){try{_sp=JSON.parse(_sp||'[]');}catch(e){_sp=[];}} (_sp||[]).forEach(s=>emAddSpecial(s));
+  emUpdateHint();
+  document.getElementById('editVendorModal').classList.add('show');
+}
+
+async function confirmEditVendor(){
+  const lockId=evLockId;
+  if(!lockId) return;
+  const name=document.getElementById('ev-name').value.trim();
+  const phone=document.getElementById('ev-phone').value.trim();
+  const product=document.getElementById('ev-product').value.trim();
+  const dailyRate=parseFloat(document.getElementById('ev-rate').value)||0;
+  if(!name){toast('กรุณากรอกชื่อร้าน/ผู้ค้า','e');return;}
+  const el=document.querySelector('.lk[data-id="'+lockId+'"]');
+  const zone=(getVendorForEdit(lockId).zone)||el?.dataset.zone||'';
+  const ei=emGetElecInputs();
+
+  if(!getApiUrl()){toast('ยังไม่ได้เชื่อมต่อ Google Sheets — แก้ไขไม่ได้ในโหมดออฟไลน์','e');return;}
+
+  const btn=document.querySelector('#editVendorModal .m-btn.primary');
+  const origTxt=btn.innerHTML; btn.disabled=true; btn.innerHTML='กำลังบันทึก...';
+  const res=await apiPost('saveVendor',{data:{
+    lock:lockId, zone, name, phone: phone||'—', product: product||'—', dailyRate,
+    elec_bulb:ei.bulb, elec_fan:ei.fan, elec_small:ei.small, elec_large:ei.large, elec_special:ei.special,
+  }});
+  btn.disabled=false; btn.innerHTML=origTxt;
+
+  if(!res || res.status!=='ok'){
+    toast('บันทึกไม่สำเร็จ — กรุณาลองใหม่','e');
+    return;
+  }
+  document.getElementById('editVendorModal').classList.remove('show');
+  addHist(lockId,{type:'daily',label:'<svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.12 2.12 0 0 1 3 3L12 15l-4 1 1-4Z"/></svg> แก้ไขข้อมูลผู้ค้า',note:name+' · '+(product||'—')});
+  toast('<svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg> บันทึกข้อมูลผู้ค้าล็อค '+lockId+' แล้ว','s');
+  await refreshRealVendorsTHU(); if(typeof loadVendorOccupancy==='function') await loadVendorOccupancy();
+  evLockId=null;
+}
+
 async function loadVendorOccupancy(){
   if(!getApiUrl()) return;
   const vendors = await apiGet('getVendors');
