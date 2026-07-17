@@ -327,8 +327,8 @@ function addHist(id,e){if(!lockHistory[id])lockHistory[id]=[];lockHistory[id].un
 function fmt(n){return '฿'+Math.round(n).toLocaleString();}
 
 // ── Google Sheets API (บันทึกแจ้งลา/ขาดล็อค/ล็อคจร/ยกเลิก ลงหลังบ้านจริง ไม่ใช่แค่ localStorage) ──
-function getApiUrl(){ return localStorage.getItem('pm-api-url')||''; }
-function getApiToken(){return localStorage.getItem('pm-api-token')||'';}
+function getApiUrl(){ return localStorage.getItem('pm-thu-api-url')||localStorage.getItem('pm-api-url')||''; }
+function getApiToken(){return localStorage.getItem('pm-thu-api-token')||localStorage.getItem('pm-api-token')||'';}
 async function apiGet(action,params={}){
   const url=getApiUrl(); if(!url) return null;
   try{ const r=await fetch(url+'?'+new URLSearchParams({action,token:getApiToken(),...params})); const j=await r.json(); return j.status==='ok'?j.data:null; }
