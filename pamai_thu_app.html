@@ -3,6 +3,12 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0">
+<link rel="icon" type="image/png" href="logo.png">
+<link rel="apple-touch-icon" href="logo.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="แพไม้มินิ">
 <title>แพไม้มินิ — ระบบบริหารจัดการ</title>
 <style>
 /* ─── TOKENS ─────────────────────────────────────── */
@@ -308,7 +314,7 @@ input:focus,select:focus,textarea:focus{border-color:var(--gm);box-shadow:0 0 0 
 <div id="login-screen" style="display:flex">
   <div class="login-box">
     <div class="login-logo">
-      <div class="li"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 9 4 4h16l1 5"/><path d="M4 9v11h16V9"/><path d="M9 20v-6h6v6"/></svg></div>
+      <div class="li"><img src="logo.png" alt="โลโก้ตลาด" style="width:78px;height:78px;border-radius:50%;object-fit:cover;box-shadow:0 4px 14px rgba(0,0,0,.25)" onerror="this.style.display='none';this.nextElementSibling.style.display='inline-block'"><svg style="display:none" class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 9 4 4h16l1 5"/><path d="M4 9v11h16V9"/><path d="M9 20v-6h6v6"/></svg></div>
       <h2>แพไม้มินิ</h2>
       <p>ระบบบริหารจัดการตลาด · กรุณาเข้าสู่ระบบ</p>
     </div>
@@ -351,7 +357,7 @@ input:focus,select:focus,textarea:focus{border-color:var(--gm);box-shadow:0 0 0 
 <header class="topbar">
   <button class="icon-btn hamburger" id="hamburger-btn" onclick="toggleSidebar()" aria-label="เปิด/ปิดเมนู" title="เมนู"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><line x1="4" y1="7" x2="20" y2="7"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="17" x2="20" y2="17"/></svg></button>
   <a class="logo" href="#" onclick="goTab('dash');return false">
-    <div class="logo-ico"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 9 4 4h16l1 5"/><path d="M4 9v11h16V9"/><path d="M9 20v-6h6v6"/></svg></div>
+    <div class="logo-ico"><img src="logo.png" alt="" style="width:30px;height:30px;border-radius:50%;object-fit:cover" onerror="this.style.display='none';this.nextElementSibling.style.display='inline-block'"><svg style="display:none" class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 9 4 4h16l1 5"/><path d="M4 9v11h16V9"/><path d="M9 20v-6h6v6"/></svg></div>
     <div class="logo-t"><h1>แพไม้มินิ</h1><p>Pamai Market Management</p></div>
   </a>
   <div class="top-right">
@@ -596,7 +602,7 @@ function toggleDark(){
   else if(window.matchMedia('(prefers-color-scheme:dark)').matches) document.documentElement.setAttribute('data-theme','dark');
 })();
 
-const APP_BUILD='20260718-0100'; // cache-buster — build.py แทนค่าอัตโนมัติ
+const APP_BUILD='20260719-1436'; // cache-buster — build.py แทนค่าอัตโนมัติ
 const DAYS=['อาทิตย์','จันทร์','อังคาร','พุธ','พฤหัสบดี','ศุกร์','เสาร์'];
 const MONS=['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
 function tick(){
