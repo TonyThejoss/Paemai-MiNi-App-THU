@@ -602,7 +602,7 @@ function toggleDark(){
   else if(window.matchMedia('(prefers-color-scheme:dark)').matches) document.documentElement.setAttribute('data-theme','dark');
 })();
 
-const APP_BUILD='20260719-1436'; // cache-buster — build.py แทนค่าอัตโนมัติ
+const APP_BUILD='20260719-1455'; // cache-buster — build.py แทนค่าอัตโนมัติ
 const DAYS=['อาทิตย์','จันทร์','อังคาร','พุธ','พฤหัสบดี','ศุกร์','เสาร์'];
 const MONS=['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
 function tick(){
@@ -998,9 +998,8 @@ function renderDashboard(){
     var apiParam=p.get('api');
     if(apiParam){
       localStorage.setItem('pm-thu-api-url',decodeURIComponent(apiParam));
-      p.delete('api');
-      var clean=location.pathname+(p.toString()?('?'+p.toString()):'')+location.hash;
-      history.replaceState(null,'',clean);
+      // คงพารามิเตอร์ไว้ใน URL — จำเป็นสำหรับ "เพิ่มลงหน้าจอโฮม" บน iOS/iPad
+      // (แอพจากหน้าจอโฮมมี storage แยก ต้องอาศัยพารามิเตอร์ตั้งค่าใหม่ทุกครั้ง)
     }
   }catch(e){}
 })();
