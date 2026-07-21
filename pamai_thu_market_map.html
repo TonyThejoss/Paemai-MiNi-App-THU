@@ -201,6 +201,8 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(
           <span class="pp-status" id="ppStatus">—</span>
           <a class="pp-call-btn" id="ppCallBtn" href="#" style="display:none"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 4h4l1.5 4.5-2 1.5a12 12 0 0 0 6 6l1.5-2L20 15.5V19a1 1 0 0 1-1 1C10 20 4 14 4 5a1 1 0 0 1 1-1z"/></svg> โทร</a>
         </div>
+        <!-- badge สถานะลา/ขาดล็อค แยกออกมาต่างหากจากสถานะทั่วไปด้านบน ให้เห็นเด่นชัด -->
+        <div id="ppLeaveBadge" style="display:none;margin-top:6px"></div>
         <div class="pp-daily-info" id="ppDailyInfo" style="display:none"></div>
       </div>
       <div class="pp-hist" id="ppHist"></div>
@@ -236,18 +238,6 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(
       <div class="bld-label" style="color:var(--b);border-color:var(--b)"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="12" height="9" rx="1"/><path d="M14 10h4l3 3v3h-7z"/><circle cx="7" cy="18.5" r="1.6"/><circle cx="17.5" cy="18.5" r="1.6"/></svg> โซนเปิดท้าย (TA·TB·TC)</div>
       <div id="tg-grid" style="margin-top:6px;overflow-x:auto"></div>
     </div>
-  </div>
-</div>
-<!-- DAILY MODAL -->
-<div class="modal-bg" id="dailyModal">
-  <div class="modal-box">
-    <div class="m-title" id="dm-title"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M11 3H5a2 2 0 0 0-2 2v6l10.5 10.5a2 2 0 0 0 2.8 0l5.2-5.2a2 2 0 0 0 0-2.8L11 3z"/><circle cx="8" cy="8" r="1.4" fill="currentColor" stroke="none"/></svg>️ จองล็อคผู้ค้าจร</div>
-    <div class="m-sub" id="dm-sub">—</div>
-    <div class="m-row"><div class="m-field"><label for="dm-name">ชื่อร้าน/ผู้ค้า *</label><input type="text" id="dm-name" placeholder="ชื่อร้านหรือผู้ค้า"></div><div class="m-field"><label for="dm-phone">เบอร์โทร</label><input type="tel" id="dm-phone" placeholder="0xx-xxx-xxxx"></div></div>
-    <div class="m-row"><div class="m-field"><label for="dm-product">สินค้า *</label><input type="text" id="dm-product" placeholder="ประเภทสินค้า"></div><div class="m-field"><label for="dm-method">ช่องทางชำระ</label><select id="dm-method"><option><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2.5" y="6" width="19" height="12" rx="2"/><circle cx="12" cy="12" r="3"/><path d="M6 9v6M18 9v6"/></svg> เงินสด</option><option><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="6.5" y="2.5" width="11" height="19" rx="2"/><path d="M11 19h2"/></svg> โอนเงิน</option><option><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2.5" y="7" width="19" height="13" rx="2"/><path d="M8 7l1.5-2.5h5L16 7"/><circle cx="12" cy="13.5" r="3.5"/></svg> QR Code</option></select></div></div>
-    <div class="m-row"><div class="m-field"><label for="dm-price">ราคาล็อคจร (฿)</label><input type="number" id="dm-price" value="300" min="0" oninput="updateDailySummary()"></div><div class="m-field"><label for="dm-elec">ค่าไฟเพิ่ม (฿)</label><input type="number" id="dm-elec" value="0" min="0" oninput="updateDailySummary()"></div></div>
-    <div class="m-summary"><div class="ms-row"><span>ค่าล็อคจร</span><span id="dm-s-price">฿300</span></div><div class="ms-row"><span>ค่าไฟ</span><span id="dm-s-elec">—</span></div><div class="ms-row"><span>รวม</span><span id="dm-s-total">฿300</span></div></div>
-    <div class="m-footer"><button class="m-btn secondary" onclick="document.getElementById('dailyModal').classList.remove('show')">ยกเลิก</button><button class="m-btn primary" onclick="confirmDailyBooking()"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="m8 12 3 3 5-6"/></svg> บันทึก & รับเงิน</button></div>
   </div>
 </div>
 <!-- LEAVE MODAL -->
@@ -558,52 +548,16 @@ function cancelAbsent(lockId){
 
 // ════════════════════════════════════════════════════
 // DAILY BOOKING
+// การขายล็อคจรทันทีจากป๊อปอัพนี้ถูกย้ายไปทำที่หน้า "คิวจองล็อคจร" (pamai_thu_floating_queue.html) ทั้งหมดแล้ว
+// (เพิ่ม 2026-07-21 — ระบบจองล็อคจรแบบคิว: ดูคู่มือ) เหลือไว้แค่ทางลัดไปหน้านั้น + ปุ่มยกเลิกจรเดิม
 // ════════════════════════════════════════════════════
-let pendingDailyId=null;
-function openDailyModal(lockId){
-  pendingDailyId=lockId;
-  const el=document.querySelector('.lk[data-id="'+lockId+'"]');
-  const at=lockAbsent[lockId]||'';
-  const statusTxt=at==='leave'?'ลาล็อค':at==='absent'?'ขาดล็อค':el?.dataset.status==='vacant'?'ว่าง':'—';
-  document.getElementById('dm-title').textContent='🏷️ จองล็อคจร — '+lockId;
-  document.getElementById('dm-sub').textContent='สถานะ: '+statusTxt+' · '+(el?.dataset.shop||'');
-  document.getElementById('dm-name').value='';
-  document.getElementById('dm-phone').value='';
-  document.getElementById('dm-product').value='';
-  document.getElementById('dm-price').value='300';
-  document.getElementById('dm-elec').value='0';
-  updateDailySummary();
+function goToFloatingQueue(lockId){
   closePopup();
-  document.getElementById('dailyModal').classList.add('show');
-}
-function updateDailySummary(){
-  const p=parseFloat(document.getElementById('dm-price').value)||0;
-  const e=parseFloat(document.getElementById('dm-elec').value)||0;
-  document.getElementById('dm-s-price').textContent=fmt(p);
-  document.getElementById('dm-s-elec').textContent=e>0?fmt(e):'—';
-  document.getElementById('dm-s-total').textContent=fmt(p+e);
-}
-function confirmDailyBooking(){
-  const name=document.getElementById('dm-name').value.trim();
-  const product=document.getElementById('dm-product').value.trim();
-  if(!name||!product){toast('กรุณากรอกชื่อร้านและสินค้า','e');return;}
-  const lockId=pendingDailyId;
-  const price=parseFloat(document.getElementById('dm-price').value)||300;
-  const elec=parseFloat(document.getElementById('dm-elec').value)||0;
-  const booking={lockId,name,product,phone:document.getElementById('dm-phone').value.trim()||'—',
-    price,elec,total:price+elec,method:document.getElementById('dm-method').value,
-    date:nowTH(),time:nowTime()};
-  dailyBookings[lockId]=booking;
-  addHist(lockId,{type:'daily',label:'🏷️ จร: '+name,note:product+' · '+fmt(booking.total)});
-  const el=document.querySelector('.lk[data-id="'+lockId+'"]');
-  if(el) refreshLk(el);
-  apiPost('saveDailyBooking',{lock_id:lockId,zone:el?.dataset.zone||'',vendor_name:name,phone:booking.phone,
-    product,price,elec,total:booking.total,method:booking.method,date:booking.date,time:booking.time,
-    original_status:el?.dataset.status||''});
-  document.getElementById('dailyModal').classList.remove('show');
-  saveMarketState(); updateExpireBanner();
-  toast('✅ จองล็อคจร '+lockId+' — '+name+' · '+fmt(booking.total)+' (คงอยู่ 3 วัน)','s');
-  updateStats(); pendingDailyId=null;
+  if(window.parent && window.parent!==window && typeof window.parent.goTab==='function'){
+    window.parent.goTab('floatingqueue');
+  } else {
+    window.location.href='pamai_thu_floating_queue.html';
+  }
 }
 function cancelDaily(lockId){
   if(!confirm('ยกเลิกผู้ค้าจรล็อค '+lockId+'?'))return;
@@ -782,9 +736,21 @@ function showPopup(el,ev){
   const stM={occupied:'✅ มีผู้เช่า',vacant:'🟡 ว่าง',cancelled:'🔴 ยกเลิก',unpaid:'🟠 ค้างชำระ'};
   const stC={occupied:'background:#ffedd5;color:#1b4332',vacant:'background:#fef3c7;color:#78350f',cancelled:'background:#fee2e2;color:#7f1d1d',unpaid:'background:#ffedd5;color:#7c2d12'};
   let stTxt=stM[d.status]||d.status;
-  if(at==='leave')stTxt+=' · 🟣ลา'; if(at==='absent')stTxt+=' · 🔴ขาด'; if(isDaily)stTxt+=' · 🏷️จร';
+  if(isDaily)stTxt+=' · 🏷️จร';
   const stEl=document.getElementById('ppStatus');
   stEl.textContent=stTxt; stEl.style.cssText=stC[d.status]||'';
+
+  // สถานะลา/ขาดล็อค — แยกออกมาเป็น badge ต่างหากให้เห็นเด่นชัด (ไม่ปนกับสถานะทั่วไปด้านบน)
+  const lbEl=document.getElementById('ppLeaveBadge');
+  if(at==='leave'){
+    lbEl.innerHTML='<span style="display:inline-flex;align-items:center;gap:4px;padding:3px 11px;border-radius:20px;font-weight:800;font-size:.86rem;background:var(--pul);color:#6d28d9">🟣 แจ้งลาล็อค</span>';
+    lbEl.style.display='block';
+  } else if(at==='absent'){
+    lbEl.innerHTML='<span style="display:inline-flex;align-items:center;gap:4px;padding:3px 11px;border-radius:20px;font-weight:800;font-size:.86rem;background:var(--rl);color:var(--r)">🔴 ขาดล็อค (ไม่แจ้ง)</span>';
+    lbEl.style.display='block';
+  } else {
+    lbEl.style.display='none';
+  }
 
   const diEl=document.getElementById('ppDailyInfo');
   if(db){diEl.innerHTML='🏷️ จร: <strong>'+db.name+'</strong> · '+db.product+' · '+fmt(db.total)+' · '+db.time;diEl.style.display='block';}
@@ -808,7 +774,9 @@ function showPopup(el,ev){
       acts+='<button class="pp-btn" style="background:var(--r);color:#fff;font-size:.64rem" onclick="cancelAbsent(\''+lockId+'\')">⚠️ ยกเลิกขาดล็อค ↩️</button>';
     }
   }
-  if(isAvailForDaily&&!isDaily) acts+='<button class="pp-btn b-daily" onclick="openDailyModal(\''+lockId+'\')">🏷️ จองจร</button>';
+  // การขายล็อคจรย้ายไปทำที่หน้า "คิวจองล็อคจร" ทั้งหมดแล้ว (ผู้จัดสามารถขายข้ามคิว/ลงคิวรอโซนที่ต้องการได้จากหน้านั้น)
+  // ป๊อปอัพนี้จึงเหลือแค่ลิงก์ทางลัดไปหน้าคิว แทนปุ่มขายทันทีแบบเดิม
+  if(isAvailForDaily&&!isDaily) acts+='<button class="pp-btn b-daily" onclick="goToFloatingQueue(\''+lockId+'\')">🏷️ ไปหน้าคิวจองล็อคจร</button>';
   if(isDaily) acts+='<button class="pp-btn b-cancel" onclick="cancelDaily(\''+lockId+'\')">✕ ยกเลิกจร</button>';
   if(isVacant) acts+='<button class="pp-btn" style="background:#dcfce7;color:#15803d" onclick="goRegisterLock(\''+lockId+'\',\''+(d.zone||'')+'\')">➕ เพิ่มผู้ค้าประจำ</button>';
   if(isOccupied||isDaily){

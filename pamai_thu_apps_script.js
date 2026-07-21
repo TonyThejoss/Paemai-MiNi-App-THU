@@ -14,6 +14,8 @@ const S = {
   ACTIVITY: 'activity_log',
   USERS:    'users',
   INSTALL:  'installment_plans',
+  QUEUE:    'floating_queue',  // เพิ่ม 2026-07-21: คิวจองล็อคจร
+  RULES:    'market_rules',    // เพิ่ม 2026-07-21: กฎระเบียบตลาด (แก้ไขได้)
 };
 
 // ── CORS Helper ──
@@ -43,10 +45,18 @@ function checkToken(providedToken) {
 }
 
 // ── GET Router ──
+// PUBLIC_ACTIONS: action ที่ "เจตนา" ให้เรียกได้โดยไม่ต้องมี token — ใช้กับหน้าสถานะสาธารณะ
+// (pamai_thu_public_status.html) ที่เปิดให้ผู้ค้าดูได้โดยไม่ต้อง login/รหัสผ่านใด ๆ
+// ห้ามเพิ่ม action อื่นเข้าไลน์นี้โดยไม่ตรวจให้แน่ใจก่อนว่าไม่มีข้อมูลอ่อนไหว (เบอร์โทร/LINE/รหัสผ่าน)
+// หลุดออกไปในผลลัพธ์ — ดูรายละเอียดการกรองฟิลด์ใน getPublicStatus()
+const PUBLIC_ACTIONS = ['getPublicStatus'];
+
 function doGet(e) {
   try {
-    if (!checkToken(e.parameter.token)) return makeErr('Unauthorized: invalid or missing token');
     const action = e.parameter.action || '';
+    if (!PUBLIC_ACTIONS.includes(action) && !checkToken(e.parameter.token)) {
+      return makeErr('Unauthorized: invalid or missing token');
+    }
     switch(action) {
       case 'getVendors':    return getVendors();
       case 'getLeaveLog':   return getLeaveLog(e.parameter.date, e.parameter.lockId);
@@ -56,6 +66,9 @@ function doGet(e) {
       case 'initSheets':    return initSheets();
       case 'migrateHashPasswords': return migrateHashPasswords();
       case 'getInstallmentPlans': return getInstallmentPlans();
+      case 'getFloatingQueue': return getFloatingQueue(e.parameter.date);
+      case 'getMarketRules':   return getMarketRules();
+      case 'getPublicStatus':  return getPublicStatus(e.parameter.date);
       default: return makeErr('Unknown action: ' + action);
     }
   } catch(err) {
@@ -81,6 +94,11 @@ function doPost(e) {
       case 'verifyUser':       return verifyUser(body.username, body.password);
       case 'saveInstallmentPlan':   return saveInstallmentPlan(body.data);
       case 'deleteInstallmentPlan': return deleteInstallmentPlan(body.lockId);
+      case 'saveFloatingQueueEntry':   return saveFloatingQueueEntry(body.data);
+      case 'sellFloatingQueueEntry':   return sellFloatingQueueEntry(body.data);
+      case 'editFloatingQueueEntry':   return editFloatingQueueEntry(body.id, body.data);
+      case 'cancelFloatingQueueEntry': return cancelFloatingQueueEntry(body.id, body.reason);
+      case 'saveMarketRules':          return saveMarketRules(body.content, body.updatedBy);
       default: return makeErr('Unknown action: ' + action);
     }
   } catch(err) {
@@ -161,6 +179,19 @@ function initSheets() {
   const iSheet = getSheet(S.INSTALL);
   if (iSheet.getLastRow() === 0) {
     iSheet.appendRow(['lock_id','terms','first_amount','start_date','deadline','status','created_at','updated_at']);
+  }
+  // floating_queue (เพิ่ม 2026-07-21: ระบบจองล็อคจรแบบคิว)
+  // สถานะ: waiting (รอคิว) / sold (ขายแล้ว — ผูกกับ daily_bookings ด้วย) / cancelled (ยกเลิก)
+  const qSheet = getSheet(S.QUEUE);
+  if (qSheet.getLastRow() === 0) {
+    qSheet.appendRow(['id','market_date','vendor_name','phone','line','zone_pref','note',
+                      'requested_at','status','assigned_lock','price','elec','total','method',
+                      'sold_by','sold_at','cancel_reason','updated_at']);
+  }
+  // market_rules (เพิ่ม 2026-07-21: กฎระเบียบตลาดที่แก้ไขได้ — เก็บเป็นแถวเดียว/ตลาด)
+  const rSheet = getSheet(S.RULES);
+  if (rSheet.getLastRow() === 0) {
+    rSheet.appendRow(['content','updated_by','updated_at']);
   }
   return makeRes('Sheets initialized');
 }
@@ -519,4 +550,204 @@ function deleteInstallmentPlan(lockId) {
     }
   }
   return makeErr('Plan not found: ' + lockId);
+}
+
+// ════════════════════════════════════════
+// GENERIC HELPER — อ่าน sheet เป็น array ของ object (ใช้ภายในเท่านั้น)
+// ════════════════════════════════════════
+function _sheetToObjects(sheetName) {
+  const sheet = getSheet(sheetName);
+  const rows  = sheet.getDataRange().getValues();
+  if (rows.length <= 1) return [];
+  const headers = rows[0];
+  return rows.slice(1).map(row => {
+    const obj = {}; headers.forEach((h, i) => obj[h] = row[i]); return obj;
+  });
+}
+
+// ════════════════════════════════════════
+// FLOATING LOT QUEUE — คิวจองล็อคจร (เพิ่ม 2026-07-21)
+// แยกจาก daily_bookings เดิมโดยสิ้นเชิงในเชิง "สถานะคิว" (waiting/sold/cancelled)
+// แต่เมื่อ "ขาย" สำเร็จ (sellFloatingQueueEntry) จะเรียก saveDailyBooking เดิมควบคู่ไปด้วยเสมอ
+// เพื่อให้ผังตลาด/รายงาน/หน้าอื่น ๆ ที่อ่าน daily_bookings อยู่แล้วเห็นข้อมูลตรงกัน
+// ไม่สร้างระบบข้อมูลคู่ขนานที่ไม่ตรงกัน — ห้ามลบ/แก้ logic ของ saveDailyBooking/cancelDailyBooking เดิม
+// ════════════════════════════════════════
+function getFloatingQueue(date) {
+  let data = _sheetToObjects(S.QUEUE).filter(r => r.status !== 'cancelled');
+  if (date) data = data.filter(r => r.market_date === date);
+  return makeRes(data);
+}
+
+function saveFloatingQueueEntry(data) {
+  // เพิ่มคิวรอใหม่ (ผู้จัดคีย์จากคำขอในกลุ่มไลน์) — สถานะเริ่มต้นเสมอคือ waiting
+  const sheet = getSheet(S.QUEUE);
+  const id    = 'FQ' + Date.now();
+  const now   = new Date().toISOString();
+  sheet.appendRow([id, data.market_date, data.vendor_name, data.phone || '', data.line || '',
+                   data.zone_pref || '', data.note || '', data.requested_at || now,
+                   'waiting', '', 0, 0, 0, '', '', '', '', now]);
+  return makeRes({ id });
+}
+
+function _findQueueRow(sheet, id) {
+  const rows  = sheet.getDataRange().getValues();
+  const idIdx = rows[0].indexOf('id');
+  for (let i = 1; i < rows.length; i++) {
+    if (rows[i][idIdx] === id) return { rowNum: i + 1, headers: rows[0], row: rows[i] };
+  }
+  return null;
+}
+
+function sellFloatingQueueEntry(data) {
+  // data: { id, assigned_lock, zone, vendor_name, phone, product, price, elec, total, method, date, time, sold_by }
+  // ผู้จัดเลือกขายแถวใดก่อนก็ได้ ไม่ต้องเรียงตามคิว (ข้อกำหนด: ข้ามคิวได้)
+  const sheet = getSheet(S.QUEUE);
+  const found = _findQueueRow(sheet, data.id);
+  if (!found) return makeErr('ไม่พบรายการคิว: ' + data.id);
+  const { rowNum, headers } = found;
+  const now = new Date().toISOString();
+  const set = (col, val) => { const i = headers.indexOf(col); if (i >= 0) sheet.getRange(rowNum, i + 1).setValue(val); };
+  set('status', 'sold');
+  set('assigned_lock', data.assigned_lock);
+  set('price', data.price || 0);
+  set('elec', data.elec || 0);
+  set('total', data.total || 0);
+  set('method', data.method || '');
+  set('sold_by', data.sold_by || '');
+  set('sold_at', now);
+  set('updated_at', now);
+  // sync กับกลไก daily_bookings เดิม (ดูหมายเหตุด้านบน)
+  saveDailyBooking({
+    lock_id: data.assigned_lock, zone: data.zone || '', vendor_name: data.vendor_name,
+    phone: data.phone || '', product: data.product, price: data.price, elec: data.elec || 0,
+    total: data.total, method: data.method, date: data.date, time: data.time,
+    original_status: data.original_status || '',
+  });
+  return makeRes({ id: data.id, assigned_lock: data.assigned_lock });
+}
+
+function editFloatingQueueEntry(id, data) {
+  // แก้ไขคิว "รอ" หรือคิวที่ "ขายแล้ว" ก็ได้ (ตามข้อกำหนด: ต้องแก้ไขได้แม้กดบันทึกไปแล้ว)
+  const sheet = getSheet(S.QUEUE);
+  const found = _findQueueRow(sheet, id);
+  if (!found) return makeErr('ไม่พบรายการคิว: ' + id);
+  const { rowNum, headers, row } = found;
+  const existing = {}; headers.forEach((h, i) => existing[h] = row[i]);
+  const prevLock = existing.assigned_lock, prevDate = existing.market_date;
+  const now = new Date().toISOString();
+  const merged = Object.assign({}, existing, data, { updated_at: now });
+  const rowData = headers.map(h => merged[h] !== undefined ? merged[h] : '');
+  sheet.getRange(rowNum, 1, 1, rowData.length).setValues([rowData]);
+  // ถ้ารายการนี้เคยขายแล้วและมีการเปลี่ยนล็อค ต้อง sync กับ daily_bookings: คืนล็อคเดิม + บันทึกล็อคใหม่
+  if (existing.status === 'sold' && data.assigned_lock && data.assigned_lock !== prevLock) {
+    cancelDailyBooking(prevLock, prevDate);
+    saveDailyBooking({
+      lock_id: data.assigned_lock, zone: data.zone || existing.zone_pref || '',
+      vendor_name: merged.vendor_name, phone: merged.phone || '', product: data.product || '',
+      price: merged.price || 0, elec: merged.elec || 0, total: merged.total || 0,
+      method: merged.method || '', date: merged.market_date, time: data.time || '',
+      original_status: '',
+    });
+  }
+  return makeRes({ id, updated: true });
+}
+
+function cancelFloatingQueueEntry(id, reason) {
+  // ยกเลิกคิว ไม่ว่าจะยัง waiting หรือ sold ไปแล้วก็ตาม — ถ้า sold แล้วต้องคืนล็อคเป็นว่างใน daily_bookings ด้วย
+  const sheet = getSheet(S.QUEUE);
+  const found = _findQueueRow(sheet, id);
+  if (!found) return makeErr('ไม่พบรายการคิว: ' + id);
+  const { rowNum, headers, row } = found;
+  const existing = {}; headers.forEach((h, i) => existing[h] = row[i]);
+  if (existing.status === 'sold' && existing.assigned_lock) {
+    cancelDailyBooking(existing.assigned_lock, existing.market_date);
+  }
+  const now = new Date().toISOString();
+  const set = (col, val) => { const i = headers.indexOf(col); if (i >= 0) sheet.getRange(rowNum, i + 1).setValue(val); };
+  set('status', 'cancelled');
+  set('cancel_reason', reason || '');
+  set('updated_at', now);
+  return makeRes({ id, cancelled: true });
+}
+
+// ════════════════════════════════════════
+// MARKET RULES — กฎระเบียบตลาด (เพิ่ม 2026-07-21)
+// เก็บเป็นแถวเดียว (singleton) เพราะฐานข้อมูลแยกกันอยู่แล้วต่อหนึ่งตลาด (ดูคู่มือหัวข้อ 8)
+// ════════════════════════════════════════
+function getMarketRules() {
+  const rows = _sheetToObjects(S.RULES);
+  if (!rows.length) return makeRes({ content: '', updated_by: '', updated_at: '' });
+  return makeRes(rows[0]);
+}
+
+function saveMarketRules(content, updatedBy) {
+  const sheet   = getSheet(S.RULES);
+  const now     = new Date().toISOString();
+  const rows    = sheet.getDataRange().getValues();
+  const rowData = [content || '', updatedBy || '', now];
+  if (rows.length <= 1) {
+    sheet.appendRow(rowData);
+  } else {
+    sheet.getRange(2, 1, 1, rowData.length).setValues([rowData]);
+  }
+  return makeRes({ saved: true, updated_at: now });
+}
+
+// ════════════════════════════════════════
+// PUBLIC STATUS — หน้าสถานะสาธารณะ pamai_thu_public_status.html (เพิ่ม 2026-07-21)
+// action นี้ถูกยกเว้นการเช็ค token ใน doGet โดยเจตนา (ดู PUBLIC_ACTIONS ด้านบนไฟล์)
+// กฎสำคัญที่ห้ามละเมิด: ห้ามใส่ phone / line / unpaid_* / password / salt ลงในผลลัพธ์นี้เด็ดขาด
+// เพราะใครก็เปิดดูได้โดยไม่ต้อง login — ลิงก์หน้านี้จะถูกส่งเข้ากลุ่มไลน์สาธารณะของผู้ค้า
+// ════════════════════════════════════════
+function getPublicStatus(date) {
+  const cache    = CacheService.getScriptCache();
+  const cacheKey = 'pubStatus_' + (date || 'nodate');
+  const hit = cache.get(cacheKey); // แคช 20 วิ กันโหลด Sheets ถี่เกินไปตอนมีคนเปิดพร้อมกันจากกลุ่มไลน์
+  if (hit) return ContentService.createTextOutput(hit).setMimeType(ContentService.MimeType.JSON);
+
+  // ── ผู้ค้าประจำ: whitelist ฟิลด์ (ไม่ใช่ blacklist) เพื่อกันข้อมูลอ่อนไหวหลุดในอนาคต ──
+  const vendorsPublic = _sheetToObjects(S.VENDORS)
+    .filter(v => v.status !== 'terminated')
+    .map(v => ({ lock: v.lock, zone: v.zone, name: v.name, product: v.product, status: v.status }));
+
+  // ── ลา/ขาดล็อค: หาสถานะล่าสุดของแต่ละล็อคในวันที่ระบุ (ตรรกะเดียวกับที่ผังตลาดใช้ในฝั่ง frontend) ──
+  let leaveRows = _sheetToObjects(S.LEAVE);
+  if (date) leaveRows = leaveRows.filter(r => r.date === date);
+  leaveRows = leaveRows.slice().sort((a, b) => String(a.created_at || a.time).localeCompare(String(b.created_at || b.time)));
+  const lockLeaveStatus = {};
+  leaveRows.forEach(r => {
+    if (!r.lock_id) return;
+    if (r.type === 'leave' || r.type === 'absent') {
+      lockLeaveStatus[r.lock_id] = { type: r.type, note: r.note || '', date: r.date };
+    } else if (r.type === 'cancel') {
+      delete lockLeaveStatus[r.lock_id];
+    }
+  });
+
+  // ── คิวจองล็อคจร: รอคิว + ขายแล้ว (ไม่ส่งเบอร์โทร/LINE) ──
+  let queueRows = _sheetToObjects(S.QUEUE).filter(r => r.status !== 'cancelled');
+  if (date) queueRows = queueRows.filter(r => r.market_date === date);
+  const queuePublic = queueRows.map(r => ({
+    id: r.id, zone_pref: r.zone_pref || 'ได้ทุกโซน', note: r.note || '',
+    vendor_name: r.vendor_name, status: r.status, assigned_lock: r.assigned_lock || '',
+    requested_at: r.requested_at,
+  }));
+
+  // ── กฎระเบียบตลาด ──
+  const rulesRows = _sheetToObjects(S.RULES);
+  const rules = rulesRows.length
+    ? { content: rulesRows[0].content || '', updated_by: rulesRows[0].updated_by || '', updated_at: rulesRows[0].updated_at || '' }
+    : { content: '', updated_by: '', updated_at: '' };
+
+  const payload = {
+    date: date || '',
+    vendors: vendorsPublic,
+    leaveStatus: lockLeaveStatus,
+    queue: queuePublic,
+    rules: rules,
+    generatedAt: new Date().toISOString(),
+  };
+  const out = JSON.stringify({ status: 'ok', data: payload, ts: new Date().toISOString() });
+  cache.put(cacheKey, out, 20);
+  return ContentService.createTextOutput(out).setMimeType(ContentService.MimeType.JSON);
 }

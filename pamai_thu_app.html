@@ -403,6 +403,8 @@ input:focus,select:focus,textarea:focus{border-color:var(--gm);box-shadow:0 0 0 
       <button class="ni" id="ni-register" onclick="goTab('register')"><span class="ico">🆕</span>ลงทะเบียนผู้ค้าใหม่</button>
       <button class="ni" id="ni-vdb" onclick="goTab('vdb')"><span class="ico"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="9" x2="9" y2="20"/></svg></span>ทะเบียนผู้ค้า (แก้ไข)</button>
       <button class="ni" id="ni-leavehist" onclick="goTab('leavehist')"><span class="ico"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="4" width="16" height="18" rx="2"/><path d="M9 3h6a1 1 0 0 1 1 1v1H8V4a1 1 0 0 1 1-1Z"/></svg></span>ประวัติลา/ขาด/จร</button>
+      <button class="ni" id="ni-floatingqueue" onclick="goTab('floatingqueue')"><span class="ico"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 10 12 2H4v8l8 8 8-8Z" transform="translate(0 2)"/><circle cx="7.5" cy="7.5" r="1" transform="translate(0 2)"/></svg></span>คิวจองล็อคจร</button>
+      <button class="ni" id="ni-rules" onclick="goTab('rules')"><span class="ico"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><polyline points="14 2 14 8 20 8"/></svg></span>กฎระเบียบตลาด</button>
     </div>
     <div class="sb-div"></div>
     <div class="sb-sec">
@@ -475,6 +477,8 @@ input:focus,select:focus,textarea:focus{border-color:var(--gm);box-shadow:0 0 0 
               <div class="mc" onclick="goTab('electric')"><div class="mc-i"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><polygon points="13 2 3 14 11 14 10 22 21 10 13 10 13 2"/></svg></div><div class="mc-n">ค่าไฟฟ้า</div><div class="mc-d">บันทึกอุปกรณ์</div></div>
               <div class="mc" onclick="goTab('register')"><div class="mc-i">🆕</div><div class="mc-n">ผู้ค้าใหม่</div><div class="mc-d">รับค่าแรกเข้า + รายปี</div></div>
               <div class="mc" onclick="goTab('leavehist')"><div class="mc-i"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="4" width="16" height="18" rx="2"/><path d="M9 3h6a1 1 0 0 1 1 1v1H8V4a1 1 0 0 1 1-1Z"/></svg></div><div class="mc-n">ประวัติลา/ขาด/จร</div><div class="mc-d">ดูย้อนหลังรายล็อค</div></div>
+              <div class="mc" onclick="goTab('floatingqueue')"><div class="mc-i"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 10 12 2H4v8l8 8 8-8Z" transform="translate(0 2)"/><circle cx="7.5" cy="7.5" r="1" transform="translate(0 2)"/></svg></div><div class="mc-n">คิวจองล็อคจร</div><div class="mc-d">ลงคิว / ขายล็อคจร</div></div>
+              <div class="mc" onclick="goTab('rules')"><div class="mc-i"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><polyline points="14 2 14 8 20 8"/></svg></div><div class="mc-n">กฎระเบียบตลาด</div><div class="mc-d">ดู/แก้ไขกฎระเบียบ</div></div>
               <div class="mc" onclick="goTab('reports')"><div class="mc-i"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><line x1="6" y1="20" x2="6" y2="12"/><line x1="12" y1="20" x2="12" y2="6"/><line x1="18" y1="20" x2="18" y2="15"/></svg></div><div class="mc-n">รายงาน PDF</div><div class="mc-d">ดาวน์โหลด 6 รายงาน</div></div>
               <div class="mc" onclick="goTab('actlog')"><div class="mc-i"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg></div><div class="mc-n">บันทึกกิจกรรม</div><div class="mc-d">ประวัติการใช้งาน</div></div>
             </div>
@@ -557,6 +561,8 @@ input:focus,select:focus,textarea:focus{border-color:var(--gm);box-shadow:0 0 0 
     <div id="electric" class="pane" data-src="pamai_thu_electric_system.html"><div class="module-loading">⏳ กำลังโหลด ค่าไฟฟ้า...</div></div>
     <div id="register" class="pane" data-src="pamai_thu_vendor_registration.html"><div class="module-loading">⏳ กำลังโหลด ผู้ค้าใหม่...</div></div>
     <div id="leavehist" class="pane" data-src="pamai_thu_leave_history.html"><div class="module-loading">⏳ กำลังโหลด ประวัติลา/ขาด/จร...</div></div>
+    <div id="floatingqueue" class="pane" data-src="pamai_thu_floating_queue.html"><div class="module-loading">⏳ กำลังโหลด คิวจองล็อคจร...</div></div>
+    <div id="rules" class="pane" data-src="pamai_thu_market_rules.html"><div class="module-loading">⏳ กำลังโหลด กฎระเบียบตลาด...</div></div>
     <div id="reports"  class="pane" data-src="pamai_thu_reports_launcher.html"><div class="module-loading">⏳ กำลังโหลด รายงาน...</div></div>
   </main>
 </div>
@@ -602,7 +608,7 @@ function toggleDark(){
   else if(window.matchMedia('(prefers-color-scheme:dark)').matches) document.documentElement.setAttribute('data-theme','dark');
 })();
 
-const APP_BUILD='20260719-1455'; // cache-buster — build.py แทนค่าอัตโนมัติ
+const APP_BUILD='20260721-0847'; // cache-buster — build.py แทนค่าอัตโนมัติ
 const DAYS=['อาทิตย์','จันทร์','อังคาร','พุธ','พฤหัสบดี','ศุกร์','เสาร์'];
 const MONS=['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
 function tick(){
@@ -632,7 +638,9 @@ let curTab='dash';
 
 function goTab(id){
   // Viewer role check
-  const viewerAllowed=['dash','reports','actlog'];
+  // rules (กฎระเบียบตลาด) เปิดให้ viewer อ่านได้ (แค่ดูได้ แก้ไขไม่ได้ — บังคับสิทธิ์ในตัวหน้านั้นเองอีกชั้น)
+  // floatingqueue (คิวจองล็อคจร) เกี่ยวข้องกับการขาย/เงิน จึงไม่ให้ viewer เข้าเหมือนหน้าอื่นที่แตะเงิน
+  const viewerAllowed=['dash','reports','actlog','rules'];
   if(window._viewerRole && !viewerAllowed.includes(id)){
     showToast('<svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><line x1="5" y1="12" x2="19" y2="12"/></svg> คุณไม่มีสิทธิ์เข้าถึงส่วนนี้ (ดูได้อย่างเดียว)','e');
     return;
@@ -655,10 +663,11 @@ function goTab(id){
   const names={dash:'หน้าหลัก',map:'ผังตลาด',payment:'รับชำระ',
                install:'ผ่อนชำระ',electric:'ค่าไฟฟ้า',register:'ผู้ค้าใหม่',
                leavehist:'ประวัติลา/ขาด/จร',
+               floatingqueue:'คิวจองล็อคจร',rules:'กฎระเบียบตลาด',
                reports:'รายงาน',actlog:'บันทึกกิจกรรม',vdb:'ทะเบียนผู้ค้า'};
   if(id!=='actlog') logAct('nav','เปิดหน้า: '+(names[id]||id));
   // Lazy load iframe module when first accessed
-  const moduleIds=['map','payment','install','electric','register','leavehist','reports'];
+  const moduleIds=['map','payment','install','electric','register','leavehist','floatingqueue','rules','reports'];
   if(moduleIds.includes(id)){
     setTimeout(()=>loadModule(id),50);
   }

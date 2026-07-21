@@ -1,0 +1,696 @@
+<!DOCTYPE html>
+<html lang="th" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>คิวจองล็อคจร — แพไม้มินิ</title>
+<style>
+:root {
+  --g:#7c2d12;--gm:#c2410c;--gb:#ea580c;--gl:#ffedd5;--gll:#fff7ed;
+  --r:#b91c1c;--rl:#fef2f2;--o:#c2410c;--ol:#fff7ed;
+  --b:#1e40af;--bl:#eff6ff;--pu:#6d28d9;--pul:#f5f3ff;
+  --y:#92400e;--yl:#fffbeb;
+  --bg:#f4f6f4;--sf:#fff;--sf2:#f8faf9;--sf3:#f1f5f2;
+  --bd:#c8d8cf;--bd2:#9bb5a5;
+  --tx:#0f1e14;--txm:#3d5247;--txl:#4d6854;
+  --shadow:0 2px 12px rgba(15,30,20,.07);
+  --ease:cubic-bezier(.4,0,.2,1);
+  --rad:10px;
+}
+[data-theme="dark"]{
+  --bg:#0a0f0c;--sf:#111a14;--sf2:#162019;--sf3:#1c2a20;
+  --bd:#2a3d30;--bd2:#3d5a46;
+  --tx:#d4e8d8;--txm:#8aab8f;--txl:#8ca696;
+  --gl:#112318;--gll:#0b170f;--rl:#1f0a0a;--ol:#1f1008;
+  --bl:#0a1228;--pul:#170f28;--yl:#1a1208;
+  --shadow:0 4px 20px rgba(0,0,0,.45);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;}
+body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--tx);font-size:13px;min-height:100vh;transition:background .3s,color .3s;}
+
+.topbar{background:linear-gradient(135deg,var(--g) 0%,var(--gm) 100%);color:#fff;padding:12px 24px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:300;box-shadow:0 2px 16px rgba(0,0,0,.35);flex-wrap:wrap;gap:8px;}
+.topbar h1{font-size:.92rem;font-weight:800;letter-spacing:-.2px;}
+.topbar p{font-size:.90rem;opacity:.72;margin-top:1px;}
+.topbar-right{display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+.dm-btn{width:44px;height:44px;border-radius:50%;border:1.5px solid rgba(255,255,255,.3);background:rgba(255,255,255,.1);color:#fff;cursor:pointer;font-size:.82rem;display:flex;align-items:center;justify-content:center;transition:all .2s;}
+.dm-btn:hover{background:rgba(255,255,255,.22);transform:rotate(18deg);}
+.conn-badge{font-size:.84rem;font-weight:700;padding:5px 10px;border-radius:20px;background:rgba(255,255,255,.14);border:1.5px solid rgba(255,255,255,.28);color:#fff;}
+.conn-badge.on{background:rgba(134,239,172,.18);border-color:#86efac;color:#dcfce7;}
+.conn-badge.off{background:rgba(252,165,165,.18);border-color:#fca5a5;color:#fee2e2;}
+.rf-btn{padding:5px 12px;border-radius:8px;border:1.5px solid rgba(255,255,255,.3);background:rgba(255,255,255,.1);color:#fff;font-size:.90rem;font-weight:700;cursor:pointer;font-family:inherit;transition:all .18s;}
+.rf-btn:hover{background:rgba(255,255,255,.22);}
+
+.page{max-width:1300px;margin:18px auto;padding:0 18px 48px;}
+
+.banner{background:var(--gll);border:1.5px solid var(--gm);border-radius:var(--rad);padding:10px 16px;margin-bottom:14px;font-size:.84rem;color:var(--g);display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+.banner b{font-weight:800;}
+.banner .date-field{padding:5px 9px;border:1.5px solid var(--gm);border-radius:7px;font-size:.76rem;background:var(--sf);color:var(--tx);font-family:inherit;}
+.viewer-banner{background:var(--rl);border:1.5px solid var(--r);color:var(--r);border-radius:var(--rad);padding:10px 16px;margin-bottom:14px;font-size:.84rem;font-weight:700;display:none;}
+
+.kpi-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:14px;}
+.kpi{background:var(--sf);border:1px solid var(--bd);border-left:3px solid var(--gm);border-radius:8px;padding:10px 12px;}
+.kpi.kp-purple{border-left-color:var(--pu);}
+.kpi.kp-o{border-left-color:var(--o);}
+.kpi-num{font-size:1.25rem;font-weight:800;}
+.kpi-label{font-size:.86rem;color:var(--txl);margin-top:2px;}
+
+.card{background:var(--sf);border-radius:var(--rad);border:1px solid var(--bd);box-shadow:var(--shadow);padding:16px 18px;margin-bottom:14px;transition:background .3s,border-color .3s;}
+.card-title{font-size:.84rem;font-weight:800;color:var(--tx);margin-bottom:12px;padding-bottom:9px;border-bottom:1.5px solid var(--bd);display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;}
+.card-title-l{display:flex;align-items:center;gap:8px;}
+.card-count{font-size:.78rem;font-weight:800;padding:2px 9px;border-radius:12px;background:var(--sf3);color:var(--txm);}
+
+.btn{padding:7px 14px;border:none;border-radius:8px;font-size:.72rem;font-weight:700;cursor:pointer;transition:all .18s;font-family:inherit;display:inline-flex;align-items:center;justify-content:center;gap:4px;white-space:nowrap;}
+.btn-primary{background:linear-gradient(135deg,var(--gm),var(--gb));color:#fff;box-shadow:0 3px 12px rgba(45,106,79,.26);}
+.btn-primary:hover{transform:translateY(-1px);filter:brightness(1.06);}
+.btn-secondary{background:var(--sf2);border:1.5px solid var(--bd);color:var(--txm);}
+.btn-secondary:hover{background:var(--bd);}
+.btn-danger{background:var(--rl);border:1.5px solid var(--r);color:var(--r);}
+.btn-danger:hover{background:var(--r);color:#fff;}
+.btn-sm{padding:4px 9px;font-size:.68rem;}
+.btn:disabled{opacity:.5;cursor:not-allowed;}
+
+.tbl-wrap{overflow-x:auto;}
+.tbl{width:100%;border-collapse:collapse;font-size:.76rem;}
+.tbl th{background:var(--g);color:#fff;padding:7px 9px;text-align:left;font-weight:700;font-size:.87rem;text-transform:uppercase;letter-spacing:.4px;border-bottom:none;white-space:nowrap;}
+.tbl td{padding:7px 9px;border-bottom:1px solid var(--bd);color:var(--tx);vertical-align:middle;}
+.tbl tbody tr:nth-child(even) td{background:var(--sf2);}
+.tbl tbody tr:hover td{background:var(--gll);}
+
+.badge{display:inline-flex;align-items:center;gap:3px;padding:2px 7px;border-radius:12px;font-size:.84rem;font-weight:800;white-space:nowrap;}
+.b-purple{background:var(--pul);color:var(--pu);}
+.b-red{background:var(--rl);color:var(--r);}
+.b-gray{background:var(--sf3);color:var(--txm);}
+.b-green{background:var(--gl);color:var(--g);}
+
+.inline-form{display:flex;gap:5px;flex-wrap:wrap;align-items:center;}
+.inline-form input,.inline-form select{padding:5px 7px;border:1.5px solid var(--bd);border-radius:6px;font-size:.72rem;background:var(--sf2);color:var(--tx);outline:none;font-family:inherit;}
+.inline-form input:focus,.inline-form select:focus{border-color:var(--gm);box-shadow:0 0 0 3px rgba(45,106,79,.15);}
+.inline-form .w-lock{min-width:120px;}
+.inline-form .w-txt{width:88px;}
+.inline-form .w-num{width:62px;}
+
+.ic{width:1em;height:1em;vertical-align:-.15em;display:inline-block;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0}
+.ic-dot{stroke:none}
+
+/* MODALS (สไตล์เดียวกับผังตลาด) */
+.modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:2000;align-items:center;justify-content:center;backdrop-filter:blur(2px);}
+.modal-bg.show{display:flex;}
+.modal-box{background:var(--sf);border-radius:15px;padding:20px 24px;max-width:440px;width:93%;box-shadow:0 20px 50px rgba(0,0,0,.28);border:1px solid var(--bd);max-height:88vh;overflow:auto;}
+.m-title{font-size:.90rem;font-weight:800;margin-bottom:2px;}
+.m-sub{font-size:.91rem;color:var(--txl);margin-bottom:14px;}
+.m-row{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px;}
+.m-row.c1{grid-template-columns:1fr;}
+.m-field{display:flex;flex-direction:column;gap:3px;min-width:0;}
+.m-field label{font-size:.86rem;font-weight:700;color:var(--txl);text-transform:uppercase;letter-spacing:.4px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.m-field input,.m-field select,.m-field textarea{padding:7px 9px;border:1.5px solid var(--bd);border-radius:7px;font-size:.78rem;background:var(--sf2);color:var(--tx);outline:none;font-family:inherit;transition:border-color .18s;width:100%;min-width:0;box-sizing:border-box;}
+.m-field input:focus,.m-field select:focus,.m-field textarea:focus{border-color:var(--gm);box-shadow:0 0 0 3px rgba(45,106,79,.15);}
+.m-footer{display:flex;gap:8px;margin-top:14px;justify-content:flex-end;}
+.m-btn{padding:7px 15px;border:none;border-radius:7px;font-size:.76rem;font-weight:700;cursor:pointer;font-family:inherit;transition:all .16s;}
+.m-btn.primary{background:linear-gradient(135deg,var(--gm),var(--gb));color:#fff;}
+.m-btn.primary:hover{transform:translateY(-1px);filter:brightness(1.06);}
+.m-btn.secondary{background:var(--sf2);border:1.5px solid var(--bd);color:var(--txm);}
+.m-btn.secondary:hover{background:var(--bd);}
+
+.toast{position:fixed;bottom:18px;right:18px;z-index:9999;padding:9px 15px;border-radius:9px;font-size:.76rem;font-weight:700;color:#fff;transform:translateY(60px);opacity:0;transition:all .26s var(--ease);max-width:340px;}
+.toast.show{transform:translateY(0);opacity:1;}
+.toast.s{background:var(--gm);}.toast.e{background:var(--r);}.toast.i{background:var(--b);}.toast.w{background:var(--o);}
+
+.empty-note{text-align:center;padding:20px;color:var(--txl);}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: .01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: .01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div>
+    <h1><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 10 12 2H4v8l8 8 8-8Z" transform="translate(0 2)"/><circle cx="7.5" cy="7.5" r="1" transform="translate(0 2)"/></svg> คิวจองล็อคจร</h1>
+    <p>ลงคิว ขายล็อคจร และติดตามสถานะล็อคว่าง — ข้อมูลจริงจาก Google Sheets</p>
+  </div>
+  <div class="topbar-right">
+    <span class="conn-badge" id="conn-badge">⏳ กำลังตรวจสอบ...</span>
+    <button class="rf-btn" onclick="loadAll()"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 12a9 9 0 0 1-15.3 6.4L3 16"/><path d="M3 12a9 9 0 0 1 15.3-6.4L21 8"/><polyline points="3 20 3 16 7 16"/><polyline points="21 4 21 8 17 8"/></svg> รีเฟรช</button>
+    <button class="dm-btn" onclick="toggleDark()" aria-label="สลับโหมดมืด/สว่าง" title="โหมดมืด"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3 7 7 0 0 0 21 12.8Z"/></svg></button>
+  </div>
+</div>
+
+<div class="page">
+
+  <div class="viewer-banner" id="viewer-banner"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><line x1="5" y1="12" x2="19" y2="12"/></svg> บัญชีของคุณดูได้อย่างเดียว — ไม่มีสิทธิ์ขาย/แก้ไข/ยกเลิกคิวล็อคจร</div>
+
+  <div class="banner">
+    <svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15 14"/></svg>
+    <span>เปิดจองล็อคจรวันพฤหัสบดีนี้ได้ตั้งแต่ <b>20:00 น. คืนวันจันทร์ที่ผ่านมา</b> ผ่านกลุ่มไลน์ (ข้อความนี้เป็นข้อมูลอ้างอิงเท่านั้น ไม่ได้บล็อกการลงคิว)</span>
+    <label for="market-date-input" class="dlabel" style="margin-left:auto;font-weight:700;font-size:.84rem">วันตลาดที่จัดการ:</label>
+    <input type="text" id="market-date-input" class="date-field" style="width:150px">
+    <button class="btn btn-secondary btn-sm" onclick="onMarketDateChange()">โหลดวันนี้</button>
+  </div>
+
+  <div class="kpi-grid">
+    <div class="kpi"><div class="kpi-num" id="kpi-available">0</div><div class="kpi-label"><svg class="ic ic-dot" viewBox="0 0 24 24" aria-hidden="true" style="color:var(--gm)"><circle cx="12" cy="12" r="8" fill="currentColor"/></svg> ล็อคว่างขายได้ตอนนี้</div></div>
+    <div class="kpi kp-purple"><div class="kpi-num" id="kpi-waiting" style="color:var(--pu)">0</div><div class="kpi-label">คิวรอ</div></div>
+    <div class="kpi kp-o"><div class="kpi-num" id="kpi-sold" style="color:var(--o)">0</div><div class="kpi-label">ขายแล้ว</div></div>
+  </div>
+
+  <!-- ═══ ล็อคว่างขายได้ตอนนี้ ═══ -->
+  <div class="card">
+    <div class="card-title">
+      <div class="card-title-l"><svg class="ic ic-dot" viewBox="0 0 24 24" aria-hidden="true" style="color:var(--gm)"><circle cx="12" cy="12" r="8" fill="currentColor"/></svg> ล็อคว่างขายได้ตอนนี้ <span class="card-count" id="count-available">0</span></div>
+      <span style="font-size:.78rem;color:var(--txl)">รวมล็อคที่แจ้งลา/ขาด + ล็อคที่ยังไม่มีผู้ค้าประจำ — ขายตรงให้ผู้ค้าจรได้ทันทีโดยไม่ต้องผ่านคิว</span>
+    </div>
+    <div class="tbl-wrap">
+      <table class="tbl">
+        <thead><tr><th>ล็อค</th><th>โซน</th><th>เหตุผลที่ว่าง</th><th style="min-width:340px">ขายให้ผู้ค้าจร</th></tr></thead>
+        <tbody id="available-tbody"><tr><td colspan="4" class="empty-note">กำลังโหลด...</td></tr></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ═══ คิวรอ ═══ -->
+  <div class="card">
+    <div class="card-title">
+      <div class="card-title-l"><svg class="ic ic-dot" viewBox="0 0 24 24" aria-hidden="true" style="color:var(--pu)"><circle cx="12" cy="12" r="8" fill="currentColor"/></svg> คิวรอ <span class="card-count" id="count-waiting">0</span></div>
+      <button class="btn btn-primary btn-sm" id="btn-add-queue" onclick="openAddQueueModal()"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg> เพิ่มคิวใหม่</button>
+    </div>
+    <div class="tbl-wrap">
+      <table class="tbl">
+        <thead><tr><th>ผู้ค้า/ร้าน</th><th>เบอร์/LINE</th><th>โซนที่ต้องการ</th><th>หมายเหตุ</th><th>แจ้งเมื่อ</th><th style="min-width:360px">ขาย (เลือกล็อคว่าง)</th><th>จัดการ</th></tr></thead>
+        <tbody id="waiting-tbody"><tr><td colspan="7" class="empty-note">กำลังโหลด...</td></tr></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ═══ ขายแล้ว ═══ -->
+  <div class="card">
+    <div class="card-title">
+      <div class="card-title-l"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg> ขายแล้ว <span class="card-count" id="count-sold">0</span></div>
+    </div>
+    <div class="tbl-wrap">
+      <table class="tbl">
+        <thead><tr><th>ล็อคที่ได้</th><th>ผู้ค้า/สินค้า</th><th>ยอดรวม</th><th>ช่องทาง</th><th>ขายโดย/เวลา</th><th>จัดการ</th></tr></thead>
+        <tbody id="sold-tbody"><tr><td colspan="6" class="empty-note">กำลังโหลด...</td></tr></tbody>
+      </table>
+    </div>
+  </div>
+
+</div>
+
+<!-- ADD QUEUE MODAL -->
+<div class="modal-bg" id="addQueueModal">
+  <div class="modal-box">
+    <div class="m-title"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg> เพิ่มคิวจองล็อคจรใหม่</div>
+    <div class="m-sub">คีย์คำขอที่ผู้ค้าแจ้งเข้ามาในกลุ่มไลน์</div>
+    <div class="m-row c1"><div class="m-field"><label for="aq-date">วันตลาด</label><input type="text" id="aq-date"></div></div>
+    <div class="m-row"><div class="m-field"><label for="aq-name">ชื่อร้าน/ผู้ค้า *</label><input type="text" id="aq-name" placeholder="ชื่อร้านหรือผู้ค้า"></div><div class="m-field"><label for="aq-phone">เบอร์โทร</label><input type="tel" id="aq-phone" placeholder="0xx-xxx-xxxx"></div></div>
+    <div class="m-row"><div class="m-field"><label for="aq-line">LINE ID</label><input type="text" id="aq-line" placeholder="LINE ID (ถ้ามี)"></div><div class="m-field"><label for="aq-zone">โซนที่ต้องการ</label><select id="aq-zone"><option value="">ได้ทุกโซน</option></select></div></div>
+    <div class="m-row c1"><div class="m-field"><label for="aq-note">หมายเหตุ</label><input type="text" id="aq-note" placeholder="เช่น ขอใกล้ทางเข้า / ไม่ระบุ = ได้ทุกโซน"></div></div>
+    <div class="m-footer"><button class="m-btn secondary" onclick="closeAddQueueModal()">ยกเลิก</button><button class="m-btn primary" onclick="saveAddQueue()"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg> บันทึกลงคิว</button></div>
+  </div>
+</div>
+
+<!-- EDIT SOLD MODAL -->
+<div class="modal-bg" id="editSoldModal">
+  <div class="modal-box">
+    <div class="m-title"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.12 2.12 0 0 1 3 3L12 15l-4 1 1-4Z"/></svg> แก้ไขรายการที่ขายแล้ว</div>
+    <div class="m-sub" id="es-sub">—</div>
+    <div class="m-row"><div class="m-field"><label for="es-lock">ล็อคที่ได้</label><select id="es-lock"></select></div><div class="m-field"><label for="es-product">สินค้า</label><input type="text" id="es-product"></div></div>
+    <div class="m-row"><div class="m-field"><label for="es-price">ราคาล็อคจร (฿)</label><input type="number" id="es-price" min="0"></div><div class="m-field"><label for="es-elec">ค่าไฟเพิ่ม (฿)</label><input type="number" id="es-elec" min="0"></div></div>
+    <div class="m-row c1"><div class="m-field"><label for="es-method">ช่องทางชำระ</label><select id="es-method"><option>เงินสด</option><option>โอนเงิน</option><option>QR Code</option></select></div></div>
+    <div class="m-footer"><button class="m-btn secondary" onclick="closeEditSoldModal()">ยกเลิก</button><button class="m-btn primary" onclick="saveEditSold()"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg> บันทึกการแก้ไข</button></div>
+  </div>
+</div>
+
+<!-- CONFIRM MODAL -->
+<div class="modal-bg" id="confirmModal" role="alertdialog" aria-modal="true" aria-labelledby="confirm-msg">
+  <div class="modal-box" style="max-width:340px">
+    <div class="m-title"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0Z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg> ยืนยันการทำรายการ</div>
+    <div class="m-sub" id="confirm-msg" style="color:var(--tx);font-weight:600">—</div>
+    <div class="m-footer">
+      <button class="m-btn secondary" id="confirm-cancel-btn">ยกเลิก</button>
+      <button class="m-btn primary" id="confirm-ok-btn">ยืนยัน</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ════════════════════════════════════════════════════
+// THEME
+// ════════════════════════════════════════════════════
+function toggleDark(){const h=document.documentElement,d=h.getAttribute('data-theme')==='dark';h.setAttribute('data-theme',d?'light':'dark');localStorage.setItem('pmthu-t',d?'light':'dark');}
+(()=>{const s=localStorage.getItem('pmthu-t');if(s)document.documentElement.setAttribute('data-theme',s);else if(window.matchMedia('(prefers-color-scheme:dark)').matches)document.documentElement.setAttribute('data-theme','dark');})();
+
+// ════════════════════════════════════════════════════
+// GOOGLE SHEETS API (เหมือนหน้าอื่นในระบบ)
+// ════════════════════════════════════════════════════
+(function(){
+  try{
+    var p=new URLSearchParams(location.search);
+    var apiParam=p.get('api');
+    if(apiParam){
+      localStorage.setItem('pm-thu-api-url',decodeURIComponent(apiParam));
+      p.delete('api');
+      var clean=location.pathname+(p.toString()?('?'+p.toString()):'')+location.hash;
+      history.replaceState(null,'',clean);
+    }
+  }catch(e){}
+})();
+function getApiUrl(){return (localStorage.getItem('pm-thu-api-url')||localStorage.getItem('pm-api-url'))||'';}
+function getApiToken(){return (localStorage.getItem('pm-thu-api-token')||localStorage.getItem('pm-api-token'))||'';}
+async function apiGet(action,params={}){
+  const url=getApiUrl(); if(!url) return null;
+  try{
+    const r=await fetch(url+'?'+new URLSearchParams({action,token:getApiToken(),...params}));
+    const j=await r.json();
+    return j.status==='ok'?j.data:null;
+  }catch(e){ console.error('apiGet error:',action,e); return null; }
+}
+async function apiPost(action,data={}){
+  const url=getApiUrl(); if(!url) return null;
+  try{
+    const r=await fetch(url,{method:'POST',body:JSON.stringify({action,token:getApiToken(),...data})});
+    return await r.json();
+  }catch(e){ console.error('apiPost error:',action,e); return null; }
+}
+function getCurrentUserName(){
+  try{
+    const sess=sessionStorage.getItem('pmthu-session');
+    if(sess){ const u=JSON.parse(sess); return u.username||'ผู้ใช้'; }
+  }catch(e){}
+  return 'ผู้ใช้';
+}
+function getCurrentUserRole(){
+  try{
+    const sess=sessionStorage.getItem('pmthu-session');
+    if(sess){ const u=JSON.parse(sess); return u.role||''; }
+  }catch(e){}
+  return '';
+}
+
+// ════════════════════════════════════════════════════
+// HELPERS
+// ════════════════════════════════════════════════════
+const MONS=['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
+function nowTH(){const n=new Date();return n.getDate()+' '+MONS[n.getMonth()]+' '+(n.getFullYear()+543);}
+function nowTime(){const n=new Date();return String(n.getHours()).padStart(2,'0')+':'+String(n.getMinutes()).padStart(2,'0');}
+function fmt(n){return '฿'+Math.round(n||0).toLocaleString();}
+function esc(s){return String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));}
+// เกณฑ์วันตลาดเดียวกับที่ใช้ทั้งระบบ — build.py จะแปลง getDay()===4 เป็น ===4 ให้อัตโนมัติฝั่งวันพฤหัสฯ
+// ห้ามเขียนเป็น !==2 หรือรูปแบบอื่น เพราะ build.py จะจับคู่แปลงไม่ได้ (ดูคู่มือหัวข้อ 7)
+function isMarketDay(d){ return d.getDay()===4; }
+function nextMarketDateStr(){
+  const d=new Date();
+  for(let i=0;i<7;i++){ if(isMarketDay(d)) break; d.setDate(d.getDate()+1); }
+  return d.getDate()+' '+MONS[d.getMonth()]+' '+(d.getFullYear()+543);
+}
+function toast(msg,type){
+  const t=document.getElementById('toast');
+  t.innerHTML=msg;t.className='toast '+(type||'i')+' show';
+  clearTimeout(t._t);t._t=setTimeout(function(){t.classList.remove('show');},3200);
+}
+function showConfirm(message,onConfirm,opts={}){
+  const ov=document.getElementById('confirmModal');
+  document.getElementById('confirm-msg').textContent=message;
+  const okBtn=document.getElementById('confirm-ok-btn');
+  okBtn.textContent=opts.okText||'ยืนยัน';
+  okBtn.style.background=opts.danger?'var(--r)':'';
+  okBtn.onclick=()=>{ov.classList.remove('show');onConfirm();};
+  document.getElementById('confirm-cancel-btn').onclick=()=>ov.classList.remove('show');
+  ov.classList.add('show');
+}
+
+// ════════════════════════════════════════════════════
+// ผังล็อคทั้งหมดของตลาดนี้ (แหล่งความจริงของ "ล็อคทั้งหมด" — เหมือนหน้าลงทะเบียนผู้ค้า)
+// ════════════════════════════════════════════════════
+//== MARKET_BLOCK:LOCKS ==//
+function thuArr(n,p){ return Array.from({length:n},(_,i)=>({id:`${p}${i+1}`,o:0})); }
+const LOCKS = {
+  A:{label:'โซนด้านนอก A', data: thuArr(20,'A')},
+  B:{label:'โซนด้านนอก B', data: thuArr(20,'B')},
+  C:{label:'โซนด้านนอก C', data: thuArr(21,'C')},
+  D:{label:'โซนด้านนอก D', data: thuArr(22,'D')},
+  E:{label:'โซนด้านนอก E', data: thuArr(11,'E')},
+  F:{label:'โซนด้านนอก F', data: thuArr(16,'F')},
+  G:{label:'ข้าง 7-Eleven G', data: thuArr(28,'G')},
+  J:{label:'ข้าง 7-Eleven J', data: thuArr(4,'J')},
+  K:{label:'ข้าง 7-Eleven K', data: thuArr(12,'K')},
+  N:{label:'ข้าง 7-Eleven N', data: thuArr(8,'N')},
+  U:{label:'ข้าง 7-Eleven U', data:[{id:'U1',o:0},{id:'U3',o:0},{id:'U4',o:0},{id:'U5',o:0},{id:'U6',o:0}]},
+  O:{label:'ข้างโลตัส O', data: thuArr(13,'O')},
+  M:{label:'ข้างโลตัส M', data: thuArr(12,'M')},
+  H:{label:'ข้างโลตัส H', data: thuArr(12,'H')},
+  L:{label:'ข้างโลตัส L', data: Array.from({length:28},(_,i)=>i+1).map(n=>({id:`L${n}`,o:0}))},
+  T:{label:'ข้างโลตัส T', data:[{id:'T1',o:0},{id:'T2',o:0}]},
+  AB:{label:'ข้างโลตัส AB', data:[{id:'AB4',o:0},{id:'AB5',o:0},{id:'AB6',o:0}]},
+  TA:{label:'โซนเปิดท้าย TA', data: thuArr(20,'TA')},
+  TB:{label:'โซนเปิดท้าย TB', data: thuArr(20,'TB')},
+  TC:{label:'โซนเปิดท้าย TC', data: thuArr(20,'TC')},
+};
+//== END_MARKET_BLOCK ==//
+function arr(n,p,vacant){ return Array.from({length:n},(_,i)=>({id:`${p}${i+1}`,o:!vacant.includes(i+1)?1:0})); }
+
+// สร้างดัชนี: ล็อคทั้งหมดแบบแบน + โซนของแต่ละล็อค
+const ALL_LOCK_IDS=[]; const ZONE_OF={};
+Object.keys(LOCKS).forEach(z=>{ LOCKS[z].data.forEach(l=>{ ALL_LOCK_IDS.push(l.id); ZONE_OF[l.id]=z; }); });
+
+// ════════════════════════════════════════════════════
+// STATE
+// ════════════════════════════════════════════════════
+let CURRENT_DATE = nextMarketDateStr();
+let VENDOR_LOCKS = new Set();     // ล็อคที่มีผู้ค้าประจำ (active/unpaid)
+let LEAVE_ABSENT = {};            // lockId -> 'leave' | 'absent'
+let DAILY_SOLD   = new Set();     // ล็อคที่ขายเป็นจรไปแล้วของวันนี้ (ผูกกับ daily_bookings)
+let AVAILABLE_LIST = [];          // [{id,zone,reason}]
+let QUEUE_ROWS = [];               // ดิบจาก getFloatingQueue
+
+// ════════════════════════════════════════════════════
+// LOAD
+// ════════════════════════════════════════════════════
+async function loadAll(){
+  const badge=document.getElementById('conn-badge');
+  if(!getApiUrl()){
+    badge.innerHTML='<svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2v6"/><path d="M8 8h8v4a4 4 0 0 1-8 0V8Z"/><line x1="9" y1="18" x2="9" y2="22"/><line x1="15" y1="18" x2="15" y2="22"/></svg> ยังไม่เชื่อมต่อ Google Sheets';
+    badge.className='conn-badge off';
+    ['available-tbody','waiting-tbody','sold-tbody'].forEach(id=>{
+      document.getElementById(id).innerHTML='<tr><td colspan="7" class="empty-note">ยังไม่ได้เชื่อมต่อ Google Sheets — ตั้งค่าที่หน้าหลักก่อน</td></tr>';
+    });
+    return;
+  }
+  badge.textContent='⏳ กำลังโหลดข้อมูล...';
+  badge.className='conn-badge';
+
+  const [vendors,leaveRows,dailyRows,queueRows]=await Promise.all([
+    apiGet('getVendors'),
+    apiGet('getLeaveLog',{date:CURRENT_DATE}),
+    apiGet('getDailyBookings',{date:CURRENT_DATE}),
+    apiGet('getFloatingQueue',{date:CURRENT_DATE}),
+  ]);
+
+  VENDOR_LOCKS=new Set((Array.isArray(vendors)?vendors:[])
+    .filter(v=>v.status==='active'||v.status==='unpaid')
+    .map(v=>v.lock));
+
+  LEAVE_ABSENT={};
+  if(Array.isArray(leaveRows)){
+    const sorted=[...leaveRows].sort((a,b)=>String(a.created_at||a.time).localeCompare(String(b.created_at||b.time)));
+    sorted.forEach(r=>{
+      if(!r.lock_id) return;
+      if(r.type==='leave') LEAVE_ABSENT[r.lock_id]='leave';
+      else if(r.type==='absent') LEAVE_ABSENT[r.lock_id]='absent';
+      else if(r.type==='cancel') delete LEAVE_ABSENT[r.lock_id];
+    });
+  }
+
+  DAILY_SOLD=new Set((Array.isArray(dailyRows)?dailyRows:[]).map(r=>r.lock_id));
+
+  QUEUE_ROWS=Array.isArray(queueRows)?queueRows:[];
+
+  // ล็อคว่างขายได้ตอนนี้ = (ไม่มีผู้ค้าประจำ) หรือ (มีผู้ค้าประจำแต่ลา/ขาดวันนี้) ลบล็อคที่ขายจรไปแล้ว
+  AVAILABLE_LIST=[];
+  ALL_LOCK_IDS.forEach(id=>{
+    if(DAILY_SOLD.has(id)) return;
+    if(!VENDOR_LOCKS.has(id)){
+      AVAILABLE_LIST.push({id,zone:ZONE_OF[id],reason:'ไม่มีผู้ค้าประจำ'});
+    } else if(LEAVE_ABSENT[id]==='leave'){
+      AVAILABLE_LIST.push({id,zone:ZONE_OF[id],reason:'แจ้งลา'});
+    } else if(LEAVE_ABSENT[id]==='absent'){
+      AVAILABLE_LIST.push({id,zone:ZONE_OF[id],reason:'ขาดล็อค'});
+    }
+  });
+
+  badge.innerHTML='<svg class="ic ic-dot" viewBox="0 0 24 24" aria-hidden="true" style="color:var(--gm)"><circle cx="12" cy="12" r="8" fill="currentColor"/></svg> เชื่อมต่อแล้ว · ล่าสุด '+nowTime();
+  badge.className='conn-badge on';
+
+  renderAvailable();
+  renderWaiting();
+  renderSold();
+}
+
+// ════════════════════════════════════════════════════
+// LOCK <select> OPTIONS
+// ════════════════════════════════════════════════════
+function buildLockOptionsHtml(zonePref){
+  const pref=(zonePref||'').trim();
+  const match=AVAILABLE_LIST.filter(l=>pref&&l.zone===pref);
+  const rest=AVAILABLE_LIST.filter(l=>!(pref&&l.zone===pref));
+  let html='<option value="">— เลือกล็อคว่าง —</option>';
+  if(match.length){
+    html+='<optgroup label="ตรงโซนที่ขอ ('+esc(pref)+')">';
+    match.forEach(l=>{ html+='<option value="'+esc(l.id)+'">'+esc(l.id)+' — โซน '+esc(l.zone)+' ('+esc(l.reason)+')</option>'; });
+    html+='</optgroup>';
+  }
+  html+='<optgroup label="'+(match.length?'โซนอื่น':'ล็อคว่างทั้งหมด')+'">';
+  rest.forEach(l=>{ html+='<option value="'+esc(l.id)+'">'+esc(l.id)+' — โซน '+esc(l.zone)+' ('+esc(l.reason)+')</option>'; });
+  html+='</optgroup>';
+  return html;
+}
+
+// ════════════════════════════════════════════════════
+// RENDER: ล็อคว่างขายได้ตอนนี้
+// ════════════════════════════════════════════════════
+function renderAvailable(){
+  document.getElementById('kpi-available').textContent=AVAILABLE_LIST.length;
+  document.getElementById('count-available').textContent=AVAILABLE_LIST.length;
+  const tbody=document.getElementById('available-tbody');
+  const readOnly=isReadOnly();
+  if(!AVAILABLE_LIST.length){ tbody.innerHTML='<tr><td colspan="4" class="empty-note">ไม่มีล็อคว่างในขณะนี้</td></tr>'; return; }
+  tbody.innerHTML=AVAILABLE_LIST.map(l=>{
+    const reasonBadge = l.reason==='แจ้งลา' ? '<span class="badge b-purple">แจ้งลา</span>'
+      : l.reason==='ขาดล็อค' ? '<span class="badge b-red">ขาดล็อค</span>'
+      : '<span class="badge b-gray">ไม่มีผู้ค้าประจำ</span>';
+    const form = readOnly ? '<span style="color:var(--txl)">ไม่มีสิทธิ์ขาย</span>' :
+      '<div class="inline-form">'
+      +'<input type="text" class="w-txt" id="av-name-'+esc(l.id)+'" placeholder="ชื่อผู้ค้า *">'
+      +'<input type="text" class="w-txt" id="av-product-'+esc(l.id)+'" placeholder="สินค้า *">'
+      +'<input type="tel" class="w-txt" id="av-phone-'+esc(l.id)+'" placeholder="เบอร์โทร">'
+      +'<input type="number" class="w-num" id="av-price-'+esc(l.id)+'" value="300" min="0" placeholder="ราคา">'
+      +'<button class="btn btn-primary btn-sm" onclick="sellAvailableRow(\''+esc(l.id)+'\')"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg> ขายเลย</button>'
+      +'</div>';
+    return '<tr><td><b>'+esc(l.id)+'</b></td><td>'+esc(l.zone)+'</td><td>'+reasonBadge+'</td><td>'+form+'</td></tr>';
+  }).join('');
+}
+
+function isReadOnly(){ return getCurrentUserRole()==='viewer'; }
+
+async function sellAvailableRow(lockId){
+  if(isReadOnly()) return;
+  const name=(document.getElementById('av-name-'+lockId).value||'').trim();
+  const product=(document.getElementById('av-product-'+lockId).value||'').trim();
+  const phone=(document.getElementById('av-phone-'+lockId).value||'').trim();
+  const price=parseFloat(document.getElementById('av-price-'+lockId).value)||0;
+  if(!name||!product){ toast('กรุณากรอกชื่อผู้ค้าและสินค้าก่อนขาย','e'); return; }
+  const zone=ZONE_OF[lockId]||'';
+  // ทุกรายการที่ขาย (ทั้งจากคิวหรือขายตรง) ต้องมีแถวใน floating_queue เพื่อให้ประวัติ/รายงานตรงกันเสมอ
+  const created=await apiPost('saveFloatingQueueEntry',{data:{
+    market_date:CURRENT_DATE, vendor_name:name, phone, line:'', zone_pref:zone,
+    note:'ขายตรงจากหน้าล็อคว่าง (ไม่ผ่านคิว)', requested_at:new Date().toISOString(),
+  }});
+  if(!created||created.status!=='ok'){ toast('บันทึกคิวไม่สำเร็จ','e'); return; }
+  const id=created.data.id;
+  const sold=await apiPost('sellFloatingQueueEntry',{data:{
+    id, assigned_lock:lockId, zone, vendor_name:name, phone, product, price, elec:0,
+    total:price, method:'เงินสด', date:CURRENT_DATE, time:nowTime(), sold_by:getCurrentUserName(),
+  }});
+  if(sold&&sold.status==='ok'){
+    toast('<svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg> ขายล็อค '+lockId+' ให้ '+esc(name)+' สำเร็จ','s');
+    loadAll();
+  } else {
+    toast('ขายไม่สำเร็จ กรุณาลองใหม่','e');
+  }
+}
+
+// ════════════════════════════════════════════════════
+// RENDER: คิวรอ
+// ════════════════════════════════════════════════════
+function renderWaiting(){
+  const waiting=QUEUE_ROWS.filter(r=>r.status==='waiting');
+  document.getElementById('kpi-waiting').textContent=waiting.length;
+  document.getElementById('count-waiting').textContent=waiting.length;
+  const tbody=document.getElementById('waiting-tbody');
+  const readOnly=isReadOnly();
+  if(!waiting.length){ tbody.innerHTML='<tr><td colspan="7" class="empty-note">ยังไม่มีคิวรอ</td></tr>'; return; }
+  tbody.innerHTML=waiting.map(r=>{
+    const zoneTxt=r.zone_pref?('โซน '+esc(r.zone_pref)):'ได้ทุกโซน';
+    const sellForm = readOnly ? '<span style="color:var(--txl)">ไม่มีสิทธิ์ขาย</span>' :
+      '<div class="inline-form">'
+      +'<select class="w-lock" id="q-lock-'+esc(r.id)+'">'+buildLockOptionsHtml(r.zone_pref)+'</select>'
+      +'<input type="text" class="w-txt" id="q-product-'+esc(r.id)+'" placeholder="สินค้า *">'
+      +'<input type="number" class="w-num" id="q-price-'+esc(r.id)+'" value="300" min="0" placeholder="ราคา">'
+      +'<button class="btn btn-primary btn-sm" onclick="sellQueueRow(\''+esc(r.id)+'\')"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg> บันทึก &amp; ขาย</button>'
+      +'</div>';
+    const mgmt = readOnly ? '—' :
+      '<button class="btn btn-danger btn-sm" onclick="cancelQueueEntry(\''+esc(r.id)+'\',false)"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg> ยกเลิก</button>';
+    return '<tr>'
+      +'<td><b>'+esc(r.vendor_name)+'</b></td>'
+      +'<td>'+esc(r.phone||'—')+(r.line?(' · '+esc(r.line)):'')+'</td>'
+      +'<td>'+zoneTxt+'</td>'
+      +'<td>'+esc(r.note||'—')+'</td>'
+      +'<td>'+esc(String(r.requested_at||'').slice(0,16).replace('T',' '))+'</td>'
+      +'<td>'+sellForm+'</td>'
+      +'<td>'+mgmt+'</td>'
+      +'</tr>';
+  }).join('');
+}
+
+async function sellQueueRow(queueId){
+  if(isReadOnly()) return;
+  const lockSel=document.getElementById('q-lock-'+queueId);
+  const lockId=lockSel.value;
+  const product=(document.getElementById('q-product-'+queueId).value||'').trim();
+  const price=parseFloat(document.getElementById('q-price-'+queueId).value)||0;
+  if(!lockId){ toast('กรุณาเลือกล็อคว่างก่อนขาย','e'); return; }
+  if(!product){ toast('กรุณากรอกสินค้าก่อนขาย','e'); return; }
+  const row=QUEUE_ROWS.find(r=>r.id===queueId);
+  if(!row){ toast('ไม่พบรายการคิวนี้แล้ว ลองรีเฟรช','e'); return; }
+  const zone=ZONE_OF[lockId]||row.zone_pref||'';
+  const res=await apiPost('sellFloatingQueueEntry',{data:{
+    id:queueId, assigned_lock:lockId, zone, vendor_name:row.vendor_name, phone:row.phone||'',
+    product, price, elec:0, total:price, method:'เงินสด', date:CURRENT_DATE, time:nowTime(),
+    sold_by:getCurrentUserName(),
+  }});
+  if(res&&res.status==='ok'){
+    toast('<svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg> ขายล็อค '+lockId+' ให้ '+esc(row.vendor_name)+' สำเร็จ','s');
+    loadAll();
+  } else {
+    toast('ขายไม่สำเร็จ กรุณาลองใหม่','e');
+  }
+}
+
+async function cancelQueueEntry(queueId,wasSold){
+  if(isReadOnly()) return;
+  showConfirm(wasSold?'ยกเลิกล็อคจรที่ขายไปแล้วนี้? ล็อคจะกลับมาว่างทันที':'ยกเลิกคิวรอนี้?',async()=>{
+    const reason=wasSold?'ยกเลิกโดยผู้จัดหลังขายแล้ว':'ยกเลิกคิวรอโดยผู้จัด';
+    const res=await apiPost('cancelFloatingQueueEntry',{id:queueId,reason});
+    if(res&&res.status==='ok'){ toast('ยกเลิกรายการแล้ว','i'); loadAll(); }
+    else toast('ยกเลิกไม่สำเร็จ','e');
+  },{danger:true});
+}
+
+// ════════════════════════════════════════════════════
+// RENDER: ขายแล้ว
+// ════════════════════════════════════════════════════
+function renderSold(){
+  const sold=QUEUE_ROWS.filter(r=>r.status==='sold');
+  document.getElementById('kpi-sold').textContent=sold.length;
+  document.getElementById('count-sold').textContent=sold.length;
+  const tbody=document.getElementById('sold-tbody');
+  const readOnly=isReadOnly();
+  if(!sold.length){ tbody.innerHTML='<tr><td colspan="6" class="empty-note">ยังไม่มีรายการขายแล้ว</td></tr>'; return; }
+  tbody.innerHTML=sold.map(r=>{
+    const mgmt = readOnly ? '—' :
+      '<button class="btn btn-secondary btn-sm" onclick="openEditSoldModal(\''+esc(r.id)+'\')"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.12 2.12 0 0 1 3 3L12 15l-4 1 1-4Z"/></svg> แก้ไข</button>'
+      +' <button class="btn btn-danger btn-sm" onclick="cancelQueueEntry(\''+esc(r.id)+'\',true)"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg> ยกเลิก</button>';
+    return '<tr>'
+      +'<td><b>'+esc(r.assigned_lock)+'</b> <span style="color:var(--txl)">('+esc(ZONE_OF[r.assigned_lock]||'')+')</span></td>'
+      +'<td>'+esc(r.vendor_name)+'<div style="color:var(--txl);font-size:.86rem">'+esc(r.product||'')+'</div></td>'
+      +'<td>'+fmt(r.total)+'</td>'
+      +'<td>'+esc(r.method||'—')+'</td>'
+      +'<td>'+esc(r.sold_by||'—')+'<div style="color:var(--txl);font-size:.86rem">'+esc(String(r.sold_at||'').slice(0,16).replace('T',' '))+'</div></td>'
+      +'<td>'+mgmt+'</td>'
+      +'</tr>';
+  }).join('');
+}
+
+let editingSoldId=null;
+function openEditSoldModal(id){
+  const row=QUEUE_ROWS.find(r=>r.id===id);
+  if(!row) return;
+  editingSoldId=id;
+  document.getElementById('es-sub').textContent=row.vendor_name+' — คิวเดิม: '+row.assigned_lock;
+  document.getElementById('es-lock').innerHTML=buildLockOptionsHtml(row.zone_pref)
+    .replace('value="'+row.assigned_lock+'"','value="'+row.assigned_lock+'" selected')
+  // ถ้าล็อคเดิมไม่อยู่ใน AVAILABLE_LIST (เพราะกำลังถูกใช้อยู่โดยรายการนี้เอง) ให้เติมกลับเข้าไปเป็นตัวเลือกแรก
+  if(!AVAILABLE_LIST.some(l=>l.id===row.assigned_lock)){
+    document.getElementById('es-lock').innerHTML='<option value="'+esc(row.assigned_lock)+'" selected>'+esc(row.assigned_lock)+' (ล็อคเดิม)</option>'+document.getElementById('es-lock').innerHTML;
+  }
+  document.getElementById('es-product').value=row.product||'';
+  document.getElementById('es-price').value=row.price||0;
+  document.getElementById('es-elec').value=row.elec||0;
+  document.getElementById('es-method').value=row.method||'เงินสด';
+  document.getElementById('editSoldModal').classList.add('show');
+}
+function closeEditSoldModal(){ document.getElementById('editSoldModal').classList.remove('show'); editingSoldId=null; }
+async function saveEditSold(){
+  if(!editingSoldId) return;
+  const lockId=document.getElementById('es-lock').value;
+  const product=(document.getElementById('es-product').value||'').trim();
+  const price=parseFloat(document.getElementById('es-price').value)||0;
+  const elec=parseFloat(document.getElementById('es-elec').value)||0;
+  const method=document.getElementById('es-method').value;
+  if(!lockId){ toast('กรุณาเลือกล็อค','e'); return; }
+  const res=await apiPost('editFloatingQueueEntry',{id:editingSoldId,data:{
+    assigned_lock:lockId, zone:ZONE_OF[lockId]||'', product, price, elec, total:price+elec, method,
+  }});
+  if(res&&res.status==='ok'){ toast('บันทึกการแก้ไขแล้ว','s'); closeEditSoldModal(); loadAll(); }
+  else toast('แก้ไขไม่สำเร็จ','e');
+}
+
+// ════════════════════════════════════════════════════
+// ADD QUEUE MODAL
+// ════════════════════════════════════════════════════
+function openAddQueueModal(){
+  if(isReadOnly()) return;
+  document.getElementById('aq-date').value=CURRENT_DATE;
+  document.getElementById('aq-name').value='';
+  document.getElementById('aq-phone').value='';
+  document.getElementById('aq-line').value='';
+  document.getElementById('aq-note').value='';
+  const zoneSel=document.getElementById('aq-zone');
+  zoneSel.innerHTML='<option value="">ได้ทุกโซน</option>'+Object.keys(LOCKS).map(z=>'<option value="'+esc(z)+'">โซน '+esc(z)+'</option>').join('');
+  document.getElementById('addQueueModal').classList.add('show');
+}
+function closeAddQueueModal(){ document.getElementById('addQueueModal').classList.remove('show'); }
+async function saveAddQueue(){
+  const marketDate=(document.getElementById('aq-date').value||CURRENT_DATE).trim();
+  const name=(document.getElementById('aq-name').value||'').trim();
+  const phone=(document.getElementById('aq-phone').value||'').trim();
+  const line=(document.getElementById('aq-line').value||'').trim();
+  const zonePref=document.getElementById('aq-zone').value;
+  const note=(document.getElementById('aq-note').value||'').trim();
+  if(!name){ toast('กรุณากรอกชื่อร้าน/ผู้ค้า','e'); return; }
+  const res=await apiPost('saveFloatingQueueEntry',{data:{
+    market_date:marketDate, vendor_name:name, phone, line, zone_pref:zonePref, note,
+    requested_at:new Date().toISOString(),
+  }});
+  if(res&&res.status==='ok'){
+    toast('เพิ่มคิวสำเร็จ','s');
+    closeAddQueueModal();
+    if(marketDate===CURRENT_DATE) loadAll();
+  } else {
+    toast('เพิ่มคิวไม่สำเร็จ','e');
+  }
+}
+
+// ════════════════════════════════════════════════════
+// เปลี่ยนวันตลาดที่กำลังจัดการ
+// ════════════════════════════════════════════════════
+function onMarketDateChange(){
+  const v=(document.getElementById('market-date-input').value||'').trim();
+  CURRENT_DATE=v||nextMarketDateStr();
+  document.getElementById('market-date-input').value=CURRENT_DATE;
+  loadAll();
+}
+
+// ════════════════════════════════════════════════════
+// INIT
+// ════════════════════════════════════════════════════
+window.onload=function(){
+  document.getElementById('market-date-input').value=CURRENT_DATE;
+  if(isReadOnly()){
+    document.getElementById('viewer-banner').style.display='block';
+    const addBtn=document.getElementById('btn-add-queue'); if(addBtn) addBtn.style.display='none';
+  }
+  loadAll();
+};
+</script>
+</body>
+</html>

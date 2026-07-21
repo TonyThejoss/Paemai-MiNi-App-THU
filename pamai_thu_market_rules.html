@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="th" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>กฎระเบียบตลาด — แพไม้มินิ</title>
+<style>
+:root {
+  --g:#7c2d12;--gm:#c2410c;--gb:#ea580c;--gl:#ffedd5;--gll:#fff7ed;
+  --r:#b91c1c;--rl:#fef2f2;--o:#c2410c;--ol:#fff7ed;
+  --b:#1e40af;--bl:#eff6ff;--pu:#6d28d9;--pul:#f5f3ff;
+  --y:#92400e;--yl:#fffbeb;
+  --bg:#f4f6f4;--sf:#fff;--sf2:#f8faf9;--sf3:#f1f5f2;
+  --bd:#c8d8cf;--bd2:#9bb5a5;
+  --tx:#0f1e14;--txm:#3d5247;--txl:#4d6854;
+  --shadow:0 2px 12px rgba(15,30,20,.07);
+  --ease:cubic-bezier(.4,0,.2,1);
+  --rad:10px;
+}
+[data-theme="dark"]{
+  --bg:#0a0f0c;--sf:#111a14;--sf2:#162019;--sf3:#1c2a20;
+  --bd:#2a3d30;--bd2:#3d5a46;
+  --tx:#d4e8d8;--txm:#8aab8f;--txl:#8ca696;
+  --gl:#112318;--gll:#0b170f;--rl:#1f0a0a;--ol:#1f1008;
+  --bl:#0a1228;--pul:#170f28;--yl:#1a1208;
+  --shadow:0 4px 20px rgba(0,0,0,.45);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;}
+body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--tx);font-size:13px;min-height:100vh;transition:background .3s,color .3s;}
+
+.topbar{background:linear-gradient(135deg,var(--g) 0%,var(--gm) 100%);color:#fff;padding:12px 24px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:300;box-shadow:0 2px 16px rgba(0,0,0,.35);flex-wrap:wrap;gap:8px;}
+.topbar h1{font-size:.92rem;font-weight:800;letter-spacing:-.2px;}
+.topbar p{font-size:.90rem;opacity:.72;margin-top:1px;}
+.topbar-right{display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+.dm-btn{width:44px;height:44px;border-radius:50%;border:1.5px solid rgba(255,255,255,.3);background:rgba(255,255,255,.1);color:#fff;cursor:pointer;font-size:.82rem;display:flex;align-items:center;justify-content:center;transition:all .2s;}
+.dm-btn:hover{background:rgba(255,255,255,.22);transform:rotate(18deg);}
+.conn-badge{font-size:.84rem;font-weight:700;padding:5px 10px;border-radius:20px;background:rgba(255,255,255,.14);border:1.5px solid rgba(255,255,255,.28);color:#fff;}
+.conn-badge.on{background:rgba(134,239,172,.18);border-color:#86efac;color:#dcfce7;}
+.conn-badge.off{background:rgba(252,165,165,.18);border-color:#fca5a5;color:#fee2e2;}
+.rf-btn{padding:5px 12px;border-radius:8px;border:1.5px solid rgba(255,255,255,.3);background:rgba(255,255,255,.1);color:#fff;font-size:.90rem;font-weight:700;cursor:pointer;font-family:inherit;transition:all .18s;}
+.rf-btn:hover{background:rgba(255,255,255,.22);}
+
+.page{max-width:900px;margin:18px auto;padding:0 18px 48px;}
+
+.card{background:var(--sf);border-radius:var(--rad);border:1px solid var(--bd);box-shadow:var(--shadow);padding:16px 18px;margin-bottom:14px;transition:background .3s,border-color .3s;}
+.card-title{font-size:.84rem;font-weight:800;color:var(--tx);margin-bottom:12px;padding-bottom:9px;border-bottom:1.5px solid var(--bd);display:flex;align-items:center;gap:8px;}
+
+.meta-row{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:6px;margin-bottom:10px;font-size:.84rem;color:var(--txl);}
+.meta-row b{color:var(--tx);}
+
+textarea#rules-content{width:100%;min-height:420px;padding:12px 14px;border:1.5px solid var(--bd);border-radius:8px;font-size:.84rem;line-height:1.75;background:var(--sf2);color:var(--tx);outline:none;font-family:inherit;resize:vertical;transition:border-color .18s;}
+textarea#rules-content:focus{border-color:var(--gm);box-shadow:0 0 0 3px rgba(45,106,79,.15);}
+textarea#rules-content:disabled{background:var(--sf3);color:var(--txm);cursor:not-allowed;}
+.rules-view{white-space:pre-wrap;line-height:1.8;font-size:.86rem;padding:4px 2px;}
+
+.footer-row{display:flex;justify-content:flex-end;gap:8px;margin-top:12px;}
+.btn{padding:8px 16px;border:none;border-radius:8px;font-size:.76rem;font-weight:700;cursor:pointer;transition:all .18s;font-family:inherit;display:inline-flex;align-items:center;justify-content:center;gap:5px;}
+.btn-primary{background:linear-gradient(135deg,var(--gm),var(--gb));color:#fff;box-shadow:0 3px 12px rgba(45,106,79,.26);}
+.btn-primary:hover{transform:translateY(-1px);filter:brightness(1.06);}
+.btn-primary:disabled{opacity:.5;cursor:not-allowed;transform:none;}
+.btn-secondary{background:var(--sf2);border:1.5px solid var(--bd);color:var(--txm);}
+.btn-secondary:hover{background:var(--bd);}
+
+.viewer-banner{background:var(--rl);border:1.5px solid var(--r);color:var(--r);border-radius:var(--rad);padding:10px 16px;margin-bottom:14px;font-size:.84rem;font-weight:700;display:none;}
+
+.ic{width:1em;height:1em;vertical-align:-.15em;display:inline-block;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0}
+
+.toast{position:fixed;bottom:18px;right:18px;z-index:9999;padding:9px 15px;border-radius:9px;font-size:.76rem;font-weight:700;color:#fff;transform:translateY(60px);opacity:0;transition:all .26s var(--ease);max-width:340px;}
+.toast.show{transform:translateY(0);opacity:1;}
+.toast.s{background:var(--gm);}.toast.e{background:var(--r);}.toast.i{background:var(--b);}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: .01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: .01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div>
+    <h1><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg> กฎระเบียบตลาด</h1>
+    <p>แก้ไขได้จากหน้านี้ — แสดงผลในหน้าสถานะสาธารณะและส่งให้ผู้ค้าดูได้ด้วย</p>
+  </div>
+  <div class="topbar-right">
+    <span class="conn-badge" id="conn-badge">⏳ กำลังตรวจสอบ...</span>
+    <button class="rf-btn" onclick="loadRules()"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 12a9 9 0 0 1-15.3 6.4L3 16"/><path d="M3 12a9 9 0 0 1 15.3-6.4L21 8"/><polyline points="3 20 3 16 7 16"/><polyline points="21 4 21 8 17 8"/></svg> รีเฟรช</button>
+    <button class="dm-btn" onclick="toggleDark()" aria-label="สลับโหมดมืด/สว่าง" title="โหมดมืด"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3 7 7 0 0 0 21 12.8Z"/></svg></button>
+  </div>
+</div>
+
+<div class="page">
+  <div class="viewer-banner" id="viewer-banner"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><line x1="5" y1="12" x2="19" y2="12"/></svg> บัญชีของคุณดูได้อย่างเดียว — ไม่มีสิทธิ์แก้ไขกฎระเบียบตลาด</div>
+
+  <div class="card">
+    <div class="card-title"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 10 12 2H4v8l8 8 8-8Z" transform="translate(0 2)"/><circle cx="7.5" cy="7.5" r="1" transform="translate(0 2)"/></svg> หน้าสถานะสาธารณะ (สำหรับส่งเข้ากลุ่มไลน์)</div>
+    <div class="meta-row" style="margin-bottom:12px">ผู้ค้าเปิดดูได้เองโดยไม่ต้อง login — แสดงคิว/ล็อคว่าง/กฎระเบียบแบบเรียลไทม์ ดูได้อย่างเดียว</div>
+    <div class="footer-row" style="justify-content:flex-start;flex-wrap:wrap">
+      <button class="btn btn-secondary" onclick="copyPublicLink()"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg> คัดลอกลิงก์สำหรับส่งเข้ากลุ่มไลน์</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><polyline points="14 2 14 8 20 8"/></svg> กฎระเบียบและข้อบังคับของตลาด</div>
+    <div class="meta-row">
+      <span>แก้ไขล่าสุด: <b id="rules-updated-at">—</b> โดย <b id="rules-updated-by">—</b></span>
+    </div>
+    <textarea id="rules-content" placeholder="กำลังโหลด..." disabled></textarea>
+    <div class="footer-row">
+      <button class="btn btn-secondary" id="btn-cancel-edit" onclick="loadRules()" style="display:none">ยกเลิกการแก้ไข</button>
+      <button class="btn btn-primary" id="btn-edit" onclick="startEdit()"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.12 2.12 0 0 1 3 3L12 15l-4 1 1-4Z"/></svg> แก้ไข</button>
+      <button class="btn btn-primary" id="btn-save" onclick="saveRules()" style="display:none"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg> บันทึก</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+function toggleDark(){const h=document.documentElement,d=h.getAttribute('data-theme')==='dark';h.setAttribute('data-theme',d?'light':'dark');localStorage.setItem('pmthu-t',d?'light':'dark');}
+(()=>{const s=localStorage.getItem('pmthu-t');if(s)document.documentElement.setAttribute('data-theme',s);else if(window.matchMedia('(prefers-color-scheme:dark)').matches)document.documentElement.setAttribute('data-theme','dark');})();
+
+(function(){
+  try{
+    var p=new URLSearchParams(location.search);
+    var apiParam=p.get('api');
+    if(apiParam){
+      localStorage.setItem('pm-thu-api-url',decodeURIComponent(apiParam));
+      p.delete('api');
+      var clean=location.pathname+(p.toString()?('?'+p.toString()):'')+location.hash;
+      history.replaceState(null,'',clean);
+    }
+  }catch(e){}
+})();
+function getApiUrl(){return (localStorage.getItem('pm-thu-api-url')||localStorage.getItem('pm-api-url'))||'';}
+function getApiToken(){return (localStorage.getItem('pm-thu-api-token')||localStorage.getItem('pm-api-token'))||'';}
+async function apiGet(action,params={}){
+  const url=getApiUrl(); if(!url) return null;
+  try{
+    const r=await fetch(url+'?'+new URLSearchParams({action,token:getApiToken(),...params}));
+    const j=await r.json();
+    return j.status==='ok'?j.data:null;
+  }catch(e){ console.error('apiGet error:',action,e); return null; }
+}
+async function apiPost(action,data={}){
+  const url=getApiUrl(); if(!url) return null;
+  try{
+    const r=await fetch(url,{method:'POST',body:JSON.stringify({action,token:getApiToken(),...data})});
+    return await r.json();
+  }catch(e){ console.error('apiPost error:',action,e); return null; }
+}
+function getCurrentUserName(){
+  try{
+    const sess=sessionStorage.getItem('pmthu-session');
+    if(sess){ const u=JSON.parse(sess); return u.username||'ผู้ใช้'; }
+  }catch(e){}
+  return 'ผู้ใช้';
+}
+function getCurrentUserRole(){
+  try{
+    const sess=sessionStorage.getItem('pmthu-session');
+    if(sess){ const u=JSON.parse(sess); return u.role||''; }
+  }catch(e){}
+  return '';
+}
+function isReadOnly(){ return getCurrentUserRole()==='viewer'; }
+function esc(s){return String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));}
+function toast(msg,type){
+  const t=document.getElementById('toast');
+  t.innerHTML=msg;t.className='toast '+(type||'i')+' show';
+  clearTimeout(t._t);t._t=setTimeout(function(){t.classList.remove('show');},3200);
+}
+
+const DEFAULT_RULES =
+"1) การลาล็อค: แจ้งลาได้ไม่เกินเดือนละ 2 ครั้ง\n"+
+"2) การขาดล็อค: ขาดโดยไม่แจ้งได้ไม่เกิน 2 ครั้งต่อปี\n"+
+"3) หากลาล็อค 3 ครั้งติดต่อกัน (คาบเกี่ยวข้ามเดือน) ทางตลาดขอสงวนสิทธิ์ยกเลิกการเช่า\n"+
+"4) หากเกินจำนวนครั้งตามข้อ 1-2 ทางตลาดขอสงวนสิทธิ์ยกเลิกการเช่า\n"+
+"5) การจองล็อคจร: แจ้งความประสงค์ผ่านกลุ่มไลน์ได้ตั้งแต่เวลา 20:00 น. ของคืนวันจันทร์ก่อนวันตลาด สามารถระบุโซนที่ต้องการได้ ถ้าไม่ระบุถือว่าลงได้ทุกโซน\n"+
+"6) ผู้จัดตลาดขอสงวนสิทธิ์ในการจัดสรรล็อคจรตามความเหมาะสม โดยไม่จำเป็นต้องเรียงตามลำดับคิวที่แจ้งเข้ามาก่อน-หลัง";
+
+let originalContent='';
+
+async function loadRules(){
+  const badge=document.getElementById('conn-badge');
+  const ta=document.getElementById('rules-content');
+  if(!getApiUrl()){
+    badge.innerHTML='<svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2v6"/><path d="M8 8h8v4a4 4 0 0 1-8 0V8Z"/><line x1="9" y1="18" x2="9" y2="22"/><line x1="15" y1="18" x2="15" y2="22"/></svg> ยังไม่เชื่อมต่อ Google Sheets';
+    badge.className='conn-badge off';
+    ta.value=DEFAULT_RULES; ta.placeholder='';
+    return;
+  }
+  badge.textContent='⏳ กำลังโหลดข้อมูล...';
+  badge.className='conn-badge';
+  const data=await apiGet('getMarketRules');
+  const content=(data&&data.content)?data.content:DEFAULT_RULES;
+  originalContent=content;
+  ta.value=content;
+  document.getElementById('rules-updated-at').textContent=(data&&data.updated_at)?String(data.updated_at).slice(0,16).replace('T',' '):'ยังไม่เคยแก้ไข (ใช้ข้อความเริ่มต้น)';
+  document.getElementById('rules-updated-by').textContent=(data&&data.updated_by)?data.updated_by:'—';
+  badge.innerHTML='<svg class="ic ic-dot" viewBox="0 0 24 24" aria-hidden="true" style="color:var(--gm);stroke:none"><circle cx="12" cy="12" r="8" fill="currentColor"/></svg> เชื่อมต่อแล้ว';
+  badge.className='conn-badge on';
+  endEdit();
+}
+
+function startEdit(){
+  if(isReadOnly()) return;
+  document.getElementById('rules-content').disabled=false;
+  document.getElementById('rules-content').focus();
+  document.getElementById('btn-edit').style.display='none';
+  document.getElementById('btn-save').style.display='inline-flex';
+  document.getElementById('btn-cancel-edit').style.display='inline-flex';
+}
+function endEdit(){
+  document.getElementById('rules-content').disabled=true;
+  document.getElementById('btn-edit').style.display=isReadOnly()?'none':'inline-flex';
+  document.getElementById('btn-save').style.display='none';
+  document.getElementById('btn-cancel-edit').style.display='none';
+}
+
+async function saveRules(){
+  if(isReadOnly()) return;
+  if(!getApiUrl()){ toast('ยังไม่ได้เชื่อมต่อ Google Sheets','e'); return; }
+  const content=document.getElementById('rules-content').value;
+  const saveBtn=document.getElementById('btn-save');
+  saveBtn.disabled=true;
+  const res=await apiPost('saveMarketRules',{content,updatedBy:getCurrentUserName()});
+  saveBtn.disabled=false;
+  if(res&&res.status==='ok'){
+    toast('บันทึกกฎระเบียบแล้ว','s');
+    loadRules();
+  } else {
+    toast('บันทึกไม่สำเร็จ','e');
+  }
+}
+
+// สร้างลิงก์หน้าสถานะสาธารณะ (ฝัง Web App URL ผ่าน ?api= — ไม่มี token เกี่ยวข้องเพราะหน้านั้นอ่านอย่างเดียว
+// และ backend เปิดให้ action getPublicStatus เรียกได้โดยไม่ต้องมี token อยู่แล้ว)
+async function copyPublicLink(){
+  const apiUrl=getApiUrl();
+  if(!apiUrl){ toast('ยังไม่ได้เชื่อมต่อ Google Sheets — ตั้งค่าที่หน้าหลักก่อน','e'); return; }
+  // สร้างชื่อไฟล์หน้าสถานะสาธารณะจากชื่อไฟล์ปัจจุบันของตัวเอง (แทนที่ "market_rules" ด้วย "public_status")
+  // แทนที่จะ hardcode คำว่า thu ไว้ตรง ๆ — วิธีนี้ใช้ได้ถูกต้องทั้งสองตลาดโดยไม่มีการ hardcode ชื่อไฟล์ของ
+  // ตลาดใดตลาดหนึ่งลงในซอร์สโค้ด (ป้องกัน build.py เข้าใจผิดว่าเป็นลิงก์ข้ามตลาดหลุดมา)
+  const publicUrl=location.href.replace(/market_rules\.html(\?[^#]*)?(#.*)?$/,'public_status.html');
+  const link=publicUrl+(publicUrl.includes('?')?'&':'?')+'api='+encodeURIComponent(apiUrl);
+  try{
+    await navigator.clipboard.writeText(link);
+    toast('คัดลอกลิงก์แล้ว — นำไปวางในกลุ่มไลน์ได้เลย','s');
+  }catch(e){
+    prompt('คัดลอกลิงก์นี้ไปวางในกลุ่มไลน์:',link);
+  }
+}
+
+window.onload=function(){
+  if(isReadOnly()){
+    document.getElementById('viewer-banner').style.display='block';
+    document.getElementById('btn-edit').style.display='none';
+  }
+  loadRules();
+};
+</script>
+</body>
+</html>

@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="th" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>สถานะล็อคจร / ล็อคว่าง — แพไม้มินิ</title>
+<!--
+  หน้านี้ "ไม่ต้อง login และไม่ต้องมีรหัสผ่านใด ๆ" โดยเจตนา — เปิดดูได้อย่างเดียว (read-only)
+  ใช้สำหรับส่งลิงก์เข้ากลุ่มไลน์ของผู้ค้าให้ดูสถานะคิว/ล็อคว่างได้เอง
+  ไม่มีฟอร์มบันทึก/แก้ไข/ยกเลิกใด ๆ ในหน้านี้ทั้งสิ้น — เรียกเฉพาะ action 'getPublicStatus'
+  ซึ่ง backend อนุญาตให้เรียกได้โดยไม่ต้องมี token (ดู PUBLIC_ACTIONS ใน pamai_thu_apps_script.js)
+  ห้ามเพิ่มการเรียก action อื่นในไฟล์นี้โดยเด็ดขาด
+-->
+<style>
+:root {
+  --g:#7c2d12;--gm:#c2410c;--gb:#ea580c;--gl:#ffedd5;--gll:#fff7ed;
+  --r:#b91c1c;--rl:#fef2f2;--o:#c2410c;--ol:#fff7ed;
+  --pu:#6d28d9;--pul:#f5f3ff;
+  --bg:#f4f6f4;--sf:#fff;--sf2:#f8faf9;--sf3:#f1f5f2;
+  --bd:#c8d8cf;--bd2:#9bb5a5;
+  --tx:#0f1e14;--txm:#3d5247;--txl:#4d6854;
+  --shadow:0 2px 12px rgba(15,30,20,.07);
+  --rad:12px;
+}
+[data-theme="dark"]{
+  --bg:#0a0f0c;--sf:#111a14;--sf2:#162019;--sf3:#1c2a20;
+  --bd:#2a3d30;--bd2:#3d5a46;
+  --tx:#d4e8d8;--txm:#8aab8f;--txl:#8ca696;
+  --gl:#112318;--gll:#0b170f;--rl:#1f0a0a;--ol:#1f1008;
+  --pul:#170f28;
+  --shadow:0 4px 20px rgba(0,0,0,.45);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--tx);font-size:15px;min-height:100vh;transition:background .3s,color .3s;padding-bottom:32px;}
+
+.topbar{background:linear-gradient(135deg,var(--g) 0%,var(--gm) 100%);color:#fff;padding:16px 18px;text-align:center;position:sticky;top:0;z-index:100;box-shadow:0 2px 16px rgba(0,0,0,.3);}
+.topbar h1{font-size:1.05rem;font-weight:800;}
+.topbar p{font-size:.86rem;opacity:.85;margin-top:3px;}
+.updated-row{display:flex;align-items:center;justify-content:center;gap:8px;margin-top:8px;font-size:.78rem;opacity:.85;flex-wrap:wrap;}
+.rf-btn{padding:4px 10px;border-radius:8px;border:1.5px solid rgba(255,255,255,.35);background:rgba(255,255,255,.12);color:#fff;font-size:.78rem;font-weight:700;cursor:pointer;font-family:inherit;}
+.rf-btn:hover{background:rgba(255,255,255,.24);}
+
+.wrap{max-width:640px;margin:0 auto;padding:14px 14px 0;}
+
+.section{background:var(--sf);border-radius:var(--rad);border:1px solid var(--bd);box-shadow:var(--shadow);padding:14px 16px;margin-bottom:12px;}
+.section-title{font-size:.92rem;font-weight:800;margin-bottom:10px;padding-bottom:8px;border-bottom:1.5px solid var(--bd);display:flex;align-items:center;gap:7px;}
+
+.row{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:7px 0;border-bottom:1px solid var(--sf3);font-size:.86rem;}
+.row:last-child{border-bottom:none;}
+.row .lk{font-weight:800;}
+.row .zone{color:var(--txl);font-size:.82rem;}
+
+.badge{display:inline-flex;align-items:center;gap:3px;padding:2px 9px;border-radius:12px;font-size:.80rem;font-weight:800;white-space:nowrap;}
+.b-purple{background:var(--pul);color:var(--pu);}
+.b-red{background:var(--rl);color:var(--r);}
+.b-gray{background:var(--sf3);color:var(--txm);}
+.b-green{background:var(--gl);color:var(--g);}
+.b-o{background:var(--ol);color:var(--o);}
+
+.empty-note{color:var(--txl);font-size:.86rem;text-align:center;padding:10px;}
+.rules-text{white-space:pre-wrap;line-height:1.8;font-size:.86rem;}
+.rules-meta{font-size:.78rem;color:var(--txl);margin-top:8px;padding-top:8px;border-top:1px solid var(--sf3);}
+
+.offline-box{background:var(--rl);border:1.5px solid var(--r);color:var(--r);border-radius:var(--rad);padding:14px 16px;margin:14px;font-size:.88rem;font-weight:700;text-align:center;}
+
+.dm-btn{position:fixed;bottom:14px;right:14px;width:44px;height:44px;border-radius:50%;border:1.5px solid var(--bd2);background:var(--sf);color:var(--tx);cursor:pointer;font-size:.9rem;display:flex;align-items:center;justify-content:center;box-shadow:var(--shadow);z-index:50;}
+.ic{width:1em;height:1em;vertical-align:-.15em;display:inline-block;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <h1><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 10 12 2H4v8l8 8 8-8Z" transform="translate(0 2)"/><circle cx="7.5" cy="7.5" r="1" transform="translate(0 2)"/></svg> สถานะล็อคจร / ล็อคว่าง — แพไม้มินิ</h1>
+  <p>หน้านี้ดูได้อย่างเดียว ไม่ต้องเข้าสู่ระบบ · สำหรับผู้ค้าติดตามคิวและล็อคว่าง</p>
+  <div class="updated-row">
+    <span id="updated-txt">⏳ กำลังโหลดข้อมูล...</span>
+    <button class="rf-btn" onclick="loadStatus()">รีเฟรช</button>
+  </div>
+</div>
+
+<div class="wrap" id="content-wrap" style="display:none">
+
+  <div class="section">
+    <div class="section-title"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M9 12l2 2 4-4"/></svg> คิวจองล็อคจร</div>
+    <div id="queue-waiting-list"></div>
+  </div>
+
+  <div class="section">
+    <div class="section-title"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg> ล็อคจรที่ขายแล้ว</div>
+    <div id="queue-sold-list"></div>
+  </div>
+
+  <div class="section">
+    <div class="section-title"><svg class="ic ic-dot" viewBox="0 0 24 24" aria-hidden="true" style="color:var(--gm);stroke:none"><circle cx="12" cy="12" r="8" fill="currentColor"/></svg> ล็อคว่าง / แจ้งลา / ขาดล็อค (ตอนนี้)</div>
+    <div id="available-list"></div>
+  </div>
+
+  <div class="section">
+    <div class="section-title"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><polyline points="14 2 14 8 20 8"/></svg> กฎระเบียบตลาด</div>
+    <div class="rules-text" id="rules-text">—</div>
+    <div class="rules-meta" id="rules-meta"></div>
+  </div>
+
+</div>
+
+<div class="offline-box" id="offline-box" style="display:none">
+  ยังไม่ได้เชื่อมต่อกับระบบ — กรุณาขอลิงก์ที่ถูกต้องจากผู้จัดตลาดอีกครั้ง
+</div>
+
+<button class="dm-btn" onclick="toggleDark()" aria-label="สลับโหมดมืด/สว่าง">🌓</button>
+
+<script>
+function toggleDark(){const h=document.documentElement,d=h.getAttribute('data-theme')==='dark';h.setAttribute('data-theme',d?'light':'dark');localStorage.setItem('pamai-pub-theme',d?'light':'dark');}
+(()=>{const s=localStorage.getItem('pamai-pub-theme');if(s)document.documentElement.setAttribute('data-theme',s);else if(window.matchMedia('(prefers-color-scheme:dark)').matches)document.documentElement.setAttribute('data-theme','dark');})();
+
+// ═══ เชื่อมต่อ Web App URL ผ่านลิงก์ ?api=... (ไม่มี token เกี่ยวข้องในหน้านี้เลย) ═══
+// ผู้จัดสร้างลิงก์นี้ครั้งเดียวจากหน้าคิวจองล็อคจร แล้วส่งเข้ากลุ่มไลน์ — เปิดครั้งแรกจะจำ URL ไว้ในเครื่องอัตโนมัติ
+(function(){
+  try{
+    var p=new URLSearchParams(location.search);
+    var apiParam=p.get('api');
+    if(apiParam){
+      localStorage.setItem('pm-thu-pub-api-url',decodeURIComponent(apiParam));
+      p.delete('api');
+      var clean=location.pathname+(p.toString()?('?'+p.toString()):'')+location.hash;
+      history.replaceState(null,'',clean);
+    }
+  }catch(e){}
+})();
+// คีย์เก็บ URL แยกจากคีย์ของแอพหลักโดยตั้งใจ (หน้านี้ไม่แตะ token/session ของแอพหลักเลย)
+// ต้องขึ้นต้นด้วย pm-tue- เสมอ (ไม่ใส่เครื่องหมายคำพูดในคอมเมนต์นี้) เพื่อให้ build.py แปลง prefix
+// เป็น pm-thu- ให้อัตโนมัติฝั่งวันพฤหัสฯ ตามกฎเดียวกับคีย์อื่นในระบบ (กันคีย์ชนกันข้ามตลาด)
+function getApiUrl(){return localStorage.getItem('pm-thu-pub-api-url')||(localStorage.getItem('pm-thu-api-url')||localStorage.getItem('pm-api-url'))||'';}
+// หมายเหตุความปลอดภัย: หน้านี้ "ไม่เคย" อ่านหรือส่งค่า token ใด ๆ ทั้งสิ้น เพราะ action getPublicStatus
+// ถูกออกแบบให้เรียกได้โดยไม่ต้องมี token (ดู PUBLIC_ACTIONS ฝั่ง backend) — ป้องกันไม่ให้ token ที่มีสิทธิ์เขียนข้อมูล
+// หลุดไปอยู่ในหน้าที่เปิดสู่สาธารณะโดยไม่ได้ตั้งใจ
+async function apiGetPublic(action,params={}){
+  const url=getApiUrl(); if(!url) return null;
+  try{
+    const r=await fetch(url+'?'+new URLSearchParams({action,...params}));
+    const j=await r.json();
+    return j.status==='ok'?j.data:null;
+  }catch(e){ console.error('apiGetPublic error:',action,e); return null; }
+}
+function esc(s){return String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));}
+const MONS=['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
+function isMarketDay(d){ return d.getDay()===4; } // build.py แปลงเป็น ===4 ฝั่งวันพฤหัสฯ อัตโนมัติ — ห้ามเขียนเป็น !==2
+function nextMarketDateStr(){
+  const d=new Date();
+  for(let i=0;i<7;i++){ if(isMarketDay(d)) break; d.setDate(d.getDate()+1); }
+  return d.getDate()+' '+MONS[d.getMonth()]+' '+(d.getFullYear()+543);
+}
+function nowClock(){const n=new Date();return String(n.getHours()).padStart(2,'0')+':'+String(n.getMinutes()).padStart(2,'0')+':'+String(n.getSeconds()).padStart(2,'0');}
+
+// ผังล็อคทั้งหมดของตลาดนี้ — ใช้คำนวณ "ล็อคที่ไม่มีผู้ค้าประจำ" ฝั่ง client เท่านั้น (backend ไม่ทราบผังล็อค)
+//== MARKET_BLOCK:LOCKS ==//
+function thuArr(n,p){ return Array.from({length:n},(_,i)=>({id:`${p}${i+1}`,o:0})); }
+const LOCKS = {
+  A:{label:'โซนด้านนอก A', data: thuArr(20,'A')},
+  B:{label:'โซนด้านนอก B', data: thuArr(20,'B')},
+  C:{label:'โซนด้านนอก C', data: thuArr(21,'C')},
+  D:{label:'โซนด้านนอก D', data: thuArr(22,'D')},
+  E:{label:'โซนด้านนอก E', data: thuArr(11,'E')},
+  F:{label:'โซนด้านนอก F', data: thuArr(16,'F')},
+  G:{label:'ข้าง 7-Eleven G', data: thuArr(28,'G')},
+  J:{label:'ข้าง 7-Eleven J', data: thuArr(4,'J')},
+  K:{label:'ข้าง 7-Eleven K', data: thuArr(12,'K')},
+  N:{label:'ข้าง 7-Eleven N', data: thuArr(8,'N')},
+  U:{label:'ข้าง 7-Eleven U', data:[{id:'U1',o:0},{id:'U3',o:0},{id:'U4',o:0},{id:'U5',o:0},{id:'U6',o:0}]},
+  O:{label:'ข้างโลตัส O', data: thuArr(13,'O')},
+  M:{label:'ข้างโลตัส M', data: thuArr(12,'M')},
+  H:{label:'ข้างโลตัส H', data: thuArr(12,'H')},
+  L:{label:'ข้างโลตัส L', data: Array.from({length:28},(_,i)=>i+1).map(n=>({id:`L${n}`,o:0}))},
+  T:{label:'ข้างโลตัส T', data:[{id:'T1',o:0},{id:'T2',o:0}]},
+  AB:{label:'ข้างโลตัส AB', data:[{id:'AB4',o:0},{id:'AB5',o:0},{id:'AB6',o:0}]},
+  TA:{label:'โซนเปิดท้าย TA', data: thuArr(20,'TA')},
+  TB:{label:'โซนเปิดท้าย TB', data: thuArr(20,'TB')},
+  TC:{label:'โซนเปิดท้าย TC', data: thuArr(20,'TC')},
+};
+//== END_MARKET_BLOCK ==//
+function arr(n,p,vacant){ return Array.from({length:n},(_,i)=>({id:`${p}${i+1}`,o:!vacant.includes(i+1)?1:0})); }
+const ALL_LOCK_IDS=[]; const ZONE_OF={};
+Object.keys(LOCKS).forEach(z=>{ LOCKS[z].data.forEach(l=>{ ALL_LOCK_IDS.push(l.id); ZONE_OF[l.id]=z; }); });
+
+let AUTO_TIMER=null;
+
+async function loadStatus(){
+  if(!getApiUrl()){
+    document.getElementById('content-wrap').style.display='none';
+    document.getElementById('offline-box').style.display='block';
+    document.getElementById('updated-txt').textContent='ยังไม่ได้เชื่อมต่อ';
+    return;
+  }
+  const data=await apiGetPublic('getPublicStatus',{date:nextMarketDateStr()});
+  if(!data){
+    document.getElementById('updated-txt').textContent='⚠ โหลดข้อมูลไม่สำเร็จ กำลังลองใหม่...';
+    return;
+  }
+  document.getElementById('content-wrap').style.display='block';
+  document.getElementById('offline-box').style.display='none';
+  document.getElementById('updated-txt').textContent='อัปเดตล่าสุด '+nowClock()+' · รีเฟรชอัตโนมัติทุก 25 วิ';
+
+  const vendorLockSet=new Set((data.vendors||[]).map(v=>v.lock));
+  const queue=data.queue||[];
+  const waiting=queue.filter(q=>q.status==='waiting');
+  const sold=queue.filter(q=>q.status==='sold');
+  const leaveStatus=data.leaveStatus||{};
+
+  // ── คิวรอ ──
+  const wEl=document.getElementById('queue-waiting-list');
+  wEl.innerHTML = waiting.length ? waiting.map(q=>
+    '<div class="row"><span>'+esc(q.vendor_name)+(q.note?(' <span class="zone">('+esc(q.note)+')</span>'):'')+'</span>'
+    +'<span class="badge b-purple">รอคิว · '+(q.zone_pref&&q.zone_pref!=='ได้ทุกโซน'?('โซน '+esc(q.zone_pref)):'ทุกโซน')+'</span></div>'
+  ).join('') : '<div class="empty-note">ไม่มีคิวรอในขณะนี้</div>';
+
+  // ── ขายแล้ว ──
+  const sEl=document.getElementById('queue-sold-list');
+  sEl.innerHTML = sold.length ? sold.map(q=>
+    '<div class="row"><span class="lk">'+esc(q.assigned_lock)+'</span><span>'+esc(q.vendor_name)+'</span>'
+    +'<span class="badge b-green">ขายแล้ว</span></div>'
+  ).join('') : '<div class="empty-note">ยังไม่มีล็อคจรที่ขายในวันนี้</div>';
+
+  // ── ล็อคว่าง / แจ้งลา / ขาดล็อค / ไม่มีผู้ค้าประจำ ──
+  const availRows=[];
+  ALL_LOCK_IDS.forEach(id=>{
+    if(!vendorLockSet.has(id)){
+      availRows.push({id,zone:ZONE_OF[id],badge:'<span class="badge b-gray">ไม่มีผู้ค้าประจำ</span>'});
+    } else if(leaveStatus[id]&&leaveStatus[id].type==='leave'){
+      availRows.push({id,zone:ZONE_OF[id],badge:'<span class="badge b-purple">แจ้งลา</span>'});
+    } else if(leaveStatus[id]&&leaveStatus[id].type==='absent'){
+      availRows.push({id,zone:ZONE_OF[id],badge:'<span class="badge b-red">ขาดล็อค</span>'});
+    }
+  });
+  const aEl=document.getElementById('available-list');
+  aEl.innerHTML = availRows.length ? availRows.map(r=>
+    '<div class="row"><span class="lk">'+esc(r.id)+'</span><span class="zone">โซน '+esc(r.zone)+'</span>'+r.badge+'</div>'
+  ).join('') : '<div class="empty-note">ไม่มีล็อคว่างในขณะนี้</div>';
+
+  // ── กฎระเบียบ ──
+  const rules=data.rules||{};
+  document.getElementById('rules-text').textContent=rules.content||'(ยังไม่มีการตั้งค่ากฎระเบียบ)';
+  document.getElementById('rules-meta').textContent=rules.updated_at?('แก้ไขล่าสุด: '+String(rules.updated_at).slice(0,16).replace('T',' ')+(rules.updated_by?(' โดย '+rules.updated_by):'')):'';
+}
+
+window.onload=function(){
+  loadStatus();
+  AUTO_TIMER=setInterval(loadStatus,25000);
+};
+</script>
+</body>
+</html>
