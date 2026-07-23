@@ -992,9 +992,21 @@ function getApiToken(){return (localStorage.getItem('pm-thu-api-token')||localSt
 function getCurrentUserName(){ try{const s=sessionStorage.getItem('pmthu-session');if(s){const u=JSON.parse(s);return u.username||'ผู้ใช้';}}catch(e){} return 'ผู้ใช้'; }
 async function apiPost(action,data={}){
   const url=getApiUrl(); if(!url) return null;
-  try{ const r=await fetch(url,{method:'POST',body:JSON.stringify({action,token:getApiToken(),...data})}); return await r.json(); }
+  try{
+    const r=await fetch(url,{method:'POST',body:JSON.stringify({action,token:getApiToken(),...data})});
+    const result=await r.json();
+    // แก้บั๊ก 2569-07-23: แจ้ง shell (pamai_thu_app.html) เมื่อบันทึกสำเร็จ เพื่อให้แท็บ/iframe อื่น
+    // ที่เปิดค้างไว้ (เช่น หน้าหลัก/ผังตลาด) รีเฟรชข้อมูลตาม ไม่ต้องกด F5 ทั้งหน้าเอง
+    if(result && result.status==='ok' && window.parent && window.parent!==window){
+      try{ window.parent.postMessage({type:'pm-data-changed', action}, '*'); }catch(err){}
+    }
+    return result;
+  }
   catch(e){ console.error('apiPost error:',action,e); return null; }
 }
+window.addEventListener('message', function(e){
+  if(e && e.data && e.data.type==='pm-refresh' && typeof loadRealOccupancy==='function') loadRealOccupancy();
+});
 async function apiGet(action,params={}){
   const url=getApiUrl(); if(!url) return null;
   try{ const r=await fetch(url+'?'+new URLSearchParams({action,token:getApiToken(),...params})); const j=await r.json(); return j.status==='ok'?j.data:null; }

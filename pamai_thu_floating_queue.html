@@ -278,9 +278,18 @@ async function apiPost(action,data={}){
   const url=getApiUrl(); if(!url) return null;
   try{
     const r=await fetch(url,{method:'POST',body:JSON.stringify({action,token:getApiToken(),...data})});
-    return await r.json();
+    const result=await r.json();
+    // แก้บั๊ก 2569-07-23: แจ้ง shell (pamai_thu_app.html) เมื่อบันทึกสำเร็จ เพื่อให้แท็บ/iframe อื่น
+    // ที่เปิดค้างไว้ (เช่น หน้าหลัก/ผังตลาด) รีเฟรชข้อมูลตาม ไม่ต้องกด F5 ทั้งหน้าเอง
+    if(result && result.status==='ok' && window.parent && window.parent!==window){
+      try{ window.parent.postMessage({type:'pm-data-changed', action}, '*'); }catch(err){}
+    }
+    return result;
   }catch(e){ console.error('apiPost error:',action,e); return null; }
 }
+window.addEventListener('message', function(e){
+  if(e && e.data && e.data.type==='pm-refresh' && typeof loadAll==='function') loadAll();
+});
 function getCurrentUserName(){
   try{
     const sess=sessionStorage.getItem('pmthu-session');

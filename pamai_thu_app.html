@@ -234,7 +234,26 @@ input:focus,select:focus,textarea:focus{border-color:var(--gm);box-shadow:0 0 0 
 [data-theme="dark"] .login-field label{color:#8aab8e;}
 .login-field input{width:100%;padding:10px 13px;border:1.5px solid #d0ddd5;border-radius:9px;font-size:.86rem;background:#f4f8f5;color:#0a1a10;outline:none;transition:all .2s;font-family:inherit;}
 [data-theme="dark"] .login-field input{background:#141f17;color:#d8ead0;border-color:#243028;}
-.login-field input:focus{border-color:#c2410c;box-shadow:0 0 0 3px rgba(45,106,79,.12);background:#fff;}
+.login-field input:focus{border-color:#c2410c;box-shadow:0 0 0 3px rgba(45,106,79,.12);background:#fff;color:#0a1a10;}
+/* แก้บั๊ก 2569-07-23: เดิม :focus บังคับ background:#fff ทุกธีม แต่ไม่ได้ reset สี text —
+   ในธีมมืด สีตัวอักษร (#d8ead0 เกือบขาว) จึงกลายเป็นมองไม่เห็นตอนโฟกัส/พิมพ์ (ขาวบนขาว)
+   เพิ่ม override เฉพาะธีมมืดให้ยังคงพื้นเข้ม + ตัวอักษรสว่าง อ่านออกได้ตลอดตอนพิมพ์ */
+[data-theme="dark"] .login-field input:focus{background:#1a2b20;color:#eaf6e4;border-color:#ea580c;box-shadow:0 0 0 3px rgba(64,145,108,.22);}
+/* ป้องกัน autofill ของเบราว์เซอร์ (ชื่อผู้ใช้/รหัสผ่านที่จำไว้) บังคับพื้นหลัง/สีตัวอักษรของตัวเอง
+   จนขัดกับธีมของหน้านี้ — ไม่มี override นี้มาก่อน ทำให้ช่องที่เบราว์เซอร์จำค่าไว้อ่านไม่ออกได้ */
+.login-field input:-webkit-autofill,
+.login-field input:-webkit-autofill:hover,
+.login-field input:-webkit-autofill:focus{
+  -webkit-text-fill-color:#0a1a10;
+  box-shadow:0 0 0 1000px #f4f8f5 inset;
+  transition:background-color 9999s ease-in-out 0s;
+}
+[data-theme="dark"] .login-field input:-webkit-autofill,
+[data-theme="dark"] .login-field input:-webkit-autofill:hover,
+[data-theme="dark"] .login-field input:-webkit-autofill:focus{
+  -webkit-text-fill-color:#eaf6e4;
+  box-shadow:0 0 0 1000px #141f17 inset;
+}
 .pw-wrap{position:relative;}
 .pw-wrap input{padding-right:40px;}
 .pw-eye{position:absolute;right:11px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:#6b8c76;font-size:.88rem;padding:4px;}
@@ -608,7 +627,7 @@ function toggleDark(){
   else if(window.matchMedia('(prefers-color-scheme:dark)').matches) document.documentElement.setAttribute('data-theme','dark');
 })();
 
-const APP_BUILD='20260721-0847'; // cache-buster — build.py แทนค่าอัตโนมัติ
+const APP_BUILD='20260723-0904'; // cache-buster — build.py แทนค่าอัตโนมัติ
 const DAYS=['อาทิตย์','จันทร์','อังคาร','พุธ','พฤหัสบดี','ศุกร์','เสาร์'];
 const MONS=['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
 function tick(){
@@ -1370,7 +1389,26 @@ function showToast(msg,type='i'){
 // รองรับสัญญาณจาก iframe ผังตลาด (ปุ่มเพิ่มผู้ค้าใน popup)
 window.addEventListener('message', function(e){
   if(e && e.data && e.data.type==='pm-open-register' && e.data.lock) openRegisterForLock(e.data.lock);
+  // แก้บั๊ก 2569-07-23: เดิมแต่ละเมนู (ผังตลาด/ทะเบียนผู้ค้า/หน้าหลัก ฯลฯ) เป็น iframe ที่โหลด
+  // ครั้งเดียวแล้วแคชไว้ตลอด session สลับแท็บแค่ซ่อน/โชว์ ไม่ได้ดึงข้อมูลใหม่ — พอบันทึก/แจ้งลา/
+  // แจ้งขาด/ขายล็อคจรที่แท็บหนึ่ง แท็บอื่นที่เปิดค้างไว้ก่อนหน้าจึงยังเห็นข้อมูลเก่า ต้องกด F5 ทั้งหน้า
+  // เพื่อบังคับโหลดทุก iframe ใหม่ — แก้โดยให้ทุกจุดที่บันทึกสำเร็จ (ผ่าน apiPost) ส่งสัญญาณ
+  // 'pm-data-changed' มาที่ shell นี้ แล้ว shell กระจายสัญญาณ 'pm-refresh' ต่อไปยังทุก iframe อื่น
+  // ที่โหลดอยู่ ให้แต่ละหน้าดึงข้อมูลตัวเองใหม่ทันที โดยไม่ต้องรีเฟรชทั้งหน้า
+  if(e && e.data && e.data.type==='pm-data-changed'){
+    loadVendorsFromSheets();
+    broadcastRefreshToModules(e.source);
+  }
 });
+function broadcastRefreshToModules(exceptSource){
+  loadedModules.forEach(function(id){
+    const pane=document.getElementById(id);
+    const frame=pane&&pane.querySelector('iframe');
+    if(frame&&frame.contentWindow&&frame.contentWindow!==exceptSource){
+      try{ frame.contentWindow.postMessage({type:'pm-refresh'},'*'); }catch(err){}
+    }
+  });
+}
 
 function openRegisterForLock(lockId) {
   goTab('register');
