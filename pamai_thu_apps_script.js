@@ -104,6 +104,43 @@ function _normMonth(v) {
   const d = _normDate(s);
   return /^\d{4}-\d{2}-\d{2}$/.test(d) ? d.slice(0, 7) : s.slice(0, 7);
 }
+// ── TIME OF DAY (เพิ่ม 2026-07-27 — แก้บั๊ก #32 "เวลาในบันทึกกิจกรรม/รายงานแสดงเป็น 1899-12-30")
+// ต้นเหตุเดียวกับ #28/#29: Google Sheets แปลงข้อความ "10:15" เป็น "ค่าเวลา" อัตโนมัติ เก็บภายในเป็น
+// วันที่ 30 ธ.ค. 1899 + เวลา เมื่ออ่านผ่าน getValues() จึงได้ Date object แปลก ๆ แล้ว JSON.stringify
+// ส่งออกเป็น "1899-12-30T03:15:56.000Z" หน้าเว็บจึงแสดงเวลาเพี้ยน
+// ทางแก้: อ่านคอลัมน์ 'time' จาก getDisplayValues() (ค่าที่ "ตาเห็นในชีต" — ไม่ผ่านการแปลงชนิด)
+// แล้วดึงเฉพาะ HH:mm ออกมา + บังคับ number format ของคอลัมน์เป็นข้อความไว้ล่วงหน้าใน initSheets()
+// หมายเหตุ: ห้ามใช้ Utilities.formatDate กับ Date ปี 1899 เพราะโซนเวลาไทยยุคนั้นเป็น LMT (+6:42)
+// ผลลัพธ์จะคลาดเคลื่อนเป็นหลักนาที — จึงต้องใช้ display value เท่านั้น
+function _normTime(v) {
+  if (v === null || v === undefined || v === '') return '';
+  const s = String(v).trim();
+  let m = s.match(/^(\d{1,2}):(\d{2})/);                       // "10:15" / "10:15:00"
+  if (m) return _pad2(parseInt(m[1], 10)) + ':' + m[2];
+  m = s.match(/^(\d{1,2}):(\d{2})\s*(AM|PM)$/i);               // "10:15 AM"
+  if (m) {
+    let h = parseInt(m[1], 10);
+    if (/PM/i.test(m[3]) && h < 12) h += 12;
+    if (/AM/i.test(m[3]) && h === 12) h = 0;
+    return _pad2(h) + ':' + m[2];
+  }
+  return s;
+}
+// อ่านชีตเป็น object โดยให้คอลัมน์ 'time' ใช้ค่าที่แสดงในชีต (กันการแปลงชนิดของ Sheets)
+function _rowsWithTime(sheet) {
+  const range = sheet.getDataRange();
+  const vals  = range.getValues();
+  if (vals.length <= 1) return { headers: vals[0] || [], list: [] };
+  const headers = vals[0];
+  const iTime   = headers.indexOf('time');
+  const disp    = iTime >= 0 ? range.getDisplayValues() : null;
+  const list = vals.slice(1).map((row, r) => {
+    const obj = {}; headers.forEach((h, i) => obj[h] = row[i]);
+    if (iTime >= 0) obj.time = _normTime(disp[r + 1][iTime]);
+    return obj;
+  });
+  return { headers: headers, list: list };
+}
 function _todayISO() { return Utilities.formatDate(new Date(), 'Asia/Bangkok', 'yyyy-MM-dd'); }
 function _thisMonthISO() { return Utilities.formatDate(new Date(), 'Asia/Bangkok', 'yyyy-MM'); }
 
@@ -418,6 +455,11 @@ function initSheets() {
   _forceTextCol(vSheet, 'phone');
   _forceTextCol(dSheet, 'phone');
   _forceTextCol(qSheet, 'phone');
+  // บังคับคอลัมน์เวลาเป็นข้อความ กัน Sheets แปลง "10:15" เป็นค่าเวลา 1899-12-30 (บั๊ก #32)
+  _forceTextCol(lSheet,  'time');
+  _forceTextCol(dSheet,  'time');
+  _forceTextCol(pSheet,  'time');
+  _forceTextCol(aSheet,  'time');
   return makeRes('Sheets initialized');
 }
 
@@ -510,14 +552,24 @@ function deleteVendor(lockId) {
 // ════════════════════════════════════════
 function getLeaveLog(opt, lockId, zone) {
   const sheet = getSheet(S.LEAVE);
-  const rows  = sheet.getDataRange().getValues();
-  if (rows.length <= 1) return makeRes([]);
-  const headers = rows[0];
-  let data = rows.slice(1).map(row => {
-    const obj = {}; headers.forEach((h,i)=>obj[h]=row[i]);
+  const read  = _rowsWithTime(sheet);
+  if (!read.list.length) return makeRes([]);
+  let data = read.list.map(obj => {
     obj.date_iso = _normDate(obj.date);           // ให้หน้าเว็บเรียง/กรองต่อได้โดยไม่ต้องแปลงเอง
     return obj;
   });
+  // กติกา "1 ล็อค + 1 วัน = 1 ประวัติ" — logLeave() บังคับไว้แล้วตั้งแต่ v2.3 แต่ชีตจริงยังมีแถวซ้ำ
+  // ที่เกิดก่อนหน้านั้น (พบ H12 วันเดียวกัน 4 แถว) จึงกรองซ้ำตอนอ่านด้วย เพื่อให้ประวัติถูกต้องทันที
+  // โดยไม่ต้องลบข้อมูลเก่าทิ้งถาวร (ลบข้อมูลต้องได้รับอนุญาตจากผู้ดูแลตลาดก่อนเสมอ) — เก็บแถวล่าสุด
+  const seenDaily = {};
+  data = data.filter(r => {
+    const t = String(r.type);
+    if (t !== 'leave' && t !== 'absent') return true;   // lease_cancel ฯลฯ เป็นเหตุการณ์ถาวร ไม่กรอง
+    const key = String(r.lock_id) + '|' + r.date_iso;
+    const stamp = String(r.created_at || r.id || '');
+    if (!seenDaily[key] || stamp >= seenDaily[key].stamp) { seenDaily[key] = { stamp: stamp, row: r }; }
+    return false;
+  }).concat(Object.keys(seenDaily).map(k => seenDaily[k].row));
   if (opt)    data = data.filter(r => _matchDate(r.date, opt));
   if (lockId) data = data.filter(r => r.lock_id === lockId);
   if (zone)   data = data.filter(r => r.zone === zone);
@@ -601,11 +653,9 @@ function clearLeaveForDate(lockId, date) {
 // ════════════════════════════════════════
 function getDailyBookings(opt, lockId, zone) {
   const sheet = getSheet(S.DAILY);
-  const rows  = sheet.getDataRange().getValues();
-  if (rows.length <= 1) return makeRes([]);
-  const headers = rows[0];
-  let data = rows.slice(1).map(row => {
-    const obj = {}; headers.forEach((h,i)=>obj[h]=row[i]);
+  const read  = _rowsWithTime(sheet);
+  if (!read.list.length) return makeRes([]);
+  let data = read.list.map(obj => {
     obj.phone = _normPhone(obj.phone);
     obj.date_iso = _normDate(obj.date);
     return obj;
@@ -651,11 +701,9 @@ function cancelDailyBooking(lockId, date) {
 // ════════════════════════════════════════
 function getPayments(opt, lockId) {
   const sheet = getSheet(S.PAYMENTS);
-  const rows  = sheet.getDataRange().getValues();
-  if (rows.length <= 1) return makeRes([]);
-  const headers = rows[0];
-  let data = rows.slice(1).map(row => {
-    const obj = {}; headers.forEach((h,i)=>obj[h]=row[i]);
+  const read  = _rowsWithTime(sheet);
+  if (!read.list.length) return makeRes([]);
+  let data = read.list.map(obj => {
     obj.date_iso = _normDate(obj.date);
     return obj;
   });
@@ -693,11 +741,9 @@ function logActivity(data) {
 function getActivityLog(opt) {
   _purgeActivity(ACTIVITY_RETENTION_DAYS);   // ทุกครั้งที่หน้าเว็บเปิดดู ให้ลบของเก่าเกินกำหนดก่อน
   const sheet = getSheet(S.ACTIVITY);
-  const rows  = sheet.getDataRange().getValues();
-  if (rows.length <= 1) return makeRes([]);
-  const headers = rows[0];
-  let data = rows.slice(1).map(row => {
-    const obj = {}; headers.forEach((h,i)=>obj[h]=row[i]);
+  const read  = _rowsWithTime(sheet);
+  if (!read.list.length) return makeRes([]);
+  let data = read.list.map(obj => {
     obj.date_iso = _normDate(obj.date);
     return obj;
   });
@@ -1214,9 +1260,18 @@ function getPublicStatus(date) {
   // แหล่งข้อมูลจริงคือ daily_bookings (ทุกการขายลงที่นี่เสมอ ทั้งสองช่องทาง — ดูหมายเหตุ sellFloatingQueueEntry)
   // แล้วเทียบกับ floating_queue เพื่อบอกช่องทางว่ามาจากคิวหรือขายตรง
   // whitelist: เลขล็อค + ชื่อร้าน + สินค้า + ช่องทาง เท่านั้น — ห้ามส่ง phone/price/total/method ออกหน้าสาธารณะ
-  let soldRows = _sheetToObjects(S.DAILY)
+  let soldRows = _rowsWithTime(getSheet(S.DAILY)).list
     .filter(r => r.cancelled !== true && String(r.cancelled).toUpperCase() !== 'TRUE');
   if (date) soldRows = soldRows.filter(r => _normDate(r.date) === _normDate(date));
+  // 1 ล็อค = 1 รายการในหน้าสาธารณะ — daily_bookings อาจมีหลายแถวต่อล็อคจากการบันทึกซ้ำ/แก้ไข
+  // (พบล็อค A4 ซ้ำ 3 แถวในวันเดียว) ผู้ค้าที่เปิดดูจากกลุ่มไลน์ต้องเห็นรายการล่าสุดรายการเดียว
+  const _soldLatest = {};
+  soldRows.forEach(r => {
+    const k = String(r.lock_id);
+    const stamp = String(r.created_at || r.time || r.id || '');
+    if (!_soldLatest[k] || stamp >= _soldLatest[k].stamp) _soldLatest[k] = { stamp: stamp, row: r };
+  });
+  soldRows = Object.keys(_soldLatest).map(k => _soldLatest[k].row);
   const queueSoldLocks = {};
   queueRows.forEach(r => {
     if (r.status === 'sold' && r.assigned_lock) {
