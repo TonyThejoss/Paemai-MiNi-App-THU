@@ -411,6 +411,18 @@ function switchSub(tab){
 // HELPERS
 // ════════════════════════════════════════════════════
 function esc(s){return String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));}
+// แสดงวันที่แบบไทยเสมอ (แก้ 2026-07-27 — ตารางเคยโชว์ค่าดิบ "2569-07-22T17:00:00.000Z" ที่ Sheets แปลงชนิดมา)
+// ยึด date_iso ที่ backend normalize เป็น ค.ศ. YYYY-MM-DD มาให้แล้ว จึงแปลงเป็น "22 ก.ค. 2569" ได้ตรงเสมอ
+const _LH_MONTHS=['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
+function lhDate(r){
+  const iso=String(r.date_iso||'').slice(0,10);
+  const m=/^(\d{4})-(\d{2})-(\d{2})$/.exec(iso);
+  if(m) return parseInt(m[3],10)+' '+_LH_MONTHS[parseInt(m[2],10)-1]+' '+(parseInt(m[1],10)+543);
+  const raw=String(r.date||'');
+  const m2=/^(\d{4})-(\d{2})-(\d{2})/.exec(raw);
+  if(m2){ let y=parseInt(m2[1],10); if(y<2400) y+=543; return parseInt(m2[3],10)+' '+_LH_MONTHS[parseInt(m2[2],10)-1]+' '+y; }
+  return raw;
+}
 function emptyRow(msg,cols){return '<tr><td colspan="'+cols+'" style="text-align:center;padding:24px;color:var(--txl)">'+msg+'</td></tr>';}
 function sortByCreated(rows){return [...rows].sort((a,b)=>String(b.created_at||'').localeCompare(String(a.created_at||'')));}
 
@@ -539,7 +551,7 @@ function renderLeave(){
                      : r.type==='absent' ? '<span class="badge b-red"><svg class="ic ic-dot" viewBox="0 0 24 24" aria-hidden="true" style="color:var(--r)"><circle cx="12" cy="12" r="8" fill="currentColor"/></svg> ขาดล็อค</span>'
                      : '<span class="badge b-gray"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><polyline points="9 14 4 9 9 4"/><path d="M20 20v-7a4 4 0 0 0-4-4H4"/></svg> ยกเลิกแจ้ง</span>';
     return '<tr>'
-      +'<td>'+esc(r.date)+' · '+esc(r.time)+'</td>'
+      +'<td>'+esc(lhDate(r))+' · '+esc(r.time)+'</td>'
       +'<td><b>'+esc(r.lock_id)+'</b></td>'
       +'<td>'+esc(r.zone||'—')+'</td>'
       +'<td>'+esc(r.shop||'—')+'</td>'
@@ -569,7 +581,7 @@ function renderDaily(){
   if(!getApiUrl()) return;
   if(!rows.length){ tbody.innerHTML=emptyRow('ไม่พบข้อมูลตามเงื่อนไขที่เลือก',7); return; }
   tbody.innerHTML=rows.map(r=>'<tr>'
-    +'<td>'+esc(r.date)+' · '+esc(r.time)+'</td>'
+    +'<td>'+esc(lhDate(r))+' · '+esc(r.time)+'</td>'
     +'<td><b>'+esc(r.lock_id)+'</b></td>'
     +'<td>'+esc(r.zone||'—')+'</td>'
     +'<td>'+esc(r.vendor_name||'—')+'</td>'
