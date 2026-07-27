@@ -89,6 +89,21 @@ function _dateOpt(e) {
   if (p.to)    o.to    = p.to;
   return (o.date || o.month || o.from || o.to) ? o : null;
 }
+// เดือนในรูปแบบ 'YYYY-MM' — ต้อง normalize เหมือนวันที่ เพราะ Google Sheets แปลงข้อความ "2026-07"
+// ที่เราเขียนลงไปให้กลายเป็นค่าวันที่ (1 ก.ค. 2026) อ่านกลับมาจึงไม่ใช่สตริงเดิมอีกต่อไป
+// ถ้าเทียบสตริงตรง ๆ จะหาส่วนลดของเดือนนั้นไม่เจอเลย (บั๊กชนิดเดียวกับคอลัมน์ date — พบ 2026-07-27)
+function _normMonth(v) {
+  if (v === null || v === undefined || v === '') return '';
+  if (Object.prototype.toString.call(v) === '[object Date]') return _normDate(v).slice(0, 7);
+  const s = String(v).trim();
+  if (/^\d{4}-\d{1,2}$/.test(s)) {
+    let p = s.split('-'), y = parseInt(p[0], 10);
+    if (y > 2400) y -= 543;
+    return y + '-' + _pad2(parseInt(p[1], 10));
+  }
+  const d = _normDate(s);
+  return /^\d{4}-\d{2}-\d{2}$/.test(d) ? d.slice(0, 7) : s.slice(0, 7);
+}
 function _todayISO() { return Utilities.formatDate(new Date(), 'Asia/Bangkok', 'yyyy-MM-dd'); }
 function _thisMonthISO() { return Utilities.formatDate(new Date(), 'Asia/Bangkok', 'yyyy-MM'); }
 
@@ -760,12 +775,12 @@ function saveSettings(data, updatedBy) {
 function getDiscounts(month) {
   let rows = _sheetToObjects(S.DISCOUNT).filter(r => String(r.status || 'active') !== 'deleted');
   rows = rows.map(r => ({
-    id: r.id, month: String(r.month || '').slice(0, 7), scope: r.scope, lock_id: r.lock_id || '',
+    id: r.id, month: _normMonth(r.month), scope: r.scope, lock_id: r.lock_id || '',
     amount: parseFloat(r.amount) || 0,
     apply_installment: (r.apply_installment === true || String(r.apply_installment).toUpperCase() === 'TRUE'),
     note: r.note || '', created_by: r.created_by || '', created_at: r.created_at, updated_at: r.updated_at,
   }));
-  if (month) rows = rows.filter(r => r.month === String(month).slice(0, 7));
+  if (month) rows = rows.filter(r => r.month === _normMonth(month));
   return makeRes(rows);
 }
 
@@ -793,7 +808,7 @@ function saveDiscount(data) {
   let foundRow = -1;
   for (let i = 1; i < rows.length; i++) {
     if (String(rows[i][iStatus] || 'active') === 'deleted') continue;
-    if (String(rows[i][iMonth]).slice(0, 7) !== month) continue;
+    if (_normMonth(rows[i][iMonth]) !== month) continue;
     if (String(rows[i][iScope]) !== scope) continue;
     if (scope === 'lock' && String(rows[i][iLock]) !== String(data.lock_id)) continue;
     foundRow = i + 1; break;
@@ -808,6 +823,7 @@ function saveDiscount(data) {
     created_at: foundRow > 0 ? (rows[foundRow - 1][iCreated] || now) : now, updated_at: now,
   };
   const rowData = headers.map(h => merged[h] !== undefined ? merged[h] : '');
+  _forceTextCol(sheet, 'month');   // กัน Sheets แปลง 'YYYY-MM' เป็นค่าวันที่
   if (foundRow > 0) sheet.getRange(foundRow, 1, 1, rowData.length).setValues([rowData]);
   else sheet.appendRow(rowData);
   return makeRes({ id: id, action: foundRow > 0 ? 'updated' : 'created', month: month, scope: scope });
@@ -823,7 +839,7 @@ function deleteDiscount(id) {
   for (let i = rows.length - 1; i >= 1; i--) {
     if (String(rows[i][iId]) !== String(id)) continue;
     // ห้ามลบส่วนลดของเดือนที่ผ่านไปแล้ว เพื่อรักษาความถูกต้องของรายงานย้อนหลัง
-    if (String(rows[i][iMonth]).slice(0, 7) < _thisMonthISO()) {
+    if (_normMonth(rows[i][iMonth]) < _thisMonthISO()) {
       return makeErr('ไม่สามารถลบส่วนลดของเดือนที่ผ่านไปแล้วได้ (รายงานย้อนหลังต้องคงค่าเดิม)');
     }
     sheet.deleteRow(i + 1);
