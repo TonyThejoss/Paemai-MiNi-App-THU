@@ -34,13 +34,25 @@ const _MONS_TH_FULL = ['มกราคม','กุมภาพันธ์','�
 function _pad2(n) { return ('0' + n).slice(-2); }
 function _normDate(v) {
   if (v === null || v === undefined || v === '') return '';
+  let s;
   if (Object.prototype.toString.call(v) === '[object Date]') {
     if (isNaN(v.getTime())) return '';
-    return Utilities.formatDate(v, 'Asia/Bangkok', 'yyyy-MM-dd');
+    s = Utilities.formatDate(v, 'Asia/Bangkok', 'yyyy-MM-dd');
+  } else {
+    s = String(v).trim();
   }
-  const s = String(v).trim();
-  let m = s.match(/^(\d{4})-(\d{1,2})-(\d{1,2})/);            // ISO
-  if (m) return m[1] + '-' + _pad2(parseInt(m[2], 10)) + '-' + _pad2(parseInt(m[3], 10));
+  // ── ปีพุทธศักราชในรูปแบบ ISO/Date (สำคัญมาก — ตรวจพบจากข้อมูลจริงในชีต 2026-07-27) ──
+  // สเปรดชีตตั้งค่า locale เป็นไทย Google Sheets จึง "แปลง" ข้อความวันที่ไทยที่เราเขียนลงไป
+  // (เช่น "6 ก.ค. 2569") ให้กลายเป็นค่าวันที่จริงโดยตีความ 2569 เป็นปี ค.ศ. ตรง ๆ
+  // เวลาอ่านกลับผ่าน JSON จึงได้ "2569-07-06T07:00:00.000Z" ไม่ใช่ข้อความไทยอย่างที่โค้ดเดิมคาดไว้
+  // → ทุกค่าที่ปี > 2400 ต้องลบ 543 ก่อนเสมอ ไม่งั้นเทียบวันที่ไม่ตรงตลอดกาล และรายงานจะว่างเปล่า
+  //   (นี่คือสาเหตุที่แท้จริงของอาการ "รายงานดูข้อมูลไม่ได้" — ลึกกว่าที่วิเคราะห์ไว้ตอนแรกหนึ่งชั้น)
+  let m = s.match(/^(\d{4})-(\d{1,2})-(\d{1,2})/);            // ISO (อาจเป็นปี พ.ศ.)
+  if (m) {
+    let y = parseInt(m[1], 10);
+    if (y > 2400) y -= 543;
+    return y + '-' + _pad2(parseInt(m[2], 10)) + '-' + _pad2(parseInt(m[3], 10));
+  }
   m = s.match(/^(\d{1,2})\s+(\S+)\s+(\d{4})$/);                // ไทยย่อ/เต็ม: 26 ก.ค. 2569
   if (m) {
     let mi = _MONS_TH.indexOf(m[2]);
@@ -607,8 +619,11 @@ function cancelDailyBooking(lockId, date) {
   const lockIdx = headers.indexOf('lock_id');
   const dateIdx = headers.indexOf('date');
   const canIdx  = headers.indexOf('cancelled');
+  // เทียบวันที่แบบ normalize (แก้ 2026-07-27): ค่าในชีตเป็น Date ปี พ.ศ. ไม่ใช่ข้อความไทยอย่างที่โค้ดเดิมคิด
+  // การเทียบสตริงตรง ๆ จึงไม่เคยเจอแถว ทำให้ "ยกเลิกผู้ค้าจร" ไม่มีผลจริงในฐานข้อมูล
+  const target = _normDate(date);
   for (let i = rows.length - 1; i >= 1; i--) {
-    if (rows[i][lockIdx] === lockId && rows[i][dateIdx] === date && rows[i][canIdx] !== true) {
+    if (rows[i][lockIdx] === lockId && _normDate(rows[i][dateIdx]) === target && rows[i][canIdx] !== true) {
       sheet.getRange(i+1, canIdx+1).setValue(true);
       return makeRes({ cancelled: lockId });
     }
