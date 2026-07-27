@@ -6,11 +6,11 @@
 <title>ผังตลาดแพไม้มินิ วันพฤหัสบดี</title>
 <style>a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible,[tabindex]:focus-visible,.lk:focus-visible,.zone-tab:focus-visible{outline:2.5px solid var(--gm) !important;outline-offset:2px;}.ico{width:1em;height:1em;display:inline-block;vertical-align:-0.15em;flex-shrink:0}
 :root{--g:#7c2d12;--gm:#c2410c;--gb:#ea580c;--gl:#ffedd5;--gll:#fff7ed;--r:#b91c1c;--rl:#fee2e2;--o:#c2410c;--ol:#fff7ed;--b:#2563eb;--bl:#dbeafe;--y:#f59e0b;--yl:#fef3c7;--pu:#7c3aed;--pul:#ede9fe;--bg:#f0f4f8;--sf:#fff;--sf2:#f8fafc;--bd:#e2e8f0;--bd2:#cbd5e0;--tx:#0f172a;--txm:#475569;--txl:#5b6b82;--sdw:0 4px 20px rgba(0,0,0,.09);--ease:cubic-bezier(.4,0,.2,1);--lkw:60px;--lkh:46px;}
-[data-theme="dark"]{--bg:#0d1117;--sf:#161b22;--sf2:#1c2333;--bd:#30363d;--bd2:#484f58;--tx:#e6edf3;--txm:#8b949e;--txl:#7d8590;--gl:#132a1d;--gll:#0d1f14;--rl:#2d0a0a;--ol:#2d1200;--bl:#0d1b3e;--pul:#1e0f3d;--yl:#2d2000;}
+[data-theme="dark"]{--bg:#0d1117;--sf:#161b22;--sf2:#1c2333;--bd:#30363d;--bd2:#484f58;--tx:#e6edf3;--txm:#8b949e;--txl:#7d8590;--gl:#3d1a08;--gll:#2b1205;--rl:#2d0a0a;--ol:#2d1200;--bl:#0d1b3e;--pul:#1e0f3d;--yl:#2d2000;}
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
 html{scroll-behavior:smooth;}
 body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--tx);font-size:13px;min-height:100vh;transition:background .3s,color .3s;}
-.topbar{background:linear-gradient(135deg,#0d2618,var(--g),var(--gm));color:#fff;padding:11px 18px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;box-shadow:0 2px 16px rgba(0,0,0,.4);}
+.topbar{background:linear-gradient(135deg,#3b1206,var(--g),var(--gm));color:#fff;padding:11px 18px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;box-shadow:0 2px 16px rgba(0,0,0,.4);}
 .topbar h1{font-size:.88rem;font-weight:800;}.topbar p{font-size:.65rem;opacity:.7;margin-top:1px;}
 .dm-btn{width:30px;height:30px;border-radius:50%;border:1.5px solid rgba(255,255,255,.3);background:rgba(255,255,255,.1);color:#fff;cursor:pointer;font-size:.82rem;display:flex;align-items:center;justify-content:center;transition:all .2s;position:relative;}
 .dm-btn::before{content:'';position:absolute;top:50%;left:50%;width:44px;height:44px;transform:translate(-50%,-50%);}
@@ -45,7 +45,7 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(
 /* LOCK */
 .lk{width:var(--lkw);height:var(--lkh);border-radius:8px;border:1.5px solid transparent;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;transition:all .14s var(--ease);position:relative;font-size:.58rem;font-weight:700;text-align:center;line-height:1.3;flex-shrink:0;user-select:none;}
 .lk:hover{transform:translateY(-3px) scale(1.08);z-index:20;box-shadow:0 5px 14px rgba(0,0,0,.16);}
-.lk.occupied{background:var(--gl);border-color:var(--gb);color:#1b4332;}
+.lk.occupied{background:var(--gl);border-color:var(--gb);color:#7c2d12;}
 .lk.vacant{background:var(--yl);border-color:#d97706;color:#78350f;}
 .lk.cancelled{background:var(--rl);border-color:var(--r);color:#7f1d1d;}
 .lk.unpaid{background:var(--ol);border-color:var(--o);color:#7c2d12;}
@@ -54,7 +54,7 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(
 .lk.is-leave{outline:2.5px solid #7c3aed;outline-offset:1px;}
 .lk.is-absent{outline:2.5px solid var(--r);outline-offset:1px;}
 .lk.is-daily{filter:brightness(.88) saturate(1.2);}
-[data-theme="dark"] .lk.occupied{background:#132a1d;border-color:var(--gm);color:#86efac;}
+[data-theme="dark"] .lk.occupied{background:#3d1a08;border-color:var(--gm);color:#fed7aa;}
 [data-theme="dark"] .lk.vacant{background:#2d2000;border-color:#b45309;color:#fde68a;}
 [data-theme="dark"] .lk.cancelled{background:#2d0a0a;border-color:var(--r);color:#fca5a5;}
 [data-theme="dark"] .lk.unpaid{background:#2d1200;border-color:var(--o);color:#fdba74;}
@@ -152,6 +152,260 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(
 
 .ic{width:1em;height:1em;vertical-align:-.15em;display:inline-block;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0}
 </style>
+<!-- ==== PM_MOBILE_KIT:START (สร้างโดย tools/inject_mobile_kit.py — ห้ามแก้ในไฟล์นี้) ==== -->
+<style id="pm-mobile-kit">
+/* ═══════════════════════════════════════════════════════════════════════════
+   PM MOBILE KIT — Mobile-First / Responsive / Thai typography (2026-07-26)
+   เป้าหมาย: ทุกหน้าใช้งานได้เต็มจอบนสมาร์ทโฟนทุกขนาด ไม่มีเนื้อหาล้นขอบจอด้านข้าง
+   (no horizontal overflow), ตัวอักษรไทยตัดบรรทัดถูกต้อง, ปุ่มกดง่ายด้วยนิ้วโป้ง,
+   เว้นระยะขอบบน-ล่างไม่ให้ชิดจอ
+   หมายเหตุเชิงเทคนิค: ตั้งใจ "ไม่" ใส่ viewport-fit=cover เพราะถ้าไม่ใส่ เบราว์เซอร์จะกันพื้นที่
+   รอยบาก (notch) ให้อยู่แล้วโดยอัตโนมัติ การใส่ cover แล้วจัดการ env() เองมีความเสี่ยงที่เนื้อหา
+   จะไปอยู่ใต้รอยบากถ้าพลาดจุดใดจุดหนึ่ง — เราจึงใช้ env() เป็น "ระยะเสริม" (max()) เท่านั้น
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* ── 1) พื้นฐาน: กันล้นขอบจอ + ฟอนต์ไทย ── */
+html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
+*, *::before, *::after { min-width: 0; }               /* ตัวการอันดับ 1 ของ overflow ใน flex/grid */
+body {
+  overflow-x: hidden;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Sarabun",
+               "Noto Sans Thai", "Leelawadee UI", "Thonburi", system-ui,
+               "Helvetica Neue", Arial, sans-serif;
+  overflow-wrap: break-word;                           /* ตัดเฉพาะเมื่อคำเดียวยาวเกินกรอบ */
+  word-break: normal;                                  /* ห้าม break-all — ทำให้ไทยตัดกลางพยางค์ */
+  line-break: auto;
+}
+img, svg, canvas, video, table { max-width: 100%; }
+input, select, textarea, button { font-family: inherit; max-width: 100%; }
+
+/* ── 2) ตารางเลื่อนแนวนอนได้เอง (wrapper ถูกใส่ให้อัตโนมัติโดยสคริปต์ท้ายไฟล์) ── */
+.pm-tablewrap {
+  width: 100%; max-width: 100%; overflow-x: auto; overflow-y: hidden;
+  -webkit-overflow-scrolling: touch; overscroll-behavior-x: contain;
+}
+.pm-tablewrap > table { min-width: 100%; }
+
+/* ── 3) แท็บเล็ต ── */
+@media (max-width: 900px) {
+  .two-col { grid-template-columns: 1fr !important; }
+  .g2 { grid-template-columns: 1fr !important; }
+  .kgrid, .kpi-grid, .kpi-row, .mgrid, .summary-grid { grid-template-columns: repeat(3, 1fr) !important; }
+}
+
+/* ── 4) สมาร์ทโฟน ── */
+@media (max-width: 640px) {
+  body { padding-bottom: max(18px, env(safe-area-inset-bottom)); }
+
+  /* กริดสรุป/KPI → 2 คอลัมน์ อ่านง่ายกว่าบีบ 5 ช่องในจอ 360px */
+  .kgrid, .kpi-grid, .kpi-row, .mgrid, .summary-grid,
+  .elec-types, .grid { grid-template-columns: repeat(2, 1fr) !important; }
+  /* ฟอร์ม 2 ช่องต่อแถว → 1 ช่องต่อแถว */
+  .frow, .m-row, .field-row { grid-template-columns: 1fr !important; }
+
+  /* แถบหัวเรื่อง/เครื่องมือ: ให้ห่อบรรทัดได้ ไม่ดันจนล้นจอ */
+  .toolbar, .topbar, .tb-actions, .filter-row, .action-btns,
+  .modal-btns, .option-row, .date-filter, .items-title, .summary-title {
+    flex-wrap: wrap !important;
+  }
+  .toolbar, .topbar { padding-left: 12px !important; padding-right: 12px !important; row-gap: 8px; }
+  .toolbar { padding-top: max(10px, env(safe-area-inset-top)) !important; }
+  .topbar  { padding-top: max(10px, env(safe-area-inset-top)) !important; }
+
+  /* พื้นที่กดขั้นต่ำ 44px ตาม WCAG 2.5.5 / Apple HIG — ผู้จัดตลาดกดด้วยนิ้วโป้งกลางตลาด */
+  button, .btn, .tb-btn, a.btn, input[type=checkbox], input[type=radio] { min-height: 40px; }
+  /* ปุ่มไอคอนเล็ก ๆ ที่ฝังในช่องกรอก (เช่น ปุ่มดู/ซ่อนรหัสผ่าน) และลิงก์ในเมนู */
+  .pw-eye, .icon-btn, .btn-rm { min-width: 40px; min-height: 40px; }
+  .ni, .sidebar a, a.ni { min-height: 44px; }
+  input[type=checkbox], input[type=radio] { min-width: 22px; min-height: 22px; }
+  .btn-sm, .tb-btn { min-height: 38px; }
+  /* iOS ซูมเองถ้า font-size < 16px ในช่องกรอก — ล็อคไว้ที่ 16px กัน layout เพี้ยน */
+  input, select, textarea { font-size: 16px !important; }
+
+  /* หน้ารายงาน: ตัดกรอบกระดาษ A4 ออกบนมือถือให้ใช้ความกว้างเต็มจอ */
+  .page { margin: 10px auto !important; padding: 14px 12px !important; border-radius: 8px !important; }
+  .r-head { flex-direction: column; gap: 6px; }
+  .r-meta { text-align: left !important; }
+  .sign-area { flex-direction: column; gap: 18px; align-items: flex-start; }
+
+  /* หน้ารับชำระหลายล็อค (batch payment) — เดิมไม่มี @media เลย
+     .layout เป็น flex 2 คอลัมน์ + height:100vh + overflow:hidden ทำให้ฝั่งขวาหลุดออกนอกจอ
+     และเลื่อนดูไม่ได้บนมือถือ → เปลี่ยนเป็นเรียงลงล่างและให้หน้าเลื่อนตามปกติ */
+  .layout {
+    flex-direction: column !important; height: auto !important;
+    min-height: 0 !important; overflow: visible !important;
+  }
+  .left-panel, .right-panel {
+    width: 100% !important; max-width: 100% !important; flex: none !important;
+    border-right: none !important; border-left: none !important;
+  }
+  .right-scroll { overflow: visible !important; padding: 14px 12px !important; }
+  .lock-item { flex-wrap: wrap; }
+
+  /* โมดัล: สูงไม่เกินจอ เลื่อนในตัวได้ ไม่ชิดขอบล่าง */
+  .modal, .modal-box, .m-box, .modal-content, .confirm-box {
+    max-width: calc(100vw - 20px) !important;
+    max-height: calc(100vh - 40px) !important;
+    overflow-y: auto !important;
+    margin-bottom: max(10px, env(safe-area-inset-bottom));
+  }
+
+  /* แถบเมนู/sidebar ที่เลื่อนแนวนอน */
+  .sidebar, .side, .nav { max-width: 100% !important; }
+}
+
+/* ── 5) จอเล็กมาก (iPhone SE / 320-360px) ── */
+@media (max-width: 380px) {
+  .kgrid, .kpi-grid, .kpi-row, .mgrid, .summary-grid { grid-template-columns: 1fr !important; }
+  .toolbar h1, .topbar h1 { font-size: .82rem !important; }
+}
+
+/* ── 6) โหมดแนวนอนจอเตี้ย: อย่าล็อคความสูงเป็น 100vh ── */
+@media (max-height: 480px) and (orientation: landscape) {
+  .layout { height: auto !important; overflow: visible !important; }
+}
+
+/* ── 7) พิมพ์: ยกเลิกทุกอย่างของ mobile kit ที่อาจกวนการพิมพ์รายงาน ── */
+@media print {
+  .pm-tablewrap { overflow: visible !important; }
+  body { padding-bottom: 0 !important; overflow: visible !important; }
+}
+</style>
+<script id="pm-mobile-kit-js">
+/* ครอบ <table> ทุกตัวด้วยกล่องเลื่อนแนวนอน เพื่อไม่ให้ตารางกว้างดันหน้าจอล้น
+   ทำด้วย JS เพราะแก้ CSS ล้วนไม่ได้ (ต้องมี element ครอบ) และทำแบบนี้ไม่กระทบ layout เดิมบนเดสก์ท็อป
+   ใช้ MutationObserver เพราะเกือบทุกหน้าสร้างตารางด้วย innerHTML หลังโหลดข้อมูลจาก Sheets เสร็จ */
+(function () {
+  function wrapTables(root) {
+    var tables = (root || document).querySelectorAll ? (root || document).querySelectorAll('table') : [];
+    for (var i = 0; i < tables.length; i++) {
+      var t = tables[i];
+      if (t.parentElement && t.parentElement.classList.contains('pm-tablewrap')) continue;
+      if (t.closest && t.closest('.pm-tablewrap')) continue;
+      var w = document.createElement('div');
+      w.className = 'pm-tablewrap';
+      t.parentNode.insertBefore(w, t);
+      w.appendChild(t);
+    }
+  }
+  function boot() {
+    wrapTables(document);
+    try {
+      new MutationObserver(function (muts) {
+        for (var i = 0; i < muts.length; i++) {
+          for (var j = 0; j < muts[i].addedNodes.length; j++) {
+            var n = muts[i].addedNodes[j];
+            if (n.nodeType !== 1) continue;
+            if (n.tagName === 'TABLE') { wrapTables(n.parentNode); }
+            else if (n.querySelector && n.querySelector('table')) { wrapTables(n); }
+          }
+        }
+      }).observe(document.body, { childList: true, subtree: true });
+    } catch (e) { /* เบราว์เซอร์เก่า — ยังได้ตารางชุดแรกที่ wrap ไปแล้ว */ }
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot);
+  else boot();
+})();
+</script>
+<!-- ==== PM_MOBILE_KIT:END ==== -->
+<!-- ==== PM_STATUS_COLORS:START (สร้างโดย tools/inject_status_colors.py) ==== -->
+<style id="pm-status-colors">
+/* ═══════════════════════════════════════════════════════════════════════════
+   LOCK STATUS COLOR SYSTEM — ชุดสีเดียวกันทั้งสองตลาด (2026-07-26)
+   ทุกคู่สีผ่านการวัดด้วย CIEDE2000: ΔE ต่ำสุด 13.0 (light) / 10.5 (dark) = แยกออกได้ชัดด้วยตา
+   และ contrast ตัวอักษร/พื้นทุกคู่อยู่ระหว่าง 7.9:1 – 11.8:1 (เกิน WCAG AA 4.5:1 ทุกคู่)
+   หมายเหตุ: ห้ามใช้ค่า "contrast ratio" ตัดสินว่าสองสถานะแยกออกจากกันได้ — มันวัดแค่ความสว่าง
+   ม่วงอ่อนกับแดงอ่อนที่สว่างเท่ากันจะได้ 1.00 ทั้งที่ตาเห็นต่างชัด ต้องใช้ ΔE2000 เท่านั้น
+   ลำดับความสำคัญของสถานะ (ตัวหลังทับตัวหน้า): ประจำ → ว่าง → ยกเลิก → ค้างชำระ → ลา → ขาด → จร
+   "จร" อยู่ท้ายสุดเพราะเป็นผู้ครอบครองล็อคจริงในวันนั้น จึงควรเป็นสีที่ผู้จัดเห็นเป็นอันดับแรก
+   ═══════════════════════════════════════════════════════════════════════════ */
+:root{
+  /* ล็อคว่าง — เทากลางไม่มีอมฟ้า (เดิมอมฟ้าจึงใกล้กับสีล็อคจนแยกยาก: ΔE 7.1) */
+  --st-vac-bg:#e4e7ec; --st-vac-bd:#6b7280; --st-vac-tx:#1f2937;
+  /* ล็อคจร (ผู้ค้าจรวันนี้) — ฟ้าเข้มขึ้นเพื่อถอยห่างจากสีล็อคว่างให้ชัด */
+  --st-day-bg:#b9d5fb; --st-day-bd:#1d4ed8; --st-day-tx:#10275f;
+  /* แจ้งลา — ม่วง */
+  --st-lv-bg:#e3d9fe;  --st-lv-bd:#6d28d9;  --st-lv-tx:#3f1178;
+  /* ขาดล็อค — แดง */
+  --st-ab-bg:#fbc9c9;  --st-ab-bd:#b91c1c;  --st-ab-tx:#6f1616;
+  /* ค้างชำระ — ทองเข้ม (ไม่ใช้ส้ม เพราะส้มเป็นสีแบรนด์ตลาดวันพฤหัสฯ และเดิมใกล้กันเกินไป ΔE 6.9) */
+  --st-up-bg:#fbdf8a;  --st-up-bd:#92400e;  --st-up-tx:#5b3406;
+  /* ล็อคที่ไม่เปิดใช้ / ไม่มีในผัง */
+  --st-ex-bd:#8b95a3;
+}
+[data-theme="dark"]{
+  --st-vac-bg:#2c3138; --st-vac-bd:#8b939e; --st-vac-tx:#dfe3e8;
+  --st-day-bg:#0e2f75; --st-day-bd:#5b8def; --st-day-tx:#c3d9ff;
+  --st-lv-bg:#34176f;  --st-lv-bd:#a78bfa;  --st-lv-tx:#e4dbff;
+  --st-ab-bg:#6b1414;  --st-ab-bd:#f87171;  --st-ab-tx:#ffd9d9;
+  --st-up-bg:#55370a;  --st-up-bd:#e0a02a;  --st-up-tx:#ffe9b8;
+}
+
+/* ── เลขล็อคใหญ่ขึ้นเท่าตัว และเท่ากันทั้งสองแอพ ── */
+:root{ --lkw:78px; --lkh:60px; }
+.lk{ font-size:1.6rem; }
+.lk-id{ font-size:1.6rem !important; font-weight:900 !important; letter-spacing:-.02em; line-height:1.05; }
+.lk-shop{ font-size:.62rem !important; opacity:.9; }
+@media(max-width:700px){ :root{ --lkw:64px; --lkh:54px; } .lk,.lk-id{ font-size:1.35rem !important; } }
+@media(max-width:400px){ :root{ --lkw:56px; --lkh:48px; } .lk,.lk-id{ font-size:1.15rem !important; } }
+
+/* ── สถานะ ── */
+.lk.occupied{
+  background:var(--gl) !important; border-color:var(--gb) !important; color:var(--g) !important;
+  border-width:2px !important; font-weight:900;
+}
+[data-theme="dark"] .lk.occupied{ background:var(--gl) !important; border-color:var(--gt,var(--gb)) !important; color:#fff !important; }
+
+.lk.vacant{
+  background:var(--st-vac-bg) !important; border-color:var(--st-vac-bd) !important;
+  color:var(--st-vac-tx) !important; border-width:2px !important; border-style:dashed !important;
+}
+[data-theme="dark"] .lk.vacant{ background:var(--st-vac-bg) !important; border-color:var(--st-vac-bd) !important; color:var(--st-vac-tx) !important; }
+
+.lk.cancelled{
+  background:var(--st-vac-bg) !important; border-color:var(--st-vac-bd) !important;
+  color:var(--st-vac-tx) !important; border-width:2px !important; border-style:dashed !important;
+}
+[data-theme="dark"] .lk.cancelled{ background:var(--st-vac-bg) !important; border-color:var(--st-vac-bd) !important; color:var(--st-vac-tx) !important; }
+
+.lk.unpaid{
+  background:var(--st-up-bg) !important; border-color:var(--st-up-bd) !important;
+  color:var(--st-up-tx) !important; border-width:2px !important; border-style:solid !important;
+}
+[data-theme="dark"] .lk.unpaid{ background:var(--st-up-bg) !important; border-color:var(--st-up-bd) !important; color:var(--st-up-tx) !important; }
+
+/* แจ้งลา — เดิมใช้ outline อย่างเดียวจึงมองแทบไม่ออกบนจอใหญ่ ตอนนี้เปลี่ยนพื้น+ขอบ+outline ครบ */
+.lk.is-leave{
+  background:var(--st-lv-bg) !important; border-color:var(--st-lv-bd) !important;
+  color:var(--st-lv-tx) !important; border-width:2px !important; border-style:solid !important;
+  outline:3px solid var(--st-lv-bd) !important; outline-offset:1px !important;
+}
+.lk.is-absent{
+  background:var(--st-ab-bg) !important; border-color:var(--st-ab-bd) !important;
+  color:var(--st-ab-tx) !important; border-width:2px !important; border-style:solid !important;
+  outline:3px solid var(--st-ab-bd) !important; outline-offset:1px !important;
+}
+/* ล็อคจร — ต้องต่างจากล็อคว่างชัดเจน (เดิมเป็นสีเดียวกัน) และชนะทุกสถานะเพราะเป็นผู้ใช้ล็อควันนี้ */
+.lk.is-daily{
+  background:var(--st-day-bg) !important; border-color:var(--st-day-bd) !important;
+  color:var(--st-day-tx) !important; border-width:2px !important; border-style:solid !important;
+  outline:3px solid var(--st-day-bd) !important; outline-offset:1px !important;
+  filter:none !important;
+}
+.lk.excluded{ border-color:var(--st-ex-bd) !important; }
+.lk.highlight{ outline:4px solid var(--gm) !important; outline-offset:2px !important; }
+
+/* จุดสีในแถบคำอธิบาย (legend) ให้ตรงกับสีจริงบนผัง — เดิมบางจุด hardcode คนละสี */
+.leg-dot{ width:13px; height:13px; border-radius:4px; border:1.5px solid rgba(0,0,0,.18); }
+[data-theme="dark"] .leg-dot{ border-color:rgba(255,255,255,.25); }
+.leg-dot.d-occupied{ background:var(--gl); border-color:var(--gb); }
+.leg-dot.d-vacant{ background:var(--st-vac-bg); border-color:var(--st-vac-bd); }
+.leg-dot.d-daily{ background:var(--st-day-bg); border-color:var(--st-day-bd); }
+.leg-dot.d-leave{ background:var(--st-lv-bg); border-color:var(--st-lv-bd); }
+.leg-dot.d-absent{ background:var(--st-ab-bg); border-color:var(--st-ab-bd); }
+.leg-dot.d-unpaid{ background:var(--st-up-bg); border-color:var(--st-up-bd); }
+</style>
+<!-- ==== PM_STATUS_COLORS:END ==== -->
 </head>
 <body>
 <div class="topbar">
@@ -166,14 +420,14 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(
 </div>
 <div class="toolbar">
   <div style="display:flex;gap:5px;flex-wrap:wrap">
+<!-- PM_LEGEND_V2 -->
     <div class="leg active" onclick="setFilter('',this)"><div class="leg-dot" style="background:var(--bd2)"></div>ทั้งหมด</div>
-    <div class="leg" onclick="setFilter('occupied',this)"><div class="leg-dot" style="background:#f97316"></div>มีผู้เช่า</div>
-    <div class="leg" onclick="setFilter('vacant',this)"><div class="leg-dot" style="background:var(--y)"></div>ว่าง</div>
-    <div class="leg" onclick="setFilter('unpaid',this)"><div class="leg-dot" style="background:var(--o)"></div>ค้างชำระ</div>
-    <div class="leg" onclick="setFilter('leave',this)"><div class="leg-dot" style="background:#7c3aed"></div>แจ้งลา</div>
-    <div class="leg" onclick="setFilter('absent',this)"><div class="leg-dot" style="background:var(--r)"></div>ขาดล็อค</div>
-    <div class="leg" onclick="setFilter('daily',this)"><div class="leg-dot" style="background:var(--y)"></div>มีจร</div>
-  </div>
+    <div class="leg" onclick="setFilter('occupied',this)"><div class="leg-dot d-occupied"></div>ผู้ค้าประจำ</div>
+    <div class="leg" onclick="setFilter('vacant',this)"><div class="leg-dot d-vacant"></div>ล็อคว่าง</div>
+    <div class="leg" onclick="setFilter('unpaid',this)"><div class="leg-dot d-unpaid"></div>ค้างชำระ</div>
+    <div class="leg" onclick="setFilter('leave',this)"><div class="leg-dot d-leave"></div>แจ้งลา</div>
+    <div class="leg" onclick="setFilter('absent',this)"><div class="leg-dot d-absent"></div>ขาดล็อค</div>
+    <div class="leg" onclick="setFilter('daily',this)"><div class="leg-dot d-daily"></div>ล็อคจร</div>
   <input class="sbox" id="searchBox" aria-label="ค้นหาล็อค / ร้าน" placeholder="🔍 ค้นหาล็อค / ร้านค้า..." oninput="doSearch(this.value)">
   <div class="stats-bar" id="statsBar"></div>
 </div>
@@ -378,6 +632,64 @@ function getLastThursday(){
   d.setDate(d.getDate()-(dow>=4?dow-4:7-(4-dow)));
   d.setHours(0,0,0,0); return d;
 }
+
+// ════════════════════════════════════════════════════
+// SYNC สถานะ ลา/ขาด/จร จาก GOOGLE SHEETS  (เพิ่ม/แก้ 2026-07-26 — บั๊ก #31)
+// อาการที่ผู้ใช้แจ้ง: "สีสถานะแจ้งลา แจ้งขาดล็อค ล็อคจร ปรากฏเฉพาะในโทรศัพท์ ในเบราว์เซอร์ไม่ปรากฏ"
+// ต้นเหตุ: สถานะรายวันถูกเก็บใน localStorage ของเครื่องที่กดบันทึก (กลไกวงจร 3 วัน) เครื่องอื่นจึงไม่เห็น
+//   · ฝั่งนี้เดิมไม่มีการดึงสถานะกลับจาก Sheets เลย (หรือดึงด้วย "วันที่วันนี้" ซึ่งไม่ใช่วันตลาด)
+// ทางแก้: ดึงจาก Sheets โดยอ้างอิง "วันตลาดล่าสุด" (ไม่ใช่วันนี้) แล้ว merge ทับ state ในเครื่อง
+//   ทำให้ผู้จัดตลาดทุกคน/ทุกอุปกรณ์เห็นสถานะชุดเดียวกันเสมอ
+// ════════════════════════════════════════════════════
+function marketDayTH(){
+  // แปลง "วันตลาดล่าสุด" เป็นข้อความไทยรูปแบบเดียวกับที่ทุกโมดูลใช้บันทึกลงคอลัมน์ date
+  const d=getLastThursday();
+  return d.getDate()+' '+MONS[d.getMonth()]+' '+(d.getFullYear()+543);
+}
+window.PM_MARKET_DAY_TH = marketDayTH;
+async function loadFromSheets(){
+  if(!getApiUrl()) return;                 // ยังไม่เชื่อมต่อ Sheets — ใช้ state ในเครื่องอย่างเดียว
+  const day=marketDayTH();
+  try{
+    const [leaveRows,dailyRows]=await Promise.all([
+      apiGet('getLeaveLog',{date:day}),
+      apiGet('getDailyBookings',{date:day}),
+    ]);
+    if(Array.isArray(leaveRows)){
+      // เรียงตามเวลาที่บันทึกจริง แล้วไล่ทับ — แถวหลังสุดของแต่ละล็อคชนะ
+      const sorted=[...leaveRows].sort((a,b)=>String(a.created_at||a.time).localeCompare(String(b.created_at||b.time)));
+      const seen={};
+      sorted.forEach(r=>{
+        if(!r.lock_id) return;
+        if(r.type==='leave'||r.type==='absent'){ seen[r.lock_id]=r.type; }
+        else if(r.type==='cancel'||r.type==='leave_cancel'||r.type==='absent_cancel'){ seen[r.lock_id]=''; }
+      });
+      // ล้างสถานะของล็อคที่ Sheets บอกว่าไม่มีสถานะแล้ว (กันสถานะค้างในเครื่องที่เคยบันทึกไว้)
+      Object.keys(seen).forEach(id=>{ if(seen[id]) lockAbsent[id]=seen[id]; else delete lockAbsent[id]; });
+    }
+    if(Array.isArray(dailyRows)){
+      dailyRows.forEach(row=>{
+        const id=row.lock_id; if(!id) return;
+        const cancelled=row.cancelled===true||row.cancelled==='TRUE'||row.cancelled==='true';
+        if(cancelled){ delete dailyBookings[id]; return; }
+        dailyBookings[id]={
+          lockId:id, name:row.vendor_name, product:row.product,
+          phone:row.phone||'—', price:parseFloat(row.price)||0,
+          elec:parseFloat(row.elec)||0, total:parseFloat(row.total)||0,
+          method:row.method, date:row.date, time:row.time,
+        };
+      });
+    }
+    document.querySelectorAll('.lk').forEach(el=>refreshLk(el));
+    updateStats();
+    saveMarketState();
+  }catch(e){ console.error('loadFromSheets error:',e); }
+}
+// รีเฟรชเมื่อ shell แจ้งว่ามีการบันทึกข้อมูลจากแท็บอื่น (กลไก postMessage ที่เพิ่มไว้ 2026-07-23)
+window.addEventListener('message',function(e){
+  if(e&&e.data&&e.data.type==='pm-refresh'){ if(typeof loadFromSheets==='function') loadFromSheets(); }
+});
+
 function addDays(date,n){const d=new Date(date);d.setDate(d.getDate()+n);return d;}
 
 function saveMarketState(){
@@ -449,7 +761,7 @@ function showStateBanner(tue,dl){
   }
   const d=new Date(tue);
   const dStr=d.getDate()+' '+MONS[d.getMonth()]+' '+(d.getFullYear()+543);
-  const col=dl<=1?'#fca5a5':dl<=2?'#fde68a':'#86efac';
+  const col=dl<=1?'#fca5a5':dl<=2?'#fde68a':'#fed7aa';
   b.innerHTML='<span>📅 สถานะวันพฤหัสบดี <strong>'+dStr+'</strong> · รีเซ็ตอีก <span style="color:'+col+'">'+dl+' วัน</span></span>'
     +'<button onclick="if(confirm(\'ล้างสถานะทั้งหมด?\'))clearMarketState()" style="background:rgba(255,255,255,.18);border:1.5px solid rgba(255,255,255,.28);color:#fff;padding:3px 10px;border-radius:8px;cursor:pointer;font-size:.64rem;font-weight:700;font-family:inherit">🔄 รีเซ็ต</button>';
 }
@@ -523,7 +835,7 @@ async function confirmLeave(){
   const el=document.querySelector('.lk[data-id="'+id+'"]');
   if(el) refreshLk(el);
   const shop=el?.dataset.shop||'';
-  await apiPost('logLeave',{data:{lock_id:id,zone:el?.dataset.zone||'',shop,type:'leave',note:note||'',manager:getCurrentUserName(),date:nowTH(),time:nowTime()}});
+  await apiPost('logLeave',{data:{lock_id:id,zone:el?.dataset.zone||'',shop,type:'leave',note:note||'',manager:getCurrentUserName(),date:marketDayTH(),time:nowTime()}});
   document.getElementById('leaveModal').classList.remove('show');
   saveMarketState(); updateExpireBanner();
   toast('✅ บันทึกแจ้งลาล็อค '+id+' (คงอยู่ 3 วัน)','s');
@@ -537,7 +849,7 @@ async function doAbsent(lockId){
   const el=document.querySelector('.lk[data-id="'+lockId+'"]');
   if(el) refreshLk(el);
   const shop=el?.dataset.shop||'';
-  await apiPost('logLeave',{data:{lock_id:lockId,zone:el?.dataset.zone||'',shop,type:'absent',note:'บันทึกโดยผู้ดูแล',manager:getCurrentUserName(),date:nowTH(),time:nowTime()}});
+  await apiPost('logLeave',{data:{lock_id:lockId,zone:el?.dataset.zone||'',shop,type:'absent',note:'บันทึกโดยผู้ดูแล',manager:getCurrentUserName(),date:marketDayTH(),time:nowTime()}});
   saveMarketState(); updateExpireBanner();
   closePopup();
   toast('⚠️ บันทึกขาดล็อค '+lockId+' (คงอยู่ 3 วัน)','e');
@@ -551,7 +863,7 @@ async function cancelAbsent(lockId){
   addHist(lockId,{type:'leave',label:'↩️ ยกเลิก'+(prevType==='leave'?'การแจ้งลา':'บันทึกขาดล็อค'),note:'คืนสถานะปกติโดยผู้ดูแล'});
   const el=document.querySelector('.lk[data-id="'+lockId+'"]');
   if(el) refreshLk(el);
-  await apiPost('logLeave',{data:{lock_id:lockId,zone:el?.dataset.zone||'',shop:el?.dataset.shop||'',type:prevType==='leave'?'leave_cancel':'absent_cancel',note:'คืนสถานะปกติโดยผู้ดูแล',manager:getCurrentUserName(),date:nowTH(),time:nowTime()}});
+  await apiPost('logLeave',{data:{lock_id:lockId,zone:el?.dataset.zone||'',shop:el?.dataset.shop||'',type:prevType==='leave'?'leave_cancel':'absent_cancel',note:'คืนสถานะปกติโดยผู้ดูแล',manager:getCurrentUserName(),date:marketDayTH(),time:nowTime()}});
   saveMarketState(); updateExpireBanner();
   closePopup();
   toast('↩️ ยกเลิก'+(prevType==='leave'?'การแจ้งลา':'ขาดล็อค')+' '+lockId+' — คืนสถานะปกติแล้ว','i');
@@ -763,7 +1075,7 @@ function showPopup(el,ev){
   document.getElementById('ppMgr').textContent=v.manager||'—';
 
   const stM={occupied:'✅ มีผู้เช่า',vacant:'🟡 ว่าง',cancelled:'🔴 ยกเลิก',unpaid:'🟠 ค้างชำระ'};
-  const stC={occupied:'background:#ffedd5;color:#1b4332',vacant:'background:#fef3c7;color:#78350f',cancelled:'background:#fee2e2;color:#7f1d1d',unpaid:'background:#ffedd5;color:#7c2d12'};
+  const stC={occupied:'background:#ffedd5;color:#7c2d12',vacant:'background:#fef3c7;color:#78350f',cancelled:'background:#fee2e2;color:#7f1d1d',unpaid:'background:#ffedd5;color:#7c2d12'};
   let stTxt=stM[d.status]||d.status;
   if(isDaily)stTxt+=' · 🏷️จร';
   const stEl=document.getElementById('ppStatus');
@@ -807,7 +1119,7 @@ function showPopup(el,ev){
   // ป๊อปอัพนี้จึงเหลือแค่ลิงก์ทางลัดไปหน้าคิว แทนปุ่มขายทันทีแบบเดิม
   if(isAvailForDaily&&!isDaily) acts+='<button class="pp-btn b-daily" onclick="goToFloatingQueue(\''+lockId+'\')">🏷️ ไปหน้าคิวจองล็อคจร</button>';
   if(isDaily) acts+='<button class="pp-btn b-cancel" onclick="cancelDaily(\''+lockId+'\')">✕ ยกเลิกจร</button>';
-  if(isVacant) acts+='<button class="pp-btn" style="background:#dcfce7;color:#15803d" onclick="goRegisterLock(\''+lockId+'\',\''+(d.zone||'')+'\')">➕ เพิ่มผู้ค้าประจำ</button>';
+  if(isVacant) acts+='<button class="pp-btn" style="background:#ffedd5;color:#c2410c" onclick="goRegisterLock(\''+lockId+'\',\''+(d.zone||'')+'\')">➕ เพิ่มผู้ค้าประจำ</button>';
   if(isOccupied||isDaily){
     acts+='<button class="pp-btn" style="background:var(--gll);color:var(--gm);flex-basis:100%" onclick="openEditVendorModal(\''+lockId+'\')">✏️ แก้ไขข้อมูลผู้ค้า</button>';
     acts+='<button class="pp-btn" style="background:var(--bl);color:var(--b)" onclick="openMoveModal(\''+lockId+'\')">🔄 ย้ายล็อค</button>';
@@ -1156,6 +1468,7 @@ function buildAll(){
   buildTailgateZone();
   updateStats();
   loadVendorOccupancy();
+  loadFromSheets();   // PM_SYNC_BOOT ซิงก์สถานะลา/ขาด/จร ของวันตลาดล่าสุดจาก Sheets (บั๊ก #31)
 }
 
 function switchZone(z,btn){

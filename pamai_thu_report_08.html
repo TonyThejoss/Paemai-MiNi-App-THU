@@ -3,16 +3,16 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>รายงานรายได้ค่าไฟฟ้าแยกโซน — แพไม้มินิ วันพฤหัสบดี</title>
+<title>รายงานส่วนลดค่าเช่า — แพไม้มินิ</title>
 <style>a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible,[tabindex]:focus-visible,.lk:focus-visible,.zone-tab:focus-visible{outline:2.5px solid var(--gm) !important;outline-offset:2px;}.ico{width:1em;height:1em;display:inline-block;vertical-align:-0.15em;flex-shrink:0}
 :root{
   --g:#7c2d12;--gm:#c2410c;--gb:#ea580c;--gl:#ffedd5;--gll:#fff7ed;
   --r:#b91c1c;--rl:#fee2e2;--o:#c2410c;--ol:#fff7ed;
   --y:#92400e;--yl:#fffbeb;
-  --bg:#eef2f0;--sf:#fff;--sf2:#f4f8f5;--bd:#d0ddd5;--bd2:#a8c0b0;
-  --tx:#0a1a10;--txm:#2e4a38;--txl:#4d6854;
+  --bg:#eef2f0;--sf:#fff;--sf2:#f4f8f5;--bd:#d0ddd5;--bd2:#c7b4a0;
+  --tx:#0a1a10;--txm:#4c3c2c;--txl:#725a43;
 }
-[data-theme="dark"]{--bg:#090f0b;--sf:#0f1a13;--sf2:#141f17;--bd:#243028;--bd2:#364d3c;--tx:#d8ead0;--txm:#8aab8e;--txl:#8ca696;--gl:#2d1200;--gll:#1a0f06;--rl:#1f0a0a;--ol:#1a0f06;--bl:#091228;--yl:#120f06;}
+[data-theme="dark"]{--bg:#090f0b;--sf:#0f1a13;--sf2:#141f17;--bd:#243028;--bd2:#534230;--tx:#eadad0;--txm:#b59a80;--txl:#b4997e;--gl:#2d1200;--gll:#1a0f06;--rl:#1f0a0a;--ol:#1a0f06;--bl:#091228;--yl:#120f06;}
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
 body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--tx);font-size:13px;}
 .toolbar{position:sticky;top:0;z-index:50;background:linear-gradient(135deg,var(--g),var(--gm));color:#fff;padding:10px 18px;display:flex;align-items:center;justify-content:space-between;box-shadow:0 2px 12px rgba(0,0,0,.25);flex-wrap:wrap;gap:8px;}
@@ -62,26 +62,434 @@ tfoot.zone-total td{font-weight:800;background:var(--gll);border-top:2px solid v
   @page{size:A4 landscape;margin:12mm;}
 }
 </style>
+<!-- ==== PM_MOBILE_KIT:START (สร้างโดย tools/inject_mobile_kit.py — ห้ามแก้ในไฟล์นี้) ==== -->
+<style id="pm-mobile-kit">
+/* ═══════════════════════════════════════════════════════════════════════════
+   PM MOBILE KIT — Mobile-First / Responsive / Thai typography (2026-07-26)
+   เป้าหมาย: ทุกหน้าใช้งานได้เต็มจอบนสมาร์ทโฟนทุกขนาด ไม่มีเนื้อหาล้นขอบจอด้านข้าง
+   (no horizontal overflow), ตัวอักษรไทยตัดบรรทัดถูกต้อง, ปุ่มกดง่ายด้วยนิ้วโป้ง,
+   เว้นระยะขอบบน-ล่างไม่ให้ชิดจอ
+   หมายเหตุเชิงเทคนิค: ตั้งใจ "ไม่" ใส่ viewport-fit=cover เพราะถ้าไม่ใส่ เบราว์เซอร์จะกันพื้นที่
+   รอยบาก (notch) ให้อยู่แล้วโดยอัตโนมัติ การใส่ cover แล้วจัดการ env() เองมีความเสี่ยงที่เนื้อหา
+   จะไปอยู่ใต้รอยบากถ้าพลาดจุดใดจุดหนึ่ง — เราจึงใช้ env() เป็น "ระยะเสริม" (max()) เท่านั้น
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* ── 1) พื้นฐาน: กันล้นขอบจอ + ฟอนต์ไทย ── */
+html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
+*, *::before, *::after { min-width: 0; }               /* ตัวการอันดับ 1 ของ overflow ใน flex/grid */
+body {
+  overflow-x: hidden;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Sarabun",
+               "Noto Sans Thai", "Leelawadee UI", "Thonburi", system-ui,
+               "Helvetica Neue", Arial, sans-serif;
+  overflow-wrap: break-word;                           /* ตัดเฉพาะเมื่อคำเดียวยาวเกินกรอบ */
+  word-break: normal;                                  /* ห้าม break-all — ทำให้ไทยตัดกลางพยางค์ */
+  line-break: auto;
+}
+img, svg, canvas, video, table { max-width: 100%; }
+input, select, textarea, button { font-family: inherit; max-width: 100%; }
+
+/* ── 2) ตารางเลื่อนแนวนอนได้เอง (wrapper ถูกใส่ให้อัตโนมัติโดยสคริปต์ท้ายไฟล์) ── */
+.pm-tablewrap {
+  width: 100%; max-width: 100%; overflow-x: auto; overflow-y: hidden;
+  -webkit-overflow-scrolling: touch; overscroll-behavior-x: contain;
+}
+.pm-tablewrap > table { min-width: 100%; }
+
+/* ── 3) แท็บเล็ต ── */
+@media (max-width: 900px) {
+  .two-col { grid-template-columns: 1fr !important; }
+  .g2 { grid-template-columns: 1fr !important; }
+  .kgrid, .kpi-grid, .kpi-row, .mgrid, .summary-grid { grid-template-columns: repeat(3, 1fr) !important; }
+}
+
+/* ── 4) สมาร์ทโฟน ── */
+@media (max-width: 640px) {
+  body { padding-bottom: max(18px, env(safe-area-inset-bottom)); }
+
+  /* กริดสรุป/KPI → 2 คอลัมน์ อ่านง่ายกว่าบีบ 5 ช่องในจอ 360px */
+  .kgrid, .kpi-grid, .kpi-row, .mgrid, .summary-grid,
+  .elec-types, .grid { grid-template-columns: repeat(2, 1fr) !important; }
+  /* ฟอร์ม 2 ช่องต่อแถว → 1 ช่องต่อแถว */
+  .frow, .m-row, .field-row { grid-template-columns: 1fr !important; }
+
+  /* แถบหัวเรื่อง/เครื่องมือ: ให้ห่อบรรทัดได้ ไม่ดันจนล้นจอ */
+  .toolbar, .topbar, .tb-actions, .filter-row, .action-btns,
+  .modal-btns, .option-row, .date-filter, .items-title, .summary-title {
+    flex-wrap: wrap !important;
+  }
+  .toolbar, .topbar { padding-left: 12px !important; padding-right: 12px !important; row-gap: 8px; }
+  .toolbar { padding-top: max(10px, env(safe-area-inset-top)) !important; }
+  .topbar  { padding-top: max(10px, env(safe-area-inset-top)) !important; }
+
+  /* พื้นที่กดขั้นต่ำ 44px ตาม WCAG 2.5.5 / Apple HIG — ผู้จัดตลาดกดด้วยนิ้วโป้งกลางตลาด */
+  button, .btn, .tb-btn, a.btn, input[type=checkbox], input[type=radio] { min-height: 40px; }
+  /* ปุ่มไอคอนเล็ก ๆ ที่ฝังในช่องกรอก (เช่น ปุ่มดู/ซ่อนรหัสผ่าน) และลิงก์ในเมนู */
+  .pw-eye, .icon-btn, .btn-rm { min-width: 40px; min-height: 40px; }
+  .ni, .sidebar a, a.ni { min-height: 44px; }
+  input[type=checkbox], input[type=radio] { min-width: 22px; min-height: 22px; }
+  .btn-sm, .tb-btn { min-height: 38px; }
+  /* iOS ซูมเองถ้า font-size < 16px ในช่องกรอก — ล็อคไว้ที่ 16px กัน layout เพี้ยน */
+  input, select, textarea { font-size: 16px !important; }
+
+  /* หน้ารายงาน: ตัดกรอบกระดาษ A4 ออกบนมือถือให้ใช้ความกว้างเต็มจอ */
+  .page { margin: 10px auto !important; padding: 14px 12px !important; border-radius: 8px !important; }
+  .r-head { flex-direction: column; gap: 6px; }
+  .r-meta { text-align: left !important; }
+  .sign-area { flex-direction: column; gap: 18px; align-items: flex-start; }
+
+  /* หน้ารับชำระหลายล็อค (batch payment) — เดิมไม่มี @media เลย
+     .layout เป็น flex 2 คอลัมน์ + height:100vh + overflow:hidden ทำให้ฝั่งขวาหลุดออกนอกจอ
+     และเลื่อนดูไม่ได้บนมือถือ → เปลี่ยนเป็นเรียงลงล่างและให้หน้าเลื่อนตามปกติ */
+  .layout {
+    flex-direction: column !important; height: auto !important;
+    min-height: 0 !important; overflow: visible !important;
+  }
+  .left-panel, .right-panel {
+    width: 100% !important; max-width: 100% !important; flex: none !important;
+    border-right: none !important; border-left: none !important;
+  }
+  .right-scroll { overflow: visible !important; padding: 14px 12px !important; }
+  .lock-item { flex-wrap: wrap; }
+
+  /* โมดัล: สูงไม่เกินจอ เลื่อนในตัวได้ ไม่ชิดขอบล่าง */
+  .modal, .modal-box, .m-box, .modal-content, .confirm-box {
+    max-width: calc(100vw - 20px) !important;
+    max-height: calc(100vh - 40px) !important;
+    overflow-y: auto !important;
+    margin-bottom: max(10px, env(safe-area-inset-bottom));
+  }
+
+  /* แถบเมนู/sidebar ที่เลื่อนแนวนอน */
+  .sidebar, .side, .nav { max-width: 100% !important; }
+}
+
+/* ── 5) จอเล็กมาก (iPhone SE / 320-360px) ── */
+@media (max-width: 380px) {
+  .kgrid, .kpi-grid, .kpi-row, .mgrid, .summary-grid { grid-template-columns: 1fr !important; }
+  .toolbar h1, .topbar h1 { font-size: .82rem !important; }
+}
+
+/* ── 6) โหมดแนวนอนจอเตี้ย: อย่าล็อคความสูงเป็น 100vh ── */
+@media (max-height: 480px) and (orientation: landscape) {
+  .layout { height: auto !important; overflow: visible !important; }
+}
+
+/* ── 7) พิมพ์: ยกเลิกทุกอย่างของ mobile kit ที่อาจกวนการพิมพ์รายงาน ── */
+@media print {
+  .pm-tablewrap { overflow: visible !important; }
+  body { padding-bottom: 0 !important; overflow: visible !important; }
+}
+</style>
+<script id="pm-mobile-kit-js">
+/* ครอบ <table> ทุกตัวด้วยกล่องเลื่อนแนวนอน เพื่อไม่ให้ตารางกว้างดันหน้าจอล้น
+   ทำด้วย JS เพราะแก้ CSS ล้วนไม่ได้ (ต้องมี element ครอบ) และทำแบบนี้ไม่กระทบ layout เดิมบนเดสก์ท็อป
+   ใช้ MutationObserver เพราะเกือบทุกหน้าสร้างตารางด้วย innerHTML หลังโหลดข้อมูลจาก Sheets เสร็จ */
+(function () {
+  function wrapTables(root) {
+    var tables = (root || document).querySelectorAll ? (root || document).querySelectorAll('table') : [];
+    for (var i = 0; i < tables.length; i++) {
+      var t = tables[i];
+      if (t.parentElement && t.parentElement.classList.contains('pm-tablewrap')) continue;
+      if (t.closest && t.closest('.pm-tablewrap')) continue;
+      var w = document.createElement('div');
+      w.className = 'pm-tablewrap';
+      t.parentNode.insertBefore(w, t);
+      w.appendChild(t);
+    }
+  }
+  function boot() {
+    wrapTables(document);
+    try {
+      new MutationObserver(function (muts) {
+        for (var i = 0; i < muts.length; i++) {
+          for (var j = 0; j < muts[i].addedNodes.length; j++) {
+            var n = muts[i].addedNodes[j];
+            if (n.nodeType !== 1) continue;
+            if (n.tagName === 'TABLE') { wrapTables(n.parentNode); }
+            else if (n.querySelector && n.querySelector('table')) { wrapTables(n); }
+          }
+        }
+      }).observe(document.body, { childList: true, subtree: true });
+    } catch (e) { /* เบราว์เซอร์เก่า — ยังได้ตารางชุดแรกที่ wrap ไปแล้ว */ }
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot);
+  else boot();
+})();
+</script>
+<!-- ==== PM_MOBILE_KIT:END ==== -->
+<!-- ==== PM_REPORT_FILTER:START (สร้างโดย tools/inject_report_filter.py) ==== -->
+<style id="pm-report-filter-css">
+.pm-fbar{display:flex;flex-wrap:wrap;align-items:flex-end;gap:10px;margin-bottom:14px;
+  background:var(--sf2,#f4f8f5);border:1px solid var(--bd,#d0ddd5);border-radius:10px;padding:10px 12px;}
+.pm-fgrp{display:flex;flex-direction:column;gap:3px;min-width:0;}
+.pm-fgrp>label{font-size:.64rem;font-weight:800;color:var(--txm,#4c3c2c);letter-spacing:.01em;}
+.pm-fbar select,.pm-fbar input{padding:6px 9px;border:1.5px solid var(--bd,#d0ddd5);border-radius:7px;
+  font-size:.76rem;font-family:inherit;background:#fff;color:var(--tx,#0a1a10);min-height:34px;}
+.pm-fbar .pm-fbtn{padding:7px 14px;background:var(--gm,#c2410c);color:#fff;border:none;border-radius:7px;
+  font-size:.74rem;font-weight:800;cursor:pointer;font-family:inherit;min-height:34px;}
+.pm-fbar .pm-fbtn.ghost{background:transparent;color:var(--gm,#c2410c);border:1.5px solid var(--gm,#c2410c);}
+.pm-fbar .pm-fbtn:hover{filter:brightness(1.08);}
+.pm-fsum{font-size:.68rem;color:var(--txl,#9c7c5b);width:100%;margin-top:2px;}
+.pm-fsum b{color:var(--gm,#c2410c);}
+.pm-hidden{display:none !important;}
+@media (max-width:640px){
+  .pm-fbar{gap:8px;padding:10px;}
+  .pm-fgrp{flex:1 1 calc(50% - 8px);}
+  .pm-fgrp.pm-wide{flex:1 1 100%;}
+  .pm-fbar select,.pm-fbar input{width:100%;}
+  .pm-fbar .pm-fbtn{flex:1 1 calc(50% - 8px);}
+}
+@media print{ .pm-fbar{display:none !important;} }
+</style>
+<script id="pm-report-filter-js">
+/* ═══════════════════════════════════════════════════════════════════════════
+   PM REPORT FILTER KIT — ตัวกรองกลางของทุกรายงาน (2026-07-26)
+   ใช้งานในไฟล์รายงาน:
+     · PM_FILTER.mount({date:true, zone:true})  → สร้างแถบตัวกรอง (เรียกครั้งเดียวตอนโหลด)
+     · PM_FILTER.apiParams()                    → {date:'YYYY-MM-DD'} | {from,to} | {month:'YYYY-MM'}
+     · PM_FILTER.zone()                          → '' (ทุกโซน) หรือรหัสโซน
+     · PM_FILTER.byZone(rows,'zone')             → กรองแถวตามโซนที่เลือก
+     · PM_FILTER.label()                         → ข้อความช่วงเวลาที่เลือก สำหรับพาดหัวรายงาน
+   ค่าเริ่มต้น: ทุกโซน + วันปัจจุบัน (ตามข้อกำหนด)
+   ═══════════════════════════════════════════════════════════════════════════ */
+window.PM_FILTER = (function () {
+  var MONS_FULL = ['มกราคม','กุมภาพันธ์','มีนาคม','เมษายน','พฤษภาคม','มิถุนายน',
+                   'กรกฎาคม','สิงหาคม','กันยายน','ตุลาคม','พฤศจิกายน','ธันวาคม'];
+  var MONS_ABBR = ['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
+  var cfg = { date: true, zone: true, onChange: null };
+
+  function pad(n) { return ('0' + n).slice(-2); }
+  function todayISO() {
+    var n = new Date();
+    return n.getFullYear() + '-' + pad(n.getMonth() + 1) + '-' + pad(n.getDate());
+  }
+  function isoToTH(iso) {
+    if (!iso) return '';
+    var p = String(iso).split('-');
+    if (p.length < 3) return iso;
+    return parseInt(p[2], 10) + ' ' + MONS_ABBR[parseInt(p[1], 10) - 1] + ' ' + (parseInt(p[0], 10) + 543);
+  }
+  // วันตลาดล่าสุด — ตลาดเปิดสัปดาห์ละวัน รายงานประจำวันจึงมักต้องการวันนี้
+  // (build.py แปลง getDay()===4 → ===4 ให้ฝั่งวันพฤหัสฯ อัตโนมัติ ห้ามเขียนรูปแบบอื่น)
+  function isMarketDay(d) { return d.getDay() === 2; }
+  function lastMarketDayISO() {
+    var d = new Date();
+    for (var i = 0; i < 7; i++) { if (isMarketDay(d)) break; d.setDate(d.getDate() - 1); }
+    return d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate());
+  }
+
+  function zoneOptions() {
+    // ดึงรายชื่อโซนจากตัวแปรผังโซนของรายงานนั้น ๆ (แต่ละฉบับใช้ชื่อไม่เหมือนกัน)
+    // ทำแบบนี้เพื่อไม่ต้องมี MARKET_BLOCK ใหม่อีกบล็อค — โซนของสองตลาดต่างกันอยู่แล้วในตัวแปรเดิม
+    var z = [];
+    try {
+      if (typeof ZONE_ORDER !== 'undefined' && ZONE_ORDER) z = [].concat(ZONE_ORDER);
+      else if (typeof ZONE_TOTALS !== 'undefined' && ZONE_TOTALS) z = Object.keys(ZONE_TOTALS);
+      else if (typeof ZONE_LOCKS !== 'undefined' && ZONE_LOCKS) z = Object.keys(ZONE_LOCKS);
+      else if (typeof ZONE_GROUPS !== 'undefined' && ZONE_GROUPS) {
+        Object.keys(ZONE_GROUPS).forEach(function (g) {
+          var v = ZONE_GROUPS[g];
+          if (Array.isArray(v)) z = z.concat(v);
+        });
+      }
+    } catch (e) {}
+    if (!z.length && window.PM_ZONES_FALLBACK) z = [].concat(window.PM_ZONES_FALLBACK);
+    // ไม่ซ้ำ + คงลำดับเดิม
+    var seen = {}, out = [];
+    z.forEach(function (x) { if (x && !seen[x]) { seen[x] = 1; out.push(x); } });
+    return out;
+  }
+
+  function yearOptions() {
+    var y = new Date().getFullYear(), out = [];
+    for (var i = y + 1; i >= y - 4; i--) out.push(i);
+    return out;
+  }
+
+  function html() {
+    var zones = zoneOptions();
+    var zoneHtml = cfg.zone ? (
+      '<div class="pm-fgrp"><label for="pmf-zone">โซน</label>' +
+      '<select id="pmf-zone"><option value="">ทุกโซน</option>' +
+      zones.map(function (z) { return '<option value="' + z + '">โซน ' + z + '</option>'; }).join('') +
+      '</select></div>') : '';
+    if (!cfg.date) {
+      return '<div class="pm-fbar">' + zoneHtml +
+        '<div class="pm-fgrp"><label>&nbsp;</label>' +
+        '<button class="pm-fbtn" onclick="PM_FILTER.apply()">ดูข้อมูล</button></div>' +
+        '<div class="pm-fsum" id="pmf-sum"></div></div>';
+    }
+    var thisY = new Date().getFullYear(), thisM = new Date().getMonth() + 1;
+    return '' +
+      '<div class="pm-fbar">' +
+        zoneHtml +
+        '<div class="pm-fgrp"><label for="pmf-mode">ช่วงเวลา</label>' +
+          '<select id="pmf-mode" onchange="PM_FILTER.modeChanged()">' +
+            '<option value="day">วันเดียว</option>' +
+            '<option value="range">ช่วงวันที่</option>' +
+            '<option value="month">เดือน / ปี</option>' +
+            '<option value="all">ทั้งหมด</option>' +
+          '</select></div>' +
+        '<div class="pm-fgrp" id="pmf-g-day"><label for="pmf-date">วันที่</label>' +
+          '<input type="date" id="pmf-date" value="' + todayISO() + '"></div>' +
+        '<div class="pm-fgrp pm-hidden" id="pmf-g-from"><label for="pmf-from">ตั้งแต่วันที่</label>' +
+          '<input type="date" id="pmf-from" value="' + todayISO() + '"></div>' +
+        '<div class="pm-fgrp pm-hidden" id="pmf-g-to"><label for="pmf-to">ถึงวันที่</label>' +
+          '<input type="date" id="pmf-to" value="' + todayISO() + '"></div>' +
+        '<div class="pm-fgrp pm-hidden" id="pmf-g-month"><label for="pmf-month">เดือน</label>' +
+          '<select id="pmf-month">' + MONS_FULL.map(function (m, i) {
+            return '<option value="' + (i + 1) + '"' + (i + 1 === thisM ? ' selected' : '') + '>' + m + '</option>';
+          }).join('') + '</select></div>' +
+        '<div class="pm-fgrp pm-hidden" id="pmf-g-year"><label for="pmf-year">ปี (พ.ศ.)</label>' +
+          '<select id="pmf-year">' + yearOptions().map(function (y) {
+            return '<option value="' + y + '"' + (y === thisY ? ' selected' : '') + '>' + (y + 543) + '</option>';
+          }).join('') + '</select></div>' +
+        '<div class="pm-fgrp"><label>&nbsp;</label>' +
+          '<button class="pm-fbtn" onclick="PM_FILTER.apply()">ดูข้อมูล</button></div>' +
+        '<div class="pm-fgrp"><label>&nbsp;</label>' +
+          '<button class="pm-fbtn ghost" onclick="PM_FILTER.lastMarketDay()" ' +
+          'title="ตลาดเปิดสัปดาห์ละวัน — ปุ่มนี้ข้ามไปวันตลาดล่าสุดที่มีข้อมูล">วันตลาดล่าสุด</button></div>' +
+        '<div class="pm-fsum" id="pmf-sum"></div>' +
+      '</div>';
+  }
+
+  function el(id) { return document.getElementById(id); }
+  function mode() { var m = el('pmf-mode'); return m ? m.value : 'day'; }
+
+  function modeChanged() {
+    var m = mode();
+    var show = {
+      day:   ['pmf-g-day'],
+      range: ['pmf-g-from', 'pmf-g-to'],
+      month: ['pmf-g-month', 'pmf-g-year'],
+      all:   [],
+    }[m] || [];
+    ['pmf-g-day', 'pmf-g-from', 'pmf-g-to', 'pmf-g-month', 'pmf-g-year'].forEach(function (id) {
+      var g = el(id); if (g) g.classList.add('pm-hidden');
+    });
+    show.forEach(function (id) { var g = el(id); if (g) g.classList.remove('pm-hidden'); });
+  }
+
+  function apiParams() {
+    if (!cfg.date) return {};
+    var m = mode();
+    if (m === 'all') return {};
+    if (m === 'month') {
+      var y = el('pmf-year') ? el('pmf-year').value : new Date().getFullYear();
+      var mo = el('pmf-month') ? el('pmf-month').value : (new Date().getMonth() + 1);
+      return { month: y + '-' + pad(parseInt(mo, 10)) };
+    }
+    if (m === 'range') {
+      var f = el('pmf-from') ? el('pmf-from').value : '';
+      var t = el('pmf-to') ? el('pmf-to').value : '';
+      if (f && t && f > t) { var tmp = f; f = t; t = tmp; }   // ผู้ใช้สลับวันที่ → จัดให้เอง ไม่ error
+      var o = {}; if (f) o.from = f; if (t) o.to = t; return o;
+    }
+    var d = el('pmf-date') ? el('pmf-date').value : todayISO();
+    return d ? { date: d } : {};
+  }
+
+  function monthKey() {
+    // เดือนที่รายงานอ้างอิง (ใช้กับรายงานส่วนลด/ค่าเช่าที่คิดเป็นรายเดือน)
+    var p = apiParams();
+    if (p.month) return p.month;
+    if (p.date) return String(p.date).slice(0, 7);
+    if (p.from) return String(p.from).slice(0, 7);
+    return todayISO().slice(0, 7);
+  }
+
+  function label() {
+    if (!cfg.date) return zone() ? ('โซน ' + zone()) : 'ทุกโซน';
+    var p = apiParams(), t;
+    if (p.date) t = 'วันที่ ' + isoToTH(p.date);
+    else if (p.month) {
+      var pp = p.month.split('-');
+      t = 'เดือน' + MONS_FULL[parseInt(pp[1], 10) - 1] + ' ' + (parseInt(pp[0], 10) + 543);
+    } else if (p.from || p.to) t = isoToTH(p.from) + ' – ' + isoToTH(p.to);
+    else t = 'ทั้งหมด (ทุกช่วงเวลา)';
+    return t + ' · ' + (zone() ? 'โซน ' + zone() : 'ทุกโซน');
+  }
+
+  function zone() { var z = el('pmf-zone'); return z ? z.value : ''; }
+  function byZone(rows, field) {
+    var z = zone();
+    if (!z || !Array.isArray(rows)) return rows || [];
+    var f = field || 'zone';
+    return rows.filter(function (r) {
+      if (r && r[f]) return String(r[f]) === z;
+      // บางชีต (payments) ไม่มีคอลัมน์ zone — เดาจาก prefix ตัวอักษรของรหัสล็อคแทน
+      var lock = r && (r.lock_id || r.lock || '');
+      var m = String(lock).match(/^([A-Za-z]+)/);
+      return m ? m[1].toUpperCase() === z.toUpperCase() : false;
+    });
+  }
+
+  function syncSummary() {
+    var s = el('pmf-sum');
+    if (s) s.innerHTML = 'กำลังแสดง: <b>' + label() + '</b>';
+  }
+
+  function apply() {
+    syncSummary();
+    if (typeof cfg.onChange === 'function') cfg.onChange();
+    else if (typeof window.render === 'function') window.render();
+  }
+
+  function lastMarketDay() {
+    var m = el('pmf-mode'); if (m) m.value = 'day';
+    modeChanged();
+    var d = el('pmf-date'); if (d) d.value = lastMarketDayISO();
+    apply();
+  }
+
+  function mount(opts) {
+    cfg.date = !opts || opts.date !== false;
+    cfg.zone = !opts || opts.zone !== false;
+    if (opts && opts.onChange) cfg.onChange = opts.onChange;
+    var holder = document.querySelector('.date-filter');
+    if (holder) {
+      holder.outerHTML = html();
+    } else {
+      var body = el('reportBody');
+      if (!body) return;
+      var div = document.createElement('div');
+      div.innerHTML = html();
+      body.parentNode.insertBefore(div.firstChild, body);
+    }
+    modeChanged();
+    syncSummary();
+  }
+
+  return {
+    mount: mount, apply: apply, modeChanged: modeChanged, apiParams: apiParams,
+    zone: zone, byZone: byZone, label: label, monthKey: monthKey,
+    lastMarketDay: lastMarketDay, isoToTH: isoToTH, todayISO: todayISO,
+    lastMarketDayISO: lastMarketDayISO,
+  };
+})();
+</script>
+<!-- ==== PM_REPORT_FILTER:END ==== -->
 </head>
 <body>
 
 <div class="toolbar">
   <div>
-    <h1><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2 4 14h6l-1 8 9-13h-6l1-7z"/></svg> รายงานรายได้ค่าไฟฟ้าแยกโซน</h1>
-    <p>แพไม้มินิ วันพฤหัสบดี วันพฤหัสบดี · ข้อมูลสด จาก Google Sheets</p>
+    <h1><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M20.6 3.4A2 2 0 0 0 19.2 3H15l-9.6 9.6a2 2 0 0 0 0 2.8l5.2 5.2a2 2 0 0 0 2.8 0L23 11V6.8a2 2 0 0 0-.6-1.4Z"/><circle cx="17.5" cy="8.5" r="1.3" fill="currentColor" stroke="none"/></svg> รายงานส่วนลดค่าเช่า</h1>
+    <p>แพไม้มินิ วันพฤหัสบดี · แยกรายเดือน / รายล็อค / รายโซน / ทั้งตลาด · ข้อมูลสดจาก Google Sheets</p>
   </div>
   <div class="tb-actions">
-    <button class="tb-btn dm-toggle" onclick="toggleDark()" aria-label="สลับโหมดสว่าง/มืด" style="background:rgba(255,255,255,.16);color:#fff;border:1px solid rgba(255,255,255,.3);width:34px;padding:7px;justify-content:center;"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 3a9 9 0 0 0 0 18z" fill="currentColor" stroke="none"/></svg></button><button class="tb-btn refresh" onclick="render()"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 11a8 8 0 0 0-14.9-4M4 13a8 8 0 0 0 14.9 4"/><path d="M4 4v4h4M20 20v-4h-4"/></svg> รีเฟรช</button>
-    <button class="tb-btn back" onclick="window.close()">← ปิด</button>
-    <button class="tb-btn print" onclick="window.print()"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M7 8V3h10v5"/><rect x="5" y="8" width="14" height="8" rx="1.5"/><path d="M7 15h10v6H7z"/><circle cx="16.5" cy="11" r=".6" fill="currentColor" stroke="none"/></svg>️ พิมพ์ / บันทึกเป็น PDF</button>
+    <button class="tb-btn refresh" onclick="render()"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 12a9 9 0 0 1-15.3 6.4L3 16"/><path d="M3 12a9 9 0 0 1 15.3-6.4L21 8"/><polyline points="3 20 3 16 7 16"/><polyline points="21 4 21 8 17 8"/></svg> รีเฟรช</button>
+    <button class="tb-btn back" onclick="window.close()"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><line x1="20" y1="12" x2="4" y2="12"/><polyline points="10 6 4 12 10 18"/></svg> ปิด</button>
+    <button class="tb-btn print" onclick="window.print()"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg> พิมพ์ / บันทึกเป็น PDF</button>
   </div>
 </div>
 
 <div class="page">
   <div class="r-head">
     <div>
-      <div class="r-brand">แพไม้มินิ วันพฤหัสบดี — Pamai Market</div>
-      <div class="r-sub">โทร 082-581-1144 · รายงานรายได้ค่าไฟฟ้า แยกตามโซน</div>
+      <div class="r-brand">แพไม้มินิ — Pamai Market</div>
+      <div class="r-sub">โทร 082-581-1144 · รายงานส่วนลดค่าเช่าผู้ค้าประจำ</div>
     </div>
     <div class="r-meta">
       <div>วันที่ออกรายงาน: <strong id="r-date">—</strong></div>
@@ -89,15 +497,15 @@ tfoot.zone-total td{font-weight:800;background:var(--gll);border-top:2px solid v
     </div>
   </div>
 
-  <div class="month-filter">
-    <label for="monthSel">เลือกเดือน:</label>
-    <select id="monthSel" onchange="render()"></select>
-  </div>
-
   <div id="dataWarn"></div>
   <div id="reportBody" class="loading">⏳ กำลังโหลดข้อมูลจาก Google Sheets...</div>
 
-  <div class="foot">จัดทำโดย: ระบบบริหารจัดการแพไม้มินิ วันพฤหัสบดี · พิมพ์เมื่อ <span id="r-stamp">—</span></div>
+  <div class="sign-area">
+    <div class="sign-box"><div class="sign-line"></div>ผู้จัดทำ</div>
+    <div class="sign-box"><div class="sign-line"></div>ผู้อนุมัติส่วนลด</div>
+  </div>
+
+  <div class="foot">จัดทำโดย: ระบบบริหารจัดการแพไม้มินิ · พิมพ์เมื่อ <span id="r-stamp">—</span></div>
 </div>
 
 <script>
@@ -105,9 +513,24 @@ function toggleDark(){const h=document.documentElement,d=h.getAttribute('data-th
 (()=>{const s=localStorage.getItem('pmthu-t');if(s)document.documentElement.setAttribute('data-theme',s);else if(window.matchMedia('(prefers-color-scheme:dark)').matches)document.documentElement.setAttribute('data-theme','dark');})();
 
 const MONS=['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
+const MONS_FULL=['มกราคม','กุมภาพันธ์','มีนาคม','เมษายน','พฤษภาคม','มิถุนายน','กรกฎาคม','สิงหาคม','กันยายน','ตุลาคม','พฤศจิกายน','ธันวาคม'];
 function nowTH(){const n=new Date();return n.getDate()+' '+MONS[n.getMonth()]+' '+(n.getFullYear()+543);}
 function baht(n){return '฿'+Math.round(n||0).toLocaleString();}
+function esc(x){return String(x??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));}
+function monthLabel(key){const p=String(key||'').split('-');if(p.length<2)return key||'—';return MONS_FULL[parseInt(p[1],10)-1]+' '+(parseInt(p[0],10)+543);}
 
+// ═══ AUTO-CONNECT: ตั้งค่า URL ฐานข้อมูลครั้งเดียวต่อเครื่องผ่านลิงก์ ?api=... (ห้าม hardcode URL จริง) ═══
+(function(){
+  try{
+    var p=new URLSearchParams(location.search);
+    var apiParam=p.get('api'), tokenParam=p.get('token');
+    if(apiParam){ localStorage.setItem('pm-thu-api-url',decodeURIComponent(apiParam)); p.delete('api'); }
+    if(tokenParam){ localStorage.setItem('pm-thu-api-token',decodeURIComponent(tokenParam)); p.delete('token'); }
+    if(apiParam||tokenParam){
+      history.replaceState(null,'',location.pathname+(p.toString()?('?'+p.toString()):'')+location.hash);
+    }
+  }catch(e){}
+})();
 function getApiUrl(){return (localStorage.getItem('pm-thu-api-url')||localStorage.getItem('pm-api-url'))||'';}
 function getApiToken(){return (localStorage.getItem('pm-thu-api-token')||localStorage.getItem('pm-api-token'))||'';}
 async function apiGet(action,params={}){
@@ -119,7 +542,7 @@ async function apiGet(action,params={}){
   }catch(e){ console.error('apiGet error:',action,e); return null; }
 }
 
-// ลำดับโซนตามผังตลาดจริง: โรงหน้า → โรงใหญ่ → โซนด้านนอก
+// ลำดับโซนตามผังตลาดจริง
 //== MARKET_BLOCK:ZONES ==//
 const ZONE_ORDER = ['A','B','C','D','E','F','G','J','K','N','U','O','M','H','L','T','AB','TA','TB','TC'];
 const ZONE_GROUP_NAME = {
@@ -130,164 +553,175 @@ const ZONE_GROUP_NAME = {
 };
 //== END_MARKET_BLOCK ==//
 
-// รูปแบบวันที่จริงที่บันทึกไว้: "6 ก.ค. 2569" (วัน เดือนย่อ ปี พ.ศ.)
-function parsePayDate(dstr){
-  const parts = (dstr||'').trim().split(/\s+/);
-  if (parts.length < 3) return null;
-  const mIdx = MONS.indexOf(parts[1]);
-  const year = parseInt(parts[2]) || 0;
-  if (mIdx < 0 || !year) return null;
-  return { key: parts[1]+' '+year, sortKey: year*12+mIdx };
+// จำนวนวันตลาดในเดือนที่ระบุ — ใช้คำนวณค่าเช่าเต็มเดือนก่อนหักส่วนลด
+// (build.py แปลง getDay()===4 → ===4 ให้ฝั่งวันพฤหัสฯ อัตโนมัติ ห้ามเขียนรูปแบบอื่น)
+function countMarketDaysInMonth(year,month){
+  let c=0; const d=new Date(year,month,1);
+  while(d.getMonth()===month){ if(d.getDay()===4) c++; d.setDate(d.getDate()+1); }
+  return c;
+}
+function marketDaysOfKey(key){
+  const p=String(key).split('-');
+  return countMarketDaysInMonth(parseInt(p[0],10), parseInt(p[1],10)-1);
 }
 
-let ALL_PAYMENTS = [];
-let VENDOR_ZONE = {};
-
-function populateMonthSelect(monthKeys){
-  const sel = document.getElementById('monthSel');
-  const prev = sel.value;
-  sel.innerHTML = monthKeys.map(k=>`<option value="${k.key}">${k.key}</option>`).join('');
-  if (prev && monthKeys.some(k=>k.key===prev)) sel.value = prev;
-  else if (monthKeys.length) sel.value = monthKeys[0].key;
-}
-
+// ══════════════════════════════════════════════════════════════════════════
+// RENDER
+// ตรรกะส่วนลดต้องตรงกับที่หน้ารับชำระใช้คิดเงินเป๊ะ (ดู PM_DISCOUNT ใน pamai_thu_batch_payment)
+//   · ส่วนลดรายล็อคชนะส่วนลดทั้งตลาดเสมอ
+//   · ล็อคที่อยู่ระหว่างผ่อนชำระ ได้ส่วนลดทั้งตลาดเฉพาะเมื่อรายการนั้นติ๊ก "ให้ล็อคที่ผ่อนชำระด้วย"
+//   · ส่วนลดไม่เกินค่าเช่าจริงของเดือนนั้น (กันยอดสุทธิติดลบ)
+// ══════════════════════════════════════════════════════════════════════════
 async function render(){
   document.getElementById('r-date').textContent = nowTH();
-  document.getElementById('r-stamp').textContent = nowTH() + ' ' + new Date().toLocaleTimeString('th-TH',{hour:'2-digit',minute:'2-digit'});
+  document.getElementById('r-stamp').textContent = nowTH()+' '+new Date().toLocaleTimeString('th-TH',{hour:'2-digit',minute:'2-digit'});
   document.getElementById('reportBody').innerHTML = '<div class="loading">⏳ กำลังโหลดข้อมูลจาก Google Sheets...</div>';
   document.getElementById('dataWarn').innerHTML = '';
 
   if(!getApiUrl()){
     document.getElementById('dataWarn').innerHTML =
-      '<div class="warn">⚠️ ยังไม่ได้เชื่อมต่อ Google Sheets — กรุณาตั้งค่าที่หน้าหลักของระบบก่อน</div>';
-    document.getElementById('reportBody').innerHTML = '';
-    document.getElementById('monthSel').innerHTML = '';
+      '<div class="warn"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0Z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg> ยังไม่ได้เชื่อมต่อ Google Sheets — กรุณาตั้งค่าที่หน้าหลักของระบบก่อน</div>';
+    document.getElementById('reportBody').innerHTML='';
     return;
   }
 
-  const [payments, vendors] = await Promise.all([
-    apiGet('getPayments'),
+  const monthKey = PM_FILTER.monthKey();
+  const [allDisc, vendorsRaw, plans] = await Promise.all([
+    apiGet('getDiscounts'),
     apiGet('getVendors'),
+    apiGet('getInstallmentPlans'),
   ]);
+  const discounts = Array.isArray(allDisc)?allDisc:[];
+  const vendors = PM_FILTER.byZone((Array.isArray(vendorsRaw)?vendorsRaw:[])
+    .filter(v=>v.status==='active'||v.status==='unpaid'), 'zone');
+  const installLocks = new Set((Array.isArray(plans)?plans:[])
+    .filter(p=>String(p.status||'active')==='active').map(p=>p.lock_id));
 
-  VENDOR_ZONE = {};
-  (vendors||[]).forEach(v=>{ VENDOR_ZONE[v.lock] = v.zone; });
-
-  const elecPayments = (payments||[])
-    .filter(p=>p.type==='ค่าไฟฟ้า')
-    .map(p=>({...p, amount:parseFloat(p.amount)||0, _pd:parsePayDate(p.date)}))
-    .filter(p=>p._pd && p.amount>0);
-
-  ALL_PAYMENTS = elecPayments;
-
-  if (!elecPayments.length){
+  if(!discounts.length){
     document.getElementById('dataWarn').innerHTML =
-      '<div class="warn">⚠️ ยังไม่มีประวัติการรับชำระค่าไฟฟ้าใน Google Sheets</div>';
-    document.getElementById('reportBody').innerHTML = '<div class="empty">ยังไม่มีข้อมูล</div>';
-    document.getElementById('monthSel').innerHTML = '';
+      '<div class="warn"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg> ยังไม่มีการกำหนดส่วนลดค่าเช่าในระบบ — กำหนดได้ที่หน้า "รับชำระหลายล็อค" ปุ่ม "ส่วนลดค่าเช่า"</div>';
+    document.getElementById('reportBody').innerHTML='<div class="empty">ยังไม่มีข้อมูลส่วนลด</div>';
     return;
   }
 
-  // สร้างรายการเดือนที่มีข้อมูลจริง เรียงล่าสุดก่อน
-  const monthMap = {};
-  elecPayments.forEach(p=>{ if(!monthMap[p._pd.key]) monthMap[p._pd.key]=p._pd.sortKey; });
-  const monthKeys = Object.keys(monthMap)
-    .map(k=>({key:k, sortKey:monthMap[k]}))
-    .sort((a,b)=>b.sortKey-a.sortKey);
+  // ── ส่วนที่ 1: สรุปรายเดือน (ทุกเดือนที่มีการให้ส่วนลด) ──
+  const monthKeys=[...new Set(discounts.map(d=>d.month))].sort().reverse();
+  const daysOfMonth={}; monthKeys.forEach(k=>daysOfMonth[k]=marketDaysOfKey(k));
 
-  populateMonthSelect(monthKeys);
-  const selMonth = document.getElementById('monthSel').value;
+  function effectiveFor(lock, month){
+    const perLock=discounts.find(d=>d.month===month&&d.scope==='lock'&&d.lock_id===lock);
+    if(perLock) return {amount:perLock.amount, src:'รายล็อค', note:perLock.note};
+    const mk=discounts.find(d=>d.month===month&&d.scope==='market');
+    if(!mk) return {amount:0, src:'—', note:''};
+    if(installLocks.has(lock) && !mk.apply_installment) return {amount:0, src:'ทั้งตลาด (ยกเว้นล็อคผ่อนชำระ)', note:mk.note};
+    return {amount:mk.amount, src:'ทั้งตลาด', note:mk.note};
+  }
 
-  const recs = elecPayments.filter(p=>p._pd.key===selMonth).map(p=>{
-    const lockId = p.lock_id || '';
-    const zone = VENDOR_ZONE[lockId] || 'ไม่ทราบโซน';
-    return { lock:lockId, vendor:p.vendor_name||p.product||'—', zone, amount:p.amount, date:p.date, method:p.method||'—' };
-  });
-
-  const totalAmt = recs.reduce((s,r)=>s+r.amount,0);
-  const byZone = {};
-  recs.forEach(r=>{
-    if(!byZone[r.zone]) byZone[r.zone]=[];
-    byZone[r.zone].push(r);
-  });
-  const zoneKeys = Object.keys(byZone).sort((a,b)=>{
-    const ia = ZONE_ORDER.indexOf(a), ib = ZONE_ORDER.indexOf(b);
-    return (ia<0?999:ia) - (ib<0?999:ib);
-  });
-  const zoneTotals = zoneKeys.map(z=>({
-    zone:z, count:byZone[z].length,
-    total:byZone[z].reduce((s,r)=>s+r.amount,0),
-    groupName: ZONE_GROUP_NAME[z]||'—',
-  })).sort((a,b)=>b.total-a.total);
-
-  const avgAmt = recs.length ? totalAmt/recs.length : 0;
-
-  let html = `
-  <div class="kgrid">
-    <div class="kc"><div class="n" style="font-size:.98rem">${baht(totalAmt)}</div><div class="l">ยอดรวมค่าไฟ — ${selMonth}</div></div>
-    <div class="kc"><div class="n">${recs.length}</div><div class="l">จำนวนรายการรับชำระ</div></div>
-    <div class="kc"><div class="n">${zoneKeys.length}</div><div class="l">โซนที่มีรายรับค่าไฟ</div></div>
-    <div class="kc"><div class="n">${baht(avgAmt)}</div><div class="l">เฉลี่ยต่อรายการ</div></div>
-  </div>`;
-
-  if (!recs.length){
-    html += `<div class="empty">ไม่พบรายการรับชำระค่าไฟฟ้าในเดือน ${selMonth}</div>`;
-  } else {
-    html += `<div class="r-title">สรุปรายได้ค่าไฟฟ้าตามโซน — ${selMonth}</div>
-    <table class="summary-table">
-      <thead><tr><th style="width:60px">โซน</th><th>กลุ่มโซน</th><th style="width:70px;text-align:right">รายการ</th><th style="width:100px;text-align:right">ยอดรวม</th><th style="width:170px">สัดส่วน</th></tr></thead>
-      <tbody>`;
-    zoneTotals.forEach(z=>{
-      const pct = totalAmt>0 ? (z.total/totalAmt*100) : 0;
-      html += `<tr>
-        <td><strong>${z.zone}</strong></td>
-        <td style="font-size:.66rem;color:var(--txl)">${z.groupName}</td>
-        <td style="text-align:right">${z.count}</td>
-        <td style="text-align:right;font-weight:800;color:var(--gm)">${baht(z.total)}</td>
-        <td><div class="bar-cell"><div class="bar-track"><div class="bar-fill" style="width:${pct.toFixed(1)}%"></div></div><span class="pct">${pct.toFixed(1)}%</span></div></td>
-      </tr>`;
+  let html='';
+  const monthRows=monthKeys.map(mk=>{
+    const days=daysOfMonth[mk];
+    let total=0, nLock=0;
+    vendors.forEach(v=>{
+      const rent=Math.round((parseFloat(v.dailyRate)||0)*days);
+      const eff=effectiveFor(v.lock, mk);
+      const amt=Math.min(eff.amount, rent);
+      if(amt>0){ total+=amt; nLock++; }
     });
-    html += `</tbody></table>`;
+    const mkRow=discounts.find(d=>d.month===mk&&d.scope==='market');
+    const lockRows=discounts.filter(d=>d.month===mk&&d.scope==='lock');
+    return {mk, days, total, nLock, mkRow, lockRows};
+  });
+  const grandTotal=monthRows.reduce((s,r)=>s+r.total,0);
+  const thisRow=monthRows.find(r=>r.mk===monthKey);
 
-    zoneKeys.sort((a,b)=>{
-      const ia = ZONE_ORDER.indexOf(a), ib = ZONE_ORDER.indexOf(b);
-      return (ia<0?999:ia) - (ib<0?999:ib);
-    }).forEach(zone=>{
-      const list = byZone[zone].sort((a,b)=>a.lock.localeCompare(b.lock,undefined,{numeric:true}));
-      const zoneTotal = list.reduce((s,r)=>s+r.amount,0);
-      const groupName = ZONE_GROUP_NAME[zone] || '—';
+  html+=`
+  <div class="kgrid">
+    <div class="kc"><div class="n">${monthKeys.length}</div><div class="l">เดือนที่มีส่วนลด</div></div>
+    <div class="kc"><div class="n">${thisRow?thisRow.nLock:0}</div><div class="l">ล็อคที่ได้ส่วนลด (${monthLabel(monthKey)})</div></div>
+    <div class="kc"><div class="n" style="font-size:.95rem">${baht(thisRow?thisRow.total:0)}</div><div class="l">ส่วนลดรวมเดือนที่เลือก</div></div>
+    <div class="kc"><div class="n" style="font-size:.95rem">${baht(grandTotal)}</div><div class="l">ส่วนลดรวมทุกเดือน</div></div>
+  </div>
+  <div class="r-title">สรุปส่วนลดรายเดือน <span style="font-size:.66rem;font-weight:600;color:var(--txl)">${esc(PM_FILTER.label())}</span></div>
+  <table>
+    <thead><tr><th>เดือน</th><th style="text-align:center">วันตลาด</th><th>ส่วนลดทั้งตลาด</th>
+      <th style="text-align:center">ล็อคผ่อนชำระได้ด้วย</th><th style="text-align:center">ส่วนลดรายล็อค</th>
+      <th style="text-align:center">ล็อคที่ได้ส่วนลด</th><th style="text-align:right">ส่วนลดรวม (฿)</th></tr></thead>
+    <tbody>`;
+  monthRows.forEach(r=>{
+    const cur = r.mk===monthKey ? ' style="background:var(--gll);font-weight:700"' : '';
+    html+=`<tr${cur}>
+      <td><strong>${monthLabel(r.mk)}</strong></td>
+      <td style="text-align:center">${r.days}</td>
+      <td>${r.mkRow?baht(r.mkRow.amount)+'/ล็อค':'—'}</td>
+      <td style="text-align:center">${r.mkRow?(r.mkRow.apply_installment?'ได้':'ไม่ได้'):'—'}</td>
+      <td style="text-align:center">${r.lockRows.length||'—'}</td>
+      <td style="text-align:center">${r.nLock}</td>
+      <td style="text-align:right;font-weight:800;color:var(--r)">${baht(r.total)}</td>
+    </tr>`;
+  });
+  html+=`</tbody><tfoot><tr><td colspan="6">รวมทุกเดือน</td><td style="text-align:right">${baht(grandTotal)}</td></tr></tfoot></table>`;
 
-      html += `<div class="zone-section">
-        <div class="zone-head"><span>📍 โซน ${zone} (${groupName})</span><span class="zsub">${list.length} รายการ · รวม ${baht(zoneTotal)}</span></div>
+  // ── ส่วนที่ 2: รายละเอียดรายล็อค แยกโซน ของเดือนที่เลือก ──
+  const detail=vendors.map(v=>{
+    const days=marketDaysOfKey(monthKey);
+    const rent=Math.round((parseFloat(v.dailyRate)||0)*days);
+    const eff=effectiveFor(v.lock, monthKey);
+    const amt=Math.min(eff.amount, rent);
+    return {lock:v.lock, zone:v.zone, name:v.name||v.product||'(ยังไม่ระบุ)', rent, amt,
+            src:eff.src, note:eff.note, install:installLocks.has(v.lock)};
+  }).filter(r=>r.amt>0);
+
+  html+=`<div class="r-title">รายละเอียดรายล็อค — ${monthLabel(monthKey)}</div>`;
+  if(!detail.length){
+    html+='<div class="empty">ไม่มีล็อคที่ได้รับส่วนลดในเดือนนี้'+(PM_FILTER.zone()?' (โซน '+esc(PM_FILTER.zone())+')':'')+'</div>';
+  } else {
+    const byZone={};
+    detail.forEach(r=>{ (byZone[r.zone]=byZone[r.zone]||[]).push(r); });
+    const zoneKeys=Object.keys(byZone).sort((a,b)=>{
+      const ia=ZONE_ORDER.indexOf(a), ib=ZONE_ORDER.indexOf(b);
+      return (ia<0?999:ia)-(ib<0?999:ib);
+    });
+    zoneKeys.forEach(z=>{
+      const list=byZone[z].sort((a,b)=>a.lock.localeCompare(b.lock,undefined,{numeric:true}));
+      const zTotal=list.reduce((s,r)=>s+r.amt,0);
+      html+=`<div class="zone-section">
+        <div class="zone-head"><span>โซน ${esc(z)} (${esc(ZONE_GROUP_NAME[z]||'—')})</span>
+          <span class="zsub">${list.length} ล็อค · ส่วนลดรวม ${baht(zTotal)}</span></div>
         <table>
-          <thead><tr>
-            <th style="width:22px">#</th><th>ล็อค</th><th>ร้านค้า</th><th>วันที่</th><th>ช่องทาง</th>
-            <th style="text-align:right">ค่าไฟที่ชำระ</th>
-          </tr></thead>
+          <thead><tr><th style="width:22px">#</th><th>ล็อค</th><th>ร้าน/ผู้ค้า</th>
+            <th style="text-align:right">ค่าเช่าเดือนนี้</th><th style="text-align:right">ส่วนลด</th>
+            <th style="text-align:right">ยอดสุทธิ</th><th>ที่มาของส่วนลด</th><th>หมายเหตุ</th></tr></thead>
           <tbody>`;
-
       list.forEach((r,i)=>{
-        html += `<tr>
-          <td>${i+1}</td>
-          <td><strong>${r.lock||'—'}</strong></td>
-          <td>${r.vendor}</td>
-          <td>${r.date||'—'}</td>
-          <td>${r.method}</td>
-          <td style="text-align:right;font-weight:800;color:var(--gm)">${baht(r.amount)}</td>
+        html+=`<tr>
+          <td>${i+1}</td><td><strong>${esc(r.lock)}</strong>${r.install?' <span style="font-size:.58rem;color:var(--o)">(ผ่อนชำระ)</span>':''}</td>
+          <td>${esc(r.name)}</td>
+          <td style="text-align:right">${baht(r.rent)}</td>
+          <td style="text-align:right;font-weight:800;color:var(--r)">-${baht(r.amt)}</td>
+          <td style="text-align:right;font-weight:800">${baht(r.rent-r.amt)}</td>
+          <td>${esc(r.src)}</td><td>${esc(r.note||'—')}</td>
         </tr>`;
       });
-
-      html += `</tbody>
-          <tfoot class="zone-total"><tr><td colspan="5">รวมโซน ${zone}</td><td style="text-align:right">${baht(zoneTotal)}</td></tr></tfoot>
-        </table>
-      </div>`;
+      html+=`</tbody><tfoot class="zone-total"><tr><td colspan="4">รวมโซน ${esc(z)}</td>
+        <td style="text-align:right">-${baht(zTotal)}</td><td colspan="3"></td></tr></tfoot></table></div>`;
     });
-
-    html += `<div class="grand-total"><span>⚡ ยอดรายได้ค่าไฟฟ้ารวมทั้งหมดทุกโซน — ${selMonth}</span><span>${baht(totalAmt)}</span></div>`;
+    const allTotal=detail.reduce((s,r)=>s+r.amt,0);
+    html+=`<div class="r-title">รวมทั้งตลาด — ${monthLabel(monthKey)}</div>
+      <table><tbody>
+        <tr><td>ค่าเช่าก่อนหักส่วนลด (เฉพาะล็อคที่ได้ส่วนลด)</td><td style="text-align:right">${baht(detail.reduce((s,r)=>s+r.rent,0))}</td></tr>
+        <tr><td>ส่วนลดรวม</td><td style="text-align:right;color:var(--r);font-weight:800">-${baht(allTotal)}</td></tr>
+        <tr><td><strong>ยอดสุทธิที่ต้องเก็บ</strong></td><td style="text-align:right;font-weight:800">${baht(detail.reduce((s,r)=>s+r.rent-r.amt,0))}</td></tr>
+      </tbody></table>`;
   }
 
-  document.getElementById('reportBody').innerHTML = html;
+  document.getElementById('reportBody').innerHTML=html;
 }
+
+// ══════════════════════════════════════════════════════════════
+// ต่อสายแถบตัวกรองกลาง (PM Report Filter Kit) — เพิ่ม 2026-07-26
+// ค่าเริ่มต้นตามข้อกำหนด: ทุกโซน + วันปัจจุบัน (ซึ่งให้เดือนปัจจุบันเป็นเดือนอ้างอิงของรายงานนี้)
+// ══════════════════════════════════════════════════════════════
+PM_FILTER.mount({ date: true, zone: true, onChange: render });  // PM_WIRED_MOUNT
 render();
 </script>
 </body>

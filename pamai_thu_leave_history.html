@@ -11,16 +11,16 @@
   --b:#1e40af;--bl:#eff6ff;--pu:#6d28d9;--pul:#f5f3ff;
   --y:#92400e;--yl:#fffbeb;
   --bg:#f4f6f4;--sf:#fff;--sf2:#f8faf9;--sf3:#f1f5f2;
-  --bd:#c8d8cf;--bd2:#9bb5a5;
-  --tx:#0f1e14;--txm:#3d5247;--txl:#4d6854;
+  --bd:#c8d8cf;--bd2:#bfa891;
+  --tx:#0f1e14;--txm:#5a4835;--txl:#725a43;
   --shadow:0 2px 12px rgba(15,30,20,.07);
   --ease:cubic-bezier(.4,0,.2,1);
   --rad:10px;
 }
 [data-theme="dark"]{
   --bg:#0a0f0c;--sf:#111a14;--sf2:#162019;--sf3:#1c2a20;
-  --bd:#2a3d30;--bd2:#3d5a46;
-  --tx:#d4e8d8;--txm:#8aab8f;--txl:#8ca696;
+  --bd:#413426;--bd2:#5f4c38;
+  --tx:#e8ded4;--txm:#b59a80;--txl:#b4997e;
   --gl:#112318;--gll:#0b170f;--rl:#1f0a0a;--ol:#1f1008;
   --bl:#0a1228;--pul:#170f28;--yl:#1a1208;
   --shadow:0 4px 20px rgba(0,0,0,.45);
@@ -36,7 +36,7 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(
 .dm-btn{width:44px;height:44px;border-radius:50%;border:1.5px solid rgba(255,255,255,.3);background:rgba(255,255,255,.1);color:#fff;cursor:pointer;font-size:.82rem;display:flex;align-items:center;justify-content:center;transition:all .2s;}
 .dm-btn:hover{background:rgba(255,255,255,.22);transform:rotate(18deg);}
 .conn-badge{font-size:.84rem;font-weight:700;padding:5px 10px;border-radius:20px;background:rgba(255,255,255,.14);border:1.5px solid rgba(255,255,255,.28);color:#fff;}
-.conn-badge.on{background:rgba(134,239,172,.18);border-color:#86efac;color:#dcfce7;}
+.conn-badge.on{background:rgba(134,239,172,.18);border-color:#efac86;color:#fce8dc;}
 .conn-badge.off{background:rgba(252,165,165,.18);border-color:#fca5a5;color:#fee2e2;}
 .rf-btn{padding:5px 12px;border-radius:8px;border:1.5px solid rgba(255,255,255,.3);background:rgba(255,255,255,.1);color:#fff;font-size:.90rem;font-weight:700;cursor:pointer;font-family:inherit;transition:all .18s;}
 .rf-btn:hover{background:rgba(255,255,255,.22);}
@@ -100,6 +100,162 @@ label.dlabel{display:inline-block;}
   }
 }
 </style>
+<!-- ==== PM_MOBILE_KIT:START (สร้างโดย tools/inject_mobile_kit.py — ห้ามแก้ในไฟล์นี้) ==== -->
+<style id="pm-mobile-kit">
+/* ═══════════════════════════════════════════════════════════════════════════
+   PM MOBILE KIT — Mobile-First / Responsive / Thai typography (2026-07-26)
+   เป้าหมาย: ทุกหน้าใช้งานได้เต็มจอบนสมาร์ทโฟนทุกขนาด ไม่มีเนื้อหาล้นขอบจอด้านข้าง
+   (no horizontal overflow), ตัวอักษรไทยตัดบรรทัดถูกต้อง, ปุ่มกดง่ายด้วยนิ้วโป้ง,
+   เว้นระยะขอบบน-ล่างไม่ให้ชิดจอ
+   หมายเหตุเชิงเทคนิค: ตั้งใจ "ไม่" ใส่ viewport-fit=cover เพราะถ้าไม่ใส่ เบราว์เซอร์จะกันพื้นที่
+   รอยบาก (notch) ให้อยู่แล้วโดยอัตโนมัติ การใส่ cover แล้วจัดการ env() เองมีความเสี่ยงที่เนื้อหา
+   จะไปอยู่ใต้รอยบากถ้าพลาดจุดใดจุดหนึ่ง — เราจึงใช้ env() เป็น "ระยะเสริม" (max()) เท่านั้น
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* ── 1) พื้นฐาน: กันล้นขอบจอ + ฟอนต์ไทย ── */
+html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
+*, *::before, *::after { min-width: 0; }               /* ตัวการอันดับ 1 ของ overflow ใน flex/grid */
+body {
+  overflow-x: hidden;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Sarabun",
+               "Noto Sans Thai", "Leelawadee UI", "Thonburi", system-ui,
+               "Helvetica Neue", Arial, sans-serif;
+  overflow-wrap: break-word;                           /* ตัดเฉพาะเมื่อคำเดียวยาวเกินกรอบ */
+  word-break: normal;                                  /* ห้าม break-all — ทำให้ไทยตัดกลางพยางค์ */
+  line-break: auto;
+}
+img, svg, canvas, video, table { max-width: 100%; }
+input, select, textarea, button { font-family: inherit; max-width: 100%; }
+
+/* ── 2) ตารางเลื่อนแนวนอนได้เอง (wrapper ถูกใส่ให้อัตโนมัติโดยสคริปต์ท้ายไฟล์) ── */
+.pm-tablewrap {
+  width: 100%; max-width: 100%; overflow-x: auto; overflow-y: hidden;
+  -webkit-overflow-scrolling: touch; overscroll-behavior-x: contain;
+}
+.pm-tablewrap > table { min-width: 100%; }
+
+/* ── 3) แท็บเล็ต ── */
+@media (max-width: 900px) {
+  .two-col { grid-template-columns: 1fr !important; }
+  .g2 { grid-template-columns: 1fr !important; }
+  .kgrid, .kpi-grid, .kpi-row, .mgrid, .summary-grid { grid-template-columns: repeat(3, 1fr) !important; }
+}
+
+/* ── 4) สมาร์ทโฟน ── */
+@media (max-width: 640px) {
+  body { padding-bottom: max(18px, env(safe-area-inset-bottom)); }
+
+  /* กริดสรุป/KPI → 2 คอลัมน์ อ่านง่ายกว่าบีบ 5 ช่องในจอ 360px */
+  .kgrid, .kpi-grid, .kpi-row, .mgrid, .summary-grid,
+  .elec-types, .grid { grid-template-columns: repeat(2, 1fr) !important; }
+  /* ฟอร์ม 2 ช่องต่อแถว → 1 ช่องต่อแถว */
+  .frow, .m-row, .field-row { grid-template-columns: 1fr !important; }
+
+  /* แถบหัวเรื่อง/เครื่องมือ: ให้ห่อบรรทัดได้ ไม่ดันจนล้นจอ */
+  .toolbar, .topbar, .tb-actions, .filter-row, .action-btns,
+  .modal-btns, .option-row, .date-filter, .items-title, .summary-title {
+    flex-wrap: wrap !important;
+  }
+  .toolbar, .topbar { padding-left: 12px !important; padding-right: 12px !important; row-gap: 8px; }
+  .toolbar { padding-top: max(10px, env(safe-area-inset-top)) !important; }
+  .topbar  { padding-top: max(10px, env(safe-area-inset-top)) !important; }
+
+  /* พื้นที่กดขั้นต่ำ 44px ตาม WCAG 2.5.5 / Apple HIG — ผู้จัดตลาดกดด้วยนิ้วโป้งกลางตลาด */
+  button, .btn, .tb-btn, a.btn, input[type=checkbox], input[type=radio] { min-height: 40px; }
+  /* ปุ่มไอคอนเล็ก ๆ ที่ฝังในช่องกรอก (เช่น ปุ่มดู/ซ่อนรหัสผ่าน) และลิงก์ในเมนู */
+  .pw-eye, .icon-btn, .btn-rm { min-width: 40px; min-height: 40px; }
+  .ni, .sidebar a, a.ni { min-height: 44px; }
+  input[type=checkbox], input[type=radio] { min-width: 22px; min-height: 22px; }
+  .btn-sm, .tb-btn { min-height: 38px; }
+  /* iOS ซูมเองถ้า font-size < 16px ในช่องกรอก — ล็อคไว้ที่ 16px กัน layout เพี้ยน */
+  input, select, textarea { font-size: 16px !important; }
+
+  /* หน้ารายงาน: ตัดกรอบกระดาษ A4 ออกบนมือถือให้ใช้ความกว้างเต็มจอ */
+  .page { margin: 10px auto !important; padding: 14px 12px !important; border-radius: 8px !important; }
+  .r-head { flex-direction: column; gap: 6px; }
+  .r-meta { text-align: left !important; }
+  .sign-area { flex-direction: column; gap: 18px; align-items: flex-start; }
+
+  /* หน้ารับชำระหลายล็อค (batch payment) — เดิมไม่มี @media เลย
+     .layout เป็น flex 2 คอลัมน์ + height:100vh + overflow:hidden ทำให้ฝั่งขวาหลุดออกนอกจอ
+     และเลื่อนดูไม่ได้บนมือถือ → เปลี่ยนเป็นเรียงลงล่างและให้หน้าเลื่อนตามปกติ */
+  .layout {
+    flex-direction: column !important; height: auto !important;
+    min-height: 0 !important; overflow: visible !important;
+  }
+  .left-panel, .right-panel {
+    width: 100% !important; max-width: 100% !important; flex: none !important;
+    border-right: none !important; border-left: none !important;
+  }
+  .right-scroll { overflow: visible !important; padding: 14px 12px !important; }
+  .lock-item { flex-wrap: wrap; }
+
+  /* โมดัล: สูงไม่เกินจอ เลื่อนในตัวได้ ไม่ชิดขอบล่าง */
+  .modal, .modal-box, .m-box, .modal-content, .confirm-box {
+    max-width: calc(100vw - 20px) !important;
+    max-height: calc(100vh - 40px) !important;
+    overflow-y: auto !important;
+    margin-bottom: max(10px, env(safe-area-inset-bottom));
+  }
+
+  /* แถบเมนู/sidebar ที่เลื่อนแนวนอน */
+  .sidebar, .side, .nav { max-width: 100% !important; }
+}
+
+/* ── 5) จอเล็กมาก (iPhone SE / 320-360px) ── */
+@media (max-width: 380px) {
+  .kgrid, .kpi-grid, .kpi-row, .mgrid, .summary-grid { grid-template-columns: 1fr !important; }
+  .toolbar h1, .topbar h1 { font-size: .82rem !important; }
+}
+
+/* ── 6) โหมดแนวนอนจอเตี้ย: อย่าล็อคความสูงเป็น 100vh ── */
+@media (max-height: 480px) and (orientation: landscape) {
+  .layout { height: auto !important; overflow: visible !important; }
+}
+
+/* ── 7) พิมพ์: ยกเลิกทุกอย่างของ mobile kit ที่อาจกวนการพิมพ์รายงาน ── */
+@media print {
+  .pm-tablewrap { overflow: visible !important; }
+  body { padding-bottom: 0 !important; overflow: visible !important; }
+}
+</style>
+<script id="pm-mobile-kit-js">
+/* ครอบ <table> ทุกตัวด้วยกล่องเลื่อนแนวนอน เพื่อไม่ให้ตารางกว้างดันหน้าจอล้น
+   ทำด้วย JS เพราะแก้ CSS ล้วนไม่ได้ (ต้องมี element ครอบ) และทำแบบนี้ไม่กระทบ layout เดิมบนเดสก์ท็อป
+   ใช้ MutationObserver เพราะเกือบทุกหน้าสร้างตารางด้วย innerHTML หลังโหลดข้อมูลจาก Sheets เสร็จ */
+(function () {
+  function wrapTables(root) {
+    var tables = (root || document).querySelectorAll ? (root || document).querySelectorAll('table') : [];
+    for (var i = 0; i < tables.length; i++) {
+      var t = tables[i];
+      if (t.parentElement && t.parentElement.classList.contains('pm-tablewrap')) continue;
+      if (t.closest && t.closest('.pm-tablewrap')) continue;
+      var w = document.createElement('div');
+      w.className = 'pm-tablewrap';
+      t.parentNode.insertBefore(w, t);
+      w.appendChild(t);
+    }
+  }
+  function boot() {
+    wrapTables(document);
+    try {
+      new MutationObserver(function (muts) {
+        for (var i = 0; i < muts.length; i++) {
+          for (var j = 0; j < muts[i].addedNodes.length; j++) {
+            var n = muts[i].addedNodes[j];
+            if (n.nodeType !== 1) continue;
+            if (n.tagName === 'TABLE') { wrapTables(n.parentNode); }
+            else if (n.querySelector && n.querySelector('table')) { wrapTables(n); }
+          }
+        }
+      }).observe(document.body, { childList: true, subtree: true });
+    } catch (e) { /* เบราว์เซอร์เก่า — ยังได้ตารางชุดแรกที่ wrap ไปแล้ว */ }
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot);
+  else boot();
+})();
+</script>
+<!-- ==== PM_MOBILE_KIT:END ==== -->
 </head>
 <body>
 
@@ -133,6 +289,18 @@ label.dlabel{display:inline-block;}
     <div class="search-row">
       <label for="lv-search" class="visually-hidden">ค้นหาประวัติแจ้งลา/ขาด</label>
       <input class="sbox" id="lv-search" placeholder="ค้นหา: เลขล็อค / ชื่อร้าน / โซน / ผู้บันทึก" oninput="renderLeave()">
+      <label for="lv-zone" class="visually-hidden">เลือกโซน</label>
+      <select class="fsel" id="lv-zone" onchange="onZoneChange()" title="เลือกโซนเพื่อดูประวัติเฉพาะโซนนั้น">
+        <option value="">ทุกโซน</option>
+      </select>
+      <label for="lv-group" class="visually-hidden">เลือกหมวดล็อค</label>
+      <select class="fsel" id="lv-group" onchange="onGroupChange()" title="หมวดล็อค เช่น โรงหน้า / โรงใหญ่ / โซนด้านนอก">
+        <option value="">ทุกหมวดล็อค</option>
+      </select>
+      <label for="lv-lock" class="visually-hidden">เลือกล็อค</label>
+      <select class="fsel" id="lv-lock" onchange="renderLeave()" title="เลือกล็อคเพื่อดูประวัติการลา/ขาดของล็อคนั้นโดยเฉพาะ">
+        <option value="">ทุกล็อค</option>
+      </select>
       <label for="lv-type" class="visually-hidden">กรองตามประเภท</label>
       <select class="fsel" id="lv-type" onchange="renderLeave()">
         <option value="">ทุกประเภท</option>
@@ -245,8 +413,70 @@ function switchSub(tab){
 function esc(s){return String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));}
 function emptyRow(msg,cols){return '<tr><td colspan="'+cols+'" style="text-align:center;padding:24px;color:var(--txl)">'+msg+'</td></tr>';}
 function sortByCreated(rows){return [...rows].sort((a,b)=>String(b.created_at||'').localeCompare(String(a.created_at||'')));}
+
+// ══════════════════════════════════════════════════════════════════════════
+// ตัวเลือก โซน → หมวดล็อค → ล็อค  (เพิ่ม 2026-07-26 ตามข้อกำหนดของผู้ดูแลตลาด: PM_LOCKPICK)
+// "ต้องสามารถดูประวัติการแจ้งลาหรือขาดล็อคแบบเลือกล็อคดูได้ โดยสามารถเลือกโซน เลือกหมวดล็อค
+//  และเลือกล็อคดูได้ ว่าล็อคนั้น ๆ มีประวัติการลาอย่างไร"
+// สร้างรายการจากข้อมูลจริงในชีต (ไม่ hardcode ผังล็อค) จึงใช้ได้ทั้งสองตลาดโดยไม่ต้องมี MARKET_BLOCK
+// หมวดล็อคอนุมานจาก prefix ของโซน: S* = โรงในตลาด, T* = โซนเปิดท้าย, อื่น ๆ = โซนด้านนอก
+// ══════════════════════════════════════════════════════════════════════════
+function lockGroupOf(zone){
+  const z=String(zone||'').toUpperCase();
+  if(!z) return 'ไม่ระบุ';
+  if(z.startsWith('T')) return 'โซนเปิดท้าย';
+  if(z.startsWith('S')) return 'โรงในตลาด';
+  return 'โซนด้านนอก';
+}
+function allLockRows(){ return ALL_LEAVE.concat(ALL_DAILY); }
+function buildLockPickers(){
+  const zones=[...new Set(allLockRows().map(r=>r.zone).filter(Boolean))]
+    .sort((a,b)=>String(a).localeCompare(String(b),undefined,{numeric:true}));
+  const zSel=document.getElementById('lv-zone');
+  if(zSel){
+    const keep=zSel.value;
+    zSel.innerHTML='<option value="">ทุกโซน</option>'+zones.map(z=>'<option value="'+esc(z)+'">โซน '+esc(z)+'</option>').join('');
+    if(zones.indexOf(keep)>=0) zSel.value=keep;
+  }
+  rebuildGroupOptions();
+  rebuildLockOptions();
+}
+function rebuildGroupOptions(){
+  const zone=document.getElementById('lv-zone')?.value||'';
+  const rows=allLockRows().filter(r=>!zone||r.zone===zone);
+  const groups=[...new Set(rows.map(r=>lockGroupOf(r.zone)))].sort();
+  const g=document.getElementById('lv-group');
+  if(!g) return;
+  const keep=g.value;
+  g.innerHTML='<option value="">ทุกหมวดล็อค</option>'+groups.map(x=>'<option value="'+esc(x)+'">'+esc(x)+'</option>').join('');
+  if(groups.indexOf(keep)>=0) g.value=keep;
+}
+function rebuildLockOptions(){
+  const zone=document.getElementById('lv-zone')?.value||'';
+  const grp=document.getElementById('lv-group')?.value||'';
+  const rows=allLockRows().filter(r=>(!zone||r.zone===zone)&&(!grp||lockGroupOf(r.zone)===grp));
+  const locks=[...new Set(rows.map(r=>r.lock_id).filter(Boolean))]
+    .sort((a,b)=>String(a).localeCompare(String(b),undefined,{numeric:true}));
+  const l=document.getElementById('lv-lock');
+  if(!l) return;
+  const keep=l.value;
+  l.innerHTML='<option value="">ทุกล็อค ('+locks.length+' ล็อคที่มีประวัติ)</option>'
+    +locks.map(x=>'<option value="'+esc(x)+'">ล็อค '+esc(x)+'</option>').join('');
+  if(locks.indexOf(keep)>=0) l.value=keep;
+}
+function onZoneChange(){ rebuildGroupOptions(); rebuildLockOptions(); renderLeave(); renderDaily(); }
+function onGroupChange(){ rebuildLockOptions(); renderLeave(); renderDaily(); }
+function lockPickFilter(rows){
+  const zone=document.getElementById('lv-zone')?.value||'';
+  const grp=document.getElementById('lv-group')?.value||'';
+  const lock=document.getElementById('lv-lock')?.value||'';
+  return rows.filter(r=>(!zone||r.zone===zone)&&(!grp||lockGroupOf(r.zone)===grp)&&(!lock||r.lock_id===lock));
+}
+
 function inRange(row,from,to){
-  const d=String(row.created_at||'').slice(0,10);
+  // ใช้ date_iso ที่ backend normalize มาให้เป็นหลัก (แก้ 2026-07-26) แล้วค่อย fallback ไป created_at
+  // เดิมใช้ created_at เพียงอย่างเดียว ทำให้แถวที่บันทึกย้อนหลังถูกจัดอยู่ผิดช่วงวันที่
+  const d=String(row.date_iso||row.created_at||'').slice(0,10);
   if(from && d && d<from) return false;
   if(to && d && d>to) return false;
   return true;
@@ -276,6 +506,8 @@ async function loadAll(){
   badge.className='conn-badge';
   const [leave,daily]=await Promise.all([apiGet('getLeaveLog'),apiGet('getDailyBookings')]);
   ALL_LEAVE=Array.isArray(leave)?leave:[];
+  // สร้างตัวเลือก โซน/หมวด/ล็อค จากข้อมูลจริงหลังโหลดเสร็จ (PM_LOCKPICK)
+  setTimeout(buildLockPickers,0);
   ALL_DAILY=Array.isArray(daily)?daily:[];
   badge.innerHTML='<svg class="ic ic-dot" viewBox="0 0 24 24" aria-hidden="true" style="color:var(--gm)"><circle cx="12" cy="12" r="8" fill="currentColor"/></svg> เชื่อมต่อแล้ว · ล่าสุด '+nowClock();
   badge.className='conn-badge on';
@@ -291,7 +523,7 @@ function renderLeave(){
   const type=document.getElementById('lv-type').value;
   const from=document.getElementById('lv-from').value;
   const to=document.getElementById('lv-to').value;
-  let rows=ALL_LEAVE.filter(r=>matchSearch(r,q,['lock_id','zone','shop','manager','note'])&&inRange(r,from,to)&&(!type||r.type===type));
+  let rows=lockPickFilter(ALL_LEAVE).filter(r=>matchSearch(r,q,['lock_id','zone','shop','manager','note'])&&inRange(r,from,to)&&(!type||r.type===type));
   rows=sortByCreated(rows);
 
   document.getElementById('lv-kpi-total').textContent=rows.length;
@@ -325,7 +557,7 @@ function renderDaily(){
   const q=document.getElementById('dl-search').value.trim();
   const from=document.getElementById('dl-from').value;
   const to=document.getElementById('dl-to').value;
-  let rows=ALL_DAILY.filter(r=>matchSearch(r,q,['lock_id','zone','vendor_name','product'])&&inRange(r,from,to));
+  let rows=lockPickFilter(ALL_DAILY).filter(r=>matchSearch(r,q,['lock_id','zone','vendor_name','product'])&&inRange(r,from,to));
   rows=sortByCreated(rows);
 
   document.getElementById('dl-kpi-total').textContent=rows.length;
@@ -356,6 +588,8 @@ function resetLeaveFilters(){
   document.getElementById('lv-from').value='';
   document.getElementById('lv-to').value='';
   renderLeave();
+  ['lv-zone','lv-group','lv-lock'].forEach(id=>{const e=document.getElementById(id);if(e)e.value='';});
+  rebuildGroupOptions(); rebuildLockOptions();
 }
 function resetDailyFilters(){
   document.getElementById('dl-search').value='';

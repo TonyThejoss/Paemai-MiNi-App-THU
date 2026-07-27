@@ -36,7 +36,7 @@
   --text-inv:   #ffffff;
 
   /* Topbar */
-  --top-from:   #1b4332;
+  --top-from:   #432a1b;
   --top-to:     #c2410c;
 
   /* Shadows */
@@ -62,10 +62,10 @@
   --text-lo:    #95a0bd;
   --text-inv:   #ffffff;
 
-  --top-from:   #0d2618;
-  --top-to:     #1b4332;
+  --top-from:   #26160d;
+  --top-to:     #432a1b;
 
-  --green-l:    #1b3d2a;
+  --green-l:    #3d271b;
   --green-ll:   #111f18;
   --red-l:      #2d1414;
   --orange-l:   #2d1e0a;
@@ -579,6 +579,162 @@ textarea { resize: vertical; min-height: 70px; }
   }
 }
 </style>
+<!-- ==== PM_MOBILE_KIT:START (สร้างโดย tools/inject_mobile_kit.py — ห้ามแก้ในไฟล์นี้) ==== -->
+<style id="pm-mobile-kit">
+/* ═══════════════════════════════════════════════════════════════════════════
+   PM MOBILE KIT — Mobile-First / Responsive / Thai typography (2026-07-26)
+   เป้าหมาย: ทุกหน้าใช้งานได้เต็มจอบนสมาร์ทโฟนทุกขนาด ไม่มีเนื้อหาล้นขอบจอด้านข้าง
+   (no horizontal overflow), ตัวอักษรไทยตัดบรรทัดถูกต้อง, ปุ่มกดง่ายด้วยนิ้วโป้ง,
+   เว้นระยะขอบบน-ล่างไม่ให้ชิดจอ
+   หมายเหตุเชิงเทคนิค: ตั้งใจ "ไม่" ใส่ viewport-fit=cover เพราะถ้าไม่ใส่ เบราว์เซอร์จะกันพื้นที่
+   รอยบาก (notch) ให้อยู่แล้วโดยอัตโนมัติ การใส่ cover แล้วจัดการ env() เองมีความเสี่ยงที่เนื้อหา
+   จะไปอยู่ใต้รอยบากถ้าพลาดจุดใดจุดหนึ่ง — เราจึงใช้ env() เป็น "ระยะเสริม" (max()) เท่านั้น
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* ── 1) พื้นฐาน: กันล้นขอบจอ + ฟอนต์ไทย ── */
+html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
+*, *::before, *::after { min-width: 0; }               /* ตัวการอันดับ 1 ของ overflow ใน flex/grid */
+body {
+  overflow-x: hidden;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Sarabun",
+               "Noto Sans Thai", "Leelawadee UI", "Thonburi", system-ui,
+               "Helvetica Neue", Arial, sans-serif;
+  overflow-wrap: break-word;                           /* ตัดเฉพาะเมื่อคำเดียวยาวเกินกรอบ */
+  word-break: normal;                                  /* ห้าม break-all — ทำให้ไทยตัดกลางพยางค์ */
+  line-break: auto;
+}
+img, svg, canvas, video, table { max-width: 100%; }
+input, select, textarea, button { font-family: inherit; max-width: 100%; }
+
+/* ── 2) ตารางเลื่อนแนวนอนได้เอง (wrapper ถูกใส่ให้อัตโนมัติโดยสคริปต์ท้ายไฟล์) ── */
+.pm-tablewrap {
+  width: 100%; max-width: 100%; overflow-x: auto; overflow-y: hidden;
+  -webkit-overflow-scrolling: touch; overscroll-behavior-x: contain;
+}
+.pm-tablewrap > table { min-width: 100%; }
+
+/* ── 3) แท็บเล็ต ── */
+@media (max-width: 900px) {
+  .two-col { grid-template-columns: 1fr !important; }
+  .g2 { grid-template-columns: 1fr !important; }
+  .kgrid, .kpi-grid, .kpi-row, .mgrid, .summary-grid { grid-template-columns: repeat(3, 1fr) !important; }
+}
+
+/* ── 4) สมาร์ทโฟน ── */
+@media (max-width: 640px) {
+  body { padding-bottom: max(18px, env(safe-area-inset-bottom)); }
+
+  /* กริดสรุป/KPI → 2 คอลัมน์ อ่านง่ายกว่าบีบ 5 ช่องในจอ 360px */
+  .kgrid, .kpi-grid, .kpi-row, .mgrid, .summary-grid,
+  .elec-types, .grid { grid-template-columns: repeat(2, 1fr) !important; }
+  /* ฟอร์ม 2 ช่องต่อแถว → 1 ช่องต่อแถว */
+  .frow, .m-row, .field-row { grid-template-columns: 1fr !important; }
+
+  /* แถบหัวเรื่อง/เครื่องมือ: ให้ห่อบรรทัดได้ ไม่ดันจนล้นจอ */
+  .toolbar, .topbar, .tb-actions, .filter-row, .action-btns,
+  .modal-btns, .option-row, .date-filter, .items-title, .summary-title {
+    flex-wrap: wrap !important;
+  }
+  .toolbar, .topbar { padding-left: 12px !important; padding-right: 12px !important; row-gap: 8px; }
+  .toolbar { padding-top: max(10px, env(safe-area-inset-top)) !important; }
+  .topbar  { padding-top: max(10px, env(safe-area-inset-top)) !important; }
+
+  /* พื้นที่กดขั้นต่ำ 44px ตาม WCAG 2.5.5 / Apple HIG — ผู้จัดตลาดกดด้วยนิ้วโป้งกลางตลาด */
+  button, .btn, .tb-btn, a.btn, input[type=checkbox], input[type=radio] { min-height: 40px; }
+  /* ปุ่มไอคอนเล็ก ๆ ที่ฝังในช่องกรอก (เช่น ปุ่มดู/ซ่อนรหัสผ่าน) และลิงก์ในเมนู */
+  .pw-eye, .icon-btn, .btn-rm { min-width: 40px; min-height: 40px; }
+  .ni, .sidebar a, a.ni { min-height: 44px; }
+  input[type=checkbox], input[type=radio] { min-width: 22px; min-height: 22px; }
+  .btn-sm, .tb-btn { min-height: 38px; }
+  /* iOS ซูมเองถ้า font-size < 16px ในช่องกรอก — ล็อคไว้ที่ 16px กัน layout เพี้ยน */
+  input, select, textarea { font-size: 16px !important; }
+
+  /* หน้ารายงาน: ตัดกรอบกระดาษ A4 ออกบนมือถือให้ใช้ความกว้างเต็มจอ */
+  .page { margin: 10px auto !important; padding: 14px 12px !important; border-radius: 8px !important; }
+  .r-head { flex-direction: column; gap: 6px; }
+  .r-meta { text-align: left !important; }
+  .sign-area { flex-direction: column; gap: 18px; align-items: flex-start; }
+
+  /* หน้ารับชำระหลายล็อค (batch payment) — เดิมไม่มี @media เลย
+     .layout เป็น flex 2 คอลัมน์ + height:100vh + overflow:hidden ทำให้ฝั่งขวาหลุดออกนอกจอ
+     และเลื่อนดูไม่ได้บนมือถือ → เปลี่ยนเป็นเรียงลงล่างและให้หน้าเลื่อนตามปกติ */
+  .layout {
+    flex-direction: column !important; height: auto !important;
+    min-height: 0 !important; overflow: visible !important;
+  }
+  .left-panel, .right-panel {
+    width: 100% !important; max-width: 100% !important; flex: none !important;
+    border-right: none !important; border-left: none !important;
+  }
+  .right-scroll { overflow: visible !important; padding: 14px 12px !important; }
+  .lock-item { flex-wrap: wrap; }
+
+  /* โมดัล: สูงไม่เกินจอ เลื่อนในตัวได้ ไม่ชิดขอบล่าง */
+  .modal, .modal-box, .m-box, .modal-content, .confirm-box {
+    max-width: calc(100vw - 20px) !important;
+    max-height: calc(100vh - 40px) !important;
+    overflow-y: auto !important;
+    margin-bottom: max(10px, env(safe-area-inset-bottom));
+  }
+
+  /* แถบเมนู/sidebar ที่เลื่อนแนวนอน */
+  .sidebar, .side, .nav { max-width: 100% !important; }
+}
+
+/* ── 5) จอเล็กมาก (iPhone SE / 320-360px) ── */
+@media (max-width: 380px) {
+  .kgrid, .kpi-grid, .kpi-row, .mgrid, .summary-grid { grid-template-columns: 1fr !important; }
+  .toolbar h1, .topbar h1 { font-size: .82rem !important; }
+}
+
+/* ── 6) โหมดแนวนอนจอเตี้ย: อย่าล็อคความสูงเป็น 100vh ── */
+@media (max-height: 480px) and (orientation: landscape) {
+  .layout { height: auto !important; overflow: visible !important; }
+}
+
+/* ── 7) พิมพ์: ยกเลิกทุกอย่างของ mobile kit ที่อาจกวนการพิมพ์รายงาน ── */
+@media print {
+  .pm-tablewrap { overflow: visible !important; }
+  body { padding-bottom: 0 !important; overflow: visible !important; }
+}
+</style>
+<script id="pm-mobile-kit-js">
+/* ครอบ <table> ทุกตัวด้วยกล่องเลื่อนแนวนอน เพื่อไม่ให้ตารางกว้างดันหน้าจอล้น
+   ทำด้วย JS เพราะแก้ CSS ล้วนไม่ได้ (ต้องมี element ครอบ) และทำแบบนี้ไม่กระทบ layout เดิมบนเดสก์ท็อป
+   ใช้ MutationObserver เพราะเกือบทุกหน้าสร้างตารางด้วย innerHTML หลังโหลดข้อมูลจาก Sheets เสร็จ */
+(function () {
+  function wrapTables(root) {
+    var tables = (root || document).querySelectorAll ? (root || document).querySelectorAll('table') : [];
+    for (var i = 0; i < tables.length; i++) {
+      var t = tables[i];
+      if (t.parentElement && t.parentElement.classList.contains('pm-tablewrap')) continue;
+      if (t.closest && t.closest('.pm-tablewrap')) continue;
+      var w = document.createElement('div');
+      w.className = 'pm-tablewrap';
+      t.parentNode.insertBefore(w, t);
+      w.appendChild(t);
+    }
+  }
+  function boot() {
+    wrapTables(document);
+    try {
+      new MutationObserver(function (muts) {
+        for (var i = 0; i < muts.length; i++) {
+          for (var j = 0; j < muts[i].addedNodes.length; j++) {
+            var n = muts[i].addedNodes[j];
+            if (n.nodeType !== 1) continue;
+            if (n.tagName === 'TABLE') { wrapTables(n.parentNode); }
+            else if (n.querySelector && n.querySelector('table')) { wrapTables(n); }
+          }
+        }
+      }).observe(document.body, { childList: true, subtree: true });
+    } catch (e) { /* เบราว์เซอร์เก่า — ยังได้ตารางชุดแรกที่ wrap ไปแล้ว */ }
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot);
+  else boot();
+})();
+</script>
+<!-- ==== PM_MOBILE_KIT:END ==== -->
 </head>
 <body>
 
@@ -735,6 +891,8 @@ textarea { resize: vertical; min-height: 70px; }
           </div>
         </div>
 
+        <div id="entryFeeWarn" style="display:none;margin:-4px 0 10px;padding:8px 12px;background:#fef3c7;border:1.5px solid #d97706;border-radius:8px;color:#92400e;font-size:.72rem;font-weight:700;line-height:1.5"></div>
+
         <!-- รายปี -->
         <div class="fee-block required-fee">
           <div class="fee-header"><span class="fee-label"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg> ค่าธรรมเนียมรายปี</span><span class="badge-req">บังคับ</span></div>
@@ -794,8 +952,8 @@ textarea { resize: vertical; min-height: 70px; }
           <div id="elecSpecialList" style="margin-top:8px"></div>
           <button type="button" class="btn-add-extra" onclick="addElecSpecial()">＋ เพิ่มอุปกรณ์พิเศษ (ราคากำหนดเอง)</button>
           <div class="elec-display" id="elecDisplay">
-            <svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><polygon points="13 2 3 14 11 14 10 22 21 10 13 10 13 2"/></svg> <span id="elecPerTue" class="elec-num">฿0</span>/อังคาร &nbsp;|&nbsp;
-            <svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg> <span id="elecPerMonth" class="elec-num">฿0</span>/เดือน (<span id="elecTueCount">–</span> อังคาร)
+            <svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><polygon points="13 2 3 14 11 14 10 22 21 10 13 10 13 2"/></svg> <span id="elecPerTue" class="elec-num">฿0</span>/วันพฤหัสบดี &nbsp;|&nbsp;
+            <svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg> <span id="elecPerMonth" class="elec-num">฿0</span>/เดือน (<span id="elecTueCount">–</span> วันพฤหัสบดี)
           </div>
         </div>
 
@@ -893,11 +1051,15 @@ textarea { resize: vertical; min-height: 70px; }
   <div class="success-receipt" id="successReceipt"></div>
   <div class="success-btns">
     <button class="btn btn-secondary" onclick="showToast('กำลังส่งไปยังเครื่องพิมพ์...','info')"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>️ พิมพ์ใบเสร็จ</button>
-    <button class="btn btn-primary" onclick="resetAll()"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg> ลงทะเบียนรายใหม่</button>
+    <button class="btn btn-secondary" onclick="backToEdit()" title="กลับไปแก้ไขข้อมูลผู้ค้าที่เพิ่งบันทึก โดยไม่รับชำระเงินซ้ำ"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><line x1="20" y1="12" x2="4" y2="12"/><polyline points="10 6 4 12 10 18"/></svg> ย้อนกลับไปแก้ไขข้อมูลผู้ค้า</button>
+    <button class="btn btn-primary" onclick="resetAll()" title="เริ่มลงทะเบียนผู้ค้ารายใหม่ตั้งแต่ต้น (ล้างข้อมูลเดิมทั้งหมด)"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg> ลงทะเบียนรายใหม่</button>
   </div>
 </div>
 
 <div class="toast" id="toast"></div>
+<div id="editOnlyBanner" style="display:none;position:fixed;left:50%;transform:translateX(-50%);bottom:16px;z-index:9000;background:#fef3c7;color:#92400e;border:2px solid #d97706;border-radius:12px;padding:10px 16px;font-size:.78rem;font-weight:800;box-shadow:0 6px 22px rgba(0,0,0,.18);align-items:center;gap:8px;max-width:calc(100vw - 24px);text-align:center">
+  โหมดแก้ไขข้อมูลผู้ค้าที่บันทึกแล้ว — จะไม่บันทึกการรับชำระเงินซ้ำ
+</div>
 
 <script>
 // ══════════════════════════════════
@@ -932,7 +1094,12 @@ function arr(n,p,vacant){ return Array.from({length:n},(_,i)=>({id:`${p}${i+1}`,
 
 let currentStep = 1;
 let selectedLock = null;
-let selectedZone = 'SA';
+// PM_ZONE_DEFAULT (แก้ 2026-07-26): เดิม hardcode 'SA' ซึ่งเป็นโซนของตลาดวันพฤหัสบดีเท่านั้น
+// ฝั่งวันพฤหัสฯ ไม่มีโซน SA (มี A–F, G–U, O–AB, TA–TC) ทำให้ LOCKS['SA'].data เป็น undefined
+// และหน้าลงทะเบียนพังทั้งหน้า (TypeError) — ตรวจพบด้วย tools/test_responsive.js ที่อ่าน pageerror
+// ทางแก้: ใช้โซนแรกที่มีอยู่จริงในผังของตลาดนั้นเป็นค่าเริ่มต้น ใช้ได้ทั้งสองตลาดโดยไม่ต้องแยกโค้ด
+const DEFAULT_ZONE = Object.keys(LOCKS)[0];
+let selectedZone = DEFAULT_ZONE;
 let extras = [];
 let extraCnt = 0;
 let elecSpecials = [];   // เพิ่ม 2026-07-14 (แก้บั๊ก #21) — อุปกรณ์ไฟฟ้าพิเศษราคากำหนดเอง เก็บเป็น {id}[]
@@ -970,7 +1137,7 @@ function updateRentHint(){
   const daily = parseFloat(document.getElementById('rentPrice')?.value)||0;
   const monthly = monthlyFromDaily(daily);
   const el = document.getElementById('rentMonthlyHint');
-  if(el) el.textContent = `= ฿${monthly.toLocaleString()}/เดือน (${daily.toLocaleString()}/วัน × ${thisMonthThursdays()} อังคาร)`;
+  if(el) el.textContent = `= ฿${monthly.toLocaleString()}/เดือน (${daily.toLocaleString()}/วัน × ${thisMonthThursdays()} วันพฤหัสบดี)`;
 }
 // ═══ AUTO-CONNECT v1.3: เชื่อมต่อ Google Sheets อัตโนมัติผ่านลิงก์ตั้งค่า (ตั้งครั้งเดียวต่อเครื่อง/เบราว์เซอร์) ═══
 // เปิดผ่านลิงก์พิเศษที่มี ?api=URL ต่อท้าย (ส่งให้พนักงานทางแชทภายใน ไม่เผยแพร่ในซอร์สโค้ดสาธารณะ)
@@ -1035,6 +1202,7 @@ function applyRealOccupancy(){
   updateLockGrid();
 }
 async function loadRealOccupancy(){
+  loadFeeSettings();   // เติมอัตราค่าธรรมเนียมกลางไว้ล่วงหน้า (PM_REG_FEES)
   if(!getApiUrl()) return;
   const rows = await apiGet('getVendors');
   if(Array.isArray(rows)){
@@ -1175,7 +1343,9 @@ function selectZone(z) {
 
 function updateLockGrid() {
   const grid = document.getElementById('lockGrid');
-  grid.innerHTML = LOCKS[selectedZone].data.map(l => {
+  const zoneObj = LOCKS[selectedZone] || LOCKS[DEFAULT_ZONE];
+  if (!zoneObj) { grid.innerHTML = '<div style="padding:12px;color:#b91c1c">ไม่พบผังล็อคของโซนนี้</div>'; return; }
+  grid.innerHTML = zoneObj.data.map(l => {
     const cls = l.o ? 'occupied' : (selectedLock===l.id ? 'selected' : 'vacant');
     return `<div class="lock-cell ${cls}" onclick="${l.o?'':'pickLock(\''+l.id+'\')'}" title="${l.id}">${l.id}</div>`;
   }).join('');
@@ -1183,6 +1353,7 @@ function updateLockGrid() {
 
 function pickLock(id) {
   selectedLock = id;
+  checkEntryFeeHistory(id);   // เตือนถ้าล็อคนี้เคยเก็บค่าแรกเข้าไปแล้ว (PM_REG_FEES)
   updateLockGrid();
   document.getElementById('errLock').style.display = 'none';
   document.getElementById('lockSelectedWrap').style.display = 'block';
@@ -1208,8 +1379,8 @@ function getElecInputs() {
   })).filter(s => s.price > 0);
   const specialSum = special.reduce((s,x)=>s+x.price, 0);
   const total = bulb*10 + fan*20 + small*50 + large*100 + specialSum; // ราคาต่อวันพฤหัสบดี 1 วัน
-  // ค่าไฟที่เรียกเก็บจริงเป็นรายเดือน = ราคา/อังคาร × จำนวนวันพฤหัสบดีของเดือนนี้ (เหมือนค่าเช่า)
-  // แก้ 2026-07-17 บั๊ก #27 — เดิมเก็บเงินแค่ total (1 อังคาร) ทำให้ผู้ค้าจ่ายค่าไฟแค่ 1 สัปดาห์
+  // ค่าไฟที่เรียกเก็บจริงเป็นรายเดือน = ราคา/วันพฤหัสบดี × จำนวนวันพฤหัสบดีของเดือนนี้ (เหมือนค่าเช่า)
+  // แก้ 2026-07-17 บั๊ก #27 — เดิมเก็บเงินแค่ total (1 วันพฤหัสบดี) ทำให้ผู้ค้าจ่ายค่าไฟแค่ 1 สัปดาห์
   const monthly = Math.round(total * thisMonthThursdays());
   return { bulb, fan, small, large, special, total, monthly };
 }
@@ -1221,7 +1392,7 @@ function addElecSpecial() {
   div.className = 'extra-item'; div.id = `es-${id}`;
   div.innerHTML = `
     <input type="text" placeholder="ชื่ออุปกรณ์ เช่น ตู้แช่ไอศกรีม..." oninput="calcElectric()" id="esn-${id}">
-    <input type="number" placeholder="฿ ราคา/อังคาร" min="0" oninput="calcElectric()" id="esp-${id}" style="text-align:right">
+    <input type="number" placeholder="฿ ราคา/วันพฤหัสบดี" min="0" oninput="calcElectric()" id="esp-${id}" style="text-align:right">
     <button class="btn-rm" onclick="removeElecSpecial(${id})" title="ลบ"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>`;
   document.getElementById('elecSpecialList').appendChild(div);
   document.getElementById(`esn-${id}`).focus();
@@ -1278,6 +1449,45 @@ function animateVal(id, newText) {
     el.classList.remove('changed');
     void el.offsetWidth;
     el.classList.add('changed');
+  }
+}
+
+
+// ══════════════════════════════════════════════════════════════════════════
+// PM_REG_FEES (2026-07-26) — กติกาค่าธรรมเนียมตามที่ผู้ดูแลตลาดกำหนด
+//  · ค่าธรรมเนียมแรกเข้า = เก็บ "ครั้งเดียว" ต่อการเข้าเป็นผู้ค้าประจำรายใหม่
+//    → ถ้าล็อคนี้เคยมีรายการ "ค่าแรกเข้า" ในประวัติการรับชำระ ระบบจะเตือนก่อน (ไม่บล็อก
+//      เพราะล็อคเดิมอาจเปลี่ยนผู้ค้ารายใหม่ซึ่งต้องเก็บค่าแรกเข้าใหม่จริง — ผู้จัดเป็นคนตัดสิน)
+//  · ค่าธรรมเนียมรายปี = เก็บครั้งแรกตอนลงทะเบียน แล้วเก็บอีกทุกเดือนมีนาคม (บิลเดือนมีนาคมบวกให้เอง)
+//    → ช่องนี้เติมค่าเริ่มต้นจาก "อัตรากลางทั้งตลาด" ในชีต settings ให้อัตโนมัติ
+// ══════════════════════════════════════════════════════════════════════════
+let PM_REG_SETTINGS = {};
+async function loadFeeSettings(){
+  if(!getApiUrl()) return;
+  const st = await apiGet('getSettings');
+  if(st && typeof st==='object'){
+    PM_REG_SETTINGS = st;
+    const annual = parseFloat(st.annual_fee)||0;
+    const el = document.getElementById('feeAnnualAmt');
+    if(el && !el.value && annual>0){ el.value = annual; recalc(); }
+    const entry = parseFloat(st.entry_fee)||0;
+    const el2 = document.getElementById('feeEntryAmt');
+    if(el2 && !el2.value && entry>0){ el2.value = entry; recalc(); }
+  }
+}
+async function checkEntryFeeHistory(lockId){
+  if(!getApiUrl()||!lockId) return;
+  const box = document.getElementById('entryFeeWarn');
+  if(box) box.style.display='none';
+  const rows = await apiGet('getPayments', { lockId: lockId });
+  if(!Array.isArray(rows)) return;
+  const prev = rows.filter(r=>String(r.type)==='ค่าแรกเข้า' && (parseFloat(r.amount)||0)>0);
+  if(prev.length && box){
+    const last = prev[prev.length-1];
+    box.innerHTML = 'ล็อคนี้เคยเก็บ<strong>ค่าธรรมเนียมแรกเข้า</strong>ไปแล้ว ฿'
+      + (parseFloat(last.amount)||0).toLocaleString() + ' เมื่อ ' + (last.date||'—')
+      + ' — ค่าแรกเข้าเก็บครั้งเดียวต่อผู้ค้าหนึ่งราย ถ้าเป็นผู้ค้ารายเดิมโปรดใส่ 0';
+    box.style.display='block';
   }
 }
 
@@ -1340,7 +1550,7 @@ function buildConfirm() {
       <div class="sum-row"><span class="sum-label">สินค้า</span><span class="sum-val">${product}</span></div>
       <div class="sum-row"><span class="sum-label">ล็อค</span><span class="sum-val green">${selectedLock} (โซน ${selectedZone})</span></div>
       <div class="sum-row"><span class="sum-label">ค่าเช่า/วัน</span><span class="sum-val">฿${dailyRent.toLocaleString()}</span></div>
-      <div class="sum-row"><span class="sum-label">ค่าเช่า/เดือน (× ${thisMonthThursdays()} อังคาร)</span><span class="sum-val">฿${rent.toLocaleString()}</span></div>
+      <div class="sum-row"><span class="sum-label">ค่าเช่า/เดือน (× ${thisMonthThursdays()} วันพฤหัสบดี)</span><span class="sum-val">฿${rent.toLocaleString()}</span></div>
       <div class="sum-row"><span class="sum-label">วันเริ่มเช่า</span><span class="sum-val">${date}</span></div>
     </div>
     <div class="confirm-block gray-block">
@@ -1406,13 +1616,19 @@ async function submitForm(btn) {
     }});
 
     // 2) บันทึกรายการรับชำระแต่ละประเภทลงชีต payments (วันที่แบบไทย ให้ตรงกับรายงาน)
-    const baseNote = 'ลงทะเบียนผู้ค้าใหม่ · ผู้รับเงิน: ' + collector;
+    // EDIT_ONLY_MODE = ผู้ใช้กด "ย้อนกลับไปแก้ไขข้อมูลผู้ค้า" จากหน้าสำเร็จ → อัปเดตข้อมูลเท่านั้น
+    // ห้ามสร้างรายการรับชำระซ้ำ (จะทำให้ยอดในรายงานและชีต payments เกินความจริง)
+    const baseNote = EDIT_ONLY_MODE
+      ? ('แก้ไขข้อมูลผู้ค้า · โดย: ' + collector)
+      : ('ลงทะเบียนผู้ค้าใหม่ · ผู้รับเงิน: ' + collector);
     const payRows = [];
+    if (!EDIT_ONLY_MODE) {
     if (entry  > 0) payRows.push({type:'ค่าแรกเข้า',        amount:entry});
     if (annual > 0) payRows.push({type:'ค่าธรรมเนียมรายปี', amount:annual});
     if (fRent  > 0) payRows.push({type:'ค่าเช่าประจำเดือน',  amount:fRent});
     if (elec   > 0) payRows.push({type:'ค่าไฟฟ้า',          amount:elec});
     extItems.forEach(it => payRows.push({type: it.label, amount: it.amount}));
+    }
 
     let payOk = true;
     for (const row of payRows){
@@ -1427,13 +1643,13 @@ async function submitForm(btn) {
     // 3) log กิจกรรม
     apiPost('logActivity', { data: {
       user: getCurrentUserName(), type: 'register',
-      message: 'ลงทะเบียนผู้ค้าใหม่: ' + fullName + ' (' + selectedLock + ')',
+      message: (EDIT_ONLY_MODE ? 'แก้ไขข้อมูลผู้ค้า: ' : 'ลงทะเบียนผู้ค้าใหม่: ') + fullName + ' (' + selectedLock + ')',
       detail: 'ยอดรวม ฿' + grand.toLocaleString(), date: payDateTH, time,
     }});
 
     const vOk = vRes && vRes.status==='ok';
     saveNote = (vOk && payOk)
-      ? '<div style="margin-top:10px;padding:8px 12px;background:#e6f7ee;border-radius:8px;color:#1a7f4b;font-weight:700;font-size:.72rem"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M17.5 19H9a5 5 0 1 1 1.6-9.7A6 6 0 0 1 22 11.5 4.5 4.5 0 0 1 17.5 19Z"/></svg> บันทึกขึ้น Google Sheets แล้ว</div>'
+      ? '<div style="margin-top:10px;padding:8px 12px;background:#e6f7ee;border-radius:8px;color:#7f3f1a;font-weight:700;font-size:.72rem"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M17.5 19H9a5 5 0 1 1 1.6-9.7A6 6 0 0 1 22 11.5 4.5 4.5 0 0 1 17.5 19Z"/></svg> บันทึกขึ้น Google Sheets แล้ว</div>'
       : '<div style="margin-top:10px;padding:8px 12px;background:#fff3cd;border-radius:8px;color:#92400e;font-weight:700;font-size:.72rem"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0Z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg> บันทึกบางส่วนไม่สำเร็จ กรุณาตรวจสอบการเชื่อมต่อ</div>';
     if (btn){ btn.disabled = false; btn.innerHTML = '<svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg> ยืนยันลงทะเบียน & รับชำระ'; }
   } else if (!getApiUrl()) {
@@ -1459,11 +1675,42 @@ async function submitForm(btn) {
     ${saveNote}`;
 }
 
+// ══════════════════════════════════════════════════════════════════════════
+// PM_REG_FIX (2026-07-26) — ปุ่ม "+ลงทะเบียนรายใหม่" ต้องเริ่มต้นใหม่จริง
+// อาการที่ผู้ใช้แจ้ง: กดแล้วเหมือนกลับไปแก้ข้อมูลผู้ค้าที่เพิ่งกดบันทึก
+// ต้นเหตุ: resetAll() เดิมล้างแค่ input[type=text/number/tel] และ textarea — ไม่ล้าง <select>,
+//   checkbox, การ์ดพรีวิว, คลาส .show ของหน้าสำเร็จ และไม่โหลดสถานะล็อคใหม่จาก Sheets
+//   จึงเหลือค่าเดิมค้างบนฟอร์มจนดูเหมือนกำลังแก้ผู้ค้ารายเดิม
+// ทางแก้: ล้างทุกชนิดของช่องกรอก + รีเซ็ตสถานะภายใน + ดึงล็อคที่ถูกจับจองใหม่จากฐานข้อมูล
+//   และแยกปุ่ม "ย้อนกลับไปแก้ไขข้อมูลผู้ค้า" ออกมาเป็นปุ่มของตัวเอง (โหมดไม่รับชำระซ้ำ)
+// ══════════════════════════════════════════════════════════════════════════
+let EDIT_ONLY_MODE = false;   // true = ย้อนกลับมาแก้ข้อมูลผู้ค้าที่บันทึกแล้ว (ห้ามบันทึกการรับเงินซ้ำ)
+
+function backToEdit() {
+  EDIT_ONLY_MODE = true;
+  const ss = document.getElementById('successScreen');
+  ss.classList.remove('show'); ss.style.display = 'none';
+  document.getElementById('mainLayout').style.display = 'grid';
+  const banner = document.getElementById('editOnlyBanner');
+  if (banner) banner.style.display = 'flex';
+  nextStep(1, null, true);
+  showToast('โหมดแก้ไขข้อมูลผู้ค้า — กดบันทึกอีกครั้งจะอัปเดตข้อมูลเท่านั้น ไม่รับชำระเงินซ้ำ','info');
+}
+
 function resetAll() {
+  EDIT_ONLY_MODE = false;
+  const banner = document.getElementById('editOnlyBanner');
+  if (banner) banner.style.display = 'none';
   document.getElementById('mainLayout').style.display  = 'grid';
-  document.getElementById('successScreen').style.display = 'none';
-  document.querySelectorAll('input[type=text],input[type=number],input[type=tel],textarea').forEach(el=>el.value='');
-  selectedLock = null; selectedZone = 'SA'; extras = []; extraCnt = 0;
+  const ss = document.getElementById('successScreen');
+  ss.classList.remove('show'); ss.style.display = 'none';
+  document.querySelectorAll('input[type=text],input[type=number],input[type=tel],input[type=email],textarea').forEach(el=>el.value='');
+  document.querySelectorAll('#mainLayout select').forEach(el=>{ el.selectedIndex = 0; });
+  document.querySelectorAll('#mainLayout input[type=checkbox],#mainLayout input[type=radio]').forEach(el=>{ el.checked = false; });
+  const prev = document.getElementById('vendorPreviewCard'); if (prev) prev.style.display = 'none';
+  // ดึงสถานะล็อคล่าสุดจาก Sheets เพื่อให้ล็อคที่เพิ่งลงทะเบียนไปแสดงเป็น "ไม่ว่าง" ทันที
+  if (typeof loadRealOccupancy === 'function') { try { loadRealOccupancy(); } catch(e) {} }
+  selectedLock = null; selectedZone = DEFAULT_ZONE; extras = []; extraCnt = 0;
   elecSpecials = []; elecSpecialCnt = 0;
   document.getElementById('extrasList').innerHTML = '';
   document.getElementById('elecSpecialList').innerHTML = '';

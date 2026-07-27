@@ -11,16 +11,16 @@
   --b:#1e40af;--bl:#eff6ff;--pu:#6d28d9;--pul:#f5f3ff;
   --y:#92400e;--yl:#fffbeb;
   --bg:#f4f6f4;--sf:#fff;--sf2:#f8faf9;--sf3:#f1f5f2;
-  --bd:#c8d8cf;--bd2:#9bb5a5;
-  --tx:#0f1e14;--txm:#3d5247;--txl:#7a9184;
+  --bd:#c8d8cf;--bd2:#bfa891;
+  --tx:#0f1e14;--txm:#5a4835;--txl:#a58666;
   --shadow:0 2px 12px rgba(15,30,20,.07);
   --ease:cubic-bezier(.4,0,.2,1);
   --rad:10px;
 }
 [data-theme="dark"]{
   --bg:#0a0f0c;--sf:#111a14;--sf2:#162019;--sf3:#1c2a20;
-  --bd:#2a3d30;--bd2:#3d5a46;
-  --tx:#d4e8d8;--txm:#8aab8f;--txl:#4a6350;
+  --bd:#413426;--bd2:#5f4c38;
+  --tx:#e8ded4;--txm:#b59a80;--txl:#6d5640;
   --gl:#112318;--gll:#0b170f;--rl:#1f0a0a;--ol:#1f1008;
   --bl:#0a1228;--pul:#170f28;--yl:#1a1208;
   --shadow:0 4px 20px rgba(0,0,0,.45);
@@ -159,11 +159,11 @@ textarea{resize:vertical;min-height:56px;}
 .lk-mini:hover{transform:translateY(-2px) scale(1.07);z-index:10;box-shadow:0 4px 10px rgba(0,0,0,.15);}
 .lk-mini .lk-id{font-size:.58rem;font-weight:800;}
 .lk-mini .lk-shop{font-size:.48rem;opacity:.8;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
-.lk-mini.m-full{background:var(--gl);border-color:var(--gb);color:#1b4332;}
+.lk-mini.m-full{background:var(--gl);border-color:var(--gb);color:#432a1b;}
 .lk-mini.m-partial{background:var(--ol);border-color:var(--o);color:#7c2d12;}
 .lk-mini.m-overdue{background:var(--rl);border-color:var(--r);color:#7f1d1d;}
 .lk-mini.m-vacant{background:var(--yl);border-color:#d97706;color:#78350f;}
-[data-theme="dark"] .lk-mini.m-full{background:#132a1d;border-color:var(--gm);color:#86efac;}
+[data-theme="dark"] .lk-mini.m-full{background:#2a1b13;border-color:var(--gm);color:#efac86;}
 [data-theme="dark"] .lk-mini.m-partial{background:#1f1208;border-color:var(--o);color:#fdba74;}
 [data-theme="dark"] .lk-mini.m-overdue{background:#1f0a0a;border-color:var(--r);color:#fca5a5;}
 .owe-pill{position:absolute;top:-4px;right:-4px;background:var(--r);color:#fff;font-size:.45rem;font-weight:800;padding:1px 4px;border-radius:7px;white-space:nowrap;}
@@ -218,13 +218,169 @@ textarea{resize:vertical;min-height:56px;}
 .ic{width:1em;height:1em;vertical-align:-.15em;display:inline-block;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0}
 .ic-dot{stroke:none}
 </style>
+<!-- ==== PM_MOBILE_KIT:START (สร้างโดย tools/inject_mobile_kit.py — ห้ามแก้ในไฟล์นี้) ==== -->
+<style id="pm-mobile-kit">
+/* ═══════════════════════════════════════════════════════════════════════════
+   PM MOBILE KIT — Mobile-First / Responsive / Thai typography (2026-07-26)
+   เป้าหมาย: ทุกหน้าใช้งานได้เต็มจอบนสมาร์ทโฟนทุกขนาด ไม่มีเนื้อหาล้นขอบจอด้านข้าง
+   (no horizontal overflow), ตัวอักษรไทยตัดบรรทัดถูกต้อง, ปุ่มกดง่ายด้วยนิ้วโป้ง,
+   เว้นระยะขอบบน-ล่างไม่ให้ชิดจอ
+   หมายเหตุเชิงเทคนิค: ตั้งใจ "ไม่" ใส่ viewport-fit=cover เพราะถ้าไม่ใส่ เบราว์เซอร์จะกันพื้นที่
+   รอยบาก (notch) ให้อยู่แล้วโดยอัตโนมัติ การใส่ cover แล้วจัดการ env() เองมีความเสี่ยงที่เนื้อหา
+   จะไปอยู่ใต้รอยบากถ้าพลาดจุดใดจุดหนึ่ง — เราจึงใช้ env() เป็น "ระยะเสริม" (max()) เท่านั้น
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* ── 1) พื้นฐาน: กันล้นขอบจอ + ฟอนต์ไทย ── */
+html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
+*, *::before, *::after { min-width: 0; }               /* ตัวการอันดับ 1 ของ overflow ใน flex/grid */
+body {
+  overflow-x: hidden;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Sarabun",
+               "Noto Sans Thai", "Leelawadee UI", "Thonburi", system-ui,
+               "Helvetica Neue", Arial, sans-serif;
+  overflow-wrap: break-word;                           /* ตัดเฉพาะเมื่อคำเดียวยาวเกินกรอบ */
+  word-break: normal;                                  /* ห้าม break-all — ทำให้ไทยตัดกลางพยางค์ */
+  line-break: auto;
+}
+img, svg, canvas, video, table { max-width: 100%; }
+input, select, textarea, button { font-family: inherit; max-width: 100%; }
+
+/* ── 2) ตารางเลื่อนแนวนอนได้เอง (wrapper ถูกใส่ให้อัตโนมัติโดยสคริปต์ท้ายไฟล์) ── */
+.pm-tablewrap {
+  width: 100%; max-width: 100%; overflow-x: auto; overflow-y: hidden;
+  -webkit-overflow-scrolling: touch; overscroll-behavior-x: contain;
+}
+.pm-tablewrap > table { min-width: 100%; }
+
+/* ── 3) แท็บเล็ต ── */
+@media (max-width: 900px) {
+  .two-col { grid-template-columns: 1fr !important; }
+  .g2 { grid-template-columns: 1fr !important; }
+  .kgrid, .kpi-grid, .kpi-row, .mgrid, .summary-grid { grid-template-columns: repeat(3, 1fr) !important; }
+}
+
+/* ── 4) สมาร์ทโฟน ── */
+@media (max-width: 640px) {
+  body { padding-bottom: max(18px, env(safe-area-inset-bottom)); }
+
+  /* กริดสรุป/KPI → 2 คอลัมน์ อ่านง่ายกว่าบีบ 5 ช่องในจอ 360px */
+  .kgrid, .kpi-grid, .kpi-row, .mgrid, .summary-grid,
+  .elec-types, .grid { grid-template-columns: repeat(2, 1fr) !important; }
+  /* ฟอร์ม 2 ช่องต่อแถว → 1 ช่องต่อแถว */
+  .frow, .m-row, .field-row { grid-template-columns: 1fr !important; }
+
+  /* แถบหัวเรื่อง/เครื่องมือ: ให้ห่อบรรทัดได้ ไม่ดันจนล้นจอ */
+  .toolbar, .topbar, .tb-actions, .filter-row, .action-btns,
+  .modal-btns, .option-row, .date-filter, .items-title, .summary-title {
+    flex-wrap: wrap !important;
+  }
+  .toolbar, .topbar { padding-left: 12px !important; padding-right: 12px !important; row-gap: 8px; }
+  .toolbar { padding-top: max(10px, env(safe-area-inset-top)) !important; }
+  .topbar  { padding-top: max(10px, env(safe-area-inset-top)) !important; }
+
+  /* พื้นที่กดขั้นต่ำ 44px ตาม WCAG 2.5.5 / Apple HIG — ผู้จัดตลาดกดด้วยนิ้วโป้งกลางตลาด */
+  button, .btn, .tb-btn, a.btn, input[type=checkbox], input[type=radio] { min-height: 40px; }
+  /* ปุ่มไอคอนเล็ก ๆ ที่ฝังในช่องกรอก (เช่น ปุ่มดู/ซ่อนรหัสผ่าน) และลิงก์ในเมนู */
+  .pw-eye, .icon-btn, .btn-rm { min-width: 40px; min-height: 40px; }
+  .ni, .sidebar a, a.ni { min-height: 44px; }
+  input[type=checkbox], input[type=radio] { min-width: 22px; min-height: 22px; }
+  .btn-sm, .tb-btn { min-height: 38px; }
+  /* iOS ซูมเองถ้า font-size < 16px ในช่องกรอก — ล็อคไว้ที่ 16px กัน layout เพี้ยน */
+  input, select, textarea { font-size: 16px !important; }
+
+  /* หน้ารายงาน: ตัดกรอบกระดาษ A4 ออกบนมือถือให้ใช้ความกว้างเต็มจอ */
+  .page { margin: 10px auto !important; padding: 14px 12px !important; border-radius: 8px !important; }
+  .r-head { flex-direction: column; gap: 6px; }
+  .r-meta { text-align: left !important; }
+  .sign-area { flex-direction: column; gap: 18px; align-items: flex-start; }
+
+  /* หน้ารับชำระหลายล็อค (batch payment) — เดิมไม่มี @media เลย
+     .layout เป็น flex 2 คอลัมน์ + height:100vh + overflow:hidden ทำให้ฝั่งขวาหลุดออกนอกจอ
+     และเลื่อนดูไม่ได้บนมือถือ → เปลี่ยนเป็นเรียงลงล่างและให้หน้าเลื่อนตามปกติ */
+  .layout {
+    flex-direction: column !important; height: auto !important;
+    min-height: 0 !important; overflow: visible !important;
+  }
+  .left-panel, .right-panel {
+    width: 100% !important; max-width: 100% !important; flex: none !important;
+    border-right: none !important; border-left: none !important;
+  }
+  .right-scroll { overflow: visible !important; padding: 14px 12px !important; }
+  .lock-item { flex-wrap: wrap; }
+
+  /* โมดัล: สูงไม่เกินจอ เลื่อนในตัวได้ ไม่ชิดขอบล่าง */
+  .modal, .modal-box, .m-box, .modal-content, .confirm-box {
+    max-width: calc(100vw - 20px) !important;
+    max-height: calc(100vh - 40px) !important;
+    overflow-y: auto !important;
+    margin-bottom: max(10px, env(safe-area-inset-bottom));
+  }
+
+  /* แถบเมนู/sidebar ที่เลื่อนแนวนอน */
+  .sidebar, .side, .nav { max-width: 100% !important; }
+}
+
+/* ── 5) จอเล็กมาก (iPhone SE / 320-360px) ── */
+@media (max-width: 380px) {
+  .kgrid, .kpi-grid, .kpi-row, .mgrid, .summary-grid { grid-template-columns: 1fr !important; }
+  .toolbar h1, .topbar h1 { font-size: .82rem !important; }
+}
+
+/* ── 6) โหมดแนวนอนจอเตี้ย: อย่าล็อคความสูงเป็น 100vh ── */
+@media (max-height: 480px) and (orientation: landscape) {
+  .layout { height: auto !important; overflow: visible !important; }
+}
+
+/* ── 7) พิมพ์: ยกเลิกทุกอย่างของ mobile kit ที่อาจกวนการพิมพ์รายงาน ── */
+@media print {
+  .pm-tablewrap { overflow: visible !important; }
+  body { padding-bottom: 0 !important; overflow: visible !important; }
+}
+</style>
+<script id="pm-mobile-kit-js">
+/* ครอบ <table> ทุกตัวด้วยกล่องเลื่อนแนวนอน เพื่อไม่ให้ตารางกว้างดันหน้าจอล้น
+   ทำด้วย JS เพราะแก้ CSS ล้วนไม่ได้ (ต้องมี element ครอบ) และทำแบบนี้ไม่กระทบ layout เดิมบนเดสก์ท็อป
+   ใช้ MutationObserver เพราะเกือบทุกหน้าสร้างตารางด้วย innerHTML หลังโหลดข้อมูลจาก Sheets เสร็จ */
+(function () {
+  function wrapTables(root) {
+    var tables = (root || document).querySelectorAll ? (root || document).querySelectorAll('table') : [];
+    for (var i = 0; i < tables.length; i++) {
+      var t = tables[i];
+      if (t.parentElement && t.parentElement.classList.contains('pm-tablewrap')) continue;
+      if (t.closest && t.closest('.pm-tablewrap')) continue;
+      var w = document.createElement('div');
+      w.className = 'pm-tablewrap';
+      t.parentNode.insertBefore(w, t);
+      w.appendChild(t);
+    }
+  }
+  function boot() {
+    wrapTables(document);
+    try {
+      new MutationObserver(function (muts) {
+        for (var i = 0; i < muts.length; i++) {
+          for (var j = 0; j < muts[i].addedNodes.length; j++) {
+            var n = muts[i].addedNodes[j];
+            if (n.nodeType !== 1) continue;
+            if (n.tagName === 'TABLE') { wrapTables(n.parentNode); }
+            else if (n.querySelector && n.querySelector('table')) { wrapTables(n); }
+          }
+        }
+      }).observe(document.body, { childList: true, subtree: true });
+    } catch (e) { /* เบราว์เซอร์เก่า — ยังได้ตารางชุดแรกที่ wrap ไปแล้ว */ }
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot);
+  else boot();
+})();
+</script>
+<!-- ==== PM_MOBILE_KIT:END ==== -->
 </head>
 <body>
 
 <div class="topbar">
   <div>
     <h1><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg> ระบบผ่อนชำระ & ยอดคงค้าง — แพไม้มินิ</h1>
-    <p>งวดแรก = อังคารสุดท้ายของเดือน · ชำระให้ครบภายในอังคารต้นเดือนถัดไป</p>
+    <p>งวดแรก = วันพฤหัสบดีสุดท้ายของเดือน · ชำระให้ครบภายในวันพฤหัสบดีต้นเดือนถัดไป</p>
   </div>
   <button class="dm-btn" onclick="toggleDark()" aria-label="สลับโหมดมืด/สว่าง" title="Dark/Light"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3a9 9 0 1 0 0 18Z" fill="currentColor" stroke="none"/><circle cx="12" cy="12" r="9"/></svg></button>
 </div>
@@ -324,7 +480,7 @@ textarea{resize:vertical;min-height:56px;}
         <div id="date-info-box" style="display:none;background:var(--gll);border:1.5px solid var(--gm);border-radius:8px;padding:9px 13px;margin-bottom:10px;font-size:.76rem">
           <div style="font-weight:800;color:var(--gm);margin-bottom:5px"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg> กำหนดการผ่อนชำระ (อิงวันพฤหัสบดี)</div>
           <div style="display:flex;gap:16px;flex-wrap:wrap">
-            <div><span style="color:var(--txl)">งวดแรก (อังคารสุดท้ายเดือนนี้):</span> <strong id="date-first" style="color:var(--gm)">—</strong></div>
+            <div><span style="color:var(--txl)">งวดแรก (วันพฤหัสบดีสุดท้ายเดือนนี้):</span> <strong id="date-first" style="color:var(--gm)">—</strong></div>
             <div><span style="color:var(--txl)">ชำระให้ครบภายใน:</span> <strong id="date-deadline" style="color:var(--r)">—</strong></div>
           </div>
           <div style="margin-top:5px;font-size:.70rem;color:var(--r);font-weight:600" id="date-warning"></div>
@@ -354,7 +510,7 @@ textarea{resize:vertical;min-height:56px;}
             <li>ต้องชำระให้ครบภายใน <strong>วันพฤหัสบดีต้นเดือน</strong>ของเดือนถัดจากงวดสุดท้าย</li>
             <li class="warn">หากค้างชำระเกินกำหนด สิทธิ์ผู้ค้าประจำจะสิ้นสุดทันที</li>
             <li class="warn">ต้องเข้ากระบวนการสมัครผู้ค้าประจำใหม่ + ชำระค่าแรกเข้า + รายปีอีกครั้ง</li>
-            <li>ผ่อนสูงสุด 4 งวด (4 อังคาร)</li>
+            <li>ผ่อนสูงสุด 4 งวด (4 วันพฤหัสบดี)</li>
           </ul>
         </div>
 
@@ -829,13 +985,13 @@ function calcPlan(){
       <div class="plan-num pn-next">${s.term}</div>
       <div style="flex:1">
         <div style="font-size:.76rem;font-weight:700">งวดที่ ${s.term} — ${fmtDate(s.due)}</div>
-        ${s.term===1?'<div style="font-size:.64rem;color:var(--gm)">= อังคารสุดท้ายของเดือนนี้</div>':''}
+        ${s.term===1?'<div style="font-size:.64rem;color:var(--gm)">= วันพฤหัสบดีสุดท้ายของเดือนนี้</div>':''}
       </div>
       <div style="font-size:.84rem;font-weight:800;color:var(--o)">${baht(s.amount)}</div>
     </div>`).join('');
   document.getElementById('ins-preview').innerHTML=html+
     `<div style="background:var(--rl);border-radius:7px;padding:7px 11px;margin-top:6px;font-size:.70rem;color:var(--r);font-weight:600">
-      <svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><line x1="5" y1="12" x2="19" y2="12"/></svg> ต้องชำระให้ครบภายใน: <strong>${fmtDate(deadline)}</strong> (อังคารต้นเดือน${deadline.getMonth()>6?MONTH_TH[deadline.getMonth()]:MONTH_TH[deadline.getMonth()]} ${deadline.getFullYear()+543})
+      <svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><line x1="5" y1="12" x2="19" y2="12"/></svg> ต้องชำระให้ครบภายใน: <strong>${fmtDate(deadline)}</strong> (วันพฤหัสบดีต้นเดือน${deadline.getMonth()>6?MONTH_TH[deadline.getMonth()]:MONTH_TH[deadline.getMonth()]} ${deadline.getFullYear()+543})
      </div>`;
 }
 

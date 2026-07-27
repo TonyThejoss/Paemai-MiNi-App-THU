@@ -21,8 +21,8 @@
   --y:#92400e;--yl:#fffbeb;
   --pu:#6d28d9;--pul:#f5f3ff;
   --bg:#eef2f0;--sf:#fff;--sf2:#f4f8f5;--sf3:#e8f0eb;
-  --bd:#d0ddd5;--bd2:#a8c0b0;
-  --tx:#0a1a10;--txm:#2e4a38;--txl:#4d6854;
+  --bd:#d0ddd5;--bd2:#c7b4a0;
+  --tx:#0a1a10;--txm:#4c3c2c;--txl:#725a43;
   --sdw:0 2px 12px rgba(10,26,16,.08);
   --sdw2:0 8px 32px rgba(10,26,16,.14);
   --rad:12px;
@@ -31,8 +31,8 @@
 }
 [data-theme="dark"]{
   --bg:#090f0b;--sf:#0f1a13;--sf2:#141f17;--sf3:#1a2b1e;
-  --bd:#243028;--bd2:#364d3c;
-  --tx:#d8ead0;--txm:#8aab8e;--txl:#8ca696;
+  --bd:#243028;--bd2:#534230;
+  --tx:#eadad0;--txm:#b59a80;--txl:#b4997e;
   --gl:#2d1200;--gll:#1a0f06;--rl:#1f0a0a;--ol:#1a0f06;
   --bl:#091228;--pul:#12092a;--yl:#120f06;
 }
@@ -227,16 +227,16 @@ input:focus,select:focus,textarea:focus{border-color:var(--gm);box-shadow:0 0 0 
 .login-logo{text-align:center;margin-bottom:22px;}
 .login-logo .li{width:52px;height:52px;border-radius:14px;background:linear-gradient(135deg,#7c2d12,#c2410c);display:inline-flex;align-items:center;justify-content:center;font-size:1.5rem;margin-bottom:8px;box-shadow:0 6px 18px rgba(45,106,79,.38);}
 .login-logo h2{font-size:1.05rem;font-weight:800;color:#0a1a10;margin-bottom:2px;}
-[data-theme="dark"] .login-logo h2{color:#d8ead0;}
-.login-logo p{font-size:.91rem;color:#6b8c76;}
+[data-theme="dark"] .login-logo h2{color:#eadad0;}
+.login-logo p{font-size:.91rem;color:#9c7c5b;}
 .login-field{margin-bottom:12px;}
-.login-field label{display:block;font-size:.90rem;font-weight:700;color:#3d5247;text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px;}
-[data-theme="dark"] .login-field label{color:#8aab8e;}
+.login-field label{display:block;font-size:.90rem;font-weight:700;color:#5a4835;text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px;}
+[data-theme="dark"] .login-field label{color:#b59a80;}
 .login-field input{width:100%;padding:10px 13px;border:1.5px solid #d0ddd5;border-radius:9px;font-size:.86rem;background:#f4f8f5;color:#0a1a10;outline:none;transition:all .2s;font-family:inherit;}
-[data-theme="dark"] .login-field input{background:#141f17;color:#d8ead0;border-color:#243028;}
+[data-theme="dark"] .login-field input{background:#141f17;color:#eadad0;border-color:#243028;}
 .login-field input:focus{border-color:#c2410c;box-shadow:0 0 0 3px rgba(45,106,79,.12);background:#fff;color:#0a1a10;}
 /* แก้บั๊ก 2569-07-23: เดิม :focus บังคับ background:#fff ทุกธีม แต่ไม่ได้ reset สี text —
-   ในธีมมืด สีตัวอักษร (#d8ead0 เกือบขาว) จึงกลายเป็นมองไม่เห็นตอนโฟกัส/พิมพ์ (ขาวบนขาว)
+   ในธีมมืด สีตัวอักษร (#eadad0 เกือบขาว) จึงกลายเป็นมองไม่เห็นตอนโฟกัส/พิมพ์ (ขาวบนขาว)
    เพิ่ม override เฉพาะธีมมืดให้ยังคงพื้นเข้ม + ตัวอักษรสว่าง อ่านออกได้ตลอดตอนพิมพ์ */
 [data-theme="dark"] .login-field input:focus{background:#1a2b20;color:#eaf6e4;border-color:#ea580c;box-shadow:0 0 0 3px rgba(64,145,108,.22);}
 /* ป้องกัน autofill ของเบราว์เซอร์ (ชื่อผู้ใช้/รหัสผ่านที่จำไว้) บังคับพื้นหลัง/สีตัวอักษรของตัวเอง
@@ -256,7 +256,7 @@ input:focus,select:focus,textarea:focus{border-color:var(--gm);box-shadow:0 0 0 
 }
 .pw-wrap{position:relative;}
 .pw-wrap input{padding-right:40px;}
-.pw-eye{position:absolute;right:11px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:#6b8c76;font-size:.88rem;padding:4px;}
+.pw-eye{position:absolute;right:11px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:#9c7c5b;font-size:.88rem;padding:4px;}
 .login-btn{width:100%;padding:11px;background:linear-gradient(135deg,#c2410c,#ea580c);color:#fff;border:none;border-radius:9px;font-size:.86rem;font-weight:800;cursor:pointer;font-family:inherit;transition:all .2s;box-shadow:0 4px 14px rgba(45,106,79,.32);margin-top:4px;}
 .login-btn:hover{transform:translateY(-1px);filter:brightness(1.07);}
 .login-err{background:#fee2e2;border:1px solid #fca5a5;border-radius:7px;padding:8px 12px;font-size:.74rem;font-weight:700;color:#b91c1c;margin-bottom:11px;text-align:center;display:none;animation:shake .3s;}
@@ -326,6 +326,162 @@ input:focus,select:focus,textarea:focus{border-color:var(--gm);box-shadow:0 0 0 
 /* ─── VENDOR DB (ported from THU v1.1) ─── */
 .vdb-toolbar{padding:10px 14px;background:var(--sf);border-bottom:1px solid var(--bd);display:flex;gap:7px;flex-wrap:wrap;align-items:center;flex-shrink:0;}
 </style>
+<!-- ==== PM_MOBILE_KIT:START (สร้างโดย tools/inject_mobile_kit.py — ห้ามแก้ในไฟล์นี้) ==== -->
+<style id="pm-mobile-kit">
+/* ═══════════════════════════════════════════════════════════════════════════
+   PM MOBILE KIT — Mobile-First / Responsive / Thai typography (2026-07-26)
+   เป้าหมาย: ทุกหน้าใช้งานได้เต็มจอบนสมาร์ทโฟนทุกขนาด ไม่มีเนื้อหาล้นขอบจอด้านข้าง
+   (no horizontal overflow), ตัวอักษรไทยตัดบรรทัดถูกต้อง, ปุ่มกดง่ายด้วยนิ้วโป้ง,
+   เว้นระยะขอบบน-ล่างไม่ให้ชิดจอ
+   หมายเหตุเชิงเทคนิค: ตั้งใจ "ไม่" ใส่ viewport-fit=cover เพราะถ้าไม่ใส่ เบราว์เซอร์จะกันพื้นที่
+   รอยบาก (notch) ให้อยู่แล้วโดยอัตโนมัติ การใส่ cover แล้วจัดการ env() เองมีความเสี่ยงที่เนื้อหา
+   จะไปอยู่ใต้รอยบากถ้าพลาดจุดใดจุดหนึ่ง — เราจึงใช้ env() เป็น "ระยะเสริม" (max()) เท่านั้น
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* ── 1) พื้นฐาน: กันล้นขอบจอ + ฟอนต์ไทย ── */
+html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
+*, *::before, *::after { min-width: 0; }               /* ตัวการอันดับ 1 ของ overflow ใน flex/grid */
+body {
+  overflow-x: hidden;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Sarabun",
+               "Noto Sans Thai", "Leelawadee UI", "Thonburi", system-ui,
+               "Helvetica Neue", Arial, sans-serif;
+  overflow-wrap: break-word;                           /* ตัดเฉพาะเมื่อคำเดียวยาวเกินกรอบ */
+  word-break: normal;                                  /* ห้าม break-all — ทำให้ไทยตัดกลางพยางค์ */
+  line-break: auto;
+}
+img, svg, canvas, video, table { max-width: 100%; }
+input, select, textarea, button { font-family: inherit; max-width: 100%; }
+
+/* ── 2) ตารางเลื่อนแนวนอนได้เอง (wrapper ถูกใส่ให้อัตโนมัติโดยสคริปต์ท้ายไฟล์) ── */
+.pm-tablewrap {
+  width: 100%; max-width: 100%; overflow-x: auto; overflow-y: hidden;
+  -webkit-overflow-scrolling: touch; overscroll-behavior-x: contain;
+}
+.pm-tablewrap > table { min-width: 100%; }
+
+/* ── 3) แท็บเล็ต ── */
+@media (max-width: 900px) {
+  .two-col { grid-template-columns: 1fr !important; }
+  .g2 { grid-template-columns: 1fr !important; }
+  .kgrid, .kpi-grid, .kpi-row, .mgrid, .summary-grid { grid-template-columns: repeat(3, 1fr) !important; }
+}
+
+/* ── 4) สมาร์ทโฟน ── */
+@media (max-width: 640px) {
+  body { padding-bottom: max(18px, env(safe-area-inset-bottom)); }
+
+  /* กริดสรุป/KPI → 2 คอลัมน์ อ่านง่ายกว่าบีบ 5 ช่องในจอ 360px */
+  .kgrid, .kpi-grid, .kpi-row, .mgrid, .summary-grid,
+  .elec-types, .grid { grid-template-columns: repeat(2, 1fr) !important; }
+  /* ฟอร์ม 2 ช่องต่อแถว → 1 ช่องต่อแถว */
+  .frow, .m-row, .field-row { grid-template-columns: 1fr !important; }
+
+  /* แถบหัวเรื่อง/เครื่องมือ: ให้ห่อบรรทัดได้ ไม่ดันจนล้นจอ */
+  .toolbar, .topbar, .tb-actions, .filter-row, .action-btns,
+  .modal-btns, .option-row, .date-filter, .items-title, .summary-title {
+    flex-wrap: wrap !important;
+  }
+  .toolbar, .topbar { padding-left: 12px !important; padding-right: 12px !important; row-gap: 8px; }
+  .toolbar { padding-top: max(10px, env(safe-area-inset-top)) !important; }
+  .topbar  { padding-top: max(10px, env(safe-area-inset-top)) !important; }
+
+  /* พื้นที่กดขั้นต่ำ 44px ตาม WCAG 2.5.5 / Apple HIG — ผู้จัดตลาดกดด้วยนิ้วโป้งกลางตลาด */
+  button, .btn, .tb-btn, a.btn, input[type=checkbox], input[type=radio] { min-height: 40px; }
+  /* ปุ่มไอคอนเล็ก ๆ ที่ฝังในช่องกรอก (เช่น ปุ่มดู/ซ่อนรหัสผ่าน) และลิงก์ในเมนู */
+  .pw-eye, .icon-btn, .btn-rm { min-width: 40px; min-height: 40px; }
+  .ni, .sidebar a, a.ni { min-height: 44px; }
+  input[type=checkbox], input[type=radio] { min-width: 22px; min-height: 22px; }
+  .btn-sm, .tb-btn { min-height: 38px; }
+  /* iOS ซูมเองถ้า font-size < 16px ในช่องกรอก — ล็อคไว้ที่ 16px กัน layout เพี้ยน */
+  input, select, textarea { font-size: 16px !important; }
+
+  /* หน้ารายงาน: ตัดกรอบกระดาษ A4 ออกบนมือถือให้ใช้ความกว้างเต็มจอ */
+  .page { margin: 10px auto !important; padding: 14px 12px !important; border-radius: 8px !important; }
+  .r-head { flex-direction: column; gap: 6px; }
+  .r-meta { text-align: left !important; }
+  .sign-area { flex-direction: column; gap: 18px; align-items: flex-start; }
+
+  /* หน้ารับชำระหลายล็อค (batch payment) — เดิมไม่มี @media เลย
+     .layout เป็น flex 2 คอลัมน์ + height:100vh + overflow:hidden ทำให้ฝั่งขวาหลุดออกนอกจอ
+     และเลื่อนดูไม่ได้บนมือถือ → เปลี่ยนเป็นเรียงลงล่างและให้หน้าเลื่อนตามปกติ */
+  .layout {
+    flex-direction: column !important; height: auto !important;
+    min-height: 0 !important; overflow: visible !important;
+  }
+  .left-panel, .right-panel {
+    width: 100% !important; max-width: 100% !important; flex: none !important;
+    border-right: none !important; border-left: none !important;
+  }
+  .right-scroll { overflow: visible !important; padding: 14px 12px !important; }
+  .lock-item { flex-wrap: wrap; }
+
+  /* โมดัล: สูงไม่เกินจอ เลื่อนในตัวได้ ไม่ชิดขอบล่าง */
+  .modal, .modal-box, .m-box, .modal-content, .confirm-box {
+    max-width: calc(100vw - 20px) !important;
+    max-height: calc(100vh - 40px) !important;
+    overflow-y: auto !important;
+    margin-bottom: max(10px, env(safe-area-inset-bottom));
+  }
+
+  /* แถบเมนู/sidebar ที่เลื่อนแนวนอน */
+  .sidebar, .side, .nav { max-width: 100% !important; }
+}
+
+/* ── 5) จอเล็กมาก (iPhone SE / 320-360px) ── */
+@media (max-width: 380px) {
+  .kgrid, .kpi-grid, .kpi-row, .mgrid, .summary-grid { grid-template-columns: 1fr !important; }
+  .toolbar h1, .topbar h1 { font-size: .82rem !important; }
+}
+
+/* ── 6) โหมดแนวนอนจอเตี้ย: อย่าล็อคความสูงเป็น 100vh ── */
+@media (max-height: 480px) and (orientation: landscape) {
+  .layout { height: auto !important; overflow: visible !important; }
+}
+
+/* ── 7) พิมพ์: ยกเลิกทุกอย่างของ mobile kit ที่อาจกวนการพิมพ์รายงาน ── */
+@media print {
+  .pm-tablewrap { overflow: visible !important; }
+  body { padding-bottom: 0 !important; overflow: visible !important; }
+}
+</style>
+<script id="pm-mobile-kit-js">
+/* ครอบ <table> ทุกตัวด้วยกล่องเลื่อนแนวนอน เพื่อไม่ให้ตารางกว้างดันหน้าจอล้น
+   ทำด้วย JS เพราะแก้ CSS ล้วนไม่ได้ (ต้องมี element ครอบ) และทำแบบนี้ไม่กระทบ layout เดิมบนเดสก์ท็อป
+   ใช้ MutationObserver เพราะเกือบทุกหน้าสร้างตารางด้วย innerHTML หลังโหลดข้อมูลจาก Sheets เสร็จ */
+(function () {
+  function wrapTables(root) {
+    var tables = (root || document).querySelectorAll ? (root || document).querySelectorAll('table') : [];
+    for (var i = 0; i < tables.length; i++) {
+      var t = tables[i];
+      if (t.parentElement && t.parentElement.classList.contains('pm-tablewrap')) continue;
+      if (t.closest && t.closest('.pm-tablewrap')) continue;
+      var w = document.createElement('div');
+      w.className = 'pm-tablewrap';
+      t.parentNode.insertBefore(w, t);
+      w.appendChild(t);
+    }
+  }
+  function boot() {
+    wrapTables(document);
+    try {
+      new MutationObserver(function (muts) {
+        for (var i = 0; i < muts.length; i++) {
+          for (var j = 0; j < muts[i].addedNodes.length; j++) {
+            var n = muts[i].addedNodes[j];
+            if (n.nodeType !== 1) continue;
+            if (n.tagName === 'TABLE') { wrapTables(n.parentNode); }
+            else if (n.querySelector && n.querySelector('table')) { wrapTables(n); }
+          }
+        }
+      }).observe(document.body, { childList: true, subtree: true });
+    } catch (e) { /* เบราว์เซอร์เก่า — ยังได้ตารางชุดแรกที่ wrap ไปแล้ว */ }
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot);
+  else boot();
+})();
+</script>
+<!-- ==== PM_MOBILE_KIT:END ==== -->
 </head>
 <body>
 
@@ -627,7 +783,7 @@ function toggleDark(){
   else if(window.matchMedia('(prefers-color-scheme:dark)').matches) document.documentElement.setAttribute('data-theme','dark');
 })();
 
-const APP_BUILD='20260723-0904'; // cache-buster — build.py แทนค่าอัตโนมัติ
+const APP_BUILD='20260726-1719'; // cache-buster — build.py แทนค่าอัตโนมัติ
 const DAYS=['อาทิตย์','จันทร์','อังคาร','พุธ','พฤหัสบดี','ศุกร์','เสาร์'];
 const MONS=['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
 function tick(){
@@ -675,7 +831,7 @@ function goTab(id){
   curTab=id;
   // Special actions
   if(id==='vdb') renderVDB();
-  if(id==='actlog') renderActLog();
+  if(id==='actlog'){ renderActLog(); loadActLogFromSheets(); }
   // Close sidebar on mobile
   if(window.innerWidth<=768) closeSidebar();
   // Log
@@ -876,13 +1032,65 @@ async function confirmChPw(){
 // ════════════════════════════════════════════════════
 const ACT_LOG=[];
 const ACT_ICONS={vendor:'<svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20v-1a5 5 0 0 1 5-5h3a5 5 0 0 1 5 5v1"/><path d="M16.5 5a3.5 3.5 0 0 1 0 6.9"/><path d="M21.5 20v-1a5 5 0 0 0-3.5-4.8"/></svg>',payment:'<svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M9.5 9.5c0-1.1 1.1-2 2.5-2s2.5.9 2.5 2-1.1 1.6-2.5 2-2.5.9-2.5 2 1.1 2 2.5 2 2.5-.9 2.5-2"/></svg>',leave:'<svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="4" width="16" height="18" rx="2"/><path d="M9 3h6a1 1 0 0 1 1 1v1H8V4a1 1 0 0 1 1-1Z"/></svg>',daily:'<svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 10 12 2H4v8l8 8 8-8Z" transform="translate(0 2)"/><circle cx="7.5" cy="7.5" r="1" transform="translate(0 2)"/></svg>',installment:'<svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="4" width="16" height="18" rx="2"/><path d="M9 3h6a1 1 0 0 1 1 1v1H8V4a1 1 0 0 1 1-1Z"/></svg>',nav:'<svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><polygon points="3 6 9 3 15 6 21 3 21 18 15 21 9 18 3 21"/><line x1="9" y1="3" x2="9" y2="18"/><line x1="15" y1="6" x2="15" y2="21"/></svg>',system:'<svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .34 1.87l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.7 1.7 0 0 0-1.87-.34 1.7 1.7 0 0 0-1.04 1.56V21a2 2 0 0 1-4 0v-.09A1.7 1.7 0 0 0 9 19.37a1.7 1.7 0 0 0-1.87.34l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.7 1.7 0 0 0 4.63 15a1.7 1.7 0 0 0-1.56-1.04H3a2 2 0 0 1 0-4h.09A1.7 1.7 0 0 0 4.63 9a1.7 1.7 0 0 0-.34-1.87l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.7 1.7 0 0 0 9 4.63a1.7 1.7 0 0 0 1.04-1.56V3a2 2 0 0 1 4 0v.09a1.7 1.7 0 0 0 1.04 1.56 1.7 1.7 0 0 0 1.87-.34l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.7 1.7 0 0 0 19.37 9a1.7 1.7 0 0 0 1.56 1.04H21a2 2 0 0 1 0 4h-.09A1.7 1.7 0 0 0 19.4 15Z"/></svg>'};
-function logAct(type,msg,detail=''){
+// ══════════════════════════════════════════════════════════════════════════════
+// PM_ACTLOG_SHEET (2026-07-26) — บันทึกกิจกรรมลงชีต activity_log เป็นแหล่งจริงแหล่งเดียว
+//
+// อาการที่ผู้ใช้แจ้ง: "หน้าบันทึกกิจกรรมไม่บันทึกกิจกรรมทั้งหมดที่เกิดขึ้นในแอพ"
+// ต้นเหตุ: ACT_LOG เป็นอาเรย์ในหน่วยความจำของหน้าเว็บ — หายทุกครั้งที่รีเฟรช, ไม่เห็นกิจกรรมของผู้จัด
+//   คนอื่น, และโมดูลย่อยที่รันใน iframe (ผังตลาด/รับชำระ/ค่าไฟ/คิวจร) เรียก logAct() ของ shell ไม่ได้
+// ทางแก้:
+//   1) logAct() เขียนลงชีต activity_log ผ่าน backend ทุกครั้ง (นอกจากแสดงในหน้าจอทันที)
+//   2) หน้าบันทึกกิจกรรมอ่านจากชีตจริง (getActivityLog) จึงเห็นกิจกรรมของทุกคนทุกอุปกรณ์
+//   3) โมดูลใน iframe ส่ง postMessage 'pm-activity' มาให้ shell บันทึกแทน (โมดูลบางตัวบันทึกเองด้วย
+//      logActivity อยู่แล้ว — ฝั่ง backend กันซ้ำด้วย id ที่อิงเวลาระดับมิลลิวินาที)
+//   4) backend ลบรายการที่เก่ากว่า 30 วันให้อัตโนมัติ (ACTIVITY_RETENTION_DAYS) ตามข้อกำหนด
+//      "ให้ลบข้อมูลอัตโนมัติเมื่อกิจกรรมนั้น ๆ ผ่านไป 1 เดือน"
+// ══════════════════════════════════════════════════════════════════════════════
+function pmCurrentUserName(){
+  try{ const ss=sessionStorage.getItem('pmthu-session'); if(ss){ const u=JSON.parse(ss); return u.displayName||u.username||'ผู้ใช้'; } }catch(e){}
+  return 'ผู้ใช้';
+}
+function logAct(type,msg,detail='',opts={}){
   const n=new Date();
   const ts=String(n.getHours()).padStart(2,'0')+':'+String(n.getMinutes()).padStart(2,'0')+':'+String(n.getSeconds()).padStart(2,'0');
+  // เขียนลงชีตจริง (ยิงแบบไม่รอผล เพื่อไม่ให้หน่วง UI ของผู้จัดตลาดที่กำลังเดินเก็บเงิน)
+  if(!opts.fromSheet && typeof apiPost==='function' && (localStorage.getItem('pm-thu-api-url')||localStorage.getItem('pm-api-url'))){
+    try{
+      apiPost('logActivity',{data:{
+        user:pmCurrentUserName(),
+        type:type, message:msg, detail:detail,
+        date:n.getDate()+' '+MONS[n.getMonth()]+' '+(n.getFullYear()+543), time:ts.slice(0,5),
+      }});
+    }catch(e){}
+  }
   ACT_LOG.unshift({ts,type,icon:ACT_ICONS[type]||'<svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2a5 5 0 0 0-5 5c0 3 2 4.6 3.5 8.2L12 22l1.5-6.8C15 11.6 17 10 17 7a5 5 0 0 0-5-5Z"/><circle cx="12" cy="7" r="1.6" fill="currentColor" stroke="none"/></svg>',msg,detail,date:n.getDate()+'/'+(n.getMonth()+1)+'/'+(n.getFullYear()+543)});
   if(ACT_LOG.length>200) ACT_LOG.pop();
   if(curTab==='actlog') renderActLog();
 }
+
+// ดึงบันทึกกิจกรรมจากชีตจริง (ทุกคน/ทุกอุปกรณ์) — backend ลบของเก่าเกิน 30 วันให้เองตอนอ่าน
+async function loadActLogFromSheets(){
+  if(!(localStorage.getItem('pm-thu-api-url')||localStorage.getItem('pm-api-url'))) return;
+  const listEl=document.getElementById('al-list');
+  if(listEl && !ACT_LOG.length) listEl.innerHTML='<div style="text-align:center;padding:24px;color:var(--txl);font-size:.78rem">⏳ กำลังโหลดบันทึกกิจกรรม...</div>';
+  const rows=await apiGet('getActivityLog');
+  if(!Array.isArray(rows)) return;
+  const fromSheet=rows.map(r=>({
+    ts:String(r.time||'').slice(0,8)||'—',
+    type:r.type||'system',
+    icon:ACT_ICONS[r.type]||ACT_ICONS.system,
+    msg:r.message||'—',
+    detail:(r.detail||'')+(r.user?('  ·  โดย '+r.user):''),
+    date:r.date_iso?(function(d){const p=String(d).split('-');return parseInt(p[2],10)+'/'+parseInt(p[1],10)+'/'+(parseInt(p[0],10)+543);})(r.date_iso):(r.date||''),
+    _id:r.id||'',
+  }));
+  // แทนที่ทั้งชุดด้วยข้อมูลจากชีต (ชีตคือแหล่งจริง) แล้วคงรายการในเครื่องที่ยังไม่ถูก sync ไว้ด้านบน
+  const localOnly=ACT_LOG.filter(a=>!a._id);
+  ACT_LOG.length=0;
+  ACT_LOG.push(...localOnly, ...fromSheet);
+  renderActLog();
+}
+
 function renderActLog(){
   const filter=document.getElementById('al-filter')?.value||'';
   const list=filter?ACT_LOG.filter(a=>a.type===filter):ACT_LOG;
@@ -950,8 +1158,8 @@ function currentThursdayCount(){
 let VENDORS=[]; // โหลดจาก Google Sheets จริงเท่านั้น
 //== END_MARKET_BLOCK ==//
 
-function calcElec(e){if(!e)return 0;return(e.bulb||0)*10+(e.fan||0)*20+(e.small||0)*50+(e.large||0)*100+(e.special||[]).reduce((s,x)=>s+(x.price||0),0);} // ราคา/อังคาร 1 วัน
-// ค่าไฟรายเดือน = ราคา/อังคาร × จำนวนอังคารของเดือน (เหมือน calcMonthlyRent) — แก้ 2026-07-17 บั๊ก #27
+function calcElec(e){if(!e)return 0;return(e.bulb||0)*10+(e.fan||0)*20+(e.small||0)*50+(e.large||0)*100+(e.special||[]).reduce((s,x)=>s+(x.price||0),0);} // ราคา/วันพฤหัสบดี 1 วัน
+// ค่าไฟรายเดือน = ราคา/วันพฤหัสบดี × จำนวนวันพฤหัสบดีของเดือน (เหมือน calcMonthlyRent) — แก้ 2026-07-17 บั๊ก #27
 function calcElecMonthly(e){return Math.round(calcElec(e)*currentThursdayCount());}
 function elecStr(e){if(!e)return'—';const p=[];if(e.bulb)p.push('<svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 18h6"/><path d="M10 22h4"/><path d="M12 2a7 7 0 0 0-4 12.7c.5.4.8 1 .8 1.6V17h6.4v-.7c0-.6.3-1.2.8-1.6A7 7 0 0 0 12 2Z"/></svg>×'+e.bulb);if(e.fan)p.push('<svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3a9 9 0 1 0 9 9"/><path d="M12 7a5 5 0 1 0 5 5"/></svg>×'+e.fan);if(e.small)p.push('<svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2v6"/><path d="M8 8h8v4a4 4 0 0 1-8 0V8Z"/><line x1="9" y1="18" x2="9" y2="22"/><line x1="15" y1="18" x2="15" y2="22"/></svg>×'+e.small);if(e.large)p.push('<svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .34 1.87l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.7 1.7 0 0 0-1.87-.34 1.7 1.7 0 0 0-1.04 1.56V21a2 2 0 0 1-4 0v-.09A1.7 1.7 0 0 0 9 19.37a1.7 1.7 0 0 0-1.87.34l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.7 1.7 0 0 0 4.63 15a1.7 1.7 0 0 0-1.56-1.04H3a2 2 0 0 1 0-4h.09A1.7 1.7 0 0 0 4.63 9a1.7 1.7 0 0 0-.34-1.87l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.7 1.7 0 0 0 9 4.63a1.7 1.7 0 0 0 1.04-1.56V3a2 2 0 0 1 4 0v.09a1.7 1.7 0 0 0 1.04 1.56 1.7 1.7 0 0 0 1.87-.34l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.7 1.7 0 0 0 19.37 9a1.7 1.7 0 0 0 1.56 1.04H21a2 2 0 0 1 0 4h-.09A1.7 1.7 0 0 0 19.4 15Z"/></svg>×'+e.large);(e.special||[]).forEach(x=>{if(x.price>0)p.push('<svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><polygon points="12 2 15 9 22 9.3 16.5 14 18.2 21 12 17.3 5.8 21 7.5 14 2 9.3 9 9"/></svg>'+x.name);});return p.join(' ')||'—';}
 function baht(n){return'฿'+Math.round(n).toLocaleString();}
@@ -1326,7 +1534,7 @@ function updateDbStatus(){
   const badge=document.getElementById('db-status-badge');
   const sb=document.getElementById('sb-db-badge');
   if(url){
-    if(badge){badge.innerHTML='<svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M17.5 19H9a5 5 0 1 1 1.6-9.7A6 6 0 0 1 22 11.5 4.5 4.5 0 0 1 17.5 19Z"/></svg> Sheets';badge.style.background='rgba(82,183,136,.22)';badge.style.color='#86efac';}
+    if(badge){badge.innerHTML='<svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M17.5 19H9a5 5 0 1 1 1.6-9.7A6 6 0 0 1 22 11.5 4.5 4.5 0 0 1 17.5 19Z"/></svg> Sheets';badge.style.background='rgba(82,183,136,.22)';badge.style.color='#efac86';}
     if(sb) sb.innerHTML='<svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M17.5 19H9a5 5 0 1 1 1.6-9.7A6 6 0 0 1 22 11.5 4.5 4.5 0 0 1 17.5 19Z"/></svg> เชื่อมต่อ Google Sheets แล้ว';
   } else {
     if(badge){badge.innerHTML='<svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="4" width="16" height="18" rx="2"/><path d="M9 3h6a1 1 0 0 1 1 1v1H8V4a1 1 0 0 1 1-1Z"/></svg> Local';badge.style.background='rgba(255,255,255,.14)';badge.style.color='rgba(255,255,255,.82)';}
@@ -1388,6 +1596,11 @@ function showToast(msg,type='i'){
 // ════════════════════════════════════════════════════
 // รองรับสัญญาณจาก iframe ผังตลาด (ปุ่มเพิ่มผู้ค้าใน popup)
 window.addEventListener('message', function(e){
+  // โมดูลใน iframe แจ้งกิจกรรมมาให้ shell บันทึก (PM_ACTLOG_SHEET ข้อ 3)
+  if(e && e.data && e.data.type==='pm-activity' && e.data.payload){
+    const q=e.data.payload;
+    logAct(q.actType||'system', q.message||'', q.detail||'');
+  }
   if(e && e.data && e.data.type==='pm-open-register' && e.data.lock) openRegisterForLock(e.data.lock);
   // แก้บั๊ก 2569-07-23: เดิมแต่ละเมนู (ผังตลาด/ทะเบียนผู้ค้า/หน้าหลัก ฯลฯ) เป็น iframe ที่โหลด
   // ครั้งเดียวแล้วแคชไว้ตลอด session สลับแท็บแค่ซ่อน/โชว์ ไม่ได้ดึงข้อมูลใหม่ — พอบันทึก/แจ้งลา/

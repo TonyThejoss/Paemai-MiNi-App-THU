@@ -70,10 +70,10 @@ select.filter-select:focus { border-color: #ea580c; }
   border: 1.5px solid #e2e8f0; cursor: pointer; transition: all 0.15s;
   background: white; user-select: none;
 }
-.lock-item:hover { border-color: #9ae6b4; background: #fff7ed; }
-.lock-item.selected { border-color: #38a169; background: #fff7ed; }
+.lock-item:hover { border-color: #e6b69a; background: #fff7ed; }
+.lock-item.selected { border-color: #a15e38; background: #fff7ed; }
 .lock-item.unpaid-item { border-left: 4px solid #e53e3e; }
-.lock-item.paid-item { border-left: 4px solid #38a169; }
+.lock-item.paid-item { border-left: 4px solid #a15e38; }
 .lock-item.partial-item { border-left: 4px solid #dd6b20; }
 
 .lock-item input[type=checkbox] { width: 17px; height: 17px; flex-shrink: 0; accent-color: #c2410c; cursor: pointer; }
@@ -92,7 +92,7 @@ select.filter-select:focus { border-color: #ea580c; }
   white-space: nowrap; flex-shrink: 0;
 }
 .status-unpaid { background: #fed7d7; color: #9b2c2c; }
-.status-paid { background: #c6f6d5; color: #276749; }
+.status-paid { background: #f6d8c6; color: #673e27; }
 .status-partial { background: #feebc8; color: #7b341e; }
 
 /* ── RIGHT: Batch Payment Form ── */
@@ -115,7 +115,7 @@ select.filter-select:focus { border-color: #ea580c; }
   text-align: center; border: 1.5px solid #e2e8f0;
 }
 .stat-num { font-size: 1.5rem; font-weight: 800; color: #2d3748; }
-.stat-num.green { color: #276749; }
+.stat-num.green { color: #673e27; }
 .stat-num.red { color: #9b2c2c; }
 .stat-label { font-size: 0.72rem; color: #718096; margin-top: 2px; }
 
@@ -142,7 +142,7 @@ select.filter-select:focus { border-color: #ea580c; }
 }
 .items-table td { padding: 9px 10px; border-bottom: 1px solid #f0f4f8; color: #2d3748; vertical-align: middle; }
 .items-table tr:hover td { background: #fafafa; }
-.items-table tr.row-paid td { background: #fff7ed; color: #276749; }
+.items-table tr.row-paid td { background: #fff7ed; color: #673e27; }
 
 .input-amount {
   width: 90px; padding: 5px 8px; border: 1.5px solid #e2e8f0; border-radius: 6px;
@@ -150,7 +150,7 @@ select.filter-select:focus { border-color: #ea580c; }
 }
 .input-amount:focus { border-color: #ea580c; }
 .input-amount.overpaid { border-color: #dd6b20; background: #fffaf0; }
-.input-amount.exact { border-color: #38a169; background: #fff7ed; }
+.input-amount.exact { border-color: #a15e38; background: #fff7ed; }
 
 .note-input {
   width: 100%; padding: 5px 8px; border: 1.5px solid #e2e8f0; border-radius: 6px;
@@ -180,7 +180,7 @@ select.filter-select:focus { border-color: #ea580c; }
   cursor: pointer; font-size: 0.8rem; font-weight: 600; color: #4a5568;
   background: white; transition: all 0.15s;
 }
-.method-btn:hover { border-color: #9ae6b4; color: #276749; }
+.method-btn:hover { border-color: #e6b69a; color: #673e27; }
 .method-btn.active { border-color: #c2410c; background: #fff7ed; color: #c2410c; }
 
 .form-input {
@@ -232,7 +232,7 @@ select.filter-select:focus { border-color: #ea580c; }
 .modal-sub { font-size: 0.82rem; color: #718096; margin-bottom: 20px; }
 .modal-receipt { background: #f7fafc; border-radius: 10px; padding: 16px; margin-bottom: 20px; }
 .receipt-row { display: flex; justify-content: space-between; padding: 5px 0; font-size: 0.82rem; border-bottom: 1px solid #edf2f7; }
-.receipt-row:last-child { border: none; font-weight: 700; font-size: 0.9rem; color: #276749; margin-top: 4px; }
+.receipt-row:last-child { border: none; font-weight: 700; font-size: 0.9rem; color: #673e27; margin-top: 4px; }
 .modal-btns { display: flex; gap: 10px; justify-content: flex-end; }
 
 /* ── EMPTY STATE ── */
@@ -245,7 +245,7 @@ select.filter-select:focus { border-color: #ea580c; }
 /* ── TOAST ── */
 .toast {
   position: fixed; bottom: 24px; right: 24px; z-index: 2000;
-  background: #276749; color: white; padding: 12px 20px; border-radius: 10px;
+  background: #673e27; color: white; padding: 12px 20px; border-radius: 10px;
   font-size: 0.85rem; font-weight: 600; box-shadow: 0 8px 24px rgba(0,0,0,0.2);
   transform: translateY(80px); opacity: 0; transition: all 0.3s;
 }
@@ -258,7 +258,167 @@ select.filter-select:focus { border-color: #ea580c; }
 
 .ic{width:1em;height:1em;vertical-align:-.15em;display:inline-block;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0}
 .ic-dot{stroke:none}
+.pm-feenote{font-size:.62rem;color:#c05621;margin-top:2px;line-height:1.35;word-break:break-word;}
+.pm-feetag{display:inline-block;font-size:.58rem;font-weight:800;border-radius:8px;padding:1px 6px;margin-top:2px;white-space:nowrap;}
+.pm-feetag.pm-annual{background:#fef3c7;color:#92400e;}
+.pm-feetag.pm-disc{background:#fee2e2;color:#b91c1c;}
 </style>
+<!-- ==== PM_MOBILE_KIT:START (สร้างโดย tools/inject_mobile_kit.py — ห้ามแก้ในไฟล์นี้) ==== -->
+<style id="pm-mobile-kit">
+/* ═══════════════════════════════════════════════════════════════════════════
+   PM MOBILE KIT — Mobile-First / Responsive / Thai typography (2026-07-26)
+   เป้าหมาย: ทุกหน้าใช้งานได้เต็มจอบนสมาร์ทโฟนทุกขนาด ไม่มีเนื้อหาล้นขอบจอด้านข้าง
+   (no horizontal overflow), ตัวอักษรไทยตัดบรรทัดถูกต้อง, ปุ่มกดง่ายด้วยนิ้วโป้ง,
+   เว้นระยะขอบบน-ล่างไม่ให้ชิดจอ
+   หมายเหตุเชิงเทคนิค: ตั้งใจ "ไม่" ใส่ viewport-fit=cover เพราะถ้าไม่ใส่ เบราว์เซอร์จะกันพื้นที่
+   รอยบาก (notch) ให้อยู่แล้วโดยอัตโนมัติ การใส่ cover แล้วจัดการ env() เองมีความเสี่ยงที่เนื้อหา
+   จะไปอยู่ใต้รอยบากถ้าพลาดจุดใดจุดหนึ่ง — เราจึงใช้ env() เป็น "ระยะเสริม" (max()) เท่านั้น
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* ── 1) พื้นฐาน: กันล้นขอบจอ + ฟอนต์ไทย ── */
+html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
+*, *::before, *::after { min-width: 0; }               /* ตัวการอันดับ 1 ของ overflow ใน flex/grid */
+body {
+  overflow-x: hidden;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Sarabun",
+               "Noto Sans Thai", "Leelawadee UI", "Thonburi", system-ui,
+               "Helvetica Neue", Arial, sans-serif;
+  overflow-wrap: break-word;                           /* ตัดเฉพาะเมื่อคำเดียวยาวเกินกรอบ */
+  word-break: normal;                                  /* ห้าม break-all — ทำให้ไทยตัดกลางพยางค์ */
+  line-break: auto;
+}
+img, svg, canvas, video, table { max-width: 100%; }
+input, select, textarea, button { font-family: inherit; max-width: 100%; }
+
+/* ── 2) ตารางเลื่อนแนวนอนได้เอง (wrapper ถูกใส่ให้อัตโนมัติโดยสคริปต์ท้ายไฟล์) ── */
+.pm-tablewrap {
+  width: 100%; max-width: 100%; overflow-x: auto; overflow-y: hidden;
+  -webkit-overflow-scrolling: touch; overscroll-behavior-x: contain;
+}
+.pm-tablewrap > table { min-width: 100%; }
+
+/* ── 3) แท็บเล็ต ── */
+@media (max-width: 900px) {
+  .two-col { grid-template-columns: 1fr !important; }
+  .g2 { grid-template-columns: 1fr !important; }
+  .kgrid, .kpi-grid, .kpi-row, .mgrid, .summary-grid { grid-template-columns: repeat(3, 1fr) !important; }
+}
+
+/* ── 4) สมาร์ทโฟน ── */
+@media (max-width: 640px) {
+  body { padding-bottom: max(18px, env(safe-area-inset-bottom)); }
+
+  /* กริดสรุป/KPI → 2 คอลัมน์ อ่านง่ายกว่าบีบ 5 ช่องในจอ 360px */
+  .kgrid, .kpi-grid, .kpi-row, .mgrid, .summary-grid,
+  .elec-types, .grid { grid-template-columns: repeat(2, 1fr) !important; }
+  /* ฟอร์ม 2 ช่องต่อแถว → 1 ช่องต่อแถว */
+  .frow, .m-row, .field-row { grid-template-columns: 1fr !important; }
+
+  /* แถบหัวเรื่อง/เครื่องมือ: ให้ห่อบรรทัดได้ ไม่ดันจนล้นจอ */
+  .toolbar, .topbar, .tb-actions, .filter-row, .action-btns,
+  .modal-btns, .option-row, .date-filter, .items-title, .summary-title {
+    flex-wrap: wrap !important;
+  }
+  .toolbar, .topbar { padding-left: 12px !important; padding-right: 12px !important; row-gap: 8px; }
+  .toolbar { padding-top: max(10px, env(safe-area-inset-top)) !important; }
+  .topbar  { padding-top: max(10px, env(safe-area-inset-top)) !important; }
+
+  /* พื้นที่กดขั้นต่ำ 44px ตาม WCAG 2.5.5 / Apple HIG — ผู้จัดตลาดกดด้วยนิ้วโป้งกลางตลาด */
+  button, .btn, .tb-btn, a.btn, input[type=checkbox], input[type=radio] { min-height: 40px; }
+  /* ปุ่มไอคอนเล็ก ๆ ที่ฝังในช่องกรอก (เช่น ปุ่มดู/ซ่อนรหัสผ่าน) และลิงก์ในเมนู */
+  .pw-eye, .icon-btn, .btn-rm { min-width: 40px; min-height: 40px; }
+  .ni, .sidebar a, a.ni { min-height: 44px; }
+  input[type=checkbox], input[type=radio] { min-width: 22px; min-height: 22px; }
+  .btn-sm, .tb-btn { min-height: 38px; }
+  /* iOS ซูมเองถ้า font-size < 16px ในช่องกรอก — ล็อคไว้ที่ 16px กัน layout เพี้ยน */
+  input, select, textarea { font-size: 16px !important; }
+
+  /* หน้ารายงาน: ตัดกรอบกระดาษ A4 ออกบนมือถือให้ใช้ความกว้างเต็มจอ */
+  .page { margin: 10px auto !important; padding: 14px 12px !important; border-radius: 8px !important; }
+  .r-head { flex-direction: column; gap: 6px; }
+  .r-meta { text-align: left !important; }
+  .sign-area { flex-direction: column; gap: 18px; align-items: flex-start; }
+
+  /* หน้ารับชำระหลายล็อค (batch payment) — เดิมไม่มี @media เลย
+     .layout เป็น flex 2 คอลัมน์ + height:100vh + overflow:hidden ทำให้ฝั่งขวาหลุดออกนอกจอ
+     และเลื่อนดูไม่ได้บนมือถือ → เปลี่ยนเป็นเรียงลงล่างและให้หน้าเลื่อนตามปกติ */
+  .layout {
+    flex-direction: column !important; height: auto !important;
+    min-height: 0 !important; overflow: visible !important;
+  }
+  .left-panel, .right-panel {
+    width: 100% !important; max-width: 100% !important; flex: none !important;
+    border-right: none !important; border-left: none !important;
+  }
+  .right-scroll { overflow: visible !important; padding: 14px 12px !important; }
+  .lock-item { flex-wrap: wrap; }
+
+  /* โมดัล: สูงไม่เกินจอ เลื่อนในตัวได้ ไม่ชิดขอบล่าง */
+  .modal, .modal-box, .m-box, .modal-content, .confirm-box {
+    max-width: calc(100vw - 20px) !important;
+    max-height: calc(100vh - 40px) !important;
+    overflow-y: auto !important;
+    margin-bottom: max(10px, env(safe-area-inset-bottom));
+  }
+
+  /* แถบเมนู/sidebar ที่เลื่อนแนวนอน */
+  .sidebar, .side, .nav { max-width: 100% !important; }
+}
+
+/* ── 5) จอเล็กมาก (iPhone SE / 320-360px) ── */
+@media (max-width: 380px) {
+  .kgrid, .kpi-grid, .kpi-row, .mgrid, .summary-grid { grid-template-columns: 1fr !important; }
+  .toolbar h1, .topbar h1 { font-size: .82rem !important; }
+}
+
+/* ── 6) โหมดแนวนอนจอเตี้ย: อย่าล็อคความสูงเป็น 100vh ── */
+@media (max-height: 480px) and (orientation: landscape) {
+  .layout { height: auto !important; overflow: visible !important; }
+}
+
+/* ── 7) พิมพ์: ยกเลิกทุกอย่างของ mobile kit ที่อาจกวนการพิมพ์รายงาน ── */
+@media print {
+  .pm-tablewrap { overflow: visible !important; }
+  body { padding-bottom: 0 !important; overflow: visible !important; }
+}
+</style>
+<script id="pm-mobile-kit-js">
+/* ครอบ <table> ทุกตัวด้วยกล่องเลื่อนแนวนอน เพื่อไม่ให้ตารางกว้างดันหน้าจอล้น
+   ทำด้วย JS เพราะแก้ CSS ล้วนไม่ได้ (ต้องมี element ครอบ) และทำแบบนี้ไม่กระทบ layout เดิมบนเดสก์ท็อป
+   ใช้ MutationObserver เพราะเกือบทุกหน้าสร้างตารางด้วย innerHTML หลังโหลดข้อมูลจาก Sheets เสร็จ */
+(function () {
+  function wrapTables(root) {
+    var tables = (root || document).querySelectorAll ? (root || document).querySelectorAll('table') : [];
+    for (var i = 0; i < tables.length; i++) {
+      var t = tables[i];
+      if (t.parentElement && t.parentElement.classList.contains('pm-tablewrap')) continue;
+      if (t.closest && t.closest('.pm-tablewrap')) continue;
+      var w = document.createElement('div');
+      w.className = 'pm-tablewrap';
+      t.parentNode.insertBefore(w, t);
+      w.appendChild(t);
+    }
+  }
+  function boot() {
+    wrapTables(document);
+    try {
+      new MutationObserver(function (muts) {
+        for (var i = 0; i < muts.length; i++) {
+          for (var j = 0; j < muts[i].addedNodes.length; j++) {
+            var n = muts[i].addedNodes[j];
+            if (n.nodeType !== 1) continue;
+            if (n.tagName === 'TABLE') { wrapTables(n.parentNode); }
+            else if (n.querySelector && n.querySelector('table')) { wrapTables(n); }
+          }
+        }
+      }).observe(document.body, { childList: true, subtree: true });
+    } catch (e) { /* เบราว์เซอร์เก่า — ยังได้ตารางชุดแรกที่ wrap ไปแล้ว */ }
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot);
+  else boot();
+})();
+</script>
+<!-- ==== PM_MOBILE_KIT:END ==== -->
 </head>
 <body>
 
@@ -381,7 +541,7 @@ select.filter-select:focus { border-color: #ea580c; }
         </div>
         <div class="option-row">
           <span class="option-label">วันที่รับเงิน</span>
-          <input class="form-input" type="date" id="payDate" style="max-width:200px">
+          <input class="form-input" type="date" id="payDate" style="max-width:200px" onchange="onPayDateChanged()">
         </div>
         <div class="option-row">
           <span class="option-label">ผู้รับเงิน</span>
@@ -405,6 +565,7 @@ select.filter-select:focus { border-color: #ea580c; }
       <div class="action-btns">
         <button class="btn btn-outline" onclick="clearAll()"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>️ ล้างทั้งหมด</button>
         <button class="btn btn-outline" onclick="fillAllFull()"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg> กรอกเต็มทุกล็อค</button>
+        <button class="btn btn-outline" onclick="openDiscountModal()" title="กำหนดส่วนลดค่าเช่ารายเดือน (รายล็อค หรือเท่ากันทั้งตลาด)"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M20.6 3.4A2 2 0 0 0 19.2 3H15L5.4 12.6a2 2 0 0 0 0 2.8l5.2 5.2a2 2 0 0 0 2.8 0L23 11V6.8a2 2 0 0 0-.6-1.4Z"/><circle cx="17.5" cy="8.5" r="1.3" fill="currentColor" stroke="none"/></svg> ส่วนลดค่าเช่า</button>
         <button class="btn btn-primary" id="saveBtn" disabled onclick="openConfirm()">
           <svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2Z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg> บันทึกการรับเงิน
         </button>
@@ -422,6 +583,72 @@ select.filter-select:focus { border-color: #ea580c; }
     <div class="modal-btns">
       <button class="btn btn-outline" onclick="closeModal()">ยกเลิก</button>
       <button class="btn btn-primary" onclick="confirmSave()"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg> ยืนยันบันทึก</button>
+    </div>
+  </div>
+</div>
+
+
+<!-- ═══════════ DISCOUNT MODAL (เพิ่ม 2026-07-26) ═══════════ -->
+<div class="modal-overlay" id="discountModal">
+  <div class="modal" style="max-width:640px">
+    <div class="modal-title"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M20.6 3.4A2 2 0 0 0 19.2 3H15L5.4 12.6a2 2 0 0 0 0 2.8l5.2 5.2a2 2 0 0 0 2.8 0L23 11V6.8a2 2 0 0 0-.6-1.4Z"/><circle cx="17.5" cy="8.5" r="1.3" fill="currentColor" stroke="none"/></svg> ส่วนลดค่าเช่า</div>
+    <div class="modal-sub">กำหนดได้เฉพาะเดือนปัจจุบันหรือเดือนในอนาคต — ระบบไม่อนุญาตให้ให้ส่วนลดย้อนหลัง</div>
+
+    <div class="modal-receipt" style="display:block">
+      <div class="option-row" style="gap:8px;flex-wrap:wrap;align-items:flex-end">
+        <div style="display:flex;flex-direction:column;gap:3px">
+          <label class="modal-label" for="dcMonth">เดือนที่ให้ส่วนลด</label>
+          <input class="form-input" type="month" id="dcMonth" style="max-width:180px" onchange="loadDiscountUI()">
+        </div>
+        <div style="display:flex;flex-direction:column;gap:3px">
+          <label class="modal-label" for="dcScope">ขอบเขต</label>
+          <select class="form-input" id="dcScope" style="max-width:200px" onchange="dcScopeChanged()">
+            <option value="market">ทั้งตลาด (ทุกล็อคเท่ากัน)</option>
+            <option value="lock">เฉพาะล็อค (กำหนดไม่เท่ากันได้)</option>
+          </select>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:3px" id="dcLockWrap">
+          <label class="modal-label" for="dcLock">ล็อค</label>
+          <select class="form-input" id="dcLock" style="max-width:200px"></select>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:3px">
+          <label class="modal-label" for="dcAmount">ส่วนลด (บาท)</label>
+          <input class="form-input" type="number" id="dcAmount" min="0" step="1" placeholder="0" style="max-width:130px">
+        </div>
+      </div>
+
+      <div class="option-row" style="margin-top:8px;align-items:center;gap:8px" id="dcInstallWrap">
+        <input type="checkbox" id="dcInstall">
+        <label for="dcInstall" style="font-size:.78rem">ให้ส่วนลดกับล็อคที่อยู่ระหว่าง<strong>ผ่อนชำระ</strong>ด้วย
+          <span style="color:var(--text-lo,#718096)">(ถ้าไม่ติ๊ก ล็อคที่มีแผนผ่อนชำระจะไม่ได้รับส่วนลดทั้งตลาดของเดือนนี้)</span></label>
+      </div>
+
+      <div style="display:flex;flex-direction:column;gap:3px;margin-top:8px">
+        <label class="modal-label" for="dcNote">หมายเหตุ (จะปรากฏในรายละเอียดค่าเช่าและรายงานส่วนลด)</label>
+        <input class="form-input" type="text" id="dcNote" placeholder="เช่น ส่วนลดช่วงปรับปรุงตลาด">
+      </div>
+
+      <div class="modal-btns" style="margin-top:10px">
+        <button class="btn btn-primary" onclick="saveDiscountEntry()"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg> บันทึกส่วนลด</button>
+      </div>
+
+      <div style="border-top:1px solid var(--border,#e2e8f0);margin-top:10px;padding-top:10px">
+        <div class="modal-label" style="margin-bottom:6px">ส่วนลดที่กำหนดไว้ในเดือนนี้</div>
+        <div id="dcList" style="font-size:.76rem"></div>
+      </div>
+
+      <div style="border-top:1px solid var(--border,#e2e8f0);margin-top:10px;padding-top:10px">
+        <div class="modal-label" style="margin-bottom:6px">อัตราค่าธรรมเนียมรายปีกลางของตลาด</div>
+        <div class="option-row" style="gap:8px;align-items:flex-end;flex-wrap:wrap">
+          <input class="form-input" type="number" id="dcAnnualFee" min="0" step="1" placeholder="0" style="max-width:130px">
+          <button class="btn btn-outline" onclick="saveAnnualFee()">บันทึกอัตรา</button>
+          <span style="font-size:.72rem;color:var(--text-lo,#718096)">ระบบจะบวกค่าธรรมเนียมนี้เข้าบิลค่าเช่า<strong>ทุกเดือนมีนาคม</strong>โดยอัตโนมัติ พร้อมหมายเหตุกำกับ</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal-btns">
+      <button class="btn btn-outline" onclick="closeDiscountModal()">ปิด</button>
     </div>
   </div>
 </div>
@@ -482,9 +709,89 @@ function countThursdaysInMonth(year, month){
   return count;
 }
 function thisMonthThursdays(){ const n=new Date(); return countThursdaysInMonth(n.getFullYear(), n.getMonth()); }
-function calcElecFromVendor(v){ // ราคา/อังคาร 1 วัน — เพิ่ม elec_special ที่เดิมตกหล่น (แก้ 2026-07-17 บั๊ก #27)
+function calcElecFromVendor(v){ // ราคา/วันพฤหัสบดี 1 วัน — เพิ่ม elec_special ที่เดิมตกหล่น (แก้ 2026-07-17 บั๊ก #27)
   const sp = (Array.isArray(v.elec_special)?v.elec_special:[]).reduce((s,x)=>s+(parseFloat(x.price)||0),0);
   return (parseInt(v.elec_bulb)||0)*10 + (parseInt(v.elec_fan)||0)*20 + (parseInt(v.elec_small)||0)*50 + (parseInt(v.elec_large)||0)*100 + sp;
+}
+
+
+// ══════════════════════════════════════════════════════════════════════════════
+// PM_DISCOUNT_ENGINE — ส่วนลดค่าเช่า + ค่าธรรมเนียมรายปีเดือนมีนาคม (เพิ่ม 2026-07-26)
+//
+// ข้อกำหนดจากผู้ดูแลตลาด:
+//  · ค่าธรรมเนียมแรกเข้า: เก็บ "ครั้งเดียว" ตอนลงทะเบียนผู้ค้าประจำรายใหม่
+//  · ค่าธรรมเนียมรายปี: เก็บครั้งแรกตอนลงทะเบียน แล้วเก็บอีกครั้ง "ทุกเดือนมีนาคม" ของทุกปี
+//    → บิลค่าเช่าเดือนมีนาคมต้องบวกค่าธรรมเนียมรายปีให้อัตโนมัติ พร้อมหมายเหตุระบุว่าเป็นค่าธรรมเนียมรายปี
+//  · ส่วนลดค่าเช่า: กำหนดท้ายบิลได้ 2 ระดับ — รายล็อค (ไม่เท่ากันได้) และทั้งตลาด (เท่ากันทุกล็อค)
+//    ใช้เฉพาะเดือนที่กำหนด เดือนปัจจุบันหรืออนาคตเท่านั้น (ห้ามย้อนหลัง — ตรวจซ้ำที่ backend ด้วย)
+//    ถ้าล็อคอยู่ระหว่างผ่อนชำระ ต้องเลือกได้ว่าจะให้ส่วนลดหรือไม่ (กรณีส่วนลดทั้งตลาด)
+//
+// ลำดับการคิดเงินต่อล็อคในหนึ่งเดือน:
+//    ค่าเช่าเต็มเดือน (ค่าเช่า/วัน × จำนวนวันตลาดของเดือน)
+//      + ค่าธรรมเนียมรายปี (เฉพาะเดือนมีนาคม และเฉพาะล็อคที่ยังไม่ได้จ่ายรายปีของมีนาคมนั้น)
+//      − ส่วนลด (รายล็อคชนะทั้งตลาด · ไม่เกินค่าเช่าเต็มเดือน กันยอดติดลบ)
+//      + ค่าไฟรายเดือน + ค่าปรับ + ค่าอื่น ๆ
+// ══════════════════════════════════════════════════════════════════════════════
+let PM_DISCOUNTS = [];        // ทุกรายการส่วนลดจากชีต rent_discounts
+let PM_SETTINGS = {};         // ค่าตั้งค่ากลาง (annual_fee ฯลฯ)
+let PM_INSTALL_LOCKS = new Set();  // ล็อคที่มีแผนผ่อนชำระ active
+let PM_ANNUAL_PAID = new Set();    // ล็อคที่จ่ายค่าธรรมเนียมรายปีของเดือนมีนาคมปีนี้แล้ว
+
+function pmBillMonthKey(){
+  // เดือนของรอบบิล = เดือนของ "วันที่รับชำระ" ที่ผู้ใช้เลือกไว้ (ค่าเริ่มต้น = วันนี้)
+  const v = document.getElementById('payDate')?.value;
+  if (v && /^\d{4}-\d{2}/.test(v)) return v.slice(0,7);
+  const n = new Date();
+  return n.getFullYear()+'-'+String(n.getMonth()+1).padStart(2,'0');
+}
+function pmIsMarchMonth(key){ return String(key||'').slice(5,7) === '03'; }
+function pmAnnualFeeRate(){ return parseFloat(PM_SETTINGS.annual_fee)||0; }
+
+// ส่วนลดที่มีผลกับล็อคหนึ่งในเดือนหนึ่ง — ตรรกะนี้ต้องตรงกับรายงานส่วนลด (pamai_thu_report_08) เป๊ะ
+function pmEffectiveDiscount(lockId, monthKey){
+  const perLock = PM_DISCOUNTS.find(d=>d.month===monthKey && d.scope==='lock' && d.lock_id===lockId);
+  if (perLock) return { amount: parseFloat(perLock.amount)||0, src:'ส่วนลดรายล็อค', note: perLock.note||'' };
+  const mk = PM_DISCOUNTS.find(d=>d.month===monthKey && d.scope==='market');
+  if (!mk) return { amount:0, src:'', note:'' };
+  if (PM_INSTALL_LOCKS.has(lockId) && !mk.apply_installment) {
+    return { amount:0, src:'ส่วนลดทั้งตลาด (ยกเว้นล็อคผ่อนชำระ)', note: mk.note||'' };
+  }
+  return { amount: parseFloat(mk.amount)||0, src:'ส่วนลดทั้งตลาด', note: mk.note||'' };
+}
+
+async function pmLoadDiscountData(){
+  const monthKey = pmBillMonthKey();
+  const [disc, settings, plans, marchPays] = await Promise.all([
+    apiGet('getDiscounts'),
+    apiGet('getSettings'),
+    apiGet('getInstallmentPlans'),
+    // ตรวจว่าล็อคใดจ่ายค่าธรรมเนียมรายปีของเดือนมีนาคมรอบนี้ไปแล้ว (กันเก็บซ้ำ)
+    pmIsMarchMonth(monthKey) ? apiGet('getPayments', { month: monthKey }) : Promise.resolve([]),
+  ]);
+  PM_DISCOUNTS = Array.isArray(disc) ? disc : [];
+  PM_SETTINGS  = (settings && typeof settings==='object') ? settings : {};
+  PM_INSTALL_LOCKS = new Set((Array.isArray(plans)?plans:[])
+    .filter(p=>String(p.status||'active')==='active').map(p=>p.lock_id));
+  PM_ANNUAL_PAID = new Set((Array.isArray(marchPays)?marchPays:[])
+    .filter(p=>String(p.type)==='ค่าธรรมเนียมรายปี').map(p=>p.lock_id));
+}
+
+// คำนวณองค์ประกอบค่าเช่าของล็อคหนึ่ง (ใช้ทั้งตอน render และตอนบันทึก — จุดคำนวณเดียวจุดเดียว)
+function pmRentBreakdown(lock){
+  const monthKey = pmBillMonthKey();
+  const rentBase = lock.rentBase != null ? lock.rentBase : lock.due;
+  let annualFee = 0, annualNote = '';
+  if (pmIsMarchMonth(monthKey) && pmAnnualFeeRate() > 0 && !PM_ANNUAL_PAID.has(lock.id)) {
+    annualFee = pmAnnualFeeRate();
+    annualNote = 'ค่าธรรมเนียมรายปี ' + (parseInt(monthKey.slice(0,4),10)+543) + ' (เรียกเก็บทุกเดือนมีนาคม)';
+  }
+  const eff = pmEffectiveDiscount(lock.id, monthKey);
+  const discount = Math.min(eff.amount, rentBase);
+  const notes = [];
+  if (annualFee > 0) notes.push('+ ' + annualNote + ' ฿' + annualFee.toLocaleString());
+  if (discount > 0) notes.push('− ' + (eff.src||'ส่วนลดค่าเช่า') + ' ฿' + discount.toLocaleString() + (eff.note?(' ('+eff.note+')'):''));
+  return { rentBase, annualFee, annualNote, discount, discountSrc: eff.src, discountNote: eff.note,
+           net: rentBase + annualFee - discount, notes };
 }
 
 // ── DATA — โหลดจาก Google Sheets จริง (แทน mock data เดิม) ──
@@ -497,21 +804,33 @@ async function loadLocksFromSheets(){
     return;
   }
   if(wrap) wrap.innerHTML='<div class="empty-state"><div class="empty-icon">⏳</div><div class="empty-text">กำลังโหลดข้อมูลผู้ค้าจาก Google Sheets...</div></div>';
+  await pmLoadDiscountData();   // ส่วนลด/ค่าธรรมเนียมรายปี/แผนผ่อนชำระ ต้องพร้อมก่อนคิดยอด
   const vendors = await apiGet('getVendors');
   if(!Array.isArray(vendors)){
     if(wrap) wrap.innerHTML='<div class="empty-state"><div class="empty-icon"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg></div><div class="empty-text">โหลดข้อมูลผู้ค้าไม่สำเร็จ<br>ตรวจสอบการเชื่อมต่อ Google Sheets</div></div>';
     return;
   }
   const tuesdays = thisMonthThursdays();
-  ALL_LOCKS = vendors.filter(v=>v.status==='active'||v.status==='unpaid').map(v=>({
-    id: v.lock,
-    zone: v.zone,
-    product: v.product || v.name || '—',
-    vendor: v.name || '(ยังไม่ระบุชื่อ)',
-    status: v.status==='unpaid' ? 'unpaid' : 'paid', // ใช้สถานะจาก Sheets เป็นจุดเริ่มต้น
-    due: Math.round((parseFloat(v.dailyRate)||0) * tuesdays),
-    electric: Math.round(calcElecFromVendor(v) * tuesdays), // ค่าไฟรายเดือน = ราคา/อังคาร × จำนวนอังคาร (บั๊ก #27)
-  }));
+  ALL_LOCKS = vendors.filter(v=>v.status==='active'||v.status==='unpaid').map(v=>{
+    const rentBase = Math.round((parseFloat(v.dailyRate)||0) * tuesdays);
+    const lock = {
+      id: v.lock,
+      zone: v.zone,
+      product: v.product || v.name || '—',
+      vendor: v.name || '(ยังไม่ระบุชื่อ)',
+      status: v.status==='unpaid' ? 'unpaid' : 'paid', // ใช้สถานะจาก Sheets เป็นจุดเริ่มต้น
+      rentBase: rentBase,
+      dailyRate: parseFloat(v.dailyRate)||0,
+      electric: Math.round(calcElecFromVendor(v) * tuesdays), // ค่าไฟรายเดือน = ราคา/วันพฤหัสบดี × จำนวนวันพฤหัสบดี (บั๊ก #27)
+    };
+    // due = ค่าเช่าสุทธิหลังบวกค่าธรรมเนียมรายปี (เดือนมีนาคม) และหักส่วนลดของเดือนนั้น
+    const bd = pmRentBreakdown(lock);
+    lock.annualFee = bd.annualFee; lock.annualNote = bd.annualNote;
+    lock.discount = bd.discount;   lock.discountSrc = bd.discountSrc; lock.discountNote = bd.discountNote;
+    lock.feeNotes = bd.notes;
+    lock.due = bd.net;
+    return lock;
+  });
   filteredLocks=[...ALL_LOCKS];
   renderLockList();
 }
@@ -564,6 +883,7 @@ function renderLockList() {
       </div>
       <div class="lock-amount">
         <div class="amount-due">฿${totalDue.toLocaleString()}</div>
+        ${(l.feeNotes&&l.feeNotes.length)?`<div class="pm-feenote" title="${l.feeNotes.join(' · ').replace(/"/g,'&quot;')}">${l.feeNotes.join(' · ')}</div>`:''}
         <div class="amount-label">เช่า ฿${l.due.toLocaleString()} + ไฟ ฿${l.electric}</div>
       </div>
       <span class="badge-status ${statusMap[l.status]}">${statusLabel[l.status]}</span>
@@ -652,7 +972,7 @@ function renderTable() {
     const rowClass = isPaid ? 'row-paid' : '';
 
     return `<tr class="${rowClass}">
-      <td><strong>${l.id}</strong></td>
+      <td><strong>${l.id}</strong>${(l.annualFee>0)?'<div class="pm-feetag pm-annual">+รายปี ฿'+l.annualFee.toLocaleString()+'</div>':''}${(l.discount>0)?'<div class="pm-feetag pm-disc">−ส่วนลด ฿'+l.discount.toLocaleString()+'</div>':''}</td>
       <td style="max-width:90px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:.76rem">${l.product}</td>
       <td style="text-align:right">฿${l.due.toLocaleString()}</td>
       <td style="text-align:right">${l.electric ? '฿'+l.electric : '—'}</td>
@@ -810,7 +1130,7 @@ function openConfirm() {
     html += `<div class="receipt-row" style="color:#dd6b20"><span class="modal-label"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0Z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg> ยอด 0 (ข้าม)</span><span>${zero.map(l => l.id).join(', ')}</span></div>`;
   }
 
-  const top5 = paid.slice(0, 5).map(l => `<div class="receipt-row"><span>${l.id} ${l.product}</span><span>฿${(parseFloat(payAmounts[l.id])||0).toLocaleString()}</span></div>`).join('');
+  const top5 = paid.slice(0, 5).map(l => `<div class="receipt-row"><span>${l.id} ${l.product}${(l.annualFee>0||l.discount>0)?'<br><span style="font-size:.66rem;color:#c05621">'+(l.feeNotes||[]).join(' · ')+'</span>':''}</span><span>฿${(parseFloat(payAmounts[l.id])||0).toLocaleString()}</span></div>`).join('');
   html += top5;
   if (paid.length > 5) html += `<div class="receipt-row"><span style="color:#718096">...และอีก ${paid.length - 5} ล็อค</span><span></span></div>`;
   html += `<div class="receipt-row"><span>ยอดรวมทั้งหมด</span><span>฿${totalPaid.toLocaleString()}</span></div>`;
@@ -847,12 +1167,35 @@ async function confirmSave() {
     const other = payOthers[l.id] || 0;
     const otherLabel = payOtherLabels[l.id] || '';
     const note = payNotes[l.id] || '';
+    // ── PM_SAVE_SPLIT (2026-07-26) ──
+    // ค่าธรรมเนียมรายปีของเดือนมีนาคมต้องบันทึกเป็นรายการแยก type='ค่าธรรมเนียมรายปี'
+    // ไม่รวมกับค่าเช่า เพื่อให้รายงานรับชำระแยกประเภทได้ถูกต้อง และตรวจซ้ำได้ว่าล็อคใดจ่ายรายปีแล้ว
+    // ส่วนลดบันทึกเป็น "หมายเหตุ" กำกับรายการค่าเช่า (ยอด amount คือยอดที่รับจริงหลังหักส่วนลดแล้ว)
+    const feeNote = [];
+    if (l.annualFee > 0) feeNote.push(l.annualNote);
+    if (l.discount > 0) feeNote.push('หัก' + (l.discountSrc||'ส่วนลดค่าเช่า') + ' ฿' + l.discount.toLocaleString()
+      + (l.discountNote ? (' — ' + l.discountNote) : ''));
+    const baseNote = note || ('ผู้รับเงิน: ' + collector);
+    const fullNote = feeNote.length ? (baseNote + ' | ' + feeNote.join(' | ')) : baseNote;
+
+    // แยกยอดค่าธรรมเนียมรายปีออกจากยอดที่กรอก (ถ้าผู้ใช้กรอกเต็มตามที่ระบบคิดให้)
+    const annualPart = (l.annualFee > 0 && amount >= l.annualFee) ? l.annualFee : 0;
+    const rentPart   = amount - annualPart;
+
     const res = await apiPost('savePayment', { data: {
       lock_id: l.id, vendor_name: l.vendor, product: l.product,
-      type: 'ค่าเช่าประจำเดือน', amount, penalty, other_fee: other,
-      other_label: otherLabel, method: payMethod, note: note || ('ผู้รับเงิน: '+collector),
+      type: 'ค่าเช่าประจำเดือน', amount: rentPart, penalty, other_fee: other,
+      other_label: otherLabel, method: payMethod, note: fullNote,
       date: payDate, time: nowTime(),
     }});
+    if (annualPart > 0 && res && res.status === 'ok') {
+      await apiPost('savePayment', { data: {
+        lock_id: l.id, vendor_name: l.vendor, product: l.product,
+        type: 'ค่าธรรมเนียมรายปี', amount: annualPart, penalty: 0, other_fee: 0,
+        other_label: '', method: payMethod, note: l.annualNote,
+        date: payDate, time: nowTime(),
+      }});
+    }
     if(res && res.status==='ok'){
       okCount++;
       l.status='paid';
@@ -865,6 +1208,15 @@ async function confirmSave() {
 
   if(saveBtn){ saveBtn.disabled=false; saveBtn.innerHTML='<svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2Z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg> บันทึกการรับชำระ'; }
 
+  if (okCount > 0) {
+    // บันทึกลงชีต activity_log ให้ผู้จัดตลาดทุกคนเห็นย้อนหลังได้ (บั๊ก #30)
+    apiPost('logActivity', { data: {
+      user: collector, type: 'payment',
+      message: 'รับชำระเงินหลายล็อค ' + okCount + ' ล็อค',
+      detail: 'ยอดรวม ฿' + total.toLocaleString() + ' · ช่องทาง ' + payMethod + ' · วันที่ ' + payDate,
+      date: payDate, time: nowTime(),
+    }});
+  }
   if(failCount===0){
     showToast(`<svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg> บันทึกสำเร็จ ${okCount} ล็อค · รวม ฿${total.toLocaleString()}`);
   } else {
@@ -874,6 +1226,127 @@ async function confirmSave() {
   renderLockList();
 }
 
+
+// ══════════════════════════════════════════════════════════════════════════════
+// PM_DISCOUNT_UI — หน้าจอจัดการส่วนลด + อัตราค่าธรรมเนียมรายปี (เพิ่ม 2026-07-26)
+// ══════════════════════════════════════════════════════════════════════════════
+function pmThisMonthKey(){ const n=new Date(); return n.getFullYear()+'-'+String(n.getMonth()+1).padStart(2,'0'); }
+function pmMonthLabel(key){
+  const MF=['มกราคม','กุมภาพันธ์','มีนาคม','เมษายน','พฤษภาคม','มิถุนายน','กรกฎาคม','สิงหาคม','กันยายน','ตุลาคม','พฤศจิกายน','ธันวาคม'];
+  const p=String(key||'').split('-'); if(p.length<2) return key||'—';
+  return MF[parseInt(p[1],10)-1]+' '+(parseInt(p[0],10)+543);
+}
+function pmIsReadOnly(){
+  try{ const ss=sessionStorage.getItem('pmthu-session'); if(ss){ const u=JSON.parse(ss); return u.role==='viewer'; } }catch(e){}
+  return false;
+}
+
+async function openDiscountModal(){
+  if(!getApiUrl()){ showToast('ยังไม่ได้เชื่อมต่อ Google Sheets — ตั้งค่าที่หน้าหลักก่อน'); return; }
+  if(pmIsReadOnly()){ showToast('บัญชีนี้เป็นสิทธิ์ดูอย่างเดียว ไม่สามารถกำหนดส่วนลดได้'); return; }
+  const mEl=document.getElementById('dcMonth');
+  if(!mEl.value) mEl.value=pmBillMonthKey();
+  mEl.min=pmThisMonthKey();          // กันเลือกเดือนย้อนหลังที่ระดับ UI (backend ตรวจซ้ำอีกชั้น)
+  document.getElementById('dcAnnualFee').value = pmAnnualFeeRate()||'';
+  const lockSel=document.getElementById('dcLock');
+  lockSel.innerHTML=ALL_LOCKS.slice().sort((a,b)=>a.id.localeCompare(b.id,undefined,{numeric:true}))
+    .map(l=>'<option value="'+l.id+'">'+l.id+' — '+(l.vendor||'')+' (โซน '+(l.zone||'-')+')</option>').join('');
+  dcScopeChanged();
+  await loadDiscountUI();
+  document.getElementById('discountModal').classList.add('show');
+}
+function closeDiscountModal(){ document.getElementById('discountModal').classList.remove('show'); }
+function dcScopeChanged(){
+  const isLock=document.getElementById('dcScope').value==='lock';
+  document.getElementById('dcLockWrap').style.display=isLock?'flex':'none';
+  document.getElementById('dcInstallWrap').style.display=isLock?'none':'flex';
+}
+
+async function loadDiscountUI(){
+  await pmLoadDiscountData();
+  const month=document.getElementById('dcMonth').value||pmBillMonthKey();
+  const rows=PM_DISCOUNTS.filter(d=>d.month===month);
+  const wrap=document.getElementById('dcList');
+  const past = month < pmThisMonthKey();
+  if(past){
+    wrap.innerHTML='<div style="color:#c53030;font-weight:700">เดือนนี้ผ่านไปแล้ว — ดูได้แต่แก้ไขไม่ได้ (ระบบไม่อนุญาตให้ให้ส่วนลดย้อนหลัง)</div>'
+      + (rows.length?'':'<div style="color:#718096;margin-top:4px">ไม่มีส่วนลดในเดือนนี้</div>');
+  }
+  if(!rows.length){
+    if(!past) wrap.innerHTML='<div style="color:#718096">ยังไม่มีส่วนลดในเดือน '+pmMonthLabel(month)+'</div>';
+  } else {
+    const list=rows.map(d=>{
+      const who = d.scope==='market' ? 'ทั้งตลาด (ทุกล็อค)' : ('ล็อค '+d.lock_id);
+      const inst = d.scope==='market' ? (d.apply_installment?' · รวมล็อคผ่อนชำระ':' · ไม่รวมล็อคผ่อนชำระ') : '';
+      const del = past ? '' : ' <button class="btn btn-outline" style="padding:2px 8px;font-size:.68rem" onclick="deleteDiscountEntry(\''+d.id+'\')">ลบ</button>';
+      return '<div style="display:flex;justify-content:space-between;gap:8px;align-items:center;padding:4px 0;border-bottom:1px dashed var(--border,#e2e8f0)">'
+        +'<span><strong>'+who+'</strong> — ฿'+(parseFloat(d.amount)||0).toLocaleString()+inst
+        +(d.note?' <span style="color:#718096">('+d.note+')</span>':'')+'</span><span>'+del+'</span></div>';
+    }).join('');
+    wrap.innerHTML=(past?wrap.innerHTML:'')+list;
+  }
+  // เติมค่าเดิมของขอบเขตที่เลือกไว้ ให้แก้ไขต่อได้ทันที
+  const scope=document.getElementById('dcScope').value;
+  const cur = scope==='market'
+    ? rows.find(d=>d.scope==='market')
+    : rows.find(d=>d.scope==='lock' && d.lock_id===document.getElementById('dcLock').value);
+  document.getElementById('dcAmount').value = cur ? (parseFloat(cur.amount)||0) : '';
+  document.getElementById('dcNote').value   = cur ? (cur.note||'') : '';
+  document.getElementById('dcInstall').checked = cur ? !!cur.apply_installment : false;
+}
+
+async function saveDiscountEntry(){
+  const month=document.getElementById('dcMonth').value;
+  if(!month){ showToast('กรุณาเลือกเดือน'); return; }
+  if(month < pmThisMonthKey()){ showToast('ไม่สามารถกำหนดส่วนลดย้อนหลังได้ — เลือกเดือนปัจจุบันหรือเดือนในอนาคต'); return; }
+  const scope=document.getElementById('dcScope').value;
+  const amount=parseFloat(document.getElementById('dcAmount').value)||0;
+  if(amount<0){ showToast('จำนวนส่วนลดต้องไม่ติดลบ'); return; }
+  const payload={
+    month, scope, amount,
+    lock_id: scope==='lock' ? document.getElementById('dcLock').value : '',
+    apply_installment: scope==='market' ? document.getElementById('dcInstall').checked : false,
+    note: document.getElementById('dcNote').value.trim(),
+    created_by: (document.getElementById('collector')?.value || 'ผู้จัดตลาด'),
+  };
+  const res=await apiPost('saveDiscount',{data:payload});
+  if(res && res.status==='ok'){
+    showToast('<svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg> บันทึกส่วนลดเดือน '+pmMonthLabel(month)+' แล้ว');
+    apiPost('logActivity',{data:{user:payload.created_by,type:'discount',
+      message:'กำหนดส่วนลดค่าเช่า '+(scope==='market'?'ทั้งตลาด':'ล็อค '+payload.lock_id),
+      detail:'เดือน '+pmMonthLabel(month)+' · ฿'+amount.toLocaleString()+(payload.note?(' · '+payload.note):''),
+      date:nowTH(),time:nowTime()}});
+    await loadDiscountUI();
+    await loadLocksFromSheets();   // คิดยอดค่าเช่าใหม่ทันทีให้เห็นผลของส่วนลด
+  } else {
+    showToast((res&&res.message) ? res.message : 'บันทึกส่วนลดไม่สำเร็จ');
+  }
+}
+
+async function deleteDiscountEntry(id){
+  const res=await apiPost('deleteDiscount',{id});
+  if(res && res.status==='ok'){
+    showToast('ลบรายการส่วนลดแล้ว');
+    await loadDiscountUI();
+    await loadLocksFromSheets();
+  } else {
+    showToast((res&&res.message)||'ลบไม่สำเร็จ');
+  }
+}
+
+async function saveAnnualFee(){
+  const v=parseFloat(document.getElementById('dcAnnualFee').value)||0;
+  if(v<0){ showToast('อัตราค่าธรรมเนียมต้องไม่ติดลบ'); return; }
+  const res=await apiPost('saveSettings',{data:{annual_fee:v},updatedBy:(document.getElementById('collector')?.value||'ผู้จัดตลาด')});
+  if(res && res.status==='ok'){
+    showToast('บันทึกอัตราค่าธรรมเนียมรายปี ฿'+v.toLocaleString()+' แล้ว');
+    await loadLocksFromSheets();
+  } else showToast('บันทึกอัตราไม่สำเร็จ');
+}
+
+// เปลี่ยนวันที่รับชำระ = เปลี่ยนรอบบิล → ต้องคิดค่าธรรมเนียมรายปี/ส่วนลดของเดือนนั้นใหม่
+// (เช่น เลื่อนเป็นเดือนมีนาคม ต้องมีค่าธรรมเนียมรายปีบวกเข้ามาทันที)
+async function onPayDateChanged(){ if(getApiUrl()) await loadLocksFromSheets(); }
 function filterChanged() { renderLockList(); }
 
 function showToast(msg) {

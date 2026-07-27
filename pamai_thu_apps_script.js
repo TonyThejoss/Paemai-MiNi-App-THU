@@ -16,7 +16,105 @@ const S = {
   INSTALL:  'installment_plans',
   QUEUE:    'floating_queue',  // เพิ่ม 2026-07-21: คิวจองล็อคจร
   RULES:    'market_rules',    // เพิ่ม 2026-07-21: กฎระเบียบตลาด (แก้ไขได้)
+  DISCOUNT: 'rent_discounts',  // เพิ่ม 2026-07-26: ส่วนลดค่าเช่ารายเดือน (รายล็อค/ทั้งตลาด)
+  SETTINGS: 'settings',        // เพิ่ม 2026-07-26: ค่าตั้งค่ากลางของตลาด (เช่น อัตราค่าธรรมเนียมรายปี)
 };
+
+// ════════════════════════════════════════
+// DATE NORMALIZATION (เพิ่ม 2026-07-26 — แก้บั๊ก #28 "รายงานดูข้อมูลไม่ได้")
+// ต้นเหตุ: แต่ละโมดูลบันทึกคอลัมน์ date ในรูปแบบต่างกัน — ส่วนใหญ่เป็นข้อความไทย ("26 ก.ค. 2569")
+// แต่ pamai_thu_installment.html บันทึกเป็น ISO ("2026-07-26") ซึ่ง Google Sheets แปลงเป็น Date object
+// อัตโนมัติ ทำให้การกรองแบบ r.date === date (เทียบสตริงตรง ๆ) หาไม่เจอและรายงานว่างเปล่า
+// ทางแก้: normalize ทุกค่าให้เป็น 'YYYY-MM-DD' ก่อนเทียบเสมอ ทั้งฝั่งข้อมูลในชีตและฝั่งพารามิเตอร์
+// ที่หน้าเว็บส่งมา — จึงยัง backward compatible กับหน้าเว็บเดิมที่ส่งวันที่แบบไทยมาทุกไฟล์
+// ════════════════════════════════════════
+const _MONS_TH = ['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
+const _MONS_TH_FULL = ['มกราคม','กุมภาพันธ์','มีนาคม','เมษายน','พฤษภาคม','มิถุนายน',
+                       'กรกฎาคม','สิงหาคม','กันยายน','ตุลาคม','พฤศจิกายน','ธันวาคม'];
+function _pad2(n) { return ('0' + n).slice(-2); }
+function _normDate(v) {
+  if (v === null || v === undefined || v === '') return '';
+  if (Object.prototype.toString.call(v) === '[object Date]') {
+    if (isNaN(v.getTime())) return '';
+    return Utilities.formatDate(v, 'Asia/Bangkok', 'yyyy-MM-dd');
+  }
+  const s = String(v).trim();
+  let m = s.match(/^(\d{4})-(\d{1,2})-(\d{1,2})/);            // ISO
+  if (m) return m[1] + '-' + _pad2(parseInt(m[2], 10)) + '-' + _pad2(parseInt(m[3], 10));
+  m = s.match(/^(\d{1,2})\s+(\S+)\s+(\d{4})$/);                // ไทยย่อ/เต็ม: 26 ก.ค. 2569
+  if (m) {
+    let mi = _MONS_TH.indexOf(m[2]);
+    if (mi < 0) mi = _MONS_TH_FULL.indexOf(m[2]);
+    if (mi >= 0) {
+      let y = parseInt(m[3], 10); if (y > 2400) y -= 543;
+      return y + '-' + _pad2(mi + 1) + '-' + _pad2(parseInt(m[1], 10));
+    }
+  }
+  m = s.match(/^(\d{1,2})[\/.](\d{1,2})[\/.](\d{4})$/);        // 26/7/2569
+  if (m) {
+    let y = parseInt(m[3], 10); if (y > 2400) y -= 543;
+    return y + '-' + _pad2(parseInt(m[2], 10)) + '-' + _pad2(parseInt(m[1], 10));
+  }
+  return s;
+}
+// กรองแถวตามเกณฑ์วันที่ที่หน้าเว็บส่งมา — รองรับ 4 โหมด: วันเดียว / ช่วงวันที่ / เดือน (YYYY-MM) / ทั้งหมด
+// ถ้าไม่ส่งเกณฑ์ใดเลยจะคืน true ทุกแถว (ผู้เรียกเป็นคนตัดสินว่าจะกรองหรือไม่)
+function _matchDate(rowDate, opt) {
+  const d = _normDate(rowDate);
+  if (!opt) return true;
+  if (opt.date)  return d === _normDate(opt.date);
+  if (opt.month) return d.slice(0, 7) === String(opt.month).slice(0, 7);
+  if (opt.from && d < _normDate(opt.from)) return false;
+  if (opt.to   && d > _normDate(opt.to))   return false;
+  return true;
+}
+function _dateOpt(e) {
+  const p = (e && e.parameter) ? e.parameter : {};
+  const o = {};
+  if (p.date)  o.date  = p.date;
+  if (p.month) o.month = p.month;
+  if (p.from)  o.from  = p.from;
+  if (p.to)    o.to    = p.to;
+  return (o.date || o.month || o.from || o.to) ? o : null;
+}
+function _todayISO() { return Utilities.formatDate(new Date(), 'Asia/Bangkok', 'yyyy-MM-dd'); }
+function _thisMonthISO() { return Utilities.formatDate(new Date(), 'Asia/Bangkok', 'yyyy-MM'); }
+
+// ════════════════════════════════════════
+// PHONE NUMBER (เพิ่ม 2026-07-26 — แก้บั๊ก #29 "เลข 0 หน้าเบอร์โทรหายหลังกดบันทึก")
+// ต้นเหตุ: Google Sheets แปลงสตริง "0812345678" เป็น "ตัวเลข" อัตโนมัติ เลข 0 นำหน้าจึงถูกตัดทิ้ง
+// เมื่ออ่านกลับมาได้ 812345678 — ไม่ใช่บั๊กของหน้าเว็บ (ช่องกรอกเป็น type=tel เก็บสตริงถูกต้องแล้ว)
+// ทางแก้ 2 ชั้น: (1) บังคับ number format ของคอลัมน์เบอร์โทรเป็นข้อความ '@' ก่อนเขียนทุกครั้ง
+// (2) _normPhone() เติม 0 คืนตอนอ่าน เพื่อกู้ข้อมูลเก่าที่เสียไปแล้วในชีตโดยไม่ต้องแก้มือ
+// ════════════════════════════════════════
+function _normPhone(v) {
+  if (v === null || v === undefined || v === '') return '';
+  let s = String(v).trim();
+  if (s === '—' || s === '-') return s;
+  if (/^\d+$/.test(s)) {
+    if (s.length === 9)  s = '0' + s;              // เบอร์มือถือ/บ้าน 10 หลักที่ 0 หายไป
+    else if (s.length === 8) s = '0' + s;          // เบอร์บ้าน 9 หลักที่ 0 หายไป
+  }
+  return s;
+}
+// เพิ่มคอลัมน์ใหม่ให้ชีตที่ใช้งานจริงอยู่แล้วอย่างปลอดภัย (idempotent)
+// initSheets() สร้าง header เฉพาะตอนชีตยังว่าง จึงไม่ช่วยกับชีตที่มีข้อมูลจริงแล้ว
+function _ensureColumn(sheet, headerName) {
+  const lastCol = Math.max(1, sheet.getLastColumn());
+  const headers = sheet.getRange(1, 1, 1, lastCol).getValues()[0];
+  if (headers.indexOf(headerName) >= 0) return headers.indexOf(headerName);
+  sheet.getRange(1, lastCol + 1).setValue(headerName);
+  return lastCol;   // 0-based index ของคอลัมน์ใหม่
+}
+function _forceTextCol(sheet, headerName) {
+  try {
+    const headers = sheet.getRange(1, 1, 1, Math.max(1, sheet.getLastColumn())).getValues()[0];
+    const idx = headers.indexOf(headerName);
+    if (idx < 0) return;
+    const rows = Math.max(sheet.getMaxRows() - 1, 1);
+    sheet.getRange(2, idx + 1, rows, 1).setNumberFormat('@');
+  } catch (err) { /* ไม่ critical — ถ้าตั้ง format ไม่ได้ ยังมี _normPhone() กู้ตอนอ่าน */ }
+}
 
 // ── CORS Helper ──
 function makeRes(data, status='ok') {
@@ -59,21 +157,86 @@ function doGet(e) {
     }
     switch(action) {
       case 'getVendors':    return getVendors();
-      case 'getLeaveLog':   return getLeaveLog(e.parameter.date, e.parameter.lockId);
-      case 'getDailyBookings': return getDailyBookings(e.parameter.date, e.parameter.lockId);
-      case 'getPayments':   return getPayments(e.parameter.date);
+      case 'getLeaveLog':   return getLeaveLog(_dateOpt(e), e.parameter.lockId, e.parameter.zone);
+      case 'getDailyBookings': return getDailyBookings(_dateOpt(e), e.parameter.lockId, e.parameter.zone);
+      case 'getPayments':   return getPayments(_dateOpt(e), e.parameter.lockId);
       case 'getUsers':      return getUsers();
       case 'initSheets':    return initSheets();
       case 'migrateHashPasswords': return migrateHashPasswords();
       case 'getInstallmentPlans': return getInstallmentPlans();
-      case 'getFloatingQueue': return getFloatingQueue(e.parameter.date);
+      case 'getFloatingQueue': return getFloatingQueue(_dateOpt(e));
       case 'getMarketRules':   return getMarketRules();
       case 'getPublicStatus':  return getPublicStatus(e.parameter.date);
+      // เพิ่ม 2026-07-26
+      case 'getDiscounts':     return getDiscounts(e.parameter.month);
+      case 'getSettings':      return getSettings();
+      case 'getActivityLog':   return getActivityLog(_dateOpt(e));
       default: return makeErr('Unknown action: ' + action);
     }
   } catch(err) {
     return makeErr(err.toString());
   }
+}
+
+// ── AUTO ACTIVITY LOG (เพิ่ม 2026-07-26 — บั๊ก #30) ──
+// ปัญหา: หน้า "บันทึกกิจกรรม" ไม่เห็นกิจกรรมทั้งหมดที่เกิดขึ้นจริง เพราะแต่ละหน้าเว็บต้องเรียก
+// logActivity เองและหลายหน้าไม่ได้เรียก (แถมหน้าแดชบอร์ดเก็บ log ไว้ในหน่วยความจำอย่างเดียว)
+// ทางแก้เชิงสถาปัตยกรรม: บันทึกที่ "ประตูเดียว" คือ doPost — ทุก action ที่เปลี่ยนข้อมูลจะถูกบันทึก
+// อัตโนมัติ ไม่ว่าหน้าไหนเรียกมา จึงครบถ้วนโดยไม่ต้องแก้ทุกไฟล์ frontend และไม่พลาดในอนาคต
+const AUTO_LOG_LABELS = {
+  saveVendor:              'บันทึก/แก้ไขข้อมูลผู้ค้าประจำ',
+  deleteVendor:            'ลบข้อมูลผู้ค้าประจำ',
+  logLeave:                'บันทึกสถานะแจ้งลา/ขาดล็อค',
+  saveDailyBooking:        'บันทึกผู้ค้าจร',
+  cancelDailyBooking:      'ยกเลิกผู้ค้าจร',
+  savePayment:             'รับชำระเงิน',
+  changePassword:          'เปลี่ยนรหัสผ่าน',
+  saveInstallmentPlan:     'ตั้ง/แก้ไขแผนผ่อนชำระ',
+  deleteInstallmentPlan:   'ลบแผนผ่อนชำระ',
+  saveFloatingQueueEntry:  'เพิ่มคิวจองล็อคจร',
+  sellFloatingQueueEntry:  'ขายล็อคจร',
+  editFloatingQueueEntry:  'แก้ไขรายการล็อคจร',
+  cancelFloatingQueueEntry:'ยกเลิกคิว/ล็อคจร',
+  saveMarketRules:         'แก้ไขกฎระเบียบตลาด',
+  saveDiscount:            'กำหนดส่วนลดค่าเช่า',
+  deleteDiscount:          'ลบส่วนลดค่าเช่า',
+  saveSettings:            'แก้ไขค่าตั้งค่าของตลาด',
+  clearLeaveForDate:       'ปลดสถานะลา/ขาดล็อค',
+};
+// action ที่ "ไม่" ต้องบันทึก: logActivity (จะซ้อนกันเอง) และ verifyUser (ล็อกอินมีบ่อยมาก)
+const AUTO_LOG_SKIP = ['logActivity', 'verifyUser', 'purgeOldActivity'];
+
+function _autoLog(action, body, resText) {
+  if (AUTO_LOG_SKIP.indexOf(action) >= 0) return;
+  const label = AUTO_LOG_LABELS[action];
+  if (!label) return;
+  try {
+    // เขียนตรงลงชีต (ไม่เรียก logActivity เพื่อไม่ให้ purge ทำงานซ้ำซ้อนหลายรอบใน request เดียว)
+    const d = body.data || {};
+    const who = d.manager || d.created_by || d.updatedBy || body.updatedBy || d.sold_by || d.user || 'ผู้ใช้ระบบ';
+    const lock = d.lock || d.lock_id || body.lockId || d.assigned_lock || body.id || '';
+    let detail = lock ? ('ล็อค ' + lock) : '';
+    if (d.amount !== undefined && d.amount !== '') detail += (detail ? ' · ' : '') + 'ยอด ฿' + d.amount;
+    if (d.type && action === 'savePayment') detail += (detail ? ' · ' : '') + String(d.type);
+    if (d.type && action === 'logLeave') detail += (detail ? ' · ' : '') + String(d.type);
+    if (action === 'saveDiscount') {
+      detail += (detail ? ' · ' : '') + (d.scope === 'market' ? 'ทั้งตลาด' : 'รายล็อค') +
+                ' เดือน ' + (d.month || '') + ' ฿' + (d.amount || 0);
+    }
+    const sheet = getSheet(S.ACTIVITY);
+    sheet.appendRow(['AC' + Date.now(), who, _autoLogType(action), label, detail,
+                     _todayISO(), Utilities.formatDate(new Date(), 'Asia/Bangkok', 'HH:mm')]);
+    if (Math.random() < 0.05) { try { _purgeActivity(ACTIVITY_RETENTION_DAYS); } catch (err2) {} }
+  } catch (err) { /* บันทึกกิจกรรมล้มเหลวต้องไม่ทำให้การบันทึกข้อมูลหลักล้มเหลว */ }
+}
+function _autoLogType(action) {
+  if (action.indexOf('Payment') >= 0) return 'payment';
+  if (action.indexOf('Vendor') >= 0) return 'vendor';
+  if (action.indexOf('Leave') >= 0 || action === 'logLeave') return 'leave';
+  if (action.indexOf('Daily') >= 0 || action.indexOf('FloatingQueue') >= 0) return 'daily';
+  if (action.indexOf('Installment') >= 0) return 'installment';
+  if (action.indexOf('Discount') >= 0) return 'discount';
+  return 'system';
 }
 
 // ── POST Router ──
@@ -82,6 +245,20 @@ function doPost(e) {
     const body   = JSON.parse(e.postData.contents);
     if (!checkToken(body.token)) return makeErr('Unauthorized: invalid or missing token');
     const action = body.action || '';
+    const _res = _routePost(action, body);
+    // บันทึกกิจกรรมอัตโนมัติเฉพาะเมื่อ action ทำงานสำเร็จ (ผลลัพธ์ status:'ok')
+    try {
+      const txt = _res && _res.getContent ? _res.getContent() : '';
+      if (txt.indexOf('"status":"ok"') >= 0) _autoLog(action, body, txt);
+    } catch (err) {}
+    return _res;
+  } catch(err) {
+    return makeErr(err.toString());
+  }
+}
+
+function _routePost(action, body) {
+  try {
     switch(action) {
       case 'saveVendor':       return saveVendor(body.data);
       case 'deleteVendor':     return deleteVendor(body.lockId);
@@ -99,6 +276,12 @@ function doPost(e) {
       case 'editFloatingQueueEntry':   return editFloatingQueueEntry(body.id, body.data);
       case 'cancelFloatingQueueEntry': return cancelFloatingQueueEntry(body.id, body.reason);
       case 'saveMarketRules':          return saveMarketRules(body.content, body.updatedBy);
+      // เพิ่ม 2026-07-26
+      case 'saveDiscount':     return saveDiscount(body.data);
+      case 'deleteDiscount':   return deleteDiscount(body.id);
+      case 'saveSettings':     return saveSettings(body.data, body.updatedBy);
+      case 'clearLeaveForDate': return clearLeaveForDate(body.lockId, body.date);
+      case 'purgeOldActivity': return purgeOldActivity(body.days);
       default: return makeErr('Unknown action: ' + action);
     }
   } catch(err) {
@@ -193,6 +376,21 @@ function initSheets() {
   if (rSheet.getLastRow() === 0) {
     rSheet.appendRow(['content','updated_by','updated_at']);
   }
+  // rent_discounts (เพิ่ม 2026-07-26: ส่วนลดค่าเช่ารายเดือน — รายล็อค/ทั้งตลาด หน่วยบาท)
+  const dcSheet = getSheet(S.DISCOUNT);
+  if (dcSheet.getLastRow() === 0) {
+    dcSheet.appendRow(['id','month','scope','lock_id','amount','apply_installment','note','status',
+                       'created_by','created_at','updated_at']);
+  }
+  // settings (เพิ่ม 2026-07-26: ค่าตั้งค่ากลาง เช่น อัตราค่าธรรมเนียมรายปี)
+  const stSheet = getSheet(S.SETTINGS);
+  if (stSheet.getLastRow() === 0) {
+    stSheet.appendRow(['key','value','updated_by','updated_at']);
+  }
+  // บังคับคอลัมน์เบอร์โทรเป็นข้อความ กันเลข 0 นำหน้าหาย (บั๊ก #29)
+  _forceTextCol(vSheet, 'phone');
+  _forceTextCol(dSheet, 'phone');
+  _forceTextCol(qSheet, 'phone');
   return makeRes('Sheets initialized');
 }
 
@@ -209,6 +407,7 @@ function getVendors() {
     headers.forEach((h, i) => obj[h] = row[i]);
     // Parse elec_special from JSON string
     try { obj.elec_special = JSON.parse(obj.elec_special || '[]'); } catch(e) { obj.elec_special = []; }
+    obj.phone = _normPhone(obj.phone);  // กู้เลข 0 นำหน้าที่ Sheets ตัดทิ้ง (บั๊ก #29)
     return obj;
   });
   return makeRes(vendors);
@@ -237,7 +436,7 @@ function saveVendor(data) {
     lock: data.lock,
     zone: data.zone !== undefined ? data.zone : (existing.zone || ''),
     name: data.name !== undefined ? data.name : (existing.name || ''),
-    phone: data.phone !== undefined ? data.phone : (existing.phone || ''),
+    phone: _normPhone(data.phone !== undefined ? data.phone : (existing.phone || '')),
     line: data.line !== undefined ? data.line : (existing.line || ''),
     product: data.product !== undefined ? data.product : (existing.product || ''),
     type: data.type !== undefined ? data.type : (existing.type || 'regular'),
@@ -257,6 +456,7 @@ function saveVendor(data) {
 
   const rowData = headers.map(h => merged[h] !== undefined ? merged[h] : '');
 
+  _forceTextCol(sheet, 'phone');   // บั๊ก #29: กันเลข 0 นำหน้าเบอร์โทรหาย
   if (foundRow > 0) {
     sheet.getRange(foundRow, 1, 1, rowData.length).setValues([rowData]);
   } else {
@@ -281,41 +481,111 @@ function deleteVendor(lockId) {
 // ════════════════════════════════════════
 // LEAVE LOG
 // ════════════════════════════════════════
-function getLeaveLog(date, lockId) {
+function getLeaveLog(opt, lockId, zone) {
   const sheet = getSheet(S.LEAVE);
   const rows  = sheet.getDataRange().getValues();
   if (rows.length <= 1) return makeRes([]);
   const headers = rows[0];
   let data = rows.slice(1).map(row => {
-    const obj = {}; headers.forEach((h,i)=>obj[h]=row[i]); return obj;
+    const obj = {}; headers.forEach((h,i)=>obj[h]=row[i]);
+    obj.date_iso = _normDate(obj.date);           // ให้หน้าเว็บเรียง/กรองต่อได้โดยไม่ต้องแปลงเอง
+    return obj;
   });
-  if (date) data = data.filter(r => r.date === date);
+  if (opt)    data = data.filter(r => _matchDate(r.date, opt));
   if (lockId) data = data.filter(r => r.lock_id === lockId);
+  if (zone)   data = data.filter(r => r.zone === zone);
   return makeRes(data);
 }
 
+// ── ตรรกะประวัติการลา/ขาด (ปรับ 2026-07-26 ตามข้อกำหนดใหม่) ──
+// กติกา: 1 ล็อค + 1 วัน = ประวัติได้แค่ 1 รายการเท่านั้น
+//  · แจ้งลา/ขาดซ้ำในวันเดิม → เขียนทับแถวเดิม (ไม่เพิ่มแถวใหม่ ไม่ให้ประวัติซ้ำซ้อน)
+//  · ปลดสถานะ (cancel) → ลบแถวของวันนั้นออกจากประวัติจริง ไม่ใช่เพิ่มแถว 'cancel' ทับ
+//    เพื่อให้ "ประวัติการแจ้งลาในวันนั้นหายไปด้วย" ตามที่ผู้ดูแลตลาดกำหนด
+//  · แจ้งใหม่วันเดิมหลังปลด → ได้แถวใหม่ 1 แถวตามปกติ (ประวัติกลับมาปรากฏ)
+// ประเภทที่ถือว่าเป็นการปลดสถานะ: cancel / leave_cancel / absent_cancel (สองตัวหลังมาจากแอพวันพฤหัสฯ เดิม)
+const _CANCEL_TYPES = ['cancel', 'leave_cancel', 'absent_cancel'];
 function logLeave(data) {
-  const sheet = getSheet(S.LEAVE);
-  const id    = 'LV' + Date.now();
-  const now   = new Date().toISOString();
+  const sheet   = getSheet(S.LEAVE);
+  const rows    = sheet.getDataRange().getValues();
+  const headers = rows[0];
+  const iLock = headers.indexOf('lock_id'), iDate = headers.indexOf('date'), iType = headers.indexOf('type');
+  const targetDate = _normDate(data.date);
+  const isCancel   = _CANCEL_TYPES.indexOf(String(data.type)) >= 0;
+
+  // ยกเลิกสัญญาเช่า (lease_cancel) เป็นเหตุการณ์ถาวร ไม่ใช่สถานะรายวัน → เก็บเป็นประวัติแยกตามปกติ
+  if (String(data.type) === 'lease_cancel') {
+    const id0 = 'LV' + Date.now();
+    sheet.appendRow([id0, data.lock_id, data.zone, data.shop, data.type,
+                     data.note||'', data.manager||'', data.date, data.time, new Date().toISOString()]);
+    return makeRes({ id: id0 });
+  }
+
+  // หาแถว "สถานะรายวัน" เดิมของล็อคนี้ในวันเดียวกัน (leave/absent เท่านั้น)
+  let foundRow = -1;
+  for (let i = rows.length - 1; i >= 1; i--) {
+    if (rows[i][iLock] !== data.lock_id) continue;
+    if (_normDate(rows[i][iDate]) !== targetDate) continue;
+    const t = String(rows[i][iType]);
+    if (t === 'leave' || t === 'absent') { foundRow = i + 1; break; }
+  }
+
+  if (isCancel) {
+    if (foundRow > 0) { sheet.deleteRow(foundRow); return makeRes({ cleared: true, lock: data.lock_id, date: targetDate }); }
+    return makeRes({ cleared: false, note: 'ไม่พบประวัติของวันนั้น (อาจถูกลบไปแล้ว)' });
+  }
+
+  const now = new Date().toISOString();
+  if (foundRow > 0) {
+    // เขียนทับแถวเดิม — คง id เดิมไว้เพื่อไม่ให้ประวัติ/รายงานอ้างอิงเสีย
+    const keepId = rows[foundRow - 1][headers.indexOf('id')] || ('LV' + Date.now());
+    const rowData = [keepId, data.lock_id, data.zone, data.shop, data.type,
+                     data.note||'', data.manager||'', data.date, data.time, now];
+    sheet.getRange(foundRow, 1, 1, rowData.length).setValues([rowData]);
+    return makeRes({ id: keepId, replaced: true });
+  }
+  const id = 'LV' + Date.now();
   sheet.appendRow([id, data.lock_id, data.zone, data.shop, data.type,
                    data.note||'', data.manager||'', data.date, data.time, now]);
   return makeRes({ id });
 }
 
+// ลบประวัติสถานะรายวัน (ลา/ขาด) ของล็อคหนึ่งในวันหนึ่งออกทั้งหมด — ใช้เมื่อผู้ดูแลกดปลดสถานะ
+function clearLeaveForDate(lockId, date) {
+  if (!lockId || !date) return makeErr('ต้องระบุ lockId และ date');
+  const sheet   = getSheet(S.LEAVE);
+  const rows    = sheet.getDataRange().getValues();
+  const headers = rows[0];
+  const iLock = headers.indexOf('lock_id'), iDate = headers.indexOf('date'), iType = headers.indexOf('type');
+  const target = _normDate(date);
+  let removed = 0;
+  for (let i = rows.length - 1; i >= 1; i--) {
+    if (rows[i][iLock] !== lockId) continue;
+    if (_normDate(rows[i][iDate]) !== target) continue;
+    const t = String(rows[i][iType]);
+    if (t !== 'leave' && t !== 'absent') continue;
+    sheet.deleteRow(i + 1); removed++;
+  }
+  return makeRes({ removed: removed, lock: lockId, date: target });
+}
+
 // ════════════════════════════════════════
 // DAILY BOOKINGS (ผู้ค้าจร)
 // ════════════════════════════════════════
-function getDailyBookings(date, lockId) {
+function getDailyBookings(opt, lockId, zone) {
   const sheet = getSheet(S.DAILY);
   const rows  = sheet.getDataRange().getValues();
   if (rows.length <= 1) return makeRes([]);
   const headers = rows[0];
   let data = rows.slice(1).map(row => {
-    const obj = {}; headers.forEach((h,i)=>obj[h]=row[i]); return obj;
+    const obj = {}; headers.forEach((h,i)=>obj[h]=row[i]);
+    obj.phone = _normPhone(obj.phone);
+    obj.date_iso = _normDate(obj.date);
+    return obj;
   }).filter(r => r.cancelled !== true && r.cancelled !== 'TRUE');
-  if (date) data = data.filter(r => r.date === date);
+  if (opt)    data = data.filter(r => _matchDate(r.date, opt));
   if (lockId) data = data.filter(r => r.lock_id === lockId);
+  if (zone)   data = data.filter(r => r.zone === zone);
   return makeRes(data);
 }
 
@@ -323,7 +593,8 @@ function saveDailyBooking(data) {
   const sheet = getSheet(S.DAILY);
   const id    = 'DV' + Date.now();
   const now   = new Date().toISOString();
-  sheet.appendRow([id, data.lock_id, data.zone, data.vendor_name, data.phone||'',
+  _forceTextCol(sheet, 'phone');
+  sheet.appendRow([id, data.lock_id, data.zone, data.vendor_name, _normPhone(data.phone),
                    data.product, data.price, data.elec||0, data.total,
                    data.method, data.date, data.time, data.original_status||'', false, now]);
   return makeRes({ id });
@@ -348,15 +619,18 @@ function cancelDailyBooking(lockId, date) {
 // ════════════════════════════════════════
 // PAYMENTS
 // ════════════════════════════════════════
-function getPayments(date) {
+function getPayments(opt, lockId) {
   const sheet = getSheet(S.PAYMENTS);
   const rows  = sheet.getDataRange().getValues();
   if (rows.length <= 1) return makeRes([]);
   const headers = rows[0];
   let data = rows.slice(1).map(row => {
-    const obj = {}; headers.forEach((h,i)=>obj[h]=row[i]); return obj;
+    const obj = {}; headers.forEach((h,i)=>obj[h]=row[i]);
+    obj.date_iso = _normDate(obj.date);
+    return obj;
   });
-  if (date) data = data.filter(r => r.date === date);
+  if (opt)    data = data.filter(r => _matchDate(r.date, opt));
+  if (lockId) data = data.filter(r => r.lock_id === lockId);
   return makeRes(data);
 }
 
@@ -372,11 +646,175 @@ function savePayment(data) {
 // ════════════════════════════════════════
 // ACTIVITY LOG
 // ════════════════════════════════════════
+// ปรับ 2026-07-26 (บั๊ก #30): บันทึกกิจกรรมลงชีตจริงทุกครั้ง + ลบอัตโนมัติเมื่อเกิน 30 วัน
+// เดิมหน้าแดชบอร์ดเก็บ activity log ไว้ในตัวแปร ACT_LOG ในหน่วยความจำเท่านั้น (หายทุกครั้งที่รีเฟรช
+// และไม่เห็นกิจกรรมของผู้จัดคนอื่น) จึงเปลี่ยนเป็นอ่าน/เขียนชีต activity_log เป็นแหล่งจริงแหล่งเดียว
+const ACTIVITY_RETENTION_DAYS = 30;
 function logActivity(data) {
   const sheet = getSheet(S.ACTIVITY);
   const id    = 'AC' + Date.now();
-  sheet.appendRow([id, data.user||'system', data.type, data.message, data.detail||'', data.date, data.time]);
+  sheet.appendRow([id, data.user||'system', data.type, data.message, data.detail||'',
+                   data.date || _todayISO(), data.time || Utilities.formatDate(new Date(),'Asia/Bangkok','HH:mm')]);
+  // ล้างอัตโนมัติแบบสุ่มเบา ๆ (≈1 ใน 12 ครั้งที่เขียน) เพื่อไม่ให้ทุก request ต้องสแกนทั้งชีต
+  if (Math.random() < 0.08) { try { _purgeActivity(ACTIVITY_RETENTION_DAYS); } catch (err) {} }
   return makeRes({ id });
+}
+
+function getActivityLog(opt) {
+  _purgeActivity(ACTIVITY_RETENTION_DAYS);   // ทุกครั้งที่หน้าเว็บเปิดดู ให้ลบของเก่าเกินกำหนดก่อน
+  const sheet = getSheet(S.ACTIVITY);
+  const rows  = sheet.getDataRange().getValues();
+  if (rows.length <= 1) return makeRes([]);
+  const headers = rows[0];
+  let data = rows.slice(1).map(row => {
+    const obj = {}; headers.forEach((h,i)=>obj[h]=row[i]);
+    obj.date_iso = _normDate(obj.date);
+    return obj;
+  });
+  if (opt) data = data.filter(r => _matchDate(r.date, opt));
+  data.sort((a,b) => String(b.id).localeCompare(String(a.id)));   // ใหม่สุดขึ้นก่อน
+  return makeRes(data);
+}
+
+function _purgeActivity(days) {
+  const sheet = getSheet(S.ACTIVITY);
+  const rows  = sheet.getDataRange().getValues();
+  if (rows.length <= 1) return 0;
+  const iDate = rows[0].indexOf('date');
+  const iId   = rows[0].indexOf('id');
+  const cutoffMs = Date.now() - (days * 86400000);
+  const cutoffISO = Utilities.formatDate(new Date(cutoffMs), 'Asia/Bangkok', 'yyyy-MM-dd');
+  let removed = 0;
+  for (let i = rows.length - 1; i >= 1; i--) {
+    let d = _normDate(rows[i][iDate]);
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(d)) {
+      // ไม่มีวันที่อ่านได้ → ใช้ timestamp ที่ฝังใน id ('AC<ms>') เป็นตัวตัดสินแทน
+      const m = String(rows[i][iId]).match(/^AC(\d{10,})$/);
+      if (!m) continue;
+      if (parseInt(m[1], 10) >= cutoffMs) continue;
+    } else if (d >= cutoffISO) continue;
+    sheet.deleteRow(i + 1); removed++;
+  }
+  return removed;
+}
+function purgeOldActivity(days) {
+  const n = _purgeActivity(parseInt(days, 10) > 0 ? parseInt(days, 10) : ACTIVITY_RETENTION_DAYS);
+  return makeRes({ removed: n });
+}
+
+// ════════════════════════════════════════
+// SETTINGS — ค่าตั้งค่ากลางของตลาด (เพิ่ม 2026-07-26)
+// เก็บเป็น key/value เพื่อให้เพิ่มค่าใหม่ในอนาคตได้โดยไม่ต้องแก้ schema
+// คีย์ที่ระบบใช้ตอนนี้: annual_fee (อัตราค่าธรรมเนียมรายปีกลางทั้งตลาด), entry_fee (ค่าแรกเข้าเริ่มต้น)
+// ════════════════════════════════════════
+const DEFAULT_SETTINGS = { annual_fee: 0, entry_fee: 0 };
+function getSettings() {
+  const rows = _sheetToObjects(S.SETTINGS);
+  const out = {};
+  Object.keys(DEFAULT_SETTINGS).forEach(k => out[k] = DEFAULT_SETTINGS[k]);
+  rows.forEach(r => { if (r.key) out[String(r.key)] = r.value; });
+  return makeRes(out);
+}
+function saveSettings(data, updatedBy) {
+  if (!data || typeof data !== 'object') return makeErr('ต้องส่ง data เป็น object ของ key/value');
+  const sheet   = getSheet(S.SETTINGS);
+  const now     = new Date().toISOString();
+  let rows      = sheet.getDataRange().getValues();
+  if (rows.length === 0) { sheet.appendRow(['key','value','updated_by','updated_at']); rows = sheet.getDataRange().getValues(); }
+  const iKey = rows[0].indexOf('key');
+  Object.keys(data).forEach(k => {
+    let found = -1;
+    for (let i = 1; i < rows.length; i++) { if (String(rows[i][iKey]) === k) { found = i + 1; break; } }
+    const rowData = [k, data[k], updatedBy || '', now];
+    if (found > 0) sheet.getRange(found, 1, 1, rowData.length).setValues([rowData]);
+    else { sheet.appendRow(rowData); rows = sheet.getDataRange().getValues(); }
+  });
+  return makeRes({ saved: true, updated_at: now });
+}
+
+// ════════════════════════════════════════
+// RENT DISCOUNTS — ส่วนลดค่าเช่ารายเดือน (เพิ่ม 2026-07-26)
+// ขอบเขตตามข้อกำหนดของผู้ดูแลตลาด:
+//  · กำหนดได้ 2 ระดับ: 'market' (ทุกล็อคเท่ากันทั้งตลาดในเดือนนั้น) และ 'lock' (เฉพาะล็อค)
+//  · หน่วยเป็น "จำนวนเงินบาท" เท่านั้น (ไม่มีเปอร์เซ็นต์ ตามที่ยืนยัน 2026-07-26)
+//  · ใช้ได้เฉพาะเดือนปัจจุบันหรือเดือนอนาคต — ห้ามให้ส่วนลดย้อนหลังเด็ดขาด (ตรวจที่ backend
+//    ไม่ใช่แค่ที่หน้าเว็บ เพราะหน้าเว็บถูก bypass ได้)
+//  · ส่วนลดระดับล็อคชนะส่วนลดทั้งตลาดเสมอ (specific wins over general)
+//  · ล็อคที่อยู่ระหว่างผ่อนชำระ: ได้ส่วนลดหรือไม่ ขึ้นกับ flag apply_installment ของรายการนั้น
+// ════════════════════════════════════════
+function getDiscounts(month) {
+  let rows = _sheetToObjects(S.DISCOUNT).filter(r => String(r.status || 'active') !== 'deleted');
+  rows = rows.map(r => ({
+    id: r.id, month: String(r.month || '').slice(0, 7), scope: r.scope, lock_id: r.lock_id || '',
+    amount: parseFloat(r.amount) || 0,
+    apply_installment: (r.apply_installment === true || String(r.apply_installment).toUpperCase() === 'TRUE'),
+    note: r.note || '', created_by: r.created_by || '', created_at: r.created_at, updated_at: r.updated_at,
+  }));
+  if (month) rows = rows.filter(r => r.month === String(month).slice(0, 7));
+  return makeRes(rows);
+}
+
+function saveDiscount(data) {
+  if (!data) return makeErr('ไม่มีข้อมูลส่วนลด');
+  const month = String(data.month || '').slice(0, 7);
+  if (!/^\d{4}-\d{2}$/.test(month)) return makeErr('รูปแบบเดือนต้องเป็น YYYY-MM');
+  if (month < _thisMonthISO()) return makeErr('ไม่สามารถกำหนดส่วนลดย้อนหลังได้ — ใช้ได้เฉพาะเดือนปัจจุบันหรือเดือนในอนาคต');
+  const scope = (data.scope === 'market') ? 'market' : 'lock';
+  if (scope === 'lock' && !data.lock_id) return makeErr('ส่วนลดรายล็อคต้องระบุ lock_id');
+  const amount = parseFloat(data.amount) || 0;
+  if (amount < 0) return makeErr('จำนวนส่วนลดต้องไม่ติดลบ');
+
+  const sheet = getSheet(S.DISCOUNT);
+  let rows = sheet.getDataRange().getValues();
+  if (rows.length === 0) {
+    sheet.appendRow(['id','month','scope','lock_id','amount','apply_installment','note','status','created_by','created_at','updated_at']);
+    rows = sheet.getDataRange().getValues();
+  }
+  const headers = rows[0];
+  const iMonth = headers.indexOf('month'), iScope = headers.indexOf('scope'),
+        iLock  = headers.indexOf('lock_id'), iStatus = headers.indexOf('status'),
+        iId    = headers.indexOf('id'), iCreated = headers.indexOf('created_at');
+  // upsert: 1 เดือน มีส่วนลดทั้งตลาดได้ 1 รายการ และส่วนลดรายล็อคได้ล็อคละ 1 รายการ
+  let foundRow = -1;
+  for (let i = 1; i < rows.length; i++) {
+    if (String(rows[i][iStatus] || 'active') === 'deleted') continue;
+    if (String(rows[i][iMonth]).slice(0, 7) !== month) continue;
+    if (String(rows[i][iScope]) !== scope) continue;
+    if (scope === 'lock' && String(rows[i][iLock]) !== String(data.lock_id)) continue;
+    foundRow = i + 1; break;
+  }
+  const now = new Date().toISOString();
+  const id  = foundRow > 0 ? (rows[foundRow - 1][iId] || ('DC' + Date.now())) : ('DC' + Date.now());
+  const merged = {
+    id: id, month: month, scope: scope, lock_id: scope === 'lock' ? data.lock_id : '',
+    amount: amount,
+    apply_installment: data.apply_installment === true || String(data.apply_installment).toUpperCase() === 'TRUE',
+    note: data.note || '', status: 'active', created_by: data.created_by || '',
+    created_at: foundRow > 0 ? (rows[foundRow - 1][iCreated] || now) : now, updated_at: now,
+  };
+  const rowData = headers.map(h => merged[h] !== undefined ? merged[h] : '');
+  if (foundRow > 0) sheet.getRange(foundRow, 1, 1, rowData.length).setValues([rowData]);
+  else sheet.appendRow(rowData);
+  return makeRes({ id: id, action: foundRow > 0 ? 'updated' : 'created', month: month, scope: scope });
+}
+
+function deleteDiscount(id) {
+  if (!id) return makeErr('ต้องระบุ id');
+  const sheet   = getSheet(S.DISCOUNT);
+  const rows    = sheet.getDataRange().getValues();
+  if (rows.length <= 1) return makeErr('ไม่พบรายการส่วนลด');
+  const headers = rows[0];
+  const iId = headers.indexOf('id'), iMonth = headers.indexOf('month');
+  for (let i = rows.length - 1; i >= 1; i--) {
+    if (String(rows[i][iId]) !== String(id)) continue;
+    // ห้ามลบส่วนลดของเดือนที่ผ่านไปแล้ว เพื่อรักษาความถูกต้องของรายงานย้อนหลัง
+    if (String(rows[i][iMonth]).slice(0, 7) < _thisMonthISO()) {
+      return makeErr('ไม่สามารถลบส่วนลดของเดือนที่ผ่านไปแล้วได้ (รายงานย้อนหลังต้องคงค่าเดิม)');
+    }
+    sheet.deleteRow(i + 1);
+    return makeRes({ deleted: id });
+  }
+  return makeErr('ไม่พบรายการส่วนลด: ' + id);
 }
 
 // ════════════════════════════════════════
@@ -572,9 +1010,10 @@ function _sheetToObjects(sheetName) {
 // เพื่อให้ผังตลาด/รายงาน/หน้าอื่น ๆ ที่อ่าน daily_bookings อยู่แล้วเห็นข้อมูลตรงกัน
 // ไม่สร้างระบบข้อมูลคู่ขนานที่ไม่ตรงกัน — ห้ามลบ/แก้ logic ของ saveDailyBooking/cancelDailyBooking เดิม
 // ════════════════════════════════════════
-function getFloatingQueue(date) {
+function getFloatingQueue(opt) {
   let data = _sheetToObjects(S.QUEUE).filter(r => r.status !== 'cancelled');
-  if (date) data = data.filter(r => r.market_date === date);
+  data = data.map(r => { r.phone = _normPhone(r.phone); r.date_iso = _normDate(r.market_date); return r; });
+  if (opt) data = data.filter(r => _matchDate(r.market_date, opt));
   return makeRes(data);
 }
 
@@ -583,7 +1022,8 @@ function saveFloatingQueueEntry(data) {
   const sheet = getSheet(S.QUEUE);
   const id    = 'FQ' + Date.now();
   const now   = new Date().toISOString();
-  sheet.appendRow([id, data.market_date, data.vendor_name, data.phone || '', data.line || '',
+  _forceTextCol(sheet, 'phone');
+  sheet.appendRow([id, data.market_date, data.vendor_name, _normPhone(data.phone), data.line || '',
                    data.zone_pref || '', data.note || '', data.requested_at || now,
                    'waiting', '', 0, 0, 0, '', '', '', '', now]);
   return makeRes({ id });
@@ -602,6 +1042,8 @@ function sellFloatingQueueEntry(data) {
   // data: { id, assigned_lock, zone, vendor_name, phone, product, price, elec, total, method, date, time, sold_by }
   // ผู้จัดเลือกขายแถวใดก่อนก็ได้ ไม่ต้องเรียงตามคิว (ข้อกำหนด: ข้ามคิวได้)
   const sheet = getSheet(S.QUEUE);
+  _ensureColumn(sheet, 'product');   // เพิ่ม 2026-07-26: เดิมไม่มีคอลัมน์นี้ ทำให้ตาราง "ขายแล้ว" แสดงสินค้าว่าง
+  _ensureColumn(sheet, 'zone');
   const found = _findQueueRow(sheet, data.id);
   if (!found) return makeErr('ไม่พบรายการคิว: ' + data.id);
   const { rowNum, headers } = found;
@@ -609,6 +1051,8 @@ function sellFloatingQueueEntry(data) {
   const set = (col, val) => { const i = headers.indexOf(col); if (i >= 0) sheet.getRange(rowNum, i + 1).setValue(val); };
   set('status', 'sold');
   set('assigned_lock', data.assigned_lock);
+  set('product', data.product || '');
+  set('zone', data.zone || '');
   set('price', data.price || 0);
   set('elec', data.elec || 0);
   set('total', data.total || 0);
@@ -712,25 +1156,46 @@ function getPublicStatus(date) {
 
   // ── ลา/ขาดล็อค: หาสถานะล่าสุดของแต่ละล็อคในวันที่ระบุ (ตรรกะเดียวกับที่ผังตลาดใช้ในฝั่ง frontend) ──
   let leaveRows = _sheetToObjects(S.LEAVE);
-  if (date) leaveRows = leaveRows.filter(r => r.date === date);
+  if (date) leaveRows = leaveRows.filter(r => _normDate(r.date) === _normDate(date));
   leaveRows = leaveRows.slice().sort((a, b) => String(a.created_at || a.time).localeCompare(String(b.created_at || b.time)));
   const lockLeaveStatus = {};
   leaveRows.forEach(r => {
     if (!r.lock_id) return;
     if (r.type === 'leave' || r.type === 'absent') {
       lockLeaveStatus[r.lock_id] = { type: r.type, note: r.note || '', date: r.date };
-    } else if (r.type === 'cancel') {
+    } else if (_CANCEL_TYPES.indexOf(String(r.type)) >= 0) {
+      // รวม leave_cancel/absent_cancel ของแอพวันพฤหัสฯ เดิมด้วย (เดิมเช็คแค่ 'cancel' ทำให้สถานะค้าง)
       delete lockLeaveStatus[r.lock_id];
     }
   });
 
   // ── คิวจองล็อคจร: รอคิว + ขายแล้ว (ไม่ส่งเบอร์โทร/LINE) ──
   let queueRows = _sheetToObjects(S.QUEUE).filter(r => r.status !== 'cancelled');
-  if (date) queueRows = queueRows.filter(r => r.market_date === date);
+  if (date) queueRows = queueRows.filter(r => _normDate(r.market_date) === _normDate(date));
   const queuePublic = queueRows.map(r => ({
     id: r.id, zone_pref: r.zone_pref || 'ได้ทุกโซน', note: r.note || '',
     vendor_name: r.vendor_name, status: r.status, assigned_lock: r.assigned_lock || '',
-    requested_at: r.requested_at,
+    product: r.product || '', requested_at: r.requested_at,
+  }));
+
+  // ── ล็อคจรที่ขายแล้วทั้งหมดของวันนั้น (เพิ่ม 2026-07-26 ตามข้อกำหนด) ──
+  // ต้องแสดงทั้ง 2 ช่องทาง: (ก) ขายผ่านคิวรอในระบบ (ข) ผู้จัดขายตรงไม่ผ่านคิว
+  // แหล่งข้อมูลจริงคือ daily_bookings (ทุกการขายลงที่นี่เสมอ ทั้งสองช่องทาง — ดูหมายเหตุ sellFloatingQueueEntry)
+  // แล้วเทียบกับ floating_queue เพื่อบอกช่องทางว่ามาจากคิวหรือขายตรง
+  // whitelist: เลขล็อค + ชื่อร้าน + สินค้า + ช่องทาง เท่านั้น — ห้ามส่ง phone/price/total/method ออกหน้าสาธารณะ
+  let soldRows = _sheetToObjects(S.DAILY)
+    .filter(r => r.cancelled !== true && String(r.cancelled).toUpperCase() !== 'TRUE');
+  if (date) soldRows = soldRows.filter(r => _normDate(r.date) === _normDate(date));
+  const queueSoldLocks = {};
+  queueRows.forEach(r => {
+    if (r.status === 'sold' && r.assigned_lock) {
+      queueSoldLocks[r.assigned_lock] = String(r.note || '').indexOf('ขายตรง') >= 0 ? 'direct' : 'queue';
+    }
+  });
+  const soldPublic = soldRows.map(r => ({
+    lock: r.lock_id, zone: r.zone || '', vendor_name: r.vendor_name || '', product: r.product || '',
+    via: queueSoldLocks[r.lock_id] === 'queue' ? 'queue' : 'direct',
+    time: r.time || '',
   }));
 
   // ── กฎระเบียบตลาด ──
@@ -744,10 +1209,11 @@ function getPublicStatus(date) {
     vendors: vendorsPublic,
     leaveStatus: lockLeaveStatus,
     queue: queuePublic,
+    sold: soldPublic,
     rules: rules,
     generatedAt: new Date().toISOString(),
   };
   const out = JSON.stringify({ status: 'ok', data: payload, ts: new Date().toISOString() });
-  cache.put(cacheKey, out, 20);
+  cache.put(cacheKey, out, 10);   // ลดจาก 20 → 10 วิ ให้หน้าสาธารณะใกล้เรียลไทม์ขึ้นตามที่ผู้ใช้ขอ
   return ContentService.createTextOutput(out).setMimeType(ContentService.MimeType.JSON);
 }

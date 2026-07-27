@@ -17,15 +17,15 @@
   --r:#b91c1c;--rl:#fef2f2;--o:#c2410c;--ol:#fff7ed;
   --pu:#6d28d9;--pul:#f5f3ff;
   --bg:#f4f6f4;--sf:#fff;--sf2:#f8faf9;--sf3:#f1f5f2;
-  --bd:#c8d8cf;--bd2:#9bb5a5;
-  --tx:#0f1e14;--txm:#3d5247;--txl:#4d6854;
+  --bd:#c8d8cf;--bd2:#bfa891;
+  --tx:#0f1e14;--txm:#5a4835;--txl:#725a43;
   --shadow:0 2px 12px rgba(15,30,20,.07);
   --rad:12px;
 }
 [data-theme="dark"]{
   --bg:#0a0f0c;--sf:#111a14;--sf2:#162019;--sf3:#1c2a20;
-  --bd:#2a3d30;--bd2:#3d5a46;
-  --tx:#d4e8d8;--txm:#8aab8f;--txl:#8ca696;
+  --bd:#413426;--bd2:#5f4c38;
+  --tx:#e8ded4;--txm:#b59a80;--txl:#b4997e;
   --gl:#112318;--gll:#0b170f;--rl:#1f0a0a;--ol:#1f1008;
   --pul:#170f28;
   --shadow:0 4px 20px rgba(0,0,0,.45);
@@ -65,34 +65,242 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(
 
 .dm-btn{position:fixed;bottom:14px;right:14px;width:44px;height:44px;border-radius:50%;border:1.5px solid var(--bd2);background:var(--sf);color:var(--tx);cursor:pointer;font-size:.9rem;display:flex;align-items:center;justify-content:center;box-shadow:var(--shadow);z-index:50;}
 .ic{width:1em;height:1em;vertical-align:-.15em;display:inline-block;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0}
+
+/* ══ PM_PUBLIC_V2 (2026-07-26) ══ */
+.tb-brand{display:flex;align-items:center;gap:10px;min-width:0;}
+.tb-logo{width:38px;height:38px;object-fit:contain;border-radius:8px;background:#fff;padding:2px;flex-shrink:0;}
+.tb-sub{font-size:.64rem;opacity:.8;margin-top:1px;}
+.refresh-bar{display:flex;flex-direction:column;align-items:center;gap:8px;padding:14px 12px 4px;}
+.refresh-btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;width:100%;max-width:420px;
+  min-height:54px;padding:14px 22px;border:none;border-radius:14px;cursor:pointer;font-family:inherit;
+  font-size:1.02rem;font-weight:900;color:#fff;background:linear-gradient(135deg,var(--gm),var(--gb));
+  box-shadow:0 6px 18px rgba(0,0,0,.22);transition:transform .12s,box-shadow .12s;}
+.refresh-btn:active{transform:translateY(2px);box-shadow:0 3px 10px rgba(0,0,0,.2);}
+.refresh-btn .ic{width:1.25em;height:1.25em;stroke-width:2.4;}
+.refresh-btn[disabled]{opacity:.65;cursor:progress;}
+.refresh-note{font-size:.78rem;line-height:1.6;text-align:center;color:var(--tx);background:var(--gll);
+  border:1.5px solid var(--gb);border-radius:10px;padding:9px 12px;max-width:520px;}
+.sub-note{font-size:.7rem;color:var(--txl);margin:-2px 0 8px;}
+.cnt{display:inline-block;background:var(--gm);color:#fff;border-radius:10px;font-size:.66rem;
+  font-weight:900;padding:1px 8px;margin-left:6px;vertical-align:middle;}
+.lockchips{display:flex;flex-wrap:wrap;gap:6px;}
+.lockchip{display:inline-flex;align-items:center;gap:4px;font-size:.92rem;font-weight:900;
+  border-radius:9px;padding:6px 10px;min-width:52px;justify-content:center;}
+.lockchip.c-none{background:#dde5ee;color:#293b52;border:2px dashed #7c8ea5;}
+.lockchip.c-leave{background:#e5ddfd;color:#3f1178;border:2px solid #6d28d9;}
+.lockchip.c-absent{background:#fcd9d9;color:#6f1616;border:2px solid #b91c1c;}
+.row .via{font-size:.62rem;font-weight:800;border-radius:8px;padding:1px 7px;}
+.via-queue{background:#cfe2fe;color:#16307a;}
+.via-direct{background:#fdeec2;color:#6b3d06;}
+@media(max-width:640px){
+  .refresh-btn{font-size:1rem;min-height:56px;}
+  .lockchip{font-size:.88rem;min-width:48px;}
+}
 </style>
+<!-- ==== PM_MOBILE_KIT:START (สร้างโดย tools/inject_mobile_kit.py — ห้ามแก้ในไฟล์นี้) ==== -->
+<style id="pm-mobile-kit">
+/* ═══════════════════════════════════════════════════════════════════════════
+   PM MOBILE KIT — Mobile-First / Responsive / Thai typography (2026-07-26)
+   เป้าหมาย: ทุกหน้าใช้งานได้เต็มจอบนสมาร์ทโฟนทุกขนาด ไม่มีเนื้อหาล้นขอบจอด้านข้าง
+   (no horizontal overflow), ตัวอักษรไทยตัดบรรทัดถูกต้อง, ปุ่มกดง่ายด้วยนิ้วโป้ง,
+   เว้นระยะขอบบน-ล่างไม่ให้ชิดจอ
+   หมายเหตุเชิงเทคนิค: ตั้งใจ "ไม่" ใส่ viewport-fit=cover เพราะถ้าไม่ใส่ เบราว์เซอร์จะกันพื้นที่
+   รอยบาก (notch) ให้อยู่แล้วโดยอัตโนมัติ การใส่ cover แล้วจัดการ env() เองมีความเสี่ยงที่เนื้อหา
+   จะไปอยู่ใต้รอยบากถ้าพลาดจุดใดจุดหนึ่ง — เราจึงใช้ env() เป็น "ระยะเสริม" (max()) เท่านั้น
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* ── 1) พื้นฐาน: กันล้นขอบจอ + ฟอนต์ไทย ── */
+html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
+*, *::before, *::after { min-width: 0; }               /* ตัวการอันดับ 1 ของ overflow ใน flex/grid */
+body {
+  overflow-x: hidden;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Sarabun",
+               "Noto Sans Thai", "Leelawadee UI", "Thonburi", system-ui,
+               "Helvetica Neue", Arial, sans-serif;
+  overflow-wrap: break-word;                           /* ตัดเฉพาะเมื่อคำเดียวยาวเกินกรอบ */
+  word-break: normal;                                  /* ห้าม break-all — ทำให้ไทยตัดกลางพยางค์ */
+  line-break: auto;
+}
+img, svg, canvas, video, table { max-width: 100%; }
+input, select, textarea, button { font-family: inherit; max-width: 100%; }
+
+/* ── 2) ตารางเลื่อนแนวนอนได้เอง (wrapper ถูกใส่ให้อัตโนมัติโดยสคริปต์ท้ายไฟล์) ── */
+.pm-tablewrap {
+  width: 100%; max-width: 100%; overflow-x: auto; overflow-y: hidden;
+  -webkit-overflow-scrolling: touch; overscroll-behavior-x: contain;
+}
+.pm-tablewrap > table { min-width: 100%; }
+
+/* ── 3) แท็บเล็ต ── */
+@media (max-width: 900px) {
+  .two-col { grid-template-columns: 1fr !important; }
+  .g2 { grid-template-columns: 1fr !important; }
+  .kgrid, .kpi-grid, .kpi-row, .mgrid, .summary-grid { grid-template-columns: repeat(3, 1fr) !important; }
+}
+
+/* ── 4) สมาร์ทโฟน ── */
+@media (max-width: 640px) {
+  body { padding-bottom: max(18px, env(safe-area-inset-bottom)); }
+
+  /* กริดสรุป/KPI → 2 คอลัมน์ อ่านง่ายกว่าบีบ 5 ช่องในจอ 360px */
+  .kgrid, .kpi-grid, .kpi-row, .mgrid, .summary-grid,
+  .elec-types, .grid { grid-template-columns: repeat(2, 1fr) !important; }
+  /* ฟอร์ม 2 ช่องต่อแถว → 1 ช่องต่อแถว */
+  .frow, .m-row, .field-row { grid-template-columns: 1fr !important; }
+
+  /* แถบหัวเรื่อง/เครื่องมือ: ให้ห่อบรรทัดได้ ไม่ดันจนล้นจอ */
+  .toolbar, .topbar, .tb-actions, .filter-row, .action-btns,
+  .modal-btns, .option-row, .date-filter, .items-title, .summary-title {
+    flex-wrap: wrap !important;
+  }
+  .toolbar, .topbar { padding-left: 12px !important; padding-right: 12px !important; row-gap: 8px; }
+  .toolbar { padding-top: max(10px, env(safe-area-inset-top)) !important; }
+  .topbar  { padding-top: max(10px, env(safe-area-inset-top)) !important; }
+
+  /* พื้นที่กดขั้นต่ำ 44px ตาม WCAG 2.5.5 / Apple HIG — ผู้จัดตลาดกดด้วยนิ้วโป้งกลางตลาด */
+  button, .btn, .tb-btn, a.btn, input[type=checkbox], input[type=radio] { min-height: 40px; }
+  /* ปุ่มไอคอนเล็ก ๆ ที่ฝังในช่องกรอก (เช่น ปุ่มดู/ซ่อนรหัสผ่าน) และลิงก์ในเมนู */
+  .pw-eye, .icon-btn, .btn-rm { min-width: 40px; min-height: 40px; }
+  .ni, .sidebar a, a.ni { min-height: 44px; }
+  input[type=checkbox], input[type=radio] { min-width: 22px; min-height: 22px; }
+  .btn-sm, .tb-btn { min-height: 38px; }
+  /* iOS ซูมเองถ้า font-size < 16px ในช่องกรอก — ล็อคไว้ที่ 16px กัน layout เพี้ยน */
+  input, select, textarea { font-size: 16px !important; }
+
+  /* หน้ารายงาน: ตัดกรอบกระดาษ A4 ออกบนมือถือให้ใช้ความกว้างเต็มจอ */
+  .page { margin: 10px auto !important; padding: 14px 12px !important; border-radius: 8px !important; }
+  .r-head { flex-direction: column; gap: 6px; }
+  .r-meta { text-align: left !important; }
+  .sign-area { flex-direction: column; gap: 18px; align-items: flex-start; }
+
+  /* หน้ารับชำระหลายล็อค (batch payment) — เดิมไม่มี @media เลย
+     .layout เป็น flex 2 คอลัมน์ + height:100vh + overflow:hidden ทำให้ฝั่งขวาหลุดออกนอกจอ
+     และเลื่อนดูไม่ได้บนมือถือ → เปลี่ยนเป็นเรียงลงล่างและให้หน้าเลื่อนตามปกติ */
+  .layout {
+    flex-direction: column !important; height: auto !important;
+    min-height: 0 !important; overflow: visible !important;
+  }
+  .left-panel, .right-panel {
+    width: 100% !important; max-width: 100% !important; flex: none !important;
+    border-right: none !important; border-left: none !important;
+  }
+  .right-scroll { overflow: visible !important; padding: 14px 12px !important; }
+  .lock-item { flex-wrap: wrap; }
+
+  /* โมดัล: สูงไม่เกินจอ เลื่อนในตัวได้ ไม่ชิดขอบล่าง */
+  .modal, .modal-box, .m-box, .modal-content, .confirm-box {
+    max-width: calc(100vw - 20px) !important;
+    max-height: calc(100vh - 40px) !important;
+    overflow-y: auto !important;
+    margin-bottom: max(10px, env(safe-area-inset-bottom));
+  }
+
+  /* แถบเมนู/sidebar ที่เลื่อนแนวนอน */
+  .sidebar, .side, .nav { max-width: 100% !important; }
+}
+
+/* ── 5) จอเล็กมาก (iPhone SE / 320-360px) ── */
+@media (max-width: 380px) {
+  .kgrid, .kpi-grid, .kpi-row, .mgrid, .summary-grid { grid-template-columns: 1fr !important; }
+  .toolbar h1, .topbar h1 { font-size: .82rem !important; }
+}
+
+/* ── 6) โหมดแนวนอนจอเตี้ย: อย่าล็อคความสูงเป็น 100vh ── */
+@media (max-height: 480px) and (orientation: landscape) {
+  .layout { height: auto !important; overflow: visible !important; }
+}
+
+/* ── 7) พิมพ์: ยกเลิกทุกอย่างของ mobile kit ที่อาจกวนการพิมพ์รายงาน ── */
+@media print {
+  .pm-tablewrap { overflow: visible !important; }
+  body { padding-bottom: 0 !important; overflow: visible !important; }
+}
+</style>
+<script id="pm-mobile-kit-js">
+/* ครอบ <table> ทุกตัวด้วยกล่องเลื่อนแนวนอน เพื่อไม่ให้ตารางกว้างดันหน้าจอล้น
+   ทำด้วย JS เพราะแก้ CSS ล้วนไม่ได้ (ต้องมี element ครอบ) และทำแบบนี้ไม่กระทบ layout เดิมบนเดสก์ท็อป
+   ใช้ MutationObserver เพราะเกือบทุกหน้าสร้างตารางด้วย innerHTML หลังโหลดข้อมูลจาก Sheets เสร็จ */
+(function () {
+  function wrapTables(root) {
+    var tables = (root || document).querySelectorAll ? (root || document).querySelectorAll('table') : [];
+    for (var i = 0; i < tables.length; i++) {
+      var t = tables[i];
+      if (t.parentElement && t.parentElement.classList.contains('pm-tablewrap')) continue;
+      if (t.closest && t.closest('.pm-tablewrap')) continue;
+      var w = document.createElement('div');
+      w.className = 'pm-tablewrap';
+      t.parentNode.insertBefore(w, t);
+      w.appendChild(t);
+    }
+  }
+  function boot() {
+    wrapTables(document);
+    try {
+      new MutationObserver(function (muts) {
+        for (var i = 0; i < muts.length; i++) {
+          for (var j = 0; j < muts[i].addedNodes.length; j++) {
+            var n = muts[i].addedNodes[j];
+            if (n.nodeType !== 1) continue;
+            if (n.tagName === 'TABLE') { wrapTables(n.parentNode); }
+            else if (n.querySelector && n.querySelector('table')) { wrapTables(n); }
+          }
+        }
+      }).observe(document.body, { childList: true, subtree: true });
+    } catch (e) { /* เบราว์เซอร์เก่า — ยังได้ตารางชุดแรกที่ wrap ไปแล้ว */ }
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot);
+  else boot();
+})();
+</script>
+<!-- ==== PM_MOBILE_KIT:END ==== -->
 </head>
 <body>
 
 <div class="topbar">
-  <h1><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 10 12 2H4v8l8 8 8-8Z" transform="translate(0 2)"/><circle cx="7.5" cy="7.5" r="1" transform="translate(0 2)"/></svg> สถานะล็อคจร / ล็อคว่าง — แพไม้มินิ</h1>
-  <p>หน้านี้ดูได้อย่างเดียว ไม่ต้องเข้าสู่ระบบ · สำหรับผู้ค้าติดตามคิวและล็อคว่าง</p>
+  <div class="tb-brand">
+    <img src="logo.png" alt="โลโก้แพไม้มินิ" class="tb-logo" onerror="this.style.display='none'">
+    <div>
+      <h1>สถานะล็อคจร / ล็อคว่าง — แพไม้มินิ</h1>
+      <div class="tb-sub">สำหรับผู้ค้าดูอย่างเดียว · ไม่ต้องเข้าสู่ระบบ</div>
+    </div>
+  </div>
   <div class="updated-row">
     <span id="updated-txt">⏳ กำลังโหลดข้อมูล...</span>
-    <button class="rf-btn" onclick="loadStatus()">รีเฟรช</button>
+  </div>
+</div>
+
+<!-- ปุ่มรีเฟรชแบบเด่นชัด (PM_PUBLIC_V2) — ผู้ค้ากดเองได้ทุกครั้งที่ต้องการดูข้อมูลล่าสุด -->
+<div class="refresh-bar">
+  <button class="refresh-btn" id="refreshBtn" onclick="manualRefresh()">
+    <svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 12a9 9 0 0 1-15.3 6.4L3 16"/><path d="M3 12a9 9 0 0 1 15.3-6.4L21 8"/><polyline points="3 20 3 16 7 16"/><polyline points="21 4 21 8 17 8"/></svg>
+    <span id="refreshLabel">กดรีเฟรชข้อมูลล่าสุด</span>
+  </button>
+  <div class="refresh-note">
+    <strong>ผู้ค้าโปรดกดรีเฟรชหน้านี้ทุกครั้ง</strong> เมื่อต้องการดูข้อมูลล็อคว่างและล็อคที่ถูกจำหน่ายแล้วล่าสุด
   </div>
 </div>
 
 <div class="wrap" id="content-wrap" style="display:none">
 
   <div class="section">
-    <div class="section-title"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M9 12l2 2 4-4"/></svg> คิวจองล็อคจร</div>
+    <div class="section-title"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M9 12l2 2 4-4"/></svg> คิวจองล็อคจร (รอคิว)</div>
     <div id="queue-waiting-list"></div>
   </div>
 
   <div class="section">
-    <div class="section-title"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg> ล็อคจรที่ขายแล้ว</div>
+    <div class="section-title"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg> ล็อคจรที่จำหน่ายแล้ววันนี้ <span class="cnt" id="cnt-sold">0</span></div>
+    <div class="sub-note">แสดงทั้งล็อคที่ขายผ่านคิวรอในระบบ และล็อคที่ผู้จัดขายตรงโดยไม่ผ่านคิว</div>
     <div id="queue-sold-list"></div>
   </div>
 
   <div class="section">
-    <div class="section-title"><svg class="ic ic-dot" viewBox="0 0 24 24" aria-hidden="true" style="color:var(--gm);stroke:none"><circle cx="12" cy="12" r="8" fill="currentColor"/></svg> ล็อคว่าง / แจ้งลา / ขาดล็อค (ตอนนี้)</div>
-    <div id="available-list"></div>
+    <div class="section-title"><svg class="ic ic-dot" viewBox="0 0 24 24" aria-hidden="true" style="color:var(--txl);stroke:none"><circle cx="12" cy="12" r="8" fill="currentColor"/></svg> 1. ล็อคว่าง — ไม่มีผู้ค้าประจำ <span class="cnt" id="cnt-vac1">0</span></div>
+    <div class="lockchips" id="vacant-none-list"></div>
+  </div>
+
+  <div class="section">
+    <div class="section-title"><svg class="ic ic-dot" viewBox="0 0 24 24" aria-hidden="true" style="color:#7c3aed;stroke:none"><circle cx="12" cy="12" r="8" fill="currentColor"/></svg> 2. ล็อคว่าง — ผู้ค้าประจำลาล็อค / ขาดล็อค <span class="cnt" id="cnt-vac2">0</span></div>
+    <div class="lockchips" id="vacant-leave-list"></div>
   </div>
 
   <div class="section">
@@ -184,6 +392,22 @@ Object.keys(LOCKS).forEach(z=>{ LOCKS[z].data.forEach(l=>{ ALL_LOCK_IDS.push(l.i
 
 let AUTO_TIMER=null;
 
+
+// ══════════════════════════════════════════════════════════════
+// ปุ่มรีเฟรชด้วยตนเอง (PM_PUBLIC_V2) — ผู้ค้ากดเองได้ ไม่ต้องรอรอบอัตโนมัติ
+// backend แคชผลลัพธ์ getPublicStatus ไว้ 10 วินาที จึงกดถี่ได้โดยไม่กระทบโหลดของ Google Sheets
+// ══════════════════════════════════════════════════════════════
+async function manualRefresh(){
+  const btn=document.getElementById('refreshBtn');
+  const lbl=document.getElementById('refreshLabel');
+  if(btn.disabled) return;
+  btn.disabled=true; const old=lbl.textContent; lbl.textContent='กำลังอัปเดตข้อมูล...';
+  try{ await loadStatus(); } finally {
+    lbl.textContent='อัปเดตแล้ว ' + nowClock();
+    setTimeout(()=>{ lbl.textContent=old; btn.disabled=false; }, 1200);
+  }
+}
+
 async function loadStatus(){
   if(!getApiUrl()){
     document.getElementById('content-wrap').style.display='none';
@@ -206,6 +430,22 @@ async function loadStatus(){
   const sold=queue.filter(q=>q.status==='sold');
   const leaveStatus=data.leaveStatus||{};
 
+  // ══════════════════════════════════════════════════════════════════════
+  // PM_PUBLIC_V2 (2026-07-26) — ข้อกำหนดจากผู้ดูแลตลาด:
+  //  · ต้องแสดงล็อคจรที่ "ขายตรงจากผู้จัดแบบไม่ผ่านคิว" ด้วย ว่าขายให้ใคร ล็อคอะไร
+  //  · ล็อคจรที่ขายผ่านคิวรอในระบบ ต้องแสดงว่าใครได้ล็อคหมายเลขใด
+  //  · ช่องแจ้งล็อคว่างแยกเป็น 2 ช่อง: (1) ไม่มีผู้ค้าประจำ (2) ผู้ค้าประจำลา/ขาดล็อค — แสดงเฉพาะเลขล็อค
+  //  · เมื่อล็อคทั้งสองประเภทถูกขาย ต้องหายออกจากช่องล็อคว่างแบบเรียลไทม์
+  // แหล่งข้อมูล "ขายแล้ว" คือ data.sold (มาจาก daily_bookings = ทุกการขายทั้งสองช่องทาง)
+  // จึงครบกว่าเดิมที่อ่านจาก queue อย่างเดียว (ซึ่งไม่มีรายการขายตรงที่ผู้จัดไม่ได้ลงคิวไว้)
+  // ══════════════════════════════════════════════════════════════════════
+  const soldRows = Array.isArray(data.sold) ? data.sold : [];
+  // เผื่อ backend เวอร์ชันเก่าที่ยังไม่มี data.sold — ถอยไปใช้ queue เหมือนเดิม (ไม่ให้หน้าว่างเปล่า)
+  const soldList = soldRows.length ? soldRows : sold.map(q=>({
+    lock:q.assigned_lock, zone:'', vendor_name:q.vendor_name, product:q.product||'', via:'queue', time:''
+  }));
+  const soldLockSet = new Set(soldList.map(r=>r.lock));
+
   // ── คิวรอ ──
   const wEl=document.getElementById('queue-waiting-list');
   wEl.innerHTML = waiting.length ? waiting.map(q=>
@@ -213,28 +453,41 @@ async function loadStatus(){
     +'<span class="badge b-purple">รอคิว · '+(q.zone_pref&&q.zone_pref!=='ได้ทุกโซน'?('โซน '+esc(q.zone_pref)):'ทุกโซน')+'</span></div>'
   ).join('') : '<div class="empty-note">ไม่มีคิวรอในขณะนี้</div>';
 
-  // ── ขายแล้ว ──
+  // ── ล็อคจรที่จำหน่ายแล้ว (ทั้งผ่านคิว และขายตรงไม่ผ่านคิว) ──
   const sEl=document.getElementById('queue-sold-list');
-  sEl.innerHTML = sold.length ? sold.map(q=>
-    '<div class="row"><span class="lk">'+esc(q.assigned_lock)+'</span><span>'+esc(q.vendor_name)+'</span>'
-    +'<span class="badge b-green">ขายแล้ว</span></div>'
-  ).join('') : '<div class="empty-note">ยังไม่มีล็อคจรที่ขายในวันนี้</div>';
+  document.getElementById('cnt-sold').textContent=soldList.length;
+  sEl.innerHTML = soldList.length ? soldList
+    .slice().sort((a,b)=>String(a.lock).localeCompare(String(b.lock),undefined,{numeric:true}))
+    .map(r=>{
+      const via = r.via==='queue'
+        ? '<span class="via via-queue">ขายผ่านคิวรอ</span>'
+        : '<span class="via via-direct">ผู้จัดขายตรง (ไม่ผ่านคิว)</span>';
+      const zone = r.zone||ZONE_OF[r.lock]||'';
+      return '<div class="row"><span class="lk">'+esc(r.lock)+'</span>'
+        +'<span>'+esc(r.vendor_name||'—')+(r.product?(' <span class="zone">· '+esc(r.product)+'</span>'):'')
+        +(zone?(' <span class="zone">โซน '+esc(zone)+'</span>'):'')+'</span>'
+        +via+'</div>';
+    }).join('') : '<div class="empty-note">ยังไม่มีล็อคจรที่จำหน่ายในวันนี้</div>';
 
-  // ── ล็อคว่าง / แจ้งลา / ขาดล็อค / ไม่มีผู้ค้าประจำ ──
-  const availRows=[];
+  // ── ล็อคว่าง 2 ประเภท (เฉพาะเลขล็อค) — ตัดล็อคที่ขายไปแล้วออกทันที ──
+  const vacNone=[], vacLeave=[];
   ALL_LOCK_IDS.forEach(id=>{
-    if(!vendorLockSet.has(id)){
-      availRows.push({id,zone:ZONE_OF[id],badge:'<span class="badge b-gray">ไม่มีผู้ค้าประจำ</span>'});
-    } else if(leaveStatus[id]&&leaveStatus[id].type==='leave'){
-      availRows.push({id,zone:ZONE_OF[id],badge:'<span class="badge b-purple">แจ้งลา</span>'});
-    } else if(leaveStatus[id]&&leaveStatus[id].type==='absent'){
-      availRows.push({id,zone:ZONE_OF[id],badge:'<span class="badge b-red">ขาดล็อค</span>'});
-    }
+    if(soldLockSet.has(id)) return;                 // ขายแล้ว → ไม่ใช่ล็อคว่างอีก (เรียลไทม์)
+    if(!vendorLockSet.has(id)){ vacNone.push(id); return; }
+    const st=leaveStatus[id];
+    if(st && (st.type==='leave'||st.type==='absent')) vacLeave.push({id,type:st.type});
   });
-  const aEl=document.getElementById('available-list');
-  aEl.innerHTML = availRows.length ? availRows.map(r=>
-    '<div class="row"><span class="lk">'+esc(r.id)+'</span><span class="zone">โซน '+esc(r.zone)+'</span>'+r.badge+'</div>'
-  ).join('') : '<div class="empty-note">ไม่มีล็อคว่างในขณะนี้</div>';
+  const sortLock=(a,b)=>String(a).localeCompare(String(b),undefined,{numeric:true});
+  document.getElementById('cnt-vac1').textContent=vacNone.length;
+  document.getElementById('cnt-vac2').textContent=vacLeave.length;
+  document.getElementById('vacant-none-list').innerHTML = vacNone.length
+    ? vacNone.sort(sortLock).map(id=>'<span class="lockchip c-none">'+esc(id)+'</span>').join('')
+    : '<div class="empty-note">ไม่มีล็อคว่างประเภทนี้ในขณะนี้</div>';
+  document.getElementById('vacant-leave-list').innerHTML = vacLeave.length
+    ? vacLeave.sort((a,b)=>sortLock(a.id,b.id)).map(v=>
+        '<span class="lockchip '+(v.type==='leave'?'c-leave':'c-absent')+'" title="'+(v.type==='leave'?'ผู้ค้าประจำแจ้งลา':'ผู้ค้าประจำขาดล็อค')+'">'+esc(v.id)+'</span>'
+      ).join('')
+    : '<div class="empty-note">ไม่มีล็อคว่างประเภทนี้ในขณะนี้</div>';
 
   // ── กฎระเบียบ ──
   const rules=data.rules||{};
