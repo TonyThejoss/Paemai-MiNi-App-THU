@@ -302,6 +302,12 @@ textarea { resize: vertical; min-height: 70px; }
 }
 
 /* ── FEE BLOCKS ── */
+.pm-fee-locked{
+  margin-top:7px; font-size:.70rem; font-weight:600; line-height:1.55;
+  color: var(--text-lo); display:flex; align-items:center; gap:5px;
+}
+.pm-fee-locked::before{ content:"🔒"; font-size:.78rem; }
+.pm-fee-locked.warn{ color: var(--yellow, #b45309); font-weight:800; }
 .fee-block {
   border: 1.5px solid var(--border); border-radius: 11px;
   padding: 15px 17px; margin-bottom: 10px;
@@ -606,6 +612,27 @@ body {
 img, svg, canvas, video, table { max-width: 100%; }
 input, select, textarea, button { font-family: inherit; max-width: 100%; }
 
+/* ── 1.5) แถบที่ตั้งใจให้ "เลื่อนแนวนอน" ต้องเลื่อนจริง ห้ามบีบจนตัวอักษรทับกัน ──
+   ข้อ 1) ด้านบนตั้ง min-width:0 ให้ทุก element เพื่อกัน overflow ในแนวตั้ง/แนวกริด ซึ่งถูกต้อง
+   แต่มีผลข้างเคียงกับแถบแท็บ/แถบโซนที่เป็น flex + overflow-x:auto — ลูก ๆ ยอมหดต่ำกว่าความกว้าง
+   เนื้อหาของตัวเอง ผลคือแทนที่จะเลื่อนได้ กลับบีบซ้อนกันจนอ่านไม่ออก (พบที่แถบแท็บหน้าค่าไฟฟ้า
+   บนจอ 390px: "รายชื่อผู้ค้า + ค่าไฟ / แก้ไขค่าไฟรายล็อค / สรุปบิลประจำเดือน / ประวัติค่าไฟ" ทับกัน)
+   จึงยกเว้นเฉพาะลูกโดยตรงของแถบเหล่านี้ให้ไม่หด แล้วปล่อยให้ผู้ใช้ปัดนิ้วเลื่อนตามที่ออกแบบไว้ */
+.main-tabs, .tabs, .zone-bar, .outdoor-strip, .steps, .stepbar {
+  -webkit-overflow-scrolling: touch; overscroll-behavior-x: contain; scrollbar-width: none;
+}
+.main-tabs > *, .tabs > *, .zone-bar > *, .outdoor-strip > *, .steps > *, .stepbar > * {
+  flex-shrink: 0; min-width: max-content;
+}
+.main-tabs::-webkit-scrollbar, .tabs::-webkit-scrollbar, .zone-bar::-webkit-scrollbar,
+.outdoor-strip::-webkit-scrollbar, .steps::-webkit-scrollbar,
+.stepbar::-webkit-scrollbar { display: none; }
+/* .stepbar (แถบ 4 ขั้นตอนหน้าลงทะเบียนผู้ค้าใหม่) ไม่ได้ตั้ง overflow-x ไว้แต่แรก และลูกเป็น flex:1
+   บนจอ 390px จึงถูกบีบจนคำไทยตัดเป็นแนวตั้งทีละตัวอักษร ("ข-้-อ-ม-ู-ล-ผ-ู-้-ค-้-า") อ่านไม่ได้เลย
+   → ให้เลื่อนแนวนอนแทน และยกเลิก flex:1 เพื่อให้แต่ละขั้นตอนกว้างตามข้อความจริง */
+.stepbar { overflow-x: auto; }
+.stepbar > .step { flex: none !important; }
+
 /* ── 2) ตารางเลื่อนแนวนอนได้เอง (wrapper ถูกใส่ให้อัตโนมัติโดยสคริปต์ท้ายไฟล์) ── */
 .pm-tablewrap {
   width: 100%; max-width: 100%; overflow-x: auto; overflow-y: hidden;
@@ -657,11 +684,23 @@ input, select, textarea, button { font-family: inherit; max-width: 100%; }
 
   /* หน้ารับชำระหลายล็อค (batch payment) — เดิมไม่มี @media เลย
      .layout เป็น flex 2 คอลัมน์ + height:100vh + overflow:hidden ทำให้ฝั่งขวาหลุดออกนอกจอ
-     และเลื่อนดูไม่ได้บนมือถือ → เปลี่ยนเป็นเรียงลงล่างและให้หน้าเลื่อนตามปกติ */
-  .layout {
+     และเลื่อนดูไม่ได้บนมือถือ → เปลี่ยนเป็นเรียงลงล่างและให้หน้าเลื่อนตามปกติ
+
+     ⚠️ บทเรียนบั๊ก 2569-07-27 (จอดำบนมือถือ): กฎก้อนนี้เคยเขียนเป็น `.layout` เปล่า ๆ แล้วไป
+     ชนกับ `.layout` ของ shell ในหน้าแอพหลัก (ซึ่งต้องมีความสูงแน่นอน = 100vh − topbar
+     ไม่งั้น iframe ของทุกโมดูลจะยุบเหลือ 150px แล้วที่เหลือกลายเป็นพื้นหลังเปล่า)
+     กติกาใหม่: ห้ามใช้ชื่อคลาสกว้าง ๆ เป็นตัวเลือกลอย ๆ อีก — หน้าไหนต้องการให้คอลัมน์เรียงลงล่าง
+     บนมือถือ ต้อง "ขอเอง" ด้วยการติดคลาส .pm-stack-mobile ที่ตัว .layout ของหน้านั้น
+     (ทำแบบ opt-in ไม่ใช้ :has() เพราะถ้าเบราว์เซอร์เก่าไม่รู้จัก :has() ทั้งกฎจะถูกทิ้งทั้งก้อน) */
+  .layout.pm-stack-mobile {
     flex-direction: column !important; height: auto !important;
     min-height: 0 !important; overflow: visible !important;
   }
+
+  /* shell ของแอพหลัก: ย้ำความสูงให้แน่นอนเสมอ กัน iframe โมดูลยุบเหลือ 150px */
+  .app-shell { height: calc(100vh - var(--topH, 56px)) !important; overflow: hidden !important; }
+  .app-shell > .content, .app-shell .pane, .app-shell .pane.active { min-height: 0; }
+  .module-frame { min-height: 0; height: 100% !important; }
   .left-panel, .right-panel {
     width: 100% !important; max-width: 100% !important; flex: none !important;
     border-right: none !important; border-left: none !important;
@@ -687,9 +726,10 @@ input, select, textarea, button { font-family: inherit; max-width: 100%; }
   .toolbar h1, .topbar h1 { font-size: .82rem !important; }
 }
 
-/* ── 6) โหมดแนวนอนจอเตี้ย: อย่าล็อคความสูงเป็น 100vh ── */
+/* ── 6) โหมดแนวนอนจอเตี้ย: อย่าล็อคความสูงเป็น 100vh ──
+   (ใช้เฉพาะหน้าที่ opt-in เท่านั้น ด้วยเหตุผลเดียวกับข้อ 4 — shell ของแอพต้องคงความสูงไว้) */
 @media (max-height: 480px) and (orientation: landscape) {
-  .layout { height: auto !important; overflow: visible !important; }
+  .layout.pm-stack-mobile { height: auto !important; overflow: visible !important; }
 }
 
 /* ── 7) พิมพ์: ยกเลิกทุกอย่างของ mobile kit ที่อาจกวนการพิมพ์รายงาน ── */
@@ -886,9 +926,10 @@ input, select, textarea, button { font-family: inherit; max-width: 100%; }
           <div class="fee-header"><span class="fee-label"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="4" width="16" height="18" rx="2"/><path d="M9 3h6a1 1 0 0 1 1 1v1H8V4a1 1 0 0 1 1-1Z"/></svg> ค่าธรรมเนียมแรกเข้า</span><span class="badge-req">บังคับ</span></div>
           <div class="fee-row">
             <label for="feeEntryAmt">จำนวนเงิน (฿)</label>
-            <input type="number" id="feeEntryAmt" placeholder="0" min="0" oninput="recalc()" style="width:130px;flex:none">
+            <input type="number" id="feeEntryAmt" placeholder="0" min="0" oninput="recalc()" style="width:130px;flex:none" readonly>
             <input type="text" id="feeEntryNote" placeholder="หมายเหตุ..." style="flex:1">
           </div>
+          <div class="pm-fee-locked" id="entryFeeSrc">อัตรากลางของตลาด — แก้ได้ที่เมนู <strong>ระบบ › ตั้งค่าค่าธรรมเนียม</strong></div>
         </div>
 
         <div id="entryFeeWarn" style="display:none;margin:-4px 0 10px;padding:8px 12px;background:#fef3c7;border:1.5px solid #d97706;border-radius:8px;color:#92400e;font-size:.72rem;font-weight:700;line-height:1.5"></div>
@@ -898,10 +939,11 @@ input, select, textarea, button { font-family: inherit; max-width: 100%; }
           <div class="fee-header"><span class="fee-label"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg> ค่าธรรมเนียมรายปี</span><span class="badge-req">บังคับ</span></div>
           <div class="fee-row" style="margin-bottom:8px">
             <label for="feeAnnualAmt">จำนวนเงิน (฿)</label>
-            <input type="number" id="feeAnnualAmt" placeholder="0" min="0" oninput="recalc()" style="width:130px;flex:none">
-            <input type="number" id="feeAnnualYear" placeholder="2568" style="width:90px;flex:none">
+            <input type="number" id="feeAnnualAmt" placeholder="0" min="0" oninput="recalc()" style="width:130px;flex:none" readonly>
+            <input type="number" id="feeAnnualYear" placeholder="ปี พ.ศ." style="width:100px;flex:none">
             <input type="text" id="feeAnnualNote" placeholder="หมายเหตุ..." style="flex:1">
           </div>
+          <div class="pm-fee-locked" id="annualFeeSrc">อัตรากลางของตลาด — แก้ได้ที่เมนู <strong>ระบบ › ตั้งค่าค่าธรรมเนียม</strong></div>
         </div>
 
         <!-- เช่าเดือนแรก -->
@@ -1172,7 +1214,11 @@ async function apiPost(action,data={}){
   catch(e){ console.error('apiPost error:',action,e); return null; }
 }
 window.addEventListener('message', function(e){
-  if(e && e.data && e.data.type==='pm-refresh' && typeof loadRealOccupancy==='function') loadRealOccupancy();
+  if(e && e.data && e.data.type==='pm-refresh'){
+    if(typeof loadRealOccupancy==='function') loadRealOccupancy();
+    // อัตราค่าธรรมเนียมกลางอาจถูกแก้ที่เมนู ระบบ › ตั้งค่าค่าธรรมเนียม ระหว่างที่หน้านี้เปิดค้างอยู่
+    if(typeof loadFeeSettings==='function') loadFeeSettings();
+  }
 });
 async function apiGet(action,params={}){
   const url=getApiUrl(); if(!url) return null;
@@ -1461,19 +1507,55 @@ function animateVal(id, newText) {
 //  · ค่าธรรมเนียมรายปี = เก็บครั้งแรกตอนลงทะเบียน แล้วเก็บอีกทุกเดือนมีนาคม (บิลเดือนมีนาคมบวกให้เอง)
 //    → ช่องนี้เติมค่าเริ่มต้นจาก "อัตรากลางทั้งตลาด" ในชีต settings ให้อัตโนมัติ
 // ══════════════════════════════════════════════════════════════════════════
+//  · ปรับ 2569-07-27: ช่อง "แรกเข้า" และ "รายปี" ถูกล็อค (readonly) และเติมจากอัตรากลางที่ตั้งไว้ที่
+//    เมนู ระบบ › ตั้งค่าค่าธรรมเนียม เสมอ — พนักงานไม่ต้องกรอกใหม่และกรอกผิดไม่ได้ ถ้าต้องการเปลี่ยน
+//    อัตราต้องไปแก้ที่หน้าตั้งค่า (ผู้ดูแลระบบเท่านั้น) แล้วอัตราใหม่จะถูกส่งมาที่หน้านี้ทันที
 let PM_REG_SETTINGS = {};
+function pmSetLockedFee(id, amount, connected){
+  const el = document.getElementById(id);
+  if(!el) return;
+  el.value = amount > 0 ? amount : '';
+  el.readOnly = true;
+  el.style.background = 'var(--surface2)';
+  el.style.cursor = 'not-allowed';
+  el.title = connected
+    ? 'อัตรากลางของตลาด — แก้ได้ที่เมนู ระบบ › ตั้งค่าค่าธรรมเนียม'
+    : 'ยังไม่ได้เชื่อมต่อ Google Sheets จึงยังดึงอัตรากลางมาไม่ได้';
+}
 async function loadFeeSettings(){
-  if(!getApiUrl()) return;
-  const st = await apiGet('getSettings');
-  if(st && typeof st==='object'){
-    PM_REG_SETTINGS = st;
-    const annual = parseFloat(st.annual_fee)||0;
-    const el = document.getElementById('feeAnnualAmt');
-    if(el && !el.value && annual>0){ el.value = annual; recalc(); }
-    const entry = parseFloat(st.entry_fee)||0;
-    const el2 = document.getElementById('feeEntryAmt');
-    if(el2 && !el2.value && entry>0){ el2.value = entry; recalc(); }
+  const connected = !!getApiUrl();
+  const srcNote = (msg, warn) => {
+    ['entryFeeSrc','annualFeeSrc'].forEach(id=>{
+      const n = document.getElementById(id);
+      if(!n) return;
+      n.innerHTML = msg;
+      n.classList.toggle('warn', !!warn);
+    });
+  };
+  if(!connected){
+    pmSetLockedFee('feeEntryAmt', 0, false);
+    pmSetLockedFee('feeAnnualAmt', 0, false);
+    srcNote('ยังไม่ได้เชื่อมต่อ Google Sheets — ดึงอัตรากลางของตลาดมาไม่ได้ '
+          + 'กรุณาตั้งค่าการเชื่อมต่อที่หน้าหลักก่อนลงทะเบียนผู้ค้าใหม่', true);
+    return;
   }
+  const st = await apiGet('getSettings');
+  if(!st || typeof st!=='object'){
+    srcNote('โหลดอัตรากลางไม่สำเร็จ — ตรวจสอบการเชื่อมต่อแล้วเปิดหน้านี้ใหม่', true);
+    return;
+  }
+  PM_REG_SETTINGS = st;
+  const entry  = parseFloat(st.entry_fee)  || 0;
+  const annual = parseFloat(st.annual_fee) || 0;
+  pmSetLockedFee('feeEntryAmt',  entry,  true);
+  pmSetLockedFee('feeAnnualAmt', annual, true);
+  if(entry === 0 && annual === 0){
+    srcNote('ยังไม่ได้ตั้งอัตราค่าธรรมเนียมกลางของตลาด — ตั้งที่เมนู '
+          + '<strong>ระบบ › ตั้งค่าค่าธรรมเนียม</strong> ก่อน', true);
+  } else {
+    srcNote('อัตรากลางของตลาด — แก้ได้ที่เมนู <strong>ระบบ › ตั้งค่าค่าธรรมเนียม</strong>');
+  }
+  recalc();
 }
 async function checkEntryFeeHistory(lockId){
   if(!getApiUrl()||!lockId) return;

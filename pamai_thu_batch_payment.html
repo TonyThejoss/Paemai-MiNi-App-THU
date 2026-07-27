@@ -1,12 +1,12 @@
 <!DOCTYPE html>
-<html lang="th">
+<html lang="th" data-theme="light">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>รับชำระเงินหลายล็อค — แพไม้มินิ</title>
 <style>
 * { box-sizing: border-box; margin: 0; padding: 0; }
-body { font-family: 'Segoe UI', Tahoma, sans-serif; background: #f0f4f8; color: #1a202c; font-size: 14px; }
+body { font-family: 'Segoe UI', Tahoma, sans-serif; background: var(--bg); color: var(--tx); font-size: 14px; }
 
 /* ── TOP BAR ── */
 .topbar {
@@ -28,35 +28,35 @@ body { font-family: 'Segoe UI', Tahoma, sans-serif; background: #f0f4f8; color: 
 
 /* ── LEFT: Filter + Lock List ── */
 .left-panel {
-  width: 420px; flex-shrink: 0; background: white;
-  border-right: 1px solid #e2e8f0;
+  width: 420px; flex-shrink: 0; background: var(--sf);
+  border-right: 1px solid var(--bd);
   display: flex; flex-direction: column; overflow: hidden;
 }
 
 .panel-header {
-  padding: 14px 16px; border-bottom: 1px solid #e2e8f0; background: #fafafa;
+  padding: 14px 16px; border-bottom: 1px solid var(--bd); background: var(--sf2);
 }
-.panel-title { font-weight: 700; font-size: 0.95rem; color: #2d3748; margin-bottom: 10px; }
+.panel-title { font-weight: 700; font-size: 0.95rem; color: var(--tx); margin-bottom: 10px; }
 
 .filter-row { display: flex; gap: 8px; margin-bottom: 8px; flex-wrap: wrap; }
 
 .search-box {
-  flex: 1; min-width: 150px; padding: 8px 12px; border: 1.5px solid #e2e8f0;
+  flex: 1; min-width: 150px; padding: 8px 12px; border: 1.5px solid var(--bd);
   border-radius: 8px; font-size: 0.82rem; outline: none;
   transition: border-color 0.2s;
 }
 .search-box:focus { border-color: #ea580c; }
 
 select.filter-select {
-  padding: 8px 10px; border: 1.5px solid #e2e8f0; border-radius: 8px;
-  font-size: 0.8rem; background: white; cursor: pointer; outline: none;
+  padding: 8px 10px; border: 1.5px solid var(--bd); border-radius: 8px;
+  font-size: 0.8rem; background: var(--sf); cursor: pointer; outline: none;
 }
 select.filter-select:focus { border-color: #ea580c; }
 
 .check-all-row {
   display: flex; align-items: center; gap: 8px;
-  padding: 8px 12px; background: #ebf8ff; border-radius: 8px;
-  font-size: 0.8rem; font-weight: 600; color: #2c5282; cursor: pointer;
+  padding: 8px 12px; background: var(--bl); border-radius: 8px;
+  font-size: 0.8rem; font-weight: 600; color: var(--b, #2c5282); cursor: pointer;
   user-select: none;
 }
 .check-all-row input[type=checkbox] { width: 16px; height: 16px; cursor: pointer; accent-color: #c2410c; }
@@ -67,8 +67,8 @@ select.filter-select:focus { border-color: #ea580c; }
 .lock-item {
   display: flex; align-items: center; gap: 10px;
   padding: 10px 12px; border-radius: 10px; margin-bottom: 6px;
-  border: 1.5px solid #e2e8f0; cursor: pointer; transition: all 0.15s;
-  background: white; user-select: none;
+  border: 1.5px solid var(--bd); cursor: pointer; transition: all 0.15s;
+  background: var(--sf); user-select: none;
 }
 .lock-item:hover { border-color: #e6b69a; background: #fff7ed; }
 .lock-item.selected { border-color: #a15e38; background: #fff7ed; }
@@ -79,13 +79,13 @@ select.filter-select:focus { border-color: #ea580c; }
 .lock-item input[type=checkbox] { width: 17px; height: 17px; flex-shrink: 0; accent-color: #c2410c; cursor: pointer; }
 
 .lock-info { flex: 1; min-width: 0; }
-.lock-id { font-weight: 700; font-size: 0.88rem; color: #2d3748; }
-.lock-product { font-size: 0.75rem; color: #718096; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-top: 1px; }
-.lock-vendor { font-size: 0.72rem; color: #a0aec0; margin-top: 1px; }
+.lock-id { font-weight: 700; font-size: 0.88rem; color: var(--tx); }
+.lock-product { font-size: 0.75rem; color: var(--txl); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-top: 1px; }
+.lock-vendor { font-size: 0.72rem; color: var(--txl); margin-top: 1px; }
 
 .lock-amount { text-align: right; flex-shrink: 0; }
-.amount-due { font-weight: 700; font-size: 0.9rem; color: #2d3748; }
-.amount-label { font-size: 0.68rem; color: #a0aec0; margin-top: 2px; }
+.amount-due { font-weight: 700; font-size: 0.9rem; color: var(--tx); }
+.amount-label { font-size: 0.68rem; color: var(--txl); margin-top: 2px; }
 
 .badge-status {
   font-size: 0.65rem; font-weight: 700; padding: 2px 7px; border-radius: 10px;
@@ -104,20 +104,20 @@ select.filter-select:focus { border-color: #ea580c; }
 
 /* summary box */
 .summary-box {
-  background: white; border-radius: 14px; padding: 18px 20px;
+  background: var(--sf); border-radius: 14px; padding: 18px 20px;
   box-shadow: 0 2px 10px rgba(0,0,0,0.06); margin-bottom: 18px;
 }
-.summary-title { font-weight: 700; font-size: 1rem; color: #2d3748; margin-bottom: 14px; display: flex; align-items: center; gap: 8px; }
+.summary-title { font-weight: 700; font-size: 1rem; color: var(--tx); margin-bottom: 14px; display: flex; align-items: center; gap: 8px; }
 
 .summary-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 16px; }
 .stat-card {
-  background: #f7fafc; border-radius: 10px; padding: 12px;
-  text-align: center; border: 1.5px solid #e2e8f0;
+  background: var(--sf2); border-radius: 10px; padding: 12px;
+  text-align: center; border: 1.5px solid var(--bd);
 }
-.stat-num { font-size: 1.5rem; font-weight: 800; color: #2d3748; }
+.stat-num { font-size: 1.5rem; font-weight: 800; color: var(--tx); }
 .stat-num.green { color: #673e27; }
 .stat-num.red { color: #9b2c2c; }
-.stat-label { font-size: 0.72rem; color: #718096; margin-top: 2px; }
+.stat-label { font-size: 0.72rem; color: var(--txl); margin-top: 2px; }
 
 .total-bar {
   background: linear-gradient(135deg, #c2410c, #ea580c);
@@ -129,23 +129,23 @@ select.filter-select:focus { border-color: #ea580c; }
 
 /* selected items table */
 .items-box {
-  background: white; border-radius: 14px; padding: 18px 20px;
+  background: var(--sf); border-radius: 14px; padding: 18px 20px;
   box-shadow: 0 2px 10px rgba(0,0,0,0.06); margin-bottom: 18px;
 }
-.items-title { font-weight: 700; font-size: 0.95rem; color: #2d3748; margin-bottom: 14px; display: flex; align-items: center; justify-content: space-between; }
+.items-title { font-weight: 700; font-size: 0.95rem; color: var(--tx); margin-bottom: 14px; display: flex; align-items: center; justify-content: space-between; }
 
 .items-table { width: 100%; border-collapse: collapse; font-size: 0.8rem; }
 .items-table th {
-  background: #f7fafc; padding: 9px 10px; text-align: left;
-  font-weight: 700; color: #4a5568; border-bottom: 2px solid #e2e8f0;
+  background: var(--sf2); padding: 9px 10px; text-align: left;
+  font-weight: 700; color: var(--txm); border-bottom: 2px solid var(--bd);
   font-size: 0.78rem;
 }
-.items-table td { padding: 9px 10px; border-bottom: 1px solid #f0f4f8; color: #2d3748; vertical-align: middle; }
-.items-table tr:hover td { background: #fafafa; }
+.items-table td { padding: 9px 10px; border-bottom: 1px solid var(--bg); color: var(--tx); vertical-align: middle; }
+.items-table tr:hover td { background: var(--sf2); }
 .items-table tr.row-paid td { background: #fff7ed; color: #673e27; }
 
 .input-amount {
-  width: 90px; padding: 5px 8px; border: 1.5px solid #e2e8f0; border-radius: 6px;
+  width: 90px; padding: 5px 8px; border: 1.5px solid var(--bd); border-radius: 6px;
   font-size: 0.8rem; text-align: right; outline: none; transition: border-color 0.2s;
 }
 .input-amount:focus { border-color: #ea580c; }
@@ -153,7 +153,7 @@ select.filter-select:focus { border-color: #ea580c; }
 .input-amount.exact { border-color: #a15e38; background: #fff7ed; }
 
 .note-input {
-  width: 100%; padding: 5px 8px; border: 1.5px solid #e2e8f0; border-radius: 6px;
+  width: 100%; padding: 5px 8px; border: 1.5px solid var(--bd); border-radius: 6px;
   font-size: 0.78rem; outline: none; transition: border-color 0.2s;
 }
 .note-input:focus { border-color: #ea580c; }
@@ -167,36 +167,36 @@ select.filter-select:focus { border-color: #ea580c; }
 
 /* payment options */
 .options-box {
-  background: white; border-radius: 14px; padding: 18px 20px;
+  background: var(--sf); border-radius: 14px; padding: 18px 20px;
   box-shadow: 0 2px 10px rgba(0,0,0,0.06); margin-bottom: 18px;
 }
-.options-title { font-weight: 700; font-size: 0.95rem; color: #2d3748; margin-bottom: 14px; }
+.options-title { font-weight: 700; font-size: 0.95rem; color: var(--tx); margin-bottom: 14px; }
 
 .option-row { display: flex; gap: 12px; margin-bottom: 12px; flex-wrap: wrap; }
-.option-label { font-size: 0.8rem; color: #4a5568; font-weight: 600; width: 110px; flex-shrink: 0; padding-top: 8px; }
+.option-label { font-size: 0.8rem; color: var(--txm); font-weight: 600; width: 110px; flex-shrink: 0; padding-top: 8px; }
 
 .method-btn {
-  padding: 7px 16px; border: 2px solid #e2e8f0; border-radius: 8px;
-  cursor: pointer; font-size: 0.8rem; font-weight: 600; color: #4a5568;
-  background: white; transition: all 0.15s;
+  padding: 7px 16px; border: 2px solid var(--bd); border-radius: 8px;
+  cursor: pointer; font-size: 0.8rem; font-weight: 600; color: var(--txm);
+  background: var(--sf); transition: all 0.15s;
 }
 .method-btn:hover { border-color: #e6b69a; color: #673e27; }
 .method-btn.active { border-color: #c2410c; background: #fff7ed; color: #c2410c; }
 
 .form-input {
-  flex: 1; padding: 8px 12px; border: 1.5px solid #e2e8f0; border-radius: 8px;
+  flex: 1; padding: 8px 12px; border: 1.5px solid var(--bd); border-radius: 8px;
   font-size: 0.82rem; outline: none; transition: border-color 0.2s;
 }
 .form-input:focus { border-color: #ea580c; }
 
 /* footer action bar */
 .action-bar {
-  padding: 14px 24px; background: white; border-top: 1px solid #e2e8f0;
+  padding: 14px 24px; background: var(--sf); border-top: 1px solid var(--bd);
   display: flex; align-items: center; justify-content: space-between;
   box-shadow: 0 -4px 12px rgba(0,0,0,0.05);
 }
-.action-info { font-size: 0.82rem; color: #718096; }
-.action-info strong { color: #2d3748; }
+.action-info { font-size: 0.82rem; color: var(--txl); }
+.action-info strong { color: var(--tx); }
 
 .action-btns { display: flex; gap: 10px; }
 
@@ -204,14 +204,14 @@ select.filter-select:focus { border-color: #ea580c; }
   padding: 10px 22px; border: none; border-radius: 10px;
   font-size: 0.85rem; font-weight: 700; cursor: pointer; transition: all 0.2s;
 }
-.btn-outline { background: white; border: 2px solid #e2e8f0; color: #4a5568; }
-.btn-outline:hover { border-color: #a0aec0; }
+.btn-outline { background: var(--sf); border: 2px solid var(--bd); color: var(--txm); }
+.btn-outline:hover { border-color: var(--txl); }
 .btn-primary {
   background: linear-gradient(135deg, #c2410c, #ea580c); color: white;
   box-shadow: 0 4px 12px rgba(45,106,79,0.35);
 }
 .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 6px 16px rgba(45,106,79,0.45); }
-.btn-primary:disabled { background: #a0aec0; transform: none; box-shadow: none; cursor: not-allowed; }
+.btn-primary:disabled { background: var(--txl); transform: none; box-shadow: none; cursor: not-allowed; }
 .btn-danger { background: #e53e3e; color: white; }
 .btn-danger:hover { background: #c53030; }
 
@@ -222,22 +222,22 @@ select.filter-select:focus { border-color: #ea580c; }
 }
 .modal-overlay.show { display: flex; }
 .modal {
-  background: white; border-radius: 16px; padding: 28px 32px;
+  background: var(--sf); border-radius: 16px; padding: 28px 32px;
   max-width: 500px; width: 90%; box-shadow: 0 20px 60px rgba(0,0,0,0.25);
   animation: slideUp 0.25s ease;
 }
 @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
 
-.modal-title { font-size: 1.1rem; font-weight: 800; color: #2d3748; margin-bottom: 6px; }
-.modal-sub { font-size: 0.82rem; color: #718096; margin-bottom: 20px; }
-.modal-receipt { background: #f7fafc; border-radius: 10px; padding: 16px; margin-bottom: 20px; }
-.receipt-row { display: flex; justify-content: space-between; padding: 5px 0; font-size: 0.82rem; border-bottom: 1px solid #edf2f7; }
+.modal-title { font-size: 1.1rem; font-weight: 800; color: var(--tx); margin-bottom: 6px; }
+.modal-sub { font-size: 0.82rem; color: var(--txl); margin-bottom: 20px; }
+.modal-receipt { background: var(--sf2); border-radius: 10px; padding: 16px; margin-bottom: 20px; }
+.receipt-row { display: flex; justify-content: space-between; padding: 5px 0; font-size: 0.82rem; border-bottom: 1px solid var(--sf2); }
 .receipt-row:last-child { border: none; font-weight: 700; font-size: 0.9rem; color: #673e27; margin-top: 4px; }
 .modal-btns { display: flex; gap: 10px; justify-content: flex-end; }
 
 /* ── EMPTY STATE ── */
 .empty-state {
-  text-align: center; padding: 48px 24px; color: #a0aec0;
+  text-align: center; padding: 48px 24px; color: var(--txl);
 }
 .empty-icon { font-size: 3rem; margin-bottom: 12px; }
 .empty-text { font-size: 0.88rem; }
@@ -254,7 +254,7 @@ select.filter-select:focus { border-color: #ea580c; }
 /* ── SCROLLBAR ── */
 ::-webkit-scrollbar { width: 6px; }
 ::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: #cbd5e0; border-radius: 3px; }
+::-webkit-scrollbar-thumb { background: var(--bd2); border-radius: 3px; }
 
 .ic{width:1em;height:1em;vertical-align:-.15em;display:inline-block;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0}
 .ic-dot{stroke:none}
@@ -262,6 +262,47 @@ select.filter-select:focus { border-color: #ea580c; }
 .pm-feetag{display:inline-block;font-size:.58rem;font-weight:800;border-radius:8px;padding:1px 6px;margin-top:2px;white-space:nowrap;}
 .pm-feetag.pm-annual{background:#fef3c7;color:#92400e;}
 .pm-feetag.pm-disc{background:#fee2e2;color:#b91c1c;}
+
+
+
+
+
+
+
+/* ==== PM_THEME_KIT:START (สร้างโดย tools/inject_theme_kit.py — ห้ามแก้ในไฟล์นี้) ==== */
+:root{
+  --bg:#f0f4f8;--sf:#ffffff;--sf2:#f7fafc;
+  --bd:#e2e8f0;--bd2:#cbd5e0;
+  --tx:#1a202c;--txm:#4a5568;--txl:#718096;
+  --gl:#fff7ed;--gll:#fff7ed;--rl:#fee2e2;--ol:#fff7ed;--bl:#ebf8ff;--yl:#fffbeb;
+}
+[data-theme="dark"]{--bg:#090f0b;--sf:#0f1a13;--sf2:#141f17;--bd:#243028;--bd2:#534230;--tx:#eadad0;--txm:#b59a80;--txl:#b4997e;--gl:#2d1200;--gll:#1a0f06;--rl:#1f0a0a;--ol:#1a0f06;--bl:#091228;--yl:#120f06;}
+/* หน้านี้เขียนคำว่า white/#fff ตายตัวไว้หลายจุด — ยกให้เป็นพื้นผิวตามธีมทั้งหมด */
+[data-theme="dark"] .left-panel,[data-theme="dark"] .right-panel,
+[data-theme="dark"] .panel-header,[data-theme="dark"] .card,
+[data-theme="dark"] .summary-card,[data-theme="dark"] .lock-item,
+[data-theme="dark"] .modal-box,[data-theme="dark"] .modal-content,
+[data-theme="dark"] .receipt,[data-theme="dark"] table{background:var(--sf);color:var(--tx);}
+[data-theme="dark"] .right-scroll{background:var(--bg);}
+[data-theme="dark"] thead th{background:var(--sf2);color:var(--tx);}
+[data-theme="dark"] tbody tr:nth-child(even){background:rgba(255,255,255,.03);}
+[data-theme="dark"] input,[data-theme="dark"] select,[data-theme="dark"] textarea{
+  background:var(--sf2);color:var(--tx);border-color:var(--bd);}
+[data-theme="dark"] input::placeholder,[data-theme="dark"] textarea::placeholder{color:var(--txl);}
+[data-theme="dark"] .lock-item:hover{background:var(--sf2);}
+/* แถบ "เลือกทั้งหมดที่แสดง" เป็นน้ำเงินอ่อน+ตัวอักษรน้ำเงินเข้ม — ในโหมดมืดจะกลายเป็น
+   น้ำเงินเข้มบนน้ำเงินเข้ม อ่านไม่ออก จึงสลับตัวอักษรเป็นโทนสว่าง */
+[data-theme="dark"] .check-all-row{background:var(--bl);color:#93c5fd;}
+[data-theme="dark"] .filter-select{background:var(--sf2) !important;color:var(--tx) !important;
+  border-color:var(--bd) !important;}
+
+.dm-btn.pm-theme-btn{width:40px;height:40px;min-height:40px;border-radius:50%;
+  border:1.5px solid rgba(255,255,255,.3);background:rgba(255,255,255,.12);color:#fff;
+  cursor:pointer;font-size:.9rem;display:inline-flex;align-items:center;justify-content:center;
+  transition:background .2s,transform .2s;flex-shrink:0;}
+.dm-btn.pm-theme-btn:hover{background:rgba(255,255,255,.24);transform:rotate(18deg);}
+@media print{.dm-btn.pm-theme-btn{display:none !important;}}
+/* ==== PM_THEME_KIT:END ==== */
 </style>
 <!-- ==== PM_MOBILE_KIT:START (สร้างโดย tools/inject_mobile_kit.py — ห้ามแก้ในไฟล์นี้) ==== -->
 <style id="pm-mobile-kit">
@@ -289,6 +330,27 @@ body {
 }
 img, svg, canvas, video, table { max-width: 100%; }
 input, select, textarea, button { font-family: inherit; max-width: 100%; }
+
+/* ── 1.5) แถบที่ตั้งใจให้ "เลื่อนแนวนอน" ต้องเลื่อนจริง ห้ามบีบจนตัวอักษรทับกัน ──
+   ข้อ 1) ด้านบนตั้ง min-width:0 ให้ทุก element เพื่อกัน overflow ในแนวตั้ง/แนวกริด ซึ่งถูกต้อง
+   แต่มีผลข้างเคียงกับแถบแท็บ/แถบโซนที่เป็น flex + overflow-x:auto — ลูก ๆ ยอมหดต่ำกว่าความกว้าง
+   เนื้อหาของตัวเอง ผลคือแทนที่จะเลื่อนได้ กลับบีบซ้อนกันจนอ่านไม่ออก (พบที่แถบแท็บหน้าค่าไฟฟ้า
+   บนจอ 390px: "รายชื่อผู้ค้า + ค่าไฟ / แก้ไขค่าไฟรายล็อค / สรุปบิลประจำเดือน / ประวัติค่าไฟ" ทับกัน)
+   จึงยกเว้นเฉพาะลูกโดยตรงของแถบเหล่านี้ให้ไม่หด แล้วปล่อยให้ผู้ใช้ปัดนิ้วเลื่อนตามที่ออกแบบไว้ */
+.main-tabs, .tabs, .zone-bar, .outdoor-strip, .steps, .stepbar {
+  -webkit-overflow-scrolling: touch; overscroll-behavior-x: contain; scrollbar-width: none;
+}
+.main-tabs > *, .tabs > *, .zone-bar > *, .outdoor-strip > *, .steps > *, .stepbar > * {
+  flex-shrink: 0; min-width: max-content;
+}
+.main-tabs::-webkit-scrollbar, .tabs::-webkit-scrollbar, .zone-bar::-webkit-scrollbar,
+.outdoor-strip::-webkit-scrollbar, .steps::-webkit-scrollbar,
+.stepbar::-webkit-scrollbar { display: none; }
+/* .stepbar (แถบ 4 ขั้นตอนหน้าลงทะเบียนผู้ค้าใหม่) ไม่ได้ตั้ง overflow-x ไว้แต่แรก และลูกเป็น flex:1
+   บนจอ 390px จึงถูกบีบจนคำไทยตัดเป็นแนวตั้งทีละตัวอักษร ("ข-้-อ-ม-ู-ล-ผ-ู-้-ค-้-า") อ่านไม่ได้เลย
+   → ให้เลื่อนแนวนอนแทน และยกเลิก flex:1 เพื่อให้แต่ละขั้นตอนกว้างตามข้อความจริง */
+.stepbar { overflow-x: auto; }
+.stepbar > .step { flex: none !important; }
 
 /* ── 2) ตารางเลื่อนแนวนอนได้เอง (wrapper ถูกใส่ให้อัตโนมัติโดยสคริปต์ท้ายไฟล์) ── */
 .pm-tablewrap {
@@ -341,11 +403,23 @@ input, select, textarea, button { font-family: inherit; max-width: 100%; }
 
   /* หน้ารับชำระหลายล็อค (batch payment) — เดิมไม่มี @media เลย
      .layout เป็น flex 2 คอลัมน์ + height:100vh + overflow:hidden ทำให้ฝั่งขวาหลุดออกนอกจอ
-     และเลื่อนดูไม่ได้บนมือถือ → เปลี่ยนเป็นเรียงลงล่างและให้หน้าเลื่อนตามปกติ */
-  .layout {
+     และเลื่อนดูไม่ได้บนมือถือ → เปลี่ยนเป็นเรียงลงล่างและให้หน้าเลื่อนตามปกติ
+
+     ⚠️ บทเรียนบั๊ก 2569-07-27 (จอดำบนมือถือ): กฎก้อนนี้เคยเขียนเป็น `.layout` เปล่า ๆ แล้วไป
+     ชนกับ `.layout` ของ shell ในหน้าแอพหลัก (ซึ่งต้องมีความสูงแน่นอน = 100vh − topbar
+     ไม่งั้น iframe ของทุกโมดูลจะยุบเหลือ 150px แล้วที่เหลือกลายเป็นพื้นหลังเปล่า)
+     กติกาใหม่: ห้ามใช้ชื่อคลาสกว้าง ๆ เป็นตัวเลือกลอย ๆ อีก — หน้าไหนต้องการให้คอลัมน์เรียงลงล่าง
+     บนมือถือ ต้อง "ขอเอง" ด้วยการติดคลาส .pm-stack-mobile ที่ตัว .layout ของหน้านั้น
+     (ทำแบบ opt-in ไม่ใช้ :has() เพราะถ้าเบราว์เซอร์เก่าไม่รู้จัก :has() ทั้งกฎจะถูกทิ้งทั้งก้อน) */
+  .layout.pm-stack-mobile {
     flex-direction: column !important; height: auto !important;
     min-height: 0 !important; overflow: visible !important;
   }
+
+  /* shell ของแอพหลัก: ย้ำความสูงให้แน่นอนเสมอ กัน iframe โมดูลยุบเหลือ 150px */
+  .app-shell { height: calc(100vh - var(--topH, 56px)) !important; overflow: hidden !important; }
+  .app-shell > .content, .app-shell .pane, .app-shell .pane.active { min-height: 0; }
+  .module-frame { min-height: 0; height: 100% !important; }
   .left-panel, .right-panel {
     width: 100% !important; max-width: 100% !important; flex: none !important;
     border-right: none !important; border-left: none !important;
@@ -371,9 +445,10 @@ input, select, textarea, button { font-family: inherit; max-width: 100%; }
   .toolbar h1, .topbar h1 { font-size: .82rem !important; }
 }
 
-/* ── 6) โหมดแนวนอนจอเตี้ย: อย่าล็อคความสูงเป็น 100vh ── */
+/* ── 6) โหมดแนวนอนจอเตี้ย: อย่าล็อคความสูงเป็น 100vh ──
+   (ใช้เฉพาะหน้าที่ opt-in เท่านั้น ด้วยเหตุผลเดียวกับข้อ 4 — shell ของแอพต้องคงความสูงไว้) */
 @media (max-height: 480px) and (orientation: landscape) {
-  .layout { height: auto !important; overflow: visible !important; }
+  .layout.pm-stack-mobile { height: auto !important; overflow: visible !important; }
 }
 
 /* ── 7) พิมพ์: ยกเลิกทุกอย่างของ mobile kit ที่อาจกวนการพิมพ์รายงาน ── */
@@ -434,11 +509,11 @@ input, select, textarea, button { font-family: inherit; max-width: 100%; }
     </div>
   </div>
   <div style="display:flex;gap:8px">
-    <select class="filter-select" id="monthSelect" style="background:rgba(255,255,255,0.15);color:white;border-color:rgba(255,255,255,0.3)" onchange="filterChanged()">
-      <option value="2025-06">มิ.ย. 2568</option>
-      <option value="2025-07" selected>ก.ค. 2568</option>
-      <option value="2025-08">ส.ค. 2568</option>
-    </select>
+    <button class="dm-btn pm-theme-btn" onclick="toggleDark()" aria-label="สลับโหมดมืด/สว่าง" title="โหมดมืด/สว่าง"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3a9 9 0 1 0 0 18Z" fill="currentColor" stroke="none"/><circle cx="12" cy="12" r="9"/></svg></button>
+    <!-- รายการเดือนถูกสร้างอัตโนมัติจาก "วันที่รับเงิน" ตอนโหลดหน้า (ดู pmBuildMonthOptions)
+         แก้บั๊ก 2569-07-27: เดิม 3 บรรทัดนี้เป็น <option> ที่ hardcode พ.ศ. 2568 ไว้ตั้งแต่ตอนเขียนหน้า
+         และไม่ได้ผูกกับอะไรเลย ทำให้คนเก็บเงินเข้าใจผิดว่ากำลังเก็บบิลของปีที่แล้ว -->
+    <select class="filter-select" id="monthSelect" style="background:rgba(255,255,255,0.15);color:white;border-color:rgba(255,255,255,0.3)" onchange="onMonthSelectChanged()" aria-label="รอบการเก็บเงิน"></select>
     <select class="filter-select" id="roundSelect" style="background:rgba(255,255,255,0.15);color:white;border-color:rgba(255,255,255,0.3)">
       <option>รายเดือน</option>
       <option>รายวัน (จร)</option>
@@ -448,7 +523,8 @@ input, select, textarea, button { font-family: inherit; max-width: 100%; }
   </div>
 </div>
 
-<div class="layout">
+<!-- pm-stack-mobile = ขอให้ PM MOBILE KIT เรียงคอลัมน์ซ้าย/ขวาลงล่างบนจอ ≤640px (opt-in) -->
+<div class="layout pm-stack-mobile">
 
   <!-- ════ LEFT PANEL ════ -->
   <div class="left-panel">
@@ -709,6 +785,16 @@ function countThursdaysInMonth(year, month){
   return count;
 }
 function thisMonthThursdays(){ const n=new Date(); return countThursdaysInMonth(n.getFullYear(), n.getMonth()); }
+// จำนวนวันตลาดของ "เดือนรอบบิล" ที่ผู้ใช้เลือกอยู่ — ไม่ใช่เดือนปัจจุบันของเครื่อง
+// แก้บั๊ก 2569-07-27: เดิมค่าเช่า/ค่าไฟรายเดือนคูณด้วยจำนวนวันพฤหัสบดีของ "เดือนนี้" เสมอ
+// พอผู้ใช้เลื่อนรอบบิลไปเดือนอื่น (เช่น เก็บบิลเดือนที่แล้วย้อนหลัง) ตัวคูณจึงผิดเงียบ ๆ
+// เช่น เดือนที่มี 5 วันพฤหัสบดี แต่ไปคูณด้วย 4 ของเดือนปัจจุบัน
+function billMonthThursdays(){
+  const k = pmBillMonthKey();               // 'YYYY-MM'
+  const y = parseInt(k.slice(0,4),10), m = parseInt(k.slice(5,7),10)-1;
+  if (isNaN(y) || isNaN(m)) return thisMonthThursdays();
+  return countThursdaysInMonth(y, m);
+}
 function calcElecFromVendor(v){ // ราคา/วันพฤหัสบดี 1 วัน — เพิ่ม elec_special ที่เดิมตกหล่น (แก้ 2026-07-17 บั๊ก #27)
   const sp = (Array.isArray(v.elec_special)?v.elec_special:[]).reduce((s,x)=>s+(parseFloat(x.price)||0),0);
   return (parseInt(v.elec_bulb)||0)*10 + (parseInt(v.elec_fan)||0)*20 + (parseInt(v.elec_small)||0)*50 + (parseInt(v.elec_large)||0)*100 + sp;
@@ -810,7 +896,7 @@ async function loadLocksFromSheets(){
     if(wrap) wrap.innerHTML='<div class="empty-state"><div class="empty-icon"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg></div><div class="empty-text">โหลดข้อมูลผู้ค้าไม่สำเร็จ<br>ตรวจสอบการเชื่อมต่อ Google Sheets</div></div>';
     return;
   }
-  const tuesdays = thisMonthThursdays();
+  const tuesdays = billMonthThursdays();
   ALL_LOCKS = vendors.filter(v=>v.status==='active'||v.status==='unpaid').map(v=>{
     const rentBase = Math.round((parseFloat(v.dailyRate)||0) * tuesdays);
     const lock = {
@@ -847,9 +933,13 @@ let filteredLocks = [...ALL_LOCKS];
 // ── INIT ──
 window.onload = () => {
   const today = new Date();
-  document.getElementById('payDate').value = today.toISOString().split('T')[0];
-  document.getElementById('metaDate').textContent =
-    `วันที่ ${today.toLocaleDateString('th-TH', {weekday:'long', year:'numeric', month:'long', day:'numeric'})} · รอบการเก็บเงิน`;
+  // ใช้เวลาท้องถิ่น ไม่ใช่ toISOString() ซึ่งเป็น UTC — ในไทย (UTC+7) ช่วง 00:00–06:59
+  // toISOString() จะให้ "เมื่อวาน" ทำให้รอบบิลข้ามเดือนผิดในวันที่ 1 ของเดือน
+  document.getElementById('payDate').value =
+    today.getFullYear() + '-' + String(today.getMonth()+1).padStart(2,'0')
+    + '-' + String(today.getDate()).padStart(2,'0');
+  pmBuildMonthOptions();
+  pmSyncMetaDate();
   loadLocksFromSheets();
 };
 
@@ -1344,9 +1434,93 @@ async function saveAnnualFee(){
   } else showToast('บันทึกอัตราไม่สำเร็จ');
 }
 
+// ══════════════════════════════════════════════════════════════════════════════
+// PM_MONTH_PICKER (2569-07-27) — ช่อง "รอบการเก็บเงิน" บนหัวหน้าจอ
+//
+// บั๊กเดิม: <option> สามบรรทัดถูก hardcode ไว้ตั้งแต่ตอนเขียนหน้า ("มิ.ย./ก.ค./ส.ค. 2568")
+// และ filterChanged() ไม่เคยอ่านค่าจากช่องนี้เลย → ช่องนี้ไม่มีผลกับอะไรทั้งสิ้น ยอดเงินยังถูก
+// เพราะทุกฟังก์ชันอ่านรอบบิลจาก pmBillMonthKey() ซึ่งดูจากช่อง "วันที่รับเงิน" แต่คนเก็บเงิน
+// อ่านหัวจอแล้วเข้าใจผิดว่ากำลังเก็บบิลของปีที่แล้ว
+//
+// วิธีแก้: ให้ช่องนี้เป็นมุมมองของ "วันที่รับเงิน" ตัวเดียวกัน ผูกกันสองทาง
+//   · สร้างรายการเดือนอัตโนมัติทุกครั้ง: ย้อนหลัง 3 เดือน → ล่วงหน้า 1 เดือน (รวม 5 ตัวเลือก)
+//   · label เป็น พ.ศ. ที่ถูกต้องเสมอ (ค.ศ. + 543) · value เป็น 'YYYY-MM' ค.ศ. ให้ตรงกับ
+//     รูปแบบที่ pmBillMonthKey()/ชีตใช้อยู่ ไม่ต้องแปลงที่อื่น
+//   · เลือกเดือนไหน → เลื่อนวันที่รับเงินไปเดือนนั้น (คงวันที่เดิมถ้าเดือนนั้นมีวันนั้นจริง
+//     ถ้าเป็นเดือนปัจจุบันให้กลับมาเป็นวันนี้) แล้วโหลดยอดใหม่ทั้งหมด
+// ══════════════════════════════════════════════════════════════════════════════
+const PM_MONTHS_BACK = 3, PM_MONTHS_FWD = 1;
+
+function pmMonthLabel(y, m){ return MONS[m] + ' ' + (y + 543); }        // m = 0-11
+function pmMonthKey(y, m){ return y + '-' + String(m+1).padStart(2,'0'); }
+
+function pmBuildMonthOptions(){
+  const sel = document.getElementById('monthSelect');
+  if (!sel) return;
+  const cur = pmBillMonthKey();
+  const y = parseInt(cur.slice(0,4),10), m = parseInt(cur.slice(5,7),10)-1;
+  const base = (isNaN(y)||isNaN(m)) ? new Date() : new Date(y, m, 1);
+  let html = '';
+  for (let i = -PM_MONTHS_BACK; i <= PM_MONTHS_FWD; i++){
+    const d = new Date(base.getFullYear(), base.getMonth() + i, 1);
+    const key = pmMonthKey(d.getFullYear(), d.getMonth());
+    html += '<option value="' + key + '"' + (key === cur ? ' selected' : '') + '>'
+          + pmMonthLabel(d.getFullYear(), d.getMonth()) + '</option>';
+  }
+  sel.innerHTML = html;
+  sel.value = cur;   // กันกรณี cur หลุดนอกช่วง (ผู้ใช้พิมพ์วันที่เองในช่อง date)
+  if (!sel.value){
+    // วันที่ที่เลือกอยู่นอกช่วง 3 เดือนย้อนหลัง–1 เดือนหน้า → เพิ่มตัวเลือกนั้นเข้าไปตามจริง
+    sel.insertAdjacentHTML('afterbegin',
+      '<option value="' + cur + '" selected>' + pmMonthLabel(y, m) + '</option>');
+    sel.value = cur;
+  }
+}
+
+function pmSyncMetaDate(){
+  const meta = document.getElementById('metaDate');
+  if (!meta) return;
+  const v = document.getElementById('payDate')?.value;
+  const d = (v && !isNaN(new Date(v+'T00:00:00'))) ? new Date(v+'T00:00:00') : new Date();
+  const k = pmBillMonthKey();
+  const my = parseInt(k.slice(0,4),10), mm = parseInt(k.slice(5,7),10)-1;
+  meta.textContent = 'วันที่ ' + d.toLocaleDateString('th-TH',
+      {weekday:'long', year:'numeric', month:'long', day:'numeric'})
+    + ' · รอบการเก็บเงิน ' + pmMonthLabel(my, mm)
+    + ' (' + countThursdaysInMonth(my, mm) + ' วันตลาด)';
+}
+
+// เปลี่ยน "รอบการเก็บเงิน" → เลื่อนวันที่รับเงินไปเดือนนั้น (ผูกสองทาง)
+async function onMonthSelectChanged(){
+  const sel = document.getElementById('monthSelect');
+  const inp = document.getElementById('payDate');
+  if (!sel || !inp || !sel.value) return;
+  const y = parseInt(sel.value.slice(0,4),10), m = parseInt(sel.value.slice(5,7),10)-1;
+  const today = new Date();
+  let day;
+  if (y === today.getFullYear() && m === today.getMonth()){
+    day = today.getDate();                                   // เดือนปัจจุบัน → วันนี้
+  } else {
+    const prev = new Date((inp.value||'')+'T00:00:00');
+    const wanted = isNaN(prev) ? 1 : prev.getDate();
+    const lastDay = new Date(y, m+1, 0).getDate();           // เช่น 31 ก.ค. → ก.พ. ต้องเป็น 28/29
+    day = Math.min(wanted, lastDay);
+  }
+  inp.value = y + '-' + String(m+1).padStart(2,'0') + '-' + String(day).padStart(2,'0');
+  pmSyncMetaDate();
+  pmBuildMonthOptions();
+  if (getApiUrl()) await loadLocksFromSheets();
+  else renderLockList();
+}
+
 // เปลี่ยนวันที่รับชำระ = เปลี่ยนรอบบิล → ต้องคิดค่าธรรมเนียมรายปี/ส่วนลดของเดือนนั้นใหม่
-// (เช่น เลื่อนเป็นเดือนมีนาคม ต้องมีค่าธรรมเนียมรายปีบวกเข้ามาทันที)
-async function onPayDateChanged(){ if(getApiUrl()) await loadLocksFromSheets(); }
+// (เช่น เลื่อนเป็นเดือนมีนาคม ต้องมีค่าธรรมเนียมรายปีบวกเข้ามาทันที) + อัปเดตหัวจอให้ตรงกัน
+async function onPayDateChanged(){
+  pmBuildMonthOptions();
+  pmSyncMetaDate();
+  if(getApiUrl()) await loadLocksFromSheets();
+  else renderLockList();
+}
 function filterChanged() { renderLockList(); }
 
 function showToast(msg) {
@@ -1356,5 +1530,14 @@ function showToast(msg) {
   setTimeout(() => t.classList.remove('show'), 3500);
 }
 </script>
+
+
+
+<!-- ==== PM_THEME_JS:START (สร้างโดย tools/inject_theme_kit.py) ==== -->
+<script>
+function toggleDark(){const h=document.documentElement,d=h.getAttribute('data-theme')==='dark';h.setAttribute('data-theme',d?'light':'dark');localStorage.setItem('pmthu-t',d?'light':'dark');}
+(()=>{const s=localStorage.getItem('pmthu-t');if(s)document.documentElement.setAttribute('data-theme',s);else if(window.matchMedia('(prefers-color-scheme:dark)').matches)document.documentElement.setAttribute('data-theme','dark');})();
+</script>
+<!-- ==== PM_THEME_JS:END ==== -->
 </body>
 </html>

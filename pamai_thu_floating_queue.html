@@ -154,6 +154,27 @@ body {
 img, svg, canvas, video, table { max-width: 100%; }
 input, select, textarea, button { font-family: inherit; max-width: 100%; }
 
+/* ── 1.5) แถบที่ตั้งใจให้ "เลื่อนแนวนอน" ต้องเลื่อนจริง ห้ามบีบจนตัวอักษรทับกัน ──
+   ข้อ 1) ด้านบนตั้ง min-width:0 ให้ทุก element เพื่อกัน overflow ในแนวตั้ง/แนวกริด ซึ่งถูกต้อง
+   แต่มีผลข้างเคียงกับแถบแท็บ/แถบโซนที่เป็น flex + overflow-x:auto — ลูก ๆ ยอมหดต่ำกว่าความกว้าง
+   เนื้อหาของตัวเอง ผลคือแทนที่จะเลื่อนได้ กลับบีบซ้อนกันจนอ่านไม่ออก (พบที่แถบแท็บหน้าค่าไฟฟ้า
+   บนจอ 390px: "รายชื่อผู้ค้า + ค่าไฟ / แก้ไขค่าไฟรายล็อค / สรุปบิลประจำเดือน / ประวัติค่าไฟ" ทับกัน)
+   จึงยกเว้นเฉพาะลูกโดยตรงของแถบเหล่านี้ให้ไม่หด แล้วปล่อยให้ผู้ใช้ปัดนิ้วเลื่อนตามที่ออกแบบไว้ */
+.main-tabs, .tabs, .zone-bar, .outdoor-strip, .steps, .stepbar {
+  -webkit-overflow-scrolling: touch; overscroll-behavior-x: contain; scrollbar-width: none;
+}
+.main-tabs > *, .tabs > *, .zone-bar > *, .outdoor-strip > *, .steps > *, .stepbar > * {
+  flex-shrink: 0; min-width: max-content;
+}
+.main-tabs::-webkit-scrollbar, .tabs::-webkit-scrollbar, .zone-bar::-webkit-scrollbar,
+.outdoor-strip::-webkit-scrollbar, .steps::-webkit-scrollbar,
+.stepbar::-webkit-scrollbar { display: none; }
+/* .stepbar (แถบ 4 ขั้นตอนหน้าลงทะเบียนผู้ค้าใหม่) ไม่ได้ตั้ง overflow-x ไว้แต่แรก และลูกเป็น flex:1
+   บนจอ 390px จึงถูกบีบจนคำไทยตัดเป็นแนวตั้งทีละตัวอักษร ("ข-้-อ-ม-ู-ล-ผ-ู-้-ค-้-า") อ่านไม่ได้เลย
+   → ให้เลื่อนแนวนอนแทน และยกเลิก flex:1 เพื่อให้แต่ละขั้นตอนกว้างตามข้อความจริง */
+.stepbar { overflow-x: auto; }
+.stepbar > .step { flex: none !important; }
+
 /* ── 2) ตารางเลื่อนแนวนอนได้เอง (wrapper ถูกใส่ให้อัตโนมัติโดยสคริปต์ท้ายไฟล์) ── */
 .pm-tablewrap {
   width: 100%; max-width: 100%; overflow-x: auto; overflow-y: hidden;
@@ -205,11 +226,23 @@ input, select, textarea, button { font-family: inherit; max-width: 100%; }
 
   /* หน้ารับชำระหลายล็อค (batch payment) — เดิมไม่มี @media เลย
      .layout เป็น flex 2 คอลัมน์ + height:100vh + overflow:hidden ทำให้ฝั่งขวาหลุดออกนอกจอ
-     และเลื่อนดูไม่ได้บนมือถือ → เปลี่ยนเป็นเรียงลงล่างและให้หน้าเลื่อนตามปกติ */
-  .layout {
+     และเลื่อนดูไม่ได้บนมือถือ → เปลี่ยนเป็นเรียงลงล่างและให้หน้าเลื่อนตามปกติ
+
+     ⚠️ บทเรียนบั๊ก 2569-07-27 (จอดำบนมือถือ): กฎก้อนนี้เคยเขียนเป็น `.layout` เปล่า ๆ แล้วไป
+     ชนกับ `.layout` ของ shell ในหน้าแอพหลัก (ซึ่งต้องมีความสูงแน่นอน = 100vh − topbar
+     ไม่งั้น iframe ของทุกโมดูลจะยุบเหลือ 150px แล้วที่เหลือกลายเป็นพื้นหลังเปล่า)
+     กติกาใหม่: ห้ามใช้ชื่อคลาสกว้าง ๆ เป็นตัวเลือกลอย ๆ อีก — หน้าไหนต้องการให้คอลัมน์เรียงลงล่าง
+     บนมือถือ ต้อง "ขอเอง" ด้วยการติดคลาส .pm-stack-mobile ที่ตัว .layout ของหน้านั้น
+     (ทำแบบ opt-in ไม่ใช้ :has() เพราะถ้าเบราว์เซอร์เก่าไม่รู้จัก :has() ทั้งกฎจะถูกทิ้งทั้งก้อน) */
+  .layout.pm-stack-mobile {
     flex-direction: column !important; height: auto !important;
     min-height: 0 !important; overflow: visible !important;
   }
+
+  /* shell ของแอพหลัก: ย้ำความสูงให้แน่นอนเสมอ กัน iframe โมดูลยุบเหลือ 150px */
+  .app-shell { height: calc(100vh - var(--topH, 56px)) !important; overflow: hidden !important; }
+  .app-shell > .content, .app-shell .pane, .app-shell .pane.active { min-height: 0; }
+  .module-frame { min-height: 0; height: 100% !important; }
   .left-panel, .right-panel {
     width: 100% !important; max-width: 100% !important; flex: none !important;
     border-right: none !important; border-left: none !important;
@@ -235,9 +268,10 @@ input, select, textarea, button { font-family: inherit; max-width: 100%; }
   .toolbar h1, .topbar h1 { font-size: .82rem !important; }
 }
 
-/* ── 6) โหมดแนวนอนจอเตี้ย: อย่าล็อคความสูงเป็น 100vh ── */
+/* ── 6) โหมดแนวนอนจอเตี้ย: อย่าล็อคความสูงเป็น 100vh ──
+   (ใช้เฉพาะหน้าที่ opt-in เท่านั้น ด้วยเหตุผลเดียวกับข้อ 4 — shell ของแอพต้องคงความสูงไว้) */
 @media (max-height: 480px) and (orientation: landscape) {
-  .layout { height: auto !important; overflow: visible !important; }
+  .layout.pm-stack-mobile { height: auto !important; overflow: visible !important; }
 }
 
 /* ── 7) พิมพ์: ยกเลิกทุกอย่างของ mobile kit ที่อาจกวนการพิมพ์รายงาน ── */

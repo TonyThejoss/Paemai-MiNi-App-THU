@@ -60,7 +60,12 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(
 .hamburger{display:none;}
 
 /* ─── LAYOUT ──────────────────────────────────────── */
-.layout{display:flex;height:calc(100vh - var(--topH));margin-top:var(--topH);}
+/* แก้บั๊ก 2569-07-27 (หน้าจอดำบนมือถือ): เดิมคลาสนี้ชื่อ ".layout" ซึ่งไปชนกับคลาสชื่อเดียวกัน
+   ในหน้ารับชำระ/ลงทะเบียน ที่ PM MOBILE KIT สั่ง `height:auto !important` บนจอ ≤640px
+   ผลคือ shell ของแอพเสียความสูงที่แน่นอน (definite height) → .content สูง auto → .pane สูง auto
+   → iframe ของทุกโมดูลตกไปใช้ความสูงมาตรฐาน 150px แล้วที่เหลือของจอเป็นพื้นหลังเปล่า ๆ
+   (ผู้ใช้เห็นเป็น "จอดำ" ในโหมดมืด) — เปลี่ยนชื่อเป็น .app-shell ให้ไม่ชนกับใครอีก */
+.app-shell{display:flex;height:calc(100vh - var(--topH));margin-top:var(--topH);min-height:0;}
 
 /* ─── SIDEBAR ─────────────────────────────────────── */
 .sidebar{
@@ -114,9 +119,9 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(
 .sb-db-badge:hover{background:var(--gll);border-color:var(--gm);color:var(--gm);}
 
 /* ─── CONTENT ─────────────────────────────────────── */
-.content{flex:1;overflow:hidden;position:relative;min-width:0;}
+.content{flex:1;overflow:hidden;position:relative;min-width:0;min-height:0;}
 .pane{display:none;width:100%;height:100%;}
-.pane.active{display:flex;flex-direction:column;}
+.pane.active{display:flex;flex-direction:column;min-height:0;}
 .content-frame{width:100%;height:100%;border:none;flex:1;}
 
 /* readonly banner */
@@ -353,6 +358,27 @@ body {
 img, svg, canvas, video, table { max-width: 100%; }
 input, select, textarea, button { font-family: inherit; max-width: 100%; }
 
+/* ── 1.5) แถบที่ตั้งใจให้ "เลื่อนแนวนอน" ต้องเลื่อนจริง ห้ามบีบจนตัวอักษรทับกัน ──
+   ข้อ 1) ด้านบนตั้ง min-width:0 ให้ทุก element เพื่อกัน overflow ในแนวตั้ง/แนวกริด ซึ่งถูกต้อง
+   แต่มีผลข้างเคียงกับแถบแท็บ/แถบโซนที่เป็น flex + overflow-x:auto — ลูก ๆ ยอมหดต่ำกว่าความกว้าง
+   เนื้อหาของตัวเอง ผลคือแทนที่จะเลื่อนได้ กลับบีบซ้อนกันจนอ่านไม่ออก (พบที่แถบแท็บหน้าค่าไฟฟ้า
+   บนจอ 390px: "รายชื่อผู้ค้า + ค่าไฟ / แก้ไขค่าไฟรายล็อค / สรุปบิลประจำเดือน / ประวัติค่าไฟ" ทับกัน)
+   จึงยกเว้นเฉพาะลูกโดยตรงของแถบเหล่านี้ให้ไม่หด แล้วปล่อยให้ผู้ใช้ปัดนิ้วเลื่อนตามที่ออกแบบไว้ */
+.main-tabs, .tabs, .zone-bar, .outdoor-strip, .steps, .stepbar {
+  -webkit-overflow-scrolling: touch; overscroll-behavior-x: contain; scrollbar-width: none;
+}
+.main-tabs > *, .tabs > *, .zone-bar > *, .outdoor-strip > *, .steps > *, .stepbar > * {
+  flex-shrink: 0; min-width: max-content;
+}
+.main-tabs::-webkit-scrollbar, .tabs::-webkit-scrollbar, .zone-bar::-webkit-scrollbar,
+.outdoor-strip::-webkit-scrollbar, .steps::-webkit-scrollbar,
+.stepbar::-webkit-scrollbar { display: none; }
+/* .stepbar (แถบ 4 ขั้นตอนหน้าลงทะเบียนผู้ค้าใหม่) ไม่ได้ตั้ง overflow-x ไว้แต่แรก และลูกเป็น flex:1
+   บนจอ 390px จึงถูกบีบจนคำไทยตัดเป็นแนวตั้งทีละตัวอักษร ("ข-้-อ-ม-ู-ล-ผ-ู-้-ค-้-า") อ่านไม่ได้เลย
+   → ให้เลื่อนแนวนอนแทน และยกเลิก flex:1 เพื่อให้แต่ละขั้นตอนกว้างตามข้อความจริง */
+.stepbar { overflow-x: auto; }
+.stepbar > .step { flex: none !important; }
+
 /* ── 2) ตารางเลื่อนแนวนอนได้เอง (wrapper ถูกใส่ให้อัตโนมัติโดยสคริปต์ท้ายไฟล์) ── */
 .pm-tablewrap {
   width: 100%; max-width: 100%; overflow-x: auto; overflow-y: hidden;
@@ -404,11 +430,23 @@ input, select, textarea, button { font-family: inherit; max-width: 100%; }
 
   /* หน้ารับชำระหลายล็อค (batch payment) — เดิมไม่มี @media เลย
      .layout เป็น flex 2 คอลัมน์ + height:100vh + overflow:hidden ทำให้ฝั่งขวาหลุดออกนอกจอ
-     และเลื่อนดูไม่ได้บนมือถือ → เปลี่ยนเป็นเรียงลงล่างและให้หน้าเลื่อนตามปกติ */
-  .layout {
+     และเลื่อนดูไม่ได้บนมือถือ → เปลี่ยนเป็นเรียงลงล่างและให้หน้าเลื่อนตามปกติ
+
+     ⚠️ บทเรียนบั๊ก 2569-07-27 (จอดำบนมือถือ): กฎก้อนนี้เคยเขียนเป็น `.layout` เปล่า ๆ แล้วไป
+     ชนกับ `.layout` ของ shell ในหน้าแอพหลัก (ซึ่งต้องมีความสูงแน่นอน = 100vh − topbar
+     ไม่งั้น iframe ของทุกโมดูลจะยุบเหลือ 150px แล้วที่เหลือกลายเป็นพื้นหลังเปล่า)
+     กติกาใหม่: ห้ามใช้ชื่อคลาสกว้าง ๆ เป็นตัวเลือกลอย ๆ อีก — หน้าไหนต้องการให้คอลัมน์เรียงลงล่าง
+     บนมือถือ ต้อง "ขอเอง" ด้วยการติดคลาส .pm-stack-mobile ที่ตัว .layout ของหน้านั้น
+     (ทำแบบ opt-in ไม่ใช้ :has() เพราะถ้าเบราว์เซอร์เก่าไม่รู้จัก :has() ทั้งกฎจะถูกทิ้งทั้งก้อน) */
+  .layout.pm-stack-mobile {
     flex-direction: column !important; height: auto !important;
     min-height: 0 !important; overflow: visible !important;
   }
+
+  /* shell ของแอพหลัก: ย้ำความสูงให้แน่นอนเสมอ กัน iframe โมดูลยุบเหลือ 150px */
+  .app-shell { height: calc(100vh - var(--topH, 56px)) !important; overflow: hidden !important; }
+  .app-shell > .content, .app-shell .pane, .app-shell .pane.active { min-height: 0; }
+  .module-frame { min-height: 0; height: 100% !important; }
   .left-panel, .right-panel {
     width: 100% !important; max-width: 100% !important; flex: none !important;
     border-right: none !important; border-left: none !important;
@@ -434,9 +472,10 @@ input, select, textarea, button { font-family: inherit; max-width: 100%; }
   .toolbar h1, .topbar h1 { font-size: .82rem !important; }
 }
 
-/* ── 6) โหมดแนวนอนจอเตี้ย: อย่าล็อคความสูงเป็น 100vh ── */
+/* ── 6) โหมดแนวนอนจอเตี้ย: อย่าล็อคความสูงเป็น 100vh ──
+   (ใช้เฉพาะหน้าที่ opt-in เท่านั้น ด้วยเหตุผลเดียวกับข้อ 4 — shell ของแอพต้องคงความสูงไว้) */
 @media (max-height: 480px) and (orientation: landscape) {
-  .layout { height: auto !important; overflow: visible !important; }
+  .layout.pm-stack-mobile { height: auto !important; overflow: visible !important; }
 }
 
 /* ── 7) พิมพ์: ยกเลิกทุกอย่างของ mobile kit ที่อาจกวนการพิมพ์รายงาน ── */
@@ -547,7 +586,7 @@ input, select, textarea, button { font-family: inherit; max-width: 100%; }
 <div class="sidebar-overlay" id="sidebar-overlay" onclick="closeSidebar()"></div>
 
 <!-- ═══ LAYOUT ══════════════════════════════════════ -->
-<div class="layout">
+<div class="app-shell">
 
   <!-- ═══ SIDEBAR ═══════════════════════════════════ -->
   <aside class="sidebar" id="sidebar">
@@ -584,6 +623,7 @@ input, select, textarea, button { font-family: inherit; max-width: 100%; }
     <div class="sb-div"></div>
     <div class="sb-sec">
       <div class="sb-lbl">ระบบ</div>
+      <button class="ni" id="ni-fees" onclick="goTab('fees')"><span class="ico"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .34 1.87l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.7 1.7 0 0 0-1.87-.34 1.7 1.7 0 0 0-1.04 1.56V21a2 2 0 0 1-4 0v-.09A1.7 1.7 0 0 0 9 19.37a1.7 1.7 0 0 0-1.87.34l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.7 1.7 0 0 0 4.63 15a1.7 1.7 0 0 0-1.56-1.04H3a2 2 0 0 1 0-4h.09A1.7 1.7 0 0 0 4.63 9a1.7 1.7 0 0 0-.34-1.87l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.7 1.7 0 0 0 9 4.63a1.7 1.7 0 0 0 1.04-1.56V3a2 2 0 0 1 4 0v.09a1.7 1.7 0 0 0 1.04 1.56 1.7 1.7 0 0 0 1.87-.34l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.7 1.7 0 0 0 19.37 9a1.7 1.7 0 0 0 1.56 1.04H21a2 2 0 0 1 0 4h-.09A1.7 1.7 0 0 0 19.4 15Z"/></svg></span>ตั้งค่าค่าธรรมเนียม</button>
       <button class="ni" id="ni-reports" onclick="goTab('reports')"><span class="ico"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><line x1="6" y1="20" x2="6" y2="12"/><line x1="12" y1="20" x2="12" y2="6"/><line x1="18" y1="20" x2="18" y2="15"/></svg></span>รายงาน PDF</button>
       <button class="ni" id="ni-actlog" onclick="goTab('actlog')"><span class="ico"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg></span>บันทึกกิจกรรม</button>
     </div>
@@ -729,6 +769,56 @@ input, select, textarea, button { font-family: inherit; max-width: 100%; }
       <div style="flex:1;overflow:auto;padding:12px 14px"><div id="al-list"></div></div>
     </div>
 
+    <!-- ═══ FEE SETTINGS (อัตรากลางทั้งตลาด) ═══════════════════════════════
+         เพิ่ม 2569-07-27 ตามที่ผู้ดูแลตลาดสั่ง: ย้าย "อัตราค่าธรรมเนียมรายปีกลางของตลาด" และ
+         "ค่าธรรมเนียมแรกเข้า" มาตั้งที่เดียวในเมนูหลักหมวดระบบ แล้วให้หน้าลงทะเบียนผู้ค้าใหม่
+         ดึงค่าไปใช้อัตโนมัติ ไม่ต้องกรอกซ้ำและแก้ไม่ได้ (กันกรอกไม่ตรงกันระหว่างพนักงาน)
+         เก็บที่ชีต settings (key/value) ซึ่ง backend รองรับอยู่แล้วผ่าน getSettings/saveSettings -->
+    <div id="fees" class="pane" style="overflow-y:auto;background:var(--bg)">
+      <div class="dw" style="max-width:720px">
+        <div class="dc" style="margin-bottom:12px">
+          <div class="dch"><div class="dct"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .34 1.87l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.7 1.7 0 0 0-1.87-.34 1.7 1.7 0 0 0-1.04 1.56V21a2 2 0 0 1-4 0v-.09A1.7 1.7 0 0 0 9 19.37a1.7 1.7 0 0 0-1.87.34l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.7 1.7 0 0 0 4.63 15a1.7 1.7 0 0 0-1.56-1.04H3a2 2 0 0 1 0-4h.09A1.7 1.7 0 0 0 4.63 9a1.7 1.7 0 0 0-.34-1.87l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.7 1.7 0 0 0 9 4.63a1.7 1.7 0 0 0 1.04-1.56V3a2 2 0 0 1 4 0v.09a1.7 1.7 0 0 0 1.04 1.56 1.7 1.7 0 0 0 1.87-.34l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.7 1.7 0 0 0 19.37 9a1.7 1.7 0 0 0 1.56 1.04H21a2 2 0 0 1 0 4h-.09A1.7 1.7 0 0 0 19.4 15Z"/></svg> อัตราค่าธรรมเนียมกลางของตลาด</div></div>
+          <div class="dcb">
+            <div style="font-size:.82rem;color:var(--txl);line-height:1.65;margin-bottom:14px">
+              ค่าที่ตั้งไว้ที่นี่จะถูกใช้เป็นอัตราเดียวกันทั้งตลาด และถูกเติมให้อัตโนมัติในขั้นตอน
+              <strong>เพิ่มผู้ค้าใหม่</strong> โดยที่หน้านั้นแก้ไขไม่ได้ — ถ้าต้องการเปลี่ยนอัตรา ให้แก้ที่หน้านี้เท่านั้น
+            </div>
+
+            <div id="fees-readonly" style="display:none;margin-bottom:12px;padding:9px 12px;background:var(--yl);border:1.5px solid var(--y);border-radius:9px;color:var(--y);font-size:.78rem;font-weight:700;line-height:1.55">
+              เฉพาะผู้ดูแลระบบ (admin) เท่านั้นที่แก้อัตราค่าธรรมเนียมได้ — บัญชีนี้ดูได้อย่างเดียว
+            </div>
+
+            <div style="margin-bottom:14px">
+              <label for="set-entry-fee" style="display:block;font-size:.80rem;font-weight:800;margin-bottom:5px">ค่าธรรมเนียมแรกเข้า (฿)</label>
+              <input class="sbox" type="number" id="set-entry-fee" min="0" step="1" placeholder="0" style="width:180px;max-width:100%">
+              <div style="font-size:.76rem;color:var(--txl);margin-top:5px;line-height:1.6">เก็บครั้งเดียวตอนผู้ค้าลงทะเบียนเป็นผู้ค้าประจำรายใหม่</div>
+            </div>
+
+            <div style="margin-bottom:16px">
+              <label for="set-annual-fee" style="display:block;font-size:.80rem;font-weight:800;margin-bottom:5px">ค่าธรรมเนียมรายปี (฿)</label>
+              <input class="sbox" type="number" id="set-annual-fee" min="0" step="1" placeholder="0" style="width:180px;max-width:100%">
+              <div style="font-size:.76rem;color:var(--txl);margin-top:5px;line-height:1.6">เก็บครั้งแรกตอนเข้าเป็นผู้ค้าประจำ แล้วเก็บอีกทุกเดือนมีนาคมของทุกปี — บิลค่าเช่าเดือนมีนาคมจะบวกยอดนี้ให้อัตโนมัติพร้อมหมายเหตุ</div>
+            </div>
+
+            <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+              <button class="btn btn-p" id="fees-save-btn" onclick="saveFeeSettings()"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2Z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg> บันทึกอัตรา</button>
+              <button class="btn btn-s" onclick="loadFeeSettings(true)"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 11a8 8 0 0 0-14.9-4M4 13a8 8 0 0 0 14.9 4"/><path d="M4 4v4h4M20 20v-4h-4"/></svg> โหลดค่าล่าสุด</button>
+              <span id="fees-status" style="font-size:.78rem;color:var(--txl)"></span>
+            </div>
+          </div>
+        </div>
+
+        <div class="dc">
+          <div class="dch"><div class="dct"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg> อัตรานี้ถูกใช้ที่ไหนบ้าง</div></div>
+          <div class="dcb">
+            <div class="sr"><span class="sl">เพิ่มผู้ค้าใหม่ — ค่าธรรมเนียมแรกเข้า</span><span class="sv">เติมอัตโนมัติ · แก้ไม่ได้</span></div>
+            <div class="sr"><span class="sl">เพิ่มผู้ค้าใหม่ — ค่าธรรมเนียมรายปี</span><span class="sv">เติมอัตโนมัติ · แก้ไม่ได้</span></div>
+            <div class="sr" style="border:none"><span class="sl">รับชำระหลายล็อค — บิลเดือนมีนาคม</span><span class="sv">บวกค่าธรรมเนียมรายปีให้เอง</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <!-- MODULE PANES (iframe with fallback) -->
     <div id="map"      class="pane" data-src="pamai_thu_market_map.html"><div class="module-loading">⏳ กำลังโหลด ผังตลาด...</div></div>
     <div id="payment"  class="pane" data-src="pamai_thu_batch_payment.html"><div class="module-loading">⏳ กำลังโหลด รับชำระ...</div></div>
@@ -783,7 +873,7 @@ function toggleDark(){
   else if(window.matchMedia('(prefers-color-scheme:dark)').matches) document.documentElement.setAttribute('data-theme','dark');
 })();
 
-const APP_BUILD='20260726-1719'; // cache-buster — build.py แทนค่าอัตโนมัติ
+const APP_BUILD='20260727-0632'; // cache-buster — build.py แทนค่าอัตโนมัติ
 const DAYS=['อาทิตย์','จันทร์','อังคาร','พุธ','พฤหัสบดี','ศุกร์','เสาร์'];
 const MONS=['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
 function tick(){
@@ -815,7 +905,8 @@ function goTab(id){
   // Viewer role check
   // rules (กฎระเบียบตลาด) เปิดให้ viewer อ่านได้ (แค่ดูได้ แก้ไขไม่ได้ — บังคับสิทธิ์ในตัวหน้านั้นเองอีกชั้น)
   // floatingqueue (คิวจองล็อคจร) เกี่ยวข้องกับการขาย/เงิน จึงไม่ให้ viewer เข้าเหมือนหน้าอื่นที่แตะเงิน
-  const viewerAllowed=['dash','reports','actlog','rules'];
+  // fees = หน้าตั้งค่าอัตราค่าธรรมเนียมกลาง — ให้ viewer เปิดดูได้ (ช่องถูกล็อคอยู่แล้วถ้าไม่ใช่ admin)
+  const viewerAllowed=['dash','reports','actlog','rules','fees'];
   if(window._viewerRole && !viewerAllowed.includes(id)){
     showToast('<svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><line x1="5" y1="12" x2="19" y2="12"/></svg> คุณไม่มีสิทธิ์เข้าถึงส่วนนี้ (ดูได้อย่างเดียว)','e');
     return;
@@ -832,6 +923,7 @@ function goTab(id){
   // Special actions
   if(id==='vdb') renderVDB();
   if(id==='actlog'){ renderActLog(); loadActLogFromSheets(); }
+  if(id==='fees') loadFeeSettings();
   // Close sidebar on mobile
   if(window.innerWidth<=768) closeSidebar();
   // Log
@@ -839,7 +931,8 @@ function goTab(id){
                install:'ผ่อนชำระ',electric:'ค่าไฟฟ้า',register:'ผู้ค้าใหม่',
                leavehist:'ประวัติลา/ขาด/จร',
                floatingqueue:'คิวจองล็อคจร',rules:'กฎระเบียบตลาด',
-               reports:'รายงาน',actlog:'บันทึกกิจกรรม',vdb:'ทะเบียนผู้ค้า'};
+               reports:'รายงาน',actlog:'บันทึกกิจกรรม',vdb:'ทะเบียนผู้ค้า',
+               fees:'ตั้งค่าค่าธรรมเนียม'};
   if(id!=='actlog') logAct('nav','เปิดหน้า: '+(names[id]||id));
   // Lazy load iframe module when first accessed
   const moduleIds=['map','payment','install','electric','register','leavehist','floatingqueue','rules','reports'];
@@ -1176,13 +1269,18 @@ function renderDashboard(){
 
   const setText=(id,val)=>{const el=document.getElementById(id); if(el) el.textContent=val;};
 
-  setText('kc-total', VENDORS.length);
-  const zones=[...new Set(VENDORS.map(v=>v.zone||'ไม่ระบุ'))].sort();
-  setText('kc-total-sub', VENDORS.length ? zones.length+' โซน ('+zones.join(', ')+')' : 'ยังไม่มีข้อมูลผู้ค้า');
+  // แก้บั๊ก 2569-07-27: เดิมนับจาก VENDORS ทั้งก้อนซึ่งรวมล็อคที่ "ยกเลิกการเช่า" (terminated) ไว้ด้วย
+  // ผลคือกดยกเลิกการเช่าล็อค A1 แล้ว หน้าหลักยังขึ้นว่ามีผู้ค้าประจำอยู่ในล็อคนั้น (โซน A ยังเป็น 2 ราย
+  // และ "ผู้ค้าในระบบ" ยังเป็น 17) ทั้งที่ผังตลาดแสดงเป็นล็อคว่างถูกต้องแล้ว — คนเก็บเงินจึงเห็นตัวเลข
+  // ขัดกันสองหน้า ตอนนี้ทุกตัวเลขบนหน้าหลักนับเฉพาะล็อคที่ "ยังเช่าอยู่" (live = ปกติ + ค้างชำระ)
+  // ส่วนล็อคที่ยกเลิกไปแล้วยังดูได้ครบที่การ์ด "สิ้นสุดสัญญา" ซึ่งแสดงจำนวนและเลขล็อคอยู่แล้ว
+  setText('kc-total', live.length);
+  const zones=[...new Set(live.map(v=>v.zone||'ไม่ระบุ'))].sort();
+  setText('kc-total-sub', live.length ? zones.length+' โซน ('+zones.join(', ')+')' : 'ยังไม่มีผู้ค้าที่ยังเช่าอยู่');
 
   setText('kc-active', active.length);
-  const pct = VENDORS.length ? Math.round(active.length/VENDORS.length*1000)/10 : 0;
-  setText('kc-active-sub', VENDORS.length ? pct+'% ของผู้ค้าในระบบ' : '—');
+  const pct = live.length ? Math.round(active.length/live.length*1000)/10 : 0;
+  setText('kc-active-sub', live.length ? pct+'% ของผู้ค้าที่ยังเช่าอยู่' : '—');
 
   setText('kc-unpaid', unpaid.length);
   const unpaidExtra=unpaid.reduce((s,v)=>s+(v.unpaidPenalty||0)+(v.unpaidOther||0),0);
@@ -1203,18 +1301,25 @@ function renderDashboard(){
 
   const zl=document.getElementById('zone-list');
   if(zl){
-    if(!VENDORS.length){
-      zl.innerHTML='<div style="text-align:center;padding:12px;color:var(--txl);font-size:.72rem">ยังไม่มีข้อมูลผู้ค้าในระบบ</div>';
+    if(!live.length){
+      zl.innerHTML='<div style="text-align:center;padding:12px;color:var(--txl);font-size:.72rem">ยังไม่มีผู้ค้าที่ยังเช่าอยู่ในระบบ</div>';
     } else {
+      // นับเฉพาะล็อคที่ยังเช่าอยู่ (บั๊ก 2569-07-27 — เดิมใช้ VENDORS ทั้งก้อน ทำให้ล็อคที่ยกเลิก
+      // การเช่าแล้วยังถูกนับเป็นผู้ค้าของโซนนั้นอยู่ ทั้งที่มูลค่า/เดือนหักออกไปแล้ว ตัวเลขจึงขัดกันเอง)
       const byZone={};
-      VENDORS.forEach(v=>{const zk=v.zone||'ไม่ระบุ';(byZone[zk]=byZone[zk]||[]).push(v);});
+      live.forEach(v=>{const zk=v.zone||'ไม่ระบุ';(byZone[zk]=byZone[zk]||[]).push(v);});
+      const termByZone={};
+      terminated.forEach(v=>{const zk=v.zone||'ไม่ระบุ';termByZone[zk]=(termByZone[zk]||0)+1;});
       const zoneKeys=Object.keys(byZone).sort();
       zl.innerHTML=zoneKeys.map((z,i)=>{
-        const list=byZone[z];
-        const zLive=list.filter(v=>v.status!=='terminated');
-        const zUnpaid=list.filter(v=>v.status==='unpaid').length;
+        const zLive=byZone[z];
+        const zUnpaid=zLive.filter(v=>v.status==='unpaid').length;
+        const zTerm=termByZone[z]||0;
         const zValue=zLive.reduce((s,v)=>s+calcMonthlyRent(v.dailyRate)+calcElecMonthly(v.elec),0); // มูลค่าโซน/เดือน (บั๊ก #27)
-        return `<div class="zone-row" style="${i===zoneKeys.length-1?'margin-bottom:0':''}"><div class="zone-name"><span>โซน ${z}</span><span style="color:var(--txl)">${list.length} ราย</span></div><div class="zone-detail">${baht(zValue)}/เดือน${zUnpaid?' · <span style="color:var(--o)">ค้างชำระ '+zUnpaid+' ราย</span>':''}</div></div>`;
+        const bits=[];
+        if(zUnpaid) bits.push('<span style="color:var(--o)">ค้างชำระ '+zUnpaid+' ราย</span>');
+        if(zTerm)   bits.push('<span style="color:var(--txl)">ยกเลิกแล้ว '+zTerm+' ล็อค</span>');
+        return `<div class="zone-row" style="${i===zoneKeys.length-1?'margin-bottom:0':''}"><div class="zone-name"><span>โซน ${z}</span><span style="color:var(--txl)">${zLive.length} ราย</span></div><div class="zone-detail">${baht(zValue)}/เดือน${bits.length?' · '+bits.join(' · '):''}</div></div>`;
       }).join('');
     }
   }
@@ -1504,6 +1609,107 @@ async function syncSaveVendor(v){
 
 function getApiUrl(){return (localStorage.getItem('pm-thu-api-url')||localStorage.getItem('pm-api-url'))||'';}
 function getApiToken(){return (localStorage.getItem('pm-thu-api-token')||localStorage.getItem('pm-api-token'))||'';}
+// ══════════════════════════════════════════════════════════════════════════════
+// PM_FEE_SETTINGS (2569-07-27) — อัตราค่าธรรมเนียมกลางของตลาด (หมวด ระบบ)
+//
+// ที่มา: ผู้ดูแลตลาดสั่งให้แยก "อัตราค่าธรรมเนียมรายปีกลางของตลาด" และ "ค่าธรรมเนียมแรกเข้า"
+// ออกมาตั้งที่เมนูหลัก แล้วให้ขั้นตอนเพิ่มผู้ค้าใหม่ใช้ค่านี้อัตโนมัติ ไม่ต้องกรอกใหม่อีกครั้ง
+//
+// ที่เก็บ: ชีต settings (key/value) ผ่าน getSettings / saveSettings ซึ่งมีอยู่ใน Apps Script แล้ว
+//   · entry_fee  = ค่าธรรมเนียมแรกเข้า
+//   · annual_fee = ค่าธรรมเนียมรายปี
+// ตั้งใจใช้ชีตเป็นแหล่งจริง ไม่ใช่ localStorage เพราะอัตราต้องเหมือนกันทุกเครื่องที่เปิดระบบ
+//
+// สิทธิ์: แก้ได้เฉพาะ role 'admin' (ตามที่ยืนยัน 2569-07-27) — บัญชีอื่นเปิดดูได้แต่ช่องถูกล็อค
+// การบังคับสิทธิ์ที่หน้าเว็บเป็นแค่ชั้นแรกเพื่อ UX; ชั้นจริงคือ token ที่ backend ตรวจอยู่แล้ว
+// ══════════════════════════════════════════════════════════════════════════════
+let PM_FEE_SETTINGS = { entry_fee: 0, annual_fee: 0 };
+
+function pmIsAdmin(){ return !!currentUser && currentUser.role === 'admin'; }
+
+function pmSetFeeStatus(msg, kind){
+  const el = document.getElementById('fees-status');
+  if(!el) return;
+  el.textContent = msg || '';
+  el.style.color = kind === 'e' ? 'var(--r)' : (kind === 's' ? 'var(--gm)' : 'var(--txl)');
+}
+
+function pmApplyFeePermission(){
+  const admin = pmIsAdmin();
+  const warn  = document.getElementById('fees-readonly');
+  const btn   = document.getElementById('fees-save-btn');
+  ['set-entry-fee','set-annual-fee'].forEach(id=>{
+    const el = document.getElementById(id);
+    if(!el) return;
+    el.disabled = !admin;
+    el.style.opacity = admin ? '' : '.65';
+  });
+  if(warn) warn.style.display = admin ? 'none' : 'block';
+  if(btn){ btn.disabled = !admin; btn.style.opacity = admin ? '' : '.5';
+           btn.style.cursor = admin ? '' : 'not-allowed'; }
+}
+
+async function loadFeeSettings(manual){
+  pmApplyFeePermission();
+  if(!getApiUrl()){
+    pmSetFeeStatus('ยังไม่ได้เชื่อมต่อ Google Sheets — ตั้งค่าการเชื่อมต่อก่อนจึงจะบันทึกอัตราได้','e');
+    return;
+  }
+  pmSetFeeStatus('กำลังโหลด...');
+  const st = await apiGet('getSettings');
+  if(!st || typeof st !== 'object'){
+    pmSetFeeStatus('โหลดอัตราไม่สำเร็จ — ตรวจสอบการเชื่อมต่อแล้วลองใหม่','e');
+    return;
+  }
+  PM_FEE_SETTINGS = st;
+  const e = document.getElementById('set-entry-fee');
+  const a = document.getElementById('set-annual-fee');
+  if(e) e.value = parseFloat(st.entry_fee)  || 0;
+  if(a) a.value = parseFloat(st.annual_fee) || 0;
+  pmSetFeeStatus(manual ? 'โหลดค่าล่าสุดแล้ว' : '', 's');
+}
+
+async function saveFeeSettings(){
+  if(!pmIsAdmin()){
+    showToast('เฉพาะผู้ดูแลระบบเท่านั้นที่แก้อัตราค่าธรรมเนียมได้','e');
+    return;
+  }
+  if(!getApiUrl()){
+    showToast('ยังไม่ได้เชื่อมต่อ Google Sheets — บันทึกอัตราไม่ได้','e');
+    return;
+  }
+  const entry  = parseFloat(document.getElementById('set-entry-fee').value);
+  const annual = parseFloat(document.getElementById('set-annual-fee').value);
+  // ตรวจค่าก่อนส่ง: ต้องเป็นตัวเลข ไม่ติดลบ และไม่สูงจนน่าจะพิมพ์ผิด (กันพิมพ์เกินหลัก)
+  for(const [label,val] of [['ค่าธรรมเนียมแรกเข้า',entry],['ค่าธรรมเนียมรายปี',annual]]){
+    if(!isFinite(val)){ showToast(label+': กรุณากรอกเป็นตัวเลข','e'); return; }
+    if(val < 0){        showToast(label+': ต้องไม่ติดลบ','e'); return; }
+    if(val > 1000000){  showToast(label+': ยอดสูงผิดปกติ (เกิน 1,000,000) กรุณาตรวจสอบ','e'); return; }
+  }
+  const btn = document.getElementById('fees-save-btn');
+  const orig = btn ? btn.innerHTML : '';
+  if(btn){ btn.disabled = true; btn.innerHTML = 'กำลังบันทึก...'; }
+  pmSetFeeStatus('กำลังบันทึก...');
+  const res = await apiPost('saveSettings', {
+    data: { entry_fee: entry, annual_fee: annual },
+    updatedBy: currentUser?.displayName || currentUser?.username || 'ผู้ดูแลระบบ'
+  });
+  if(btn){ btn.disabled = false; btn.innerHTML = orig; }
+  if(res && res.status === 'ok'){
+    PM_FEE_SETTINGS = { entry_fee: entry, annual_fee: annual };
+    pmSetFeeStatus('บันทึกแล้วเมื่อ ' + new Date().toLocaleTimeString('th-TH'), 's');
+    showToast('บันทึกอัตราค่าธรรมเนียมแล้ว — แรกเข้า ฿' + entry.toLocaleString()
+              + ' · รายปี ฿' + annual.toLocaleString(), 's');
+    logAct('system','แก้อัตราค่าธรรมเนียม: แรกเข้า ฿'+entry.toLocaleString()
+                    +' · รายปี ฿'+annual.toLocaleString());
+    // แจ้งโมดูลอื่น (หน้าลงทะเบียนผู้ค้าใหม่/รับชำระ) ให้ดึงอัตราใหม่ทันที ไม่ต้องรีเฟรชทั้งหน้า
+    broadcastRefreshToModules();
+  } else {
+    pmSetFeeStatus('บันทึกไม่สำเร็จ','e');
+    showToast((res && res.message) || 'บันทึกอัตราไม่สำเร็จ — ตรวจสอบการเชื่อมต่อแล้วลองใหม่','e');
+  }
+}
+
 async function apiGet(action,params={}){
   const url=getApiUrl(); if(!url)return null;
   try{const r=await fetch(url+'?'+new URLSearchParams({action,token:getApiToken(),...params}));const j=await r.json();return j.status==='ok'?j.data:null;}catch(e){return null;}

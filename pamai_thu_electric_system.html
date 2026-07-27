@@ -377,6 +377,27 @@ body {
 img, svg, canvas, video, table { max-width: 100%; }
 input, select, textarea, button { font-family: inherit; max-width: 100%; }
 
+/* ── 1.5) แถบที่ตั้งใจให้ "เลื่อนแนวนอน" ต้องเลื่อนจริง ห้ามบีบจนตัวอักษรทับกัน ──
+   ข้อ 1) ด้านบนตั้ง min-width:0 ให้ทุก element เพื่อกัน overflow ในแนวตั้ง/แนวกริด ซึ่งถูกต้อง
+   แต่มีผลข้างเคียงกับแถบแท็บ/แถบโซนที่เป็น flex + overflow-x:auto — ลูก ๆ ยอมหดต่ำกว่าความกว้าง
+   เนื้อหาของตัวเอง ผลคือแทนที่จะเลื่อนได้ กลับบีบซ้อนกันจนอ่านไม่ออก (พบที่แถบแท็บหน้าค่าไฟฟ้า
+   บนจอ 390px: "รายชื่อผู้ค้า + ค่าไฟ / แก้ไขค่าไฟรายล็อค / สรุปบิลประจำเดือน / ประวัติค่าไฟ" ทับกัน)
+   จึงยกเว้นเฉพาะลูกโดยตรงของแถบเหล่านี้ให้ไม่หด แล้วปล่อยให้ผู้ใช้ปัดนิ้วเลื่อนตามที่ออกแบบไว้ */
+.main-tabs, .tabs, .zone-bar, .outdoor-strip, .steps, .stepbar {
+  -webkit-overflow-scrolling: touch; overscroll-behavior-x: contain; scrollbar-width: none;
+}
+.main-tabs > *, .tabs > *, .zone-bar > *, .outdoor-strip > *, .steps > *, .stepbar > * {
+  flex-shrink: 0; min-width: max-content;
+}
+.main-tabs::-webkit-scrollbar, .tabs::-webkit-scrollbar, .zone-bar::-webkit-scrollbar,
+.outdoor-strip::-webkit-scrollbar, .steps::-webkit-scrollbar,
+.stepbar::-webkit-scrollbar { display: none; }
+/* .stepbar (แถบ 4 ขั้นตอนหน้าลงทะเบียนผู้ค้าใหม่) ไม่ได้ตั้ง overflow-x ไว้แต่แรก และลูกเป็น flex:1
+   บนจอ 390px จึงถูกบีบจนคำไทยตัดเป็นแนวตั้งทีละตัวอักษร ("ข-้-อ-ม-ู-ล-ผ-ู-้-ค-้-า") อ่านไม่ได้เลย
+   → ให้เลื่อนแนวนอนแทน และยกเลิก flex:1 เพื่อให้แต่ละขั้นตอนกว้างตามข้อความจริง */
+.stepbar { overflow-x: auto; }
+.stepbar > .step { flex: none !important; }
+
 /* ── 2) ตารางเลื่อนแนวนอนได้เอง (wrapper ถูกใส่ให้อัตโนมัติโดยสคริปต์ท้ายไฟล์) ── */
 .pm-tablewrap {
   width: 100%; max-width: 100%; overflow-x: auto; overflow-y: hidden;
@@ -428,11 +449,23 @@ input, select, textarea, button { font-family: inherit; max-width: 100%; }
 
   /* หน้ารับชำระหลายล็อค (batch payment) — เดิมไม่มี @media เลย
      .layout เป็น flex 2 คอลัมน์ + height:100vh + overflow:hidden ทำให้ฝั่งขวาหลุดออกนอกจอ
-     และเลื่อนดูไม่ได้บนมือถือ → เปลี่ยนเป็นเรียงลงล่างและให้หน้าเลื่อนตามปกติ */
-  .layout {
+     และเลื่อนดูไม่ได้บนมือถือ → เปลี่ยนเป็นเรียงลงล่างและให้หน้าเลื่อนตามปกติ
+
+     ⚠️ บทเรียนบั๊ก 2569-07-27 (จอดำบนมือถือ): กฎก้อนนี้เคยเขียนเป็น `.layout` เปล่า ๆ แล้วไป
+     ชนกับ `.layout` ของ shell ในหน้าแอพหลัก (ซึ่งต้องมีความสูงแน่นอน = 100vh − topbar
+     ไม่งั้น iframe ของทุกโมดูลจะยุบเหลือ 150px แล้วที่เหลือกลายเป็นพื้นหลังเปล่า)
+     กติกาใหม่: ห้ามใช้ชื่อคลาสกว้าง ๆ เป็นตัวเลือกลอย ๆ อีก — หน้าไหนต้องการให้คอลัมน์เรียงลงล่าง
+     บนมือถือ ต้อง "ขอเอง" ด้วยการติดคลาส .pm-stack-mobile ที่ตัว .layout ของหน้านั้น
+     (ทำแบบ opt-in ไม่ใช้ :has() เพราะถ้าเบราว์เซอร์เก่าไม่รู้จัก :has() ทั้งกฎจะถูกทิ้งทั้งก้อน) */
+  .layout.pm-stack-mobile {
     flex-direction: column !important; height: auto !important;
     min-height: 0 !important; overflow: visible !important;
   }
+
+  /* shell ของแอพหลัก: ย้ำความสูงให้แน่นอนเสมอ กัน iframe โมดูลยุบเหลือ 150px */
+  .app-shell { height: calc(100vh - var(--topH, 56px)) !important; overflow: hidden !important; }
+  .app-shell > .content, .app-shell .pane, .app-shell .pane.active { min-height: 0; }
+  .module-frame { min-height: 0; height: 100% !important; }
   .left-panel, .right-panel {
     width: 100% !important; max-width: 100% !important; flex: none !important;
     border-right: none !important; border-left: none !important;
@@ -458,9 +491,10 @@ input, select, textarea, button { font-family: inherit; max-width: 100%; }
   .toolbar h1, .topbar h1 { font-size: .82rem !important; }
 }
 
-/* ── 6) โหมดแนวนอนจอเตี้ย: อย่าล็อคความสูงเป็น 100vh ── */
+/* ── 6) โหมดแนวนอนจอเตี้ย: อย่าล็อคความสูงเป็น 100vh ──
+   (ใช้เฉพาะหน้าที่ opt-in เท่านั้น ด้วยเหตุผลเดียวกับข้อ 4 — shell ของแอพต้องคงความสูงไว้) */
 @media (max-height: 480px) and (orientation: landscape) {
-  .layout { height: auto !important; overflow: visible !important; }
+  .layout.pm-stack-mobile { height: auto !important; overflow: visible !important; }
 }
 
 /* ── 7) พิมพ์: ยกเลิกทุกอย่างของ mobile kit ที่อาจกวนการพิมพ์รายงาน ── */
@@ -676,11 +710,10 @@ input, select, textarea, button { font-family: inherit; max-width: 100%; }
 <!-- ═══════════════════ TAB 3: BILLING ═══════════════════ -->
 <div id="tab-billing" class="page">
   <div class="month-bar">
-    <select class="month-select" id="billMonth" onchange="renderBilling()">
-      <option value="2568-06">มิถุนายน 2568</option>
-      <option value="2568-07" selected>กรกฎาคม 2568</option>
-      <option value="2568-08">สิงหาคม 2568</option>
-    </select>
+    <!-- รายการเดือนสร้างอัตโนมัติตอนโหลดหน้า (ดู pmBuildBillMonths)
+         แก้บั๊ก 2569-07-27: เดิม hardcode พ.ศ. 2568 ไว้ 3 บรรทัด และ renderBilling() ไม่เคย
+         อ่านค่าจากช่องนี้ ทำให้เลือกเดือนแล้วยอดไม่เปลี่ยน (บั๊กชนิดเดียวกับหน้ารับชำระ) -->
+    <select class="month-select" id="billMonth" onchange="renderBilling()" aria-label="เดือนของบิล"></select>
     <div class="zone-filter-row" id="zoneFilterBill"></div>
     <button class="btn btn-primary" style="margin-left:auto;padding:7px 16px;font-size:.78rem" onclick="exportBill()"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> Export Excel</button>
   </div>
@@ -815,7 +848,10 @@ function calcElec(elec) { // ราคาต่อวันพฤหัสบด
 }
 // ค่าไฟรายเดือน = ราคา/วันพฤหัสบดี × จำนวนวันพฤหัสบดีของเดือนนี้ (เหมือนสูตรค่าเช่า)
 // แก้ 2026-07-17 บั๊ก #27 — เดิมแสดง/เก็บเงินค่าไฟ 1 วันพฤหัสบดีเป็น "ต่อเดือน" ทำให้เก็บเงินขาดไป
-function calcElecMonthly(elec) { return Math.round(calcElec(elec) * thisMonthThursdays()); }
+// ค่าไฟรายเดือน = ราคา/วันตลาด × จำนวนวันตลาด "ของเดือนที่เลือกในแท็บบิล"
+// แก้บั๊ก 2569-07-27: เดิมคูณด้วยจำนวนวันพฤหัสบดีของเดือนปัจจุบันเสมอ ทำให้เลือกเดือนอื่นแล้ว
+// ยอดไม่เปลี่ยน (เดือนที่มี 5 วันพฤหัสบดีจะถูกคิดเป็น 4 วันเงียบ ๆ)
+function calcElecMonthly(elec) { return Math.round(calcElec(elec) * billMonthThursdays()); }
 
 function elecBreakdown(elec) {
   const parts = [];
@@ -1204,12 +1240,12 @@ function setBillZone(z) {
 // ══════════════════════════════════════
 //  TAB 4: HISTORY (mock data)
 // ══════════════════════════════════════
-const MONTHS = ['มิ.ย. 2568','พ.ค. 2568','เม.ย. 2568','มี.ค. 2568','ก.พ. 2568','ม.ค. 2568'];
-
+// แก้บั๊ก 2569-07-27: เดิมเป็น array ที่ hardcode 6 เดือนของปี 2568 ไว้ตรง ๆ
+// พอขึ้นปีใหม่ ประวัติจึงแสดงเดือนของปีที่แล้วตลอดไป — เปลี่ยนเป็นคำนวณจากเดือนที่เลือกจริง
 function renderHistory() {
   const lid = document.getElementById('histLockSel')?.value||'';
   const mth = parseInt(document.getElementById('histMonths')?.value||3);
-  const months = MONTHS.slice(0, mth);
+  const months = pmHistoryMonths(mth);
 
   let rows = '';
   vendors.filter(v=>!lid||v.id===lid).forEach(v => {
@@ -1362,6 +1398,56 @@ function nowTH(){const n=new Date();return n.getDate()+' '+MONS[n.getMonth()]+' 
 function nowTime(){const n=new Date();return String(n.getHours()).padStart(2,'0')+':'+String(n.getMinutes()).padStart(2,'0');}
 function countThursdaysInMonth(y,m){let c=0;const d=new Date(y,m,1);while(d.getMonth()===m){if(d.getDay()===4)c++;d.setDate(d.getDate()+1);}return c;}
 function thisMonthThursdays(){const n=new Date();return countThursdaysInMonth(n.getFullYear(),n.getMonth())||4;}
+
+// ══════════════════════════════════════════════════════════════════════════════
+// PM_MONTH_PICKER (2569-07-27) — เดือนของบิลค่าไฟ + เดือนในแท็บประวัติ
+// สร้างรายการเดือนอัตโนมัติจากวันที่ของเครื่อง (ย้อนหลัง 3 เดือน → ล่วงหน้า 1 เดือน) พ.ศ. ถูกต้อง
+// value เก็บเป็น 'YYYY-MM' ค.ศ. ให้ตรงรูปแบบเดียวกับหน้ารับชำระและชีต ไม่ต้องแปลงที่อื่น
+// ══════════════════════════════════════════════════════════════════════════════
+const MONS_FULL=['มกราคม','กุมภาพันธ์','มีนาคม','เมษายน','พฤษภาคม','มิถุนายน',
+                 'กรกฎาคม','สิงหาคม','กันยายน','ตุลาคม','พฤศจิกายน','ธันวาคม'];
+const PM_MONTHS_BACK = 3, PM_MONTHS_FWD = 1;
+
+function pmBillMonthKey(){
+  const v = document.getElementById('billMonth')?.value;
+  if (v && /^\d{4}-\d{2}$/.test(v)) return v;
+  const n = new Date();
+  return n.getFullYear()+'-'+String(n.getMonth()+1).padStart(2,'0');
+}
+function billMonthThursdays(){
+  const k = pmBillMonthKey();
+  const y = parseInt(k.slice(0,4),10), m = parseInt(k.slice(5,7),10)-1;
+  if (isNaN(y)||isNaN(m)) return thisMonthThursdays();
+  return countThursdaysInMonth(y,m) || 4;
+}
+function pmBuildBillMonths(){
+  const sel = document.getElementById('billMonth');
+  if (!sel) return;
+  const now = new Date();
+  const cur = now.getFullYear()+'-'+String(now.getMonth()+1).padStart(2,'0');
+  let html = '';
+  for (let i = -PM_MONTHS_BACK; i <= PM_MONTHS_FWD; i++){
+    const d = new Date(now.getFullYear(), now.getMonth()+i, 1);
+    const key = d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0');
+    html += '<option value="'+key+'"'+(key===cur?' selected':'')+'>'
+          + MONS_FULL[d.getMonth()] + ' ' + (d.getFullYear()+543)
+          + ' ('+ (countThursdaysInMonth(d.getFullYear(), d.getMonth())||4) +' วันตลาด)</option>';
+  }
+  sel.innerHTML = html;
+  sel.value = cur;
+}
+// เดือนย้อนหลังสำหรับแท็บประวัติ — นับถอยจากเดือนที่เลือกในแท็บบิล
+function pmHistoryMonths(n){
+  const k = pmBillMonthKey();
+  const y = parseInt(k.slice(0,4),10), m = parseInt(k.slice(5,7),10)-1;
+  const base = (isNaN(y)||isNaN(m)) ? new Date() : new Date(y, m, 1);
+  const out = [];
+  for (let i = 0; i < n; i++){
+    const d = new Date(base.getFullYear(), base.getMonth()-i, 1);
+    out.push(MONS[d.getMonth()] + ' ' + (d.getFullYear()+543));
+  }
+  return out;
+}
 // ═══ AUTO-CONNECT v1.3: เชื่อมต่อ Google Sheets อัตโนมัติผ่านลิงก์ตั้งค่า (ตั้งครั้งเดียวต่อเครื่อง/เบราว์เซอร์) ═══
 // เปิดผ่านลิงก์พิเศษที่มี ?api=URL ต่อท้าย (ส่งให้พนักงานทางแชทภายใน ไม่เผยแพร่ในซอร์สโค้ดสาธารณะ)
 // ระบบจะบันทึกอัตโนมัติแล้วลบพารามิเตอร์ออกจาก URL ทันที ครั้งต่อไปไม่ต้องกดซ้ำ (อ่านจาก localStorage เหมือนเดิม)
@@ -1433,7 +1519,7 @@ async function persistVendorElec(v){
 // ══════════════════════════════════════
 //  INIT
 // ══════════════════════════════════════
-window.onload = () => { renderTable(); initUpdateTab(); loadVendorsFromSheets(); };
+window.onload = () => { pmBuildBillMonths(); renderTable(); initUpdateTab(); loadVendorsFromSheets(); };
 </script>
 </body>
 </html>
