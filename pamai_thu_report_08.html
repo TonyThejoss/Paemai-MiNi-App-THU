@@ -417,10 +417,14 @@ window.PM_FILTER = (function () {
   // เหตุผล: รายงาน 02/05/06 ไม่มีตัวแปร ZONE_ORDER/ZONE_TOTALS (ไม่มี MARKET_BLOCK:ZONES)
   // ตอนแรกจึงได้ dropdown ว่างเปล่า เลือกโซนไม่ได้เลย — ผิดข้อกำหนด "ทุกรายงานต้องเลือกโซนได้"
   // ตรวจพบจากการทดสอบบนเว็บไซต์จริงหลัง deploy (ไม่ใช่จากการอ่านโค้ด)
+  var knownZones = {};
   function learnZones(rows, field) {
     var sel = el('pmf-zone');
-    if (!sel || sel.options.length > 1 || !Array.isArray(rows) || !rows.length) return;
-    var f = field || 'zone', seen = {};
+    if (!sel || !Array.isArray(rows) || !rows.length) return;
+    // สะสมโซนจาก "ทุกชุดข้อมูล" ที่รายงานโหลดมา ไม่ใช่ชุดแรกชุดเดียว
+    // (เดิมพอเจอชุดแรกแล้วหยุด ทำให้รายงาน 02 ได้โซนเดียวจาก daily_bookings
+    //  แล้วไม่เรียนรู้โซนที่เหลือจาก payments — ตรวจพบจากการทดสอบบนเว็บจริง)
+    var f = field || 'zone', seen = knownZones;
     rows.forEach(function (r) {
       var v = r && r[f];
       if (!v) {   // ชีตที่ไม่มีคอลัมน์ zone (เช่น payments) → เดาจาก prefix ตัวอักษรของรหัสล็อค
@@ -432,7 +436,7 @@ window.PM_FILTER = (function () {
     var zs = Object.keys(seen).sort(function (a, b) {
       return a.localeCompare(b, undefined, { numeric: true });
     });
-    if (!zs.length) return;
+    if (!zs.length || zs.length === sel.options.length - 1) return;   // ไม่มีโซนใหม่ → ไม่ต้องสร้างใหม่
     var keep = sel.value;
     sel.innerHTML = '<option value="">ทุกโซน</option>' +
       zs.map(function (z) { return '<option value="' + z + '">โซน ' + z + '</option>'; }).join('');
