@@ -567,7 +567,13 @@ async function apiGet(action,params={}){
 // อัตราค่าไฟต่อวันพฤหัสบดี: หลอดไฟ 10฿/ดวง · พัดลม 20฿/ตัว · เครื่องเล็ก 50฿ · เครื่องใหญ่ 100฿ · อุปกรณ์พิเศษตามที่ตั้งราคาไว้
 // ค่าไฟรายเดือน (monthly) = ราคา/วันพฤหัสบดี × จำนวนวันพฤหัสบดีของเดือน (แก้ 2026-07-17 บั๊ก #27 — เดิมใช้ราคา 1 วันพฤหัสบดีเป็นรายเดือน)
 function countThursdaysInMonth(year,month){let c=0;const d=new Date(year,month,1);while(d.getMonth()===month){if(d.getDay()===4)c++;d.setDate(d.getDate()+1);}return c;}
-function thisMonthThursdays(){const n=new Date();return countThursdaysInMonth(n.getFullYear(),n.getMonth())||4;}
+// นับวันตลาดของเดือนที่ผู้ใช้เลือกในแถบตัวกรอง (เดิมยึดเดือนปัจจุบันเสมอ ทำให้ดูเดือนย้อนหลังแล้วยอดผิด)
+function thisMonthThursdays(){
+  var mk = (typeof PM_FILTER!=='undefined' && PM_FILTER.monthKey) ? PM_FILTER.monthKey() : '';
+  var m = /^(\d{4})-(\d{2})$/.exec(mk||'');
+  if (m) return countThursdaysInMonth(parseInt(m[1],10), parseInt(m[2],10)-1) || 4;
+  const n=new Date(); return countThursdaysInMonth(n.getFullYear(),n.getMonth())||4;
+}
 function calcElec(v){
   const bulb=parseInt(v.elec_bulb)||0, fan=parseInt(v.elec_fan)||0,
         small=parseInt(v.elec_small)||0, large=parseInt(v.elec_large)||0;
@@ -645,7 +651,7 @@ async function render(){
     <div class="kc"><div class="n">${active.length}</div><div class="l">ผู้ค้าที่ยังเช่าอยู่ทั้งหมด</div></div>
     <div class="kc"><div class="n" style="font-size:.95rem">${baht(totalRevenue)}</div><div class="l">ยอดที่ควรเก็บ/เดือน</div></div>
     <div class="kc"><div class="n" style="font-size:.95rem;color:var(--gm)">${baht(totalPaidElec)}</div><div class="l">รับชำระจริง (${PM_FILTER.isoToTH(elecMonth+'-01').slice(2)})</div></div>
-    <div class="kc"><div class="n" style="font-size:.95rem;color:${totalRevenue-totalPaidElec>0?'var(--r)':'var(--gm)'}">${baht(totalRevenue-totalPaidElec)}</div><div class="l">ยังเก็บไม่ครบ</div></div>
+    <div class="kc"><div class="n" style="font-size:.95rem;color:${totalRevenue-totalPaidElec>0?'var(--r)':'var(--gm)'}">${baht(Math.abs(totalRevenue-totalPaidElec))}</div><div class="l">${totalRevenue-totalPaidElec>=0?'ยังเก็บไม่ครบ':'รับชำระเกินยอดที่ควรเก็บ'}</div></div>
   </div>
   <div class="equip-summary">
     <span class="es-item"><span class="es-n">${equipTotals.bulb}</span> ${ICO_BULB} หลอดไฟ (฿10/ดวง)</span>
@@ -719,7 +725,7 @@ async function render(){
 // ต่อสายแถบตัวกรองกลาง (PM Report Filter Kit) — เพิ่ม 2026-07-26
 // ค่าเริ่มต้นตามข้อกำหนด: ทุกโซน + วันปัจจุบัน · เปลี่ยนตัวกรองแล้วกด "ดูข้อมูล" เพื่อ render ใหม่
 // ══════════════════════════════════════════════════════════════
-PM_FILTER.mount({ date: false, zone: true, onChange: render });  // PM_WIRED_MOUNT
+PM_FILTER.mount({ date: true, zone: true, onChange: render });  // PM_WIRED_MOUNT
 
 render();
 </script>
