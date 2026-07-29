@@ -536,6 +536,7 @@ window.onload=function(){
 };
 </script>
 
+
 <script id="pm-api-shim">
 /* apiGet/apiPost เวอร์ชันที่รองรับสามโหมด — เก็บของเดิมไว้เป็น __pmSheets* เพื่อใช้เทียบผล
    และเพื่อให้ย้อนกลับไปใช้ Google Sheets ได้ทันทีถ้าพบปัญหาหน้างาน (ทางถอย) */
@@ -604,6 +605,18 @@ window.onload=function(){
       return real;
     };
   }
+
+  /* ป้ายเดิมใน shell ถูกเขียนก่อน PM_API shim จะเริ่มทำงาน จึงค้างคำว่า Sheets
+     ทั้งที่คำขอจริงวิ่งเข้า Supabase แล้ว. ปรับหลังหน้าโหลดเพื่อให้ผู้ใช้เห็นแหล่งข้อมูลจริง. */
+  function refreshConnectionLabels() {
+    if (!window.PM_API || window.PM_API.mode() !== 'supabase') return;
+    var cloud = '<svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M17.5 19H9a5 5 0 1 1 1.6-9.7A6 6 0 0 1 22 11.5 4.5 4.5 0 0 1 17.5 19Z"/></svg>';
+    var badge = document.getElementById('db-status-badge');
+    var side = document.getElementById('db-status');
+    if (badge) { badge.innerHTML = cloud + ' Supabase'; badge.title = 'Supabase'; }
+    if (side) side.innerHTML = cloud + ' เชื่อมต่อ Supabase แล้ว';
+  }
+  setTimeout(refreshConnectionLabels, 1200);
 })();
 </script>
 </body>
