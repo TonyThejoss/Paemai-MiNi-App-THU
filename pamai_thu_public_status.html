@@ -84,11 +84,13 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(
 .cnt{display:inline-block;background:var(--gm);color:#fff;border-radius:10px;font-size:.66rem;
   font-weight:900;padding:1px 8px;margin-left:6px;vertical-align:middle;}
 .lockchips{display:flex;flex-wrap:wrap;gap:6px;}
+.section-note{font-size:.72rem;color:var(--txl);margin-top:8px;}
 .lockchip{display:inline-flex;align-items:center;gap:4px;font-size:.92rem;font-weight:900;
   border-radius:9px;padding:6px 10px;min-width:52px;justify-content:center;}
 .lockchip.c-none{background:#dde5ee;color:#293b52;border:2px dashed #7c8ea5;}
 .lockchip.c-leave{background:#e5ddfd;color:#3f1178;border:2px solid #6d28d9;}
 .lockchip.c-absent{background:#fcd9d9;color:#6f1616;border:2px solid #b91c1c;}
+.lockchip.c-unpaid{background:#fff0d8;color:#8a3b00;border:2px solid #d97706;}
 .row .via{font-size:.62rem;font-weight:800;border-radius:8px;padding:1px 7px;}
 .via-queue{background:#cfe2fe;color:#16307a;}
 .via-direct{background:#fdeec2;color:#6b3d06;}
@@ -338,6 +340,12 @@ input, select, textarea, button { font-family: inherit; max-width: 100%; }
   </div>
 
   <div class="section">
+    <div class="section-title"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true" style="color:#b45309"><circle cx="12" cy="12" r="9"/><path d="M12 7v5"/><path d="M12 16h.01"/></svg> 3. ล็อคที่ค้างชำระ <span class="cnt" id="cnt-unpaid">0</span></div>
+    <div class="lockchips" id="unpaid-lock-list"></div>
+    <div class="section-note">แสดงเฉพาะหมายเลขล็อค ไม่แสดงชื่อผู้ค้าหรือยอดค้างชำระ</div>
+  </div>
+
+  <div class="section">
     <div class="section-title"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><polyline points="14 2 14 8 20 8"/></svg> กฎระเบียบตลาด</div>
     <div class="rules-text" id="rules-text">—</div>
     <div class="rules-meta" id="rules-meta"></div>
@@ -479,6 +487,7 @@ async function loadStatus(){
     lock:q.assigned_lock, zone:'', vendor_name:q.vendor_name, product:q.product||'', via:'queue', time:''
   }));
   const soldLockSet = new Set(soldList.map(r=>r.lock));
+  const unpaidLocks = Array.isArray(data.unpaidLocks) ? data.unpaidLocks : [];
 
   // ── คิวรอ ──
   const wEl=document.getElementById('queue-waiting-list');
@@ -522,6 +531,12 @@ async function loadStatus(){
         '<span class="lockchip '+(v.type==='leave'?'c-leave':'c-absent')+'" title="'+(v.type==='leave'?'ผู้ค้าประจำแจ้งลา':'ผู้ค้าประจำขาดล็อค')+'">'+esc(v.id)+'</span>'
       ).join('')
     : '<div class="empty-note">ไม่มีล็อคว่างประเภทนี้ในขณะนี้</div>';
+
+  // ผู้ดูแลอนุมัติให้หน้าสาธารณะเปิดเผยได้เพียงเลขล็อคที่ค้างชำระเท่านั้น
+  document.getElementById('cnt-unpaid').textContent=unpaidLocks.length;
+  document.getElementById('unpaid-lock-list').innerHTML = unpaidLocks.length
+    ? unpaidLocks.slice().sort(sortLock).map(id=>'<span class="lockchip c-unpaid">'+esc(id)+'</span>').join('')
+    : '<div class="empty-note">ไม่มีล็อคค้างชำระในขณะนี้</div>';
 
   // ── กฎระเบียบ ──
   const rules=data.rules||{};
@@ -602,6 +617,10 @@ window.onload=function(){
   var _get = apiGet, _post = apiPost;
   window.__pmSheetsGet = _get;
   window.__pmSheetsPost = _post;
+  function notifySaved(action, result) {
+    if (!result || result.status !== 'ok' || window.parent === window) return;
+    try { window.parent.postMessage({ type: 'pm-data-changed', action: action }, '*'); } catch (e) {}
+  }
 
   window.apiGet = async function (action, params) {
     var m = window.PM_API ? window.PM_API.mode() : 'supabase';
@@ -628,9 +647,12 @@ window.onload=function(){
          ถ้าฝั่ง Supabase พลาด ให้ยึดผลจาก Sheets เป็นคำตอบ (ยังไม่ตัดของเก่าทิ้ง) */
       var shRes = null;
       try { shRes = await _post(action, data); } catch (e) {}
-      return (sbRes && sbRes.status === 'ok') ? sbRes : shRes;
+      var parallelRes = (sbRes && sbRes.status === 'ok') ? sbRes : shRes;
+      notifySaved(action, parallelRes);
+      return parallelRes;
     }
     if (sbErr) return { status: 'error', message: String(sbErr.message || sbErr) };
+    notifySaved(action, sbRes);
     return sbRes;
   };
 

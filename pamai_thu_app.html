@@ -873,7 +873,7 @@ function toggleDark(){
   else if(window.matchMedia('(prefers-color-scheme:dark)').matches) document.documentElement.setAttribute('data-theme','dark');
 })();
 
-const APP_BUILD='20260729-1731'; // cache-buster — build.py แทนค่าอัตโนมัติ
+const APP_BUILD='20260729-1817'; // cache-buster — build.py แทนค่าอัตโนมัติ
 const DAYS=['อาทิตย์','จันทร์','อังคาร','พุธ','พฤหัสบดี','ศุกร์','เสาร์'];
 const MONS=['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
 function tick(){
@@ -2041,6 +2041,10 @@ window.onload=function(){
   var _get = apiGet, _post = apiPost;
   window.__pmSheetsGet = _get;
   window.__pmSheetsPost = _post;
+  function notifySaved(action, result) {
+    if (!result || result.status !== 'ok' || window.parent === window) return;
+    try { window.parent.postMessage({ type: 'pm-data-changed', action: action }, '*'); } catch (e) {}
+  }
 
   window.apiGet = async function (action, params) {
     var m = window.PM_API ? window.PM_API.mode() : 'supabase';
@@ -2067,9 +2071,12 @@ window.onload=function(){
          ถ้าฝั่ง Supabase พลาด ให้ยึดผลจาก Sheets เป็นคำตอบ (ยังไม่ตัดของเก่าทิ้ง) */
       var shRes = null;
       try { shRes = await _post(action, data); } catch (e) {}
-      return (sbRes && sbRes.status === 'ok') ? sbRes : shRes;
+      var parallelRes = (sbRes && sbRes.status === 'ok') ? sbRes : shRes;
+      notifySaved(action, parallelRes);
+      return parallelRes;
     }
     if (sbErr) return { status: 'error', message: String(sbErr.message || sbErr) };
+    notifySaved(action, sbRes);
     return sbRes;
   };
 

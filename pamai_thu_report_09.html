@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>รายงานข้อมูลผู้ค้าปัจจุบัน — แพไม้มินิ</title>
+<style>
+:root{--g:#7c2d12;--gm:#c2410c;--gl:#ffedd5;--bg:#eef2f0;--sf:#fff;--bd:#d0ddd5;--tx:#0a1a10;--txl:#9c7c5b;--r:#b91c1c;}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--tx);font:14px system-ui,-apple-system,"Sarabun",sans-serif}.toolbar{position:sticky;top:0;z-index:2;background:linear-gradient(135deg,var(--g),var(--gm));color:#fff;padding:11px 18px;display:flex;justify-content:space-between;gap:10px;align-items:center;flex-wrap:wrap}.toolbar h1{font-size:1rem;margin:0}.toolbar p{margin:2px 0 0;font-size:.75rem;opacity:.82}.btn{border:1px solid rgba(255,255,255,.35);border-radius:8px;padding:8px 12px;color:#fff;background:rgba(255,255,255,.14);font:inherit;font-weight:700;cursor:pointer}.page{max-width:1240px;margin:18px auto;background:var(--sf);padding:24px;border-radius:12px;box-shadow:0 2px 14px #0001}.head{display:flex;justify-content:space-between;gap:12px;border-bottom:3px solid var(--gm);padding-bottom:12px}.brand{font-weight:900;color:var(--g);font-size:1.1rem}.meta{font-size:.75rem;color:var(--txl);text-align:right}.summary{display:grid;grid-template-columns:repeat(4,1fr);gap:9px;margin:16px 0}.stat{background:#f4f8f5;border:1px solid var(--bd);border-radius:8px;padding:10px;text-align:center}.stat b{display:block;color:var(--gm);font-size:1.2rem}.stat span{font-size:.72rem;color:var(--txl)}.tablewrap{overflow:auto}table{width:100%;border-collapse:collapse;min-width:900px}th{background:#e8f0eb;color:var(--g);font-size:.72rem;text-align:left;padding:8px;border-bottom:2px solid var(--gm)}td{padding:8px;border-bottom:1px solid var(--bd);vertical-align:top}tbody tr:nth-child(even){background:#f8faf9}.num{text-align:right;white-space:nowrap}.status{font-size:.72rem;font-weight:800;padding:3px 7px;border-radius:999px;background:var(--gl);color:var(--g)}.status.unpaid{background:#fff0d8;color:#8a3b00}.empty,.error{padding:30px;text-align:center;color:var(--txl)}.error{color:var(--r)}@media(max-width:700px){.page{margin:0;padding:15px;border-radius:0}.summary{grid-template-columns:repeat(2,1fr)}.head{display:block}.meta{text-align:left;margin-top:7px}}@media print{body{background:#fff}.toolbar{display:none}.page{box-shadow:none;margin:0;padding:0;max-width:none}.tablewrap{overflow:visible}@page{size:A4 landscape;margin:10mm}}
+</style>
+</head>
+<body>
+<header class="toolbar"><div><h1>รายงานข้อมูลผู้ค้าปัจจุบัน</h1><p>แพไม้มินิ · แสดงเฉพาะผู้ค้าที่ยังมีสัญญา</p></div><div><button class="btn" onclick="render()">↻ อัปเดต</button> <button class="btn" onclick="print()">พิมพ์ / PDF</button> <button class="btn" onclick="history.back()">← กลับ</button></div></header>
+<main class="page"><div class="head"><div><div class="brand">แพไม้มินิ — รายชื่อผู้ค้าปัจจุบัน</div><div style="font-size:.78rem;color:var(--txl);margin-top:3px">โซน · ล็อค · ชื่อ · เบอร์โทร · สินค้า · ค่าเช่า · ค่าไฟ · ยอดรวม</div></div><div class="meta" id="stamp">—</div></div><section class="summary" id="summary"></section><div class="tablewrap"><table><thead><tr><th>โซน</th><th>ล็อค</th><th>ชื่อผู้ค้า</th><th>เบอร์โทร</th><th>สินค้า</th><th class="num">ค่าเช่า/เดือน</th><th class="num">ค่าไฟ/เดือน</th><th class="num">รวม/เดือน</th><th>สถานะ</th></tr></thead><tbody id="rows"><tr><td colspan="9" class="empty">กำลังโหลดข้อมูล…</td></tr></tbody></table></div></main>
+<script>
+function getApiUrl(){return (localStorage.getItem('pm-thu-api-url')||localStorage.getItem('pm-api-url'))||'';}
+function getApiToken(){return (localStorage.getItem('pm-thu-api-token')||localStorage.getItem('pm-api-token'))||'';}
+async function apiGet(action,params={}){const u=getApiUrl();if(!u)return null;try{const r=await fetch(u+'?'+new URLSearchParams({action,token:getApiToken(),...params}));const j=await r.json();return j.status==='ok'?j.data:null}catch(e){return null}}
+const baht=n=>'฿'+Math.round(n||0).toLocaleString('th-TH');
+function daysInMonth(){const n=new Date(),d=new Date(n.getFullYear(),n.getMonth(),1);let c=0;while(d.getMonth()===n.getMonth()){if(d.getDay()===4)c++;d.setDate(d.getDate()+1)}return c}
+function elec(v){const sp=(Array.isArray(v.elec_special)?v.elec_special:[]).reduce((s,x)=>s+(Number(x.price)||0),0);return ((Number(v.elec_bulb)||0)*10+(Number(v.elec_fan)||0)*20+(Number(v.elec_small)||0)*50+(Number(v.elec_large)||0)*100+sp)*daysInMonth()}
+function esc(s){return String(s??'').replace(/[&<>"']/g,x=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[x]))}
+async function render(){const out=document.getElementById('rows');out.innerHTML='<tr><td colspan="9" class="empty">กำลังโหลดข้อมูล…</td></tr>';const all=await apiGet('getVendors');if(!Array.isArray(all)){out.innerHTML='<tr><td colspan="9" class="error">โหลดข้อมูลไม่สำเร็จ — กรุณาเข้าสู่ระบบและลองใหม่</td></tr>';return}const vs=all.filter(v=>v.status!=='terminated').sort((a,b)=>(a.zone||'').localeCompare(b.zone||'')||String(a.lock).localeCompare(String(b.lock),undefined,{numeric:true}));let rent=0,power=0;out.innerHTML=vs.length?vs.map(v=>{const r=(Number(v.dailyRate)||0)*daysInMonth(),e=elec(v);rent+=r;power+=e;const unpaid=v.status==='unpaid';return '<tr><td>'+esc(v.zone)+'</td><td><b>'+esc(v.lock)+'</b></td><td>'+esc(v.name||'—')+'</td><td>'+esc(v.phone||'—')+'</td><td>'+esc(v.product||'—')+'</td><td class="num">'+baht(r)+'</td><td class="num">'+baht(e)+'</td><td class="num"><b>'+baht(r+e)+'</b></td><td><span class="status '+(unpaid?'unpaid':'')+'">'+(unpaid?'ค้างชำระ':'ปกติ')+'</span></td></tr>'}).join(''):'<tr><td colspan="9" class="empty">ยังไม่มีผู้ค้าปัจจุบัน</td></tr>';document.getElementById('summary').innerHTML='<div class="stat"><b>'+vs.length+'</b><span>ผู้ค้าปัจจุบัน</span></div><div class="stat"><b>'+daysInMonth()+'</b><span>วันตลาดในเดือนนี้</span></div><div class="stat"><b>'+baht(rent)+'</b><span>ค่าเช่า/เดือน</span></div><div class="stat"><b>'+baht(rent+power)+'</b><span>รวมค่าเช่า+ค่าไฟ/เดือน</span></div>';document.getElementById('stamp').textContent='ข้อมูล ณ '+new Date().toLocaleString('th-TH')}
+render();
+</script>
+<!-- ==== PM_API_CLIENT:START (สร้างโดย tools/inject_api_client.py — ห้ามแก้ในไฟล์นี้) ==== -->
+<script id="pm-api-client">
+/* ═══════════════════════════════════════════════════════════════════════════
+   PM_API_CLIENT (v3.0) — ตัวเชื่อมต่อฐานข้อมูลชุดกลาง
+   แก้ที่ tools/inject_api_client.py เท่านั้น แล้วรันใหม่ · ห้ามแก้ในไฟล์นี้
+   ═══════════════════════════════════════════════════════════════════════════ */
+(function () {
+  var SB_URL = 'https://atvxajfwazrswdlhnosh.supabase.co';
+  var SB_KEY = 'sb_publishable_kGSsjrQvDa9EKaw7CDPeQg_UnkKtCLa';
+  var MODE_KEY = 'pm-thu-backend';
+
+  /* โหมดปัจจุบัน: sheets (เดิม) · parallel (อ่าน Supabase เขียนสองที่) · supabase (ใหม่ล้วน)
+     เปลี่ยนได้จาก console ด้วย PM_API.setMode('parallel') โดยไม่ต้อง deploy ใหม่ */
+  function mode() {
+    try { return localStorage.getItem(MODE_KEY) || 'supabase'; } catch (e) { return 'supabase'; }
+  }
+
+  function sbFetch(action, payload) {
+    /* ทุก action วิ่งผ่านฟังก์ชัน api() ตัวเดียวที่ฐานข้อมูล — ตารางทั้งหมดถูกปิดจาก
+       การเข้าถึงตรง ๆ ไว้แล้ว ต่อให้ key หลุดก็อ่าน/เขียนตารางเองไม่ได้ */
+    var body = Object.assign({}, payload || {});
+    /* token อยู่ใน sessionStorage เท่านั้น (ไม่ใช้ localStorage) และฐานข้อมูลเก็บแค่ hash
+       ของมัน — action สาธารณะ/verifyUser ไม่ต้องมี token ส่วน action อื่นจะถูกปฏิเสธที่ RPC */
+    try {
+      var sess = JSON.parse(sessionStorage.getItem('pmthu-session') || 'null');
+      if (sess && sess.apiToken) body.sessionToken = sess.apiToken;
+    } catch (e) {}
+    return fetch(SB_URL + '/rest/v1/rpc/api', {
+      method: 'POST',
+      headers: { apikey: SB_KEY, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: action, payload: body })
+    }).then(function (r) {
+      if (!r.ok) return r.text().then(function (t) { throw new Error('HTTP ' + r.status + ' ' + t.slice(0, 160)); });
+      return r.json();
+    });
+  }
+
+  window.PM_API = {
+    mode: mode,
+    setMode: function (m) {
+      if (['sheets', 'parallel', 'supabase'].indexOf(m) < 0) { console.error('โหมดไม่ถูกต้อง:', m); return; }
+      try { localStorage.setItem(MODE_KEY, m); } catch (e) {}
+      console.log('PM_API: สลับเป็นโหมด', m, '— รีเฟรชหน้าเพื่อให้มีผลทุกส่วน');
+    },
+    supabase: sbFetch,
+    url: SB_URL,
+    /* เทียบผลลัพธ์ Sheets กับ Supabase ของ action เดียวกัน — ใช้ตอนทดสอบคู่ขนาน */
+    compare: async function (action, params) {
+      var a = null, b = null;
+      try { a = await window.__pmSheetsGet(action, params || {}); } catch (e) { a = 'ERROR ' + e.message; }
+      try { b = (await sbFetch(action, params || {})).data; } catch (e) { b = 'ERROR ' + e.message; }
+      var la = Array.isArray(a) ? a.length : typeof a;
+      var lb = Array.isArray(b) ? b.length : typeof b;
+      console.log('[' + action + '] Sheets:', la, ' Supabase:', lb, la === lb ? '✅ ตรงกัน' : '⚠️ ต่างกัน');
+      return { sheets: a, supabase: b };
+    }
+  };
+})();
+</script>
+<!-- ==== PM_API_CLIENT:END ==== -->
+<script id="pm-api-shim">
+/* apiGet/apiPost เวอร์ชันที่รองรับสามโหมด — เก็บของเดิมไว้เป็น __pmSheets* เพื่อใช้เทียบผล
+   และเพื่อให้ย้อนกลับไปใช้ Google Sheets ได้ทันทีถ้าพบปัญหาหน้างาน (ทางถอย) */
+(function () {
+  if (typeof apiGet !== 'function' || typeof apiPost !== 'function') return;
+  var _get = apiGet, _post = apiPost;
+  window.__pmSheetsGet = _get;
+  window.__pmSheetsPost = _post;
+  function notifySaved(action, result) {
+    if (!result || result.status !== 'ok' || window.parent === window) return;
+    try { window.parent.postMessage({ type: 'pm-data-changed', action: action }, '*'); } catch (e) {}
+  }
+
+  window.apiGet = async function (action, params) {
+    var m = window.PM_API ? window.PM_API.mode() : 'supabase';
+    if (m === 'sheets') return _get(action, params);
+    try {
+      var r = await window.PM_API.supabase(action, params || {});
+      return (r && r.status === 'ok') ? r.data : null;
+    } catch (e) {
+      console.error('Supabase apiGet ล้มเหลว:', action, e);
+      /* โหมด parallel ยังมี Sheets เป็นตาข่ายรองรับ · โหมด supabase ล้วนต้องคืน null
+         ให้ชั้นบน (PM_VENDOR_SYNC) แสดงแถบเตือนตามปกติ ไม่แอบกลับไปอ่านของเก่าเงียบ ๆ */
+      return (m === 'parallel') ? _get(action, params) : null;
+    }
+  };
+
+  window.apiPost = async function (action, data) {
+    var m = window.PM_API ? window.PM_API.mode() : 'supabase';
+    if (m === 'sheets') return _post(action, data);
+    var sbRes = null, sbErr = null;
+    try { sbRes = await window.PM_API.supabase(action, data || {}); }
+    catch (e) { sbErr = e; console.error('Supabase apiPost ล้มเหลว:', action, e); }
+    if (m === 'parallel') {
+      /* เขียนลง Sheets ด้วยเพื่อให้ข้อมูลสองที่ตรงกันระหว่างช่วงทดสอบ
+         ถ้าฝั่ง Supabase พลาด ให้ยึดผลจาก Sheets เป็นคำตอบ (ยังไม่ตัดของเก่าทิ้ง) */
+      var shRes = null;
+      try { shRes = await _post(action, data); } catch (e) {}
+      var parallelRes = (sbRes && sbRes.status === 'ok') ? sbRes : shRes;
+      notifySaved(action, parallelRes);
+      return parallelRes;
+    }
+    if (sbErr) return { status: 'error', message: String(sbErr.message || sbErr) };
+    notifySaved(action, sbRes);
+    return sbRes;
+  };
+
+  /* ── ด่านที่ลืมไม่ได้: getApiUrl() ──
+     ทั้งระบบใช้ `if(!getApiUrl())` เป็นตัวตัดสินว่า "เชื่อมต่อฐานข้อมูลแล้วหรือยัง"
+     รวม 89 จุดใน 20 ไฟล์ (นับเมื่อ 28 ก.ค. 2026) — ไม่ใช่แค่ใช้เป็น URL เท่านั้น
+     พอย้ายมา Supabase ค่าที่คืนคือ URL ของ Apps Script ซึ่งเครื่องใหม่ไม่มี ทุกด่านจึงตัด
+     ฟีเจอร์ทิ้งเงียบ ๆ (ผังขึ้นว่างทั้งตลาด · ปุ่มบันทึกเตือนว่ายังไม่เชื่อมต่อ)
+     จึงต้องครอบที่ฟังก์ชันนี้ด้วย ไม่ใช่แค่ apiGet/apiPost
+
+     ⚠️ โหมด parallel ห้ามแทนค่า — เพราะ __pmSheetsPost ยังต้องยิงไป URL จริงของ Apps Script
+        ถ้าคืน URL ของ Supabase ไปแทน ข้อมูลจะถูกส่งผิดที่ */
+  if (typeof getApiUrl === 'function') {
+    var _url = getApiUrl;
+    window.__pmSheetsUrl = _url;
+    window.getApiUrl = function () {
+      var m = window.PM_API ? window.PM_API.mode() : 'supabase';
+      var real = '';
+      try { real = _url() || ''; } catch (e) {}
+      if (m === 'supabase') return real || (window.PM_API ? window.PM_API.url : '');
+      if (m === 'parallel' && !real) console.warn('PM_API: โหมด parallel ต้องตั้งค่า URL ของ Apps Script ด้วย');
+      return real;
+    };
+  }
+})();
+</script>
+</body>
+</html>

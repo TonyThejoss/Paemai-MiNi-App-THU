@@ -735,24 +735,18 @@ async function loadFromSheets(){
       apiGet('getLeaveLog',{date:day}),
       apiGet('getDailyBookings',{date:day}),
     ]);
-    if(Array.isArray(leaveRows)){
-      // เรียงตามเวลาที่บันทึกจริง แล้วไล่ทับ — แถวหลังสุดของแต่ละล็อคชนะ
+    // Reconcile จากฐานข้อมูลทั้งชุด: การยกเลิกล็อคหนึ่งจึงไม่แตะสถานะของล็อคอื่น
+    const nextLeave={}, nextDaily={};
+    if(Array.isArray(leaveRows) && isMarketStatusActive()){
       const sorted=[...leaveRows].sort((a,b)=>String(a.created_at||a.time).localeCompare(String(b.created_at||b.time)));
-      const seen={};
       sorted.forEach(r=>{
-        if(!r.lock_id) return;
-        if(r.type==='leave'||r.type==='absent'){ seen[r.lock_id]=r.type; }
-        else if(r.type==='cancel'||r.type==='leave_cancel'||r.type==='absent_cancel'){ seen[r.lock_id]=''; }
+        if(r.lock_id && (r.type==='leave'||r.type==='absent')) nextLeave[r.lock_id]=r.type;
       });
-      // ล้างสถานะของล็อคที่ Sheets บอกว่าไม่มีสถานะแล้ว (กันสถานะค้างในเครื่องที่เคยบันทึกไว้)
-      Object.keys(seen).forEach(id=>{ if(seen[id]) lockAbsent[id]=seen[id]; else delete lockAbsent[id]; });
     }
     if(Array.isArray(dailyRows)){
       dailyRows.forEach(row=>{
         const id=row.lock_id; if(!id) return;
-        const cancelled=row.cancelled===true||row.cancelled==='TRUE'||row.cancelled==='true';
-        if(cancelled){ delete dailyBookings[id]; return; }
-        dailyBookings[id]={
+        nextDaily[id]={
           lockId:id, name:row.vendor_name, product:row.product,
           phone:row.phone||'—', price:parseFloat(row.price)||0,
           elec:parseFloat(row.elec)||0, total:parseFloat(row.total)||0,
@@ -760,6 +754,10 @@ async function loadFromSheets(){
         };
       });
     }
+    Object.keys(lockAbsent).forEach(id=>delete lockAbsent[id]);
+    Object.keys(dailyBookings).forEach(id=>delete dailyBookings[id]);
+    Object.assign(lockAbsent,nextLeave);
+    Object.assign(dailyBookings,nextDaily);
     document.querySelectorAll('.lk').forEach(el=>refreshLk(el));
     updateStats();
     saveMarketState();
@@ -771,6 +769,9 @@ window.addEventListener('message',function(e){
 });
 
 function addDays(date,n){const d=new Date(date);d.setDate(d.getDate()+n);return d;}
+// สถานะลา/ขาดแสดงถึงก่อน 00:00 ของวันอาทิตย์ (สามวันหลังวันพฤหัสบดี)
+// ประวัติในฐานข้อมูลไม่ถูกลบ เพื่อให้รายงานย้อนหลังยังครบ
+function isMarketStatusActive(){ return new Date() < addDays(getLastThursday(),STATE_EXPIRE_DAYS); }
 
 function saveMarketState(){
   try{
@@ -827,7 +828,7 @@ function updateExpireBanner(){
     const expiry=addDays(new Date(data.tuesdayISO),STATE_EXPIRE_DAYS);
     const dl=Math.max(0,Math.ceil((expiry-new Date())/(1000*60*60*24)));
     if(dl>0) showStateBanner(new Date(data.tuesdayISO),dl);
-    else{hideBanner();clearMarketState();}
+    else{hideBanner();loadFromSheets();}
   }catch(e){}
 }
 
@@ -939,11 +940,11 @@ async function doAbsent(lockId){
 // TOGGLE cancel leave/absent
 async function cancelAbsent(lockId){
   const prevType=lockAbsent[lockId]||'';
-  lockAbsent[lockId]='';
-  addHist(lockId,{type:'leave',label:'↩️ ยกเลิก'+(prevType==='leave'?'การแจ้งลา':'บันทึกขาดล็อค'),note:'คืนสถานะปกติโดยผู้ดูแล'});
   const el=document.querySelector('.lk[data-id="'+lockId+'"]');
-  if(el) refreshLk(el);
-  await apiPost('logLeave',{data:{lock_id:lockId,zone:el?.dataset.zone||'',shop:el?.dataset.shop||'',type:prevType==='leave'?'leave_cancel':'absent_cancel',note:'คืนสถานะปกติโดยผู้ดูแล',manager:getCurrentUserName(),date:marketDayTH(),time:nowTime()}});
+  const res=await apiPost('logLeave',{data:{lock_id:lockId,zone:el?.dataset.zone||'',shop:el?.dataset.shop||'',type:prevType==='leave'?'leave_cancel':'absent_cancel',note:'คืนสถานะปกติโดยผู้ดูแล',manager:getCurrentUserName(),date:marketDayTH(),time:nowTime()}});
+  if(!res||res.status!=='ok'){ toast('ยกเลิกสถานะไม่สำเร็จ — กรุณาลองใหม่','e'); return; }
+  addHist(lockId,{type:'leave',label:'↩️ ยกเลิก'+(prevType==='leave'?'การแจ้งลา':'บันทึกขาดล็อค'),note:'คืนสถานะปกติโดยผู้ดูแล'});
+  await loadFromSheets();
   saveMarketState(); updateExpireBanner();
   closePopup();
   toast('↩️ ยกเลิก'+(prevType==='leave'?'การแจ้งลา':'ขาดล็อค')+' '+lockId+' — คืนสถานะปกติแล้ว','i');
@@ -963,13 +964,15 @@ function goToFloatingQueue(lockId){
     window.location.href='pamai_thu_floating_queue.html';
   }
 }
-function cancelDaily(lockId){
+async function cancelDaily(lockId){
   if(!confirm('ยกเลิกผู้ค้าจรล็อค '+lockId+'?'))return;
   const bk=dailyBookings[lockId];
+  const res=await apiPost('cancelDailyBooking',{lockId,date:bk?bk.date:marketDayTH()});
+  if(!res||res.status!=='ok'){ toast('ยกเลิกผู้ค้าจรไม่สำเร็จ — กรุณาลองใหม่','e'); return; }
   delete dailyBookings[lockId];
   const el=document.querySelector('.lk[data-id="'+lockId+'"]');
   if(el) refreshLk(el);
-  if(bk) apiPost('cancelDailyBooking',{lockId,date:bk.date});
+  await loadFromSheets();
   saveMarketState(); updateExpireBanner();
   closePopup(); toast('↩️ ยกเลิกผู้ค้าจร '+lockId,'i'); updateStats();
 }
@@ -1141,7 +1144,7 @@ async function confirmCancelLease(){
     // ซึ่งไม่ตรงกับ field ที่ backend (saveVendor) คาดหวัง (body.data) ทำให้ยกเลิกเช่าไม่ persist จริง
     // และ 'cancelled' ก็ไม่ตรงกับค่าที่หน้าอื่นของระบบ (แดชบอร์ดหลัก/ลงทะเบียนผู้ค้า/แบ็กเอนด์) ใช้
     // ใช้เป็นมาตรฐานเดียวกันคือ 'terminated' — แก้ให้ตรงกันทั้งระบบ พร้อม await + ตรวจผลลัพธ์จริง
-    const saveRes=await apiPost('saveVendor',{data:{lock:lockId,status:'terminated'}});
+    const saveRes=await apiPost('deleteVendor',{lockId});
     if(!saveRes||saveRes.status!=='ok'){
       toast('❌ บันทึกยกเลิกการเช่าไม่สำเร็จ — ตรวจสอบการเชื่อมต่อแล้วลองใหม่','e');
       if(btn){btn.disabled=false;btn.innerHTML=btn.dataset.origHtml;}
@@ -1154,6 +1157,8 @@ async function confirmCancelLease(){
     ['occupied','unpaid','cancelled'].forEach(c=>el.classList.remove(c));
     el.classList.add('vacant');
     lockAbsent[lockId]='';
+    // ดึงแหล่งความจริงใหม่ทันที ป้องกันข้อมูลผู้ค้าเก่าค้างบนผัง
+    await loadVendorOccupancy();
   }
   refreshLk(el); saveMarketState();
   if(btn){btn.disabled=false;btn.innerHTML=btn.dataset.origHtml;}
@@ -1450,6 +1455,16 @@ async function loadVendorOccupancy(){
 }
 function pmApplyVendorRows(vendors){
   const monthlyThursdays = thisMonthThursdays();
+  // รีเซ็ตผังจากแหล่งความจริงก่อนเสมอ: ถ้าแถวผู้ค้าถูก terminate แล้วจะไม่ถูกปล่อยให้
+  // ชื่อ/สีเดิมค้างอยู่เพียงเพราะ loop ด้านล่างข้ามแถวนั้น
+  Object.keys(VENDORS).forEach(id=>delete VENDORS[id]);
+  document.querySelectorAll('.lk[data-id]').forEach(el=>{
+    if(el.dataset.status==='excluded') return;
+    el.dataset.shop='ล็อคว่าง'; el.dataset.rent='0'; el.dataset.status='vacant';
+    ['occupied','unpaid','cancelled'].forEach(c=>el.classList.remove(c));
+    el.classList.add('vacant');
+    const shopEl=el.querySelector('.lk-shop'); if(shopEl) shopEl.textContent='—';
+  });
   vendors.forEach(v=>{
     // แก้บั๊ก 2569-07-23: เดิมเช็ค status==='cancelled' ซึ่งไม่ตรงกับค่ามาตรฐานของระบบ ('terminated'
     // ที่หน้าแดชบอร์ดหลัก/ลงทะเบียนผู้ค้า/แบ็กเอนด์ใช้) ทำให้ล็อคที่ยกเลิกเช่าแล้ว
@@ -1903,6 +1918,10 @@ window.onload=function(){buildAll();setTimeout(checkThursdayCycle,400);};
   var _get = apiGet, _post = apiPost;
   window.__pmSheetsGet = _get;
   window.__pmSheetsPost = _post;
+  function notifySaved(action, result) {
+    if (!result || result.status !== 'ok' || window.parent === window) return;
+    try { window.parent.postMessage({ type: 'pm-data-changed', action: action }, '*'); } catch (e) {}
+  }
 
   window.apiGet = async function (action, params) {
     var m = window.PM_API ? window.PM_API.mode() : 'supabase';
@@ -1929,9 +1948,12 @@ window.onload=function(){buildAll();setTimeout(checkThursdayCycle,400);};
          ถ้าฝั่ง Supabase พลาด ให้ยึดผลจาก Sheets เป็นคำตอบ (ยังไม่ตัดของเก่าทิ้ง) */
       var shRes = null;
       try { shRes = await _post(action, data); } catch (e) {}
-      return (sbRes && sbRes.status === 'ok') ? sbRes : shRes;
+      var parallelRes = (sbRes && sbRes.status === 'ok') ? sbRes : shRes;
+      notifySaved(action, parallelRes);
+      return parallelRes;
     }
     if (sbErr) return { status: 'error', message: String(sbErr.message || sbErr) };
+    notifySaved(action, sbRes);
     return sbRes;
   };
 
