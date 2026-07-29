@@ -728,7 +728,7 @@ function toggleDark(){const h=document.documentElement,d=h.getAttribute('data-th
   /* โหมดปัจจุบัน: sheets (เดิม) · parallel (อ่าน Supabase เขียนสองที่) · supabase (ใหม่ล้วน)
      เปลี่ยนได้จาก console ด้วย PM_API.setMode('parallel') โดยไม่ต้อง deploy ใหม่ */
   function mode() {
-    try { return localStorage.getItem(MODE_KEY) || 'sheets'; } catch (e) { return 'sheets'; }
+    try { return localStorage.getItem(MODE_KEY) || 'supabase'; } catch (e) { return 'supabase'; }
   }
 
   function sbFetch(action, payload) {
@@ -784,7 +784,7 @@ function toggleDark(){const h=document.documentElement,d=h.getAttribute('data-th
   window.__pmSheetsPost = _post;
 
   window.apiGet = async function (action, params) {
-    var m = window.PM_API ? window.PM_API.mode() : 'sheets';
+    var m = window.PM_API ? window.PM_API.mode() : 'supabase';
     if (m === 'sheets') return _get(action, params);
     try {
       var r = await window.PM_API.supabase(action, params || {});
@@ -798,7 +798,7 @@ function toggleDark(){const h=document.documentElement,d=h.getAttribute('data-th
   };
 
   window.apiPost = async function (action, data) {
-    var m = window.PM_API ? window.PM_API.mode() : 'sheets';
+    var m = window.PM_API ? window.PM_API.mode() : 'supabase';
     if (m === 'sheets') return _post(action, data);
     var sbRes = null, sbErr = null;
     try { sbRes = await window.PM_API.supabase(action, data || {}); }
@@ -827,7 +827,7 @@ function toggleDark(){const h=document.documentElement,d=h.getAttribute('data-th
     var _url = getApiUrl;
     window.__pmSheetsUrl = _url;
     window.getApiUrl = function () {
-      var m = window.PM_API ? window.PM_API.mode() : 'sheets';
+      var m = window.PM_API ? window.PM_API.mode() : 'supabase';
       var real = '';
       try { real = _url() || ''; } catch (e) {}
       if (m === 'supabase') return real || (window.PM_API ? window.PM_API.url : '');
