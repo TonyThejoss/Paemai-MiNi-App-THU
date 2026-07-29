@@ -154,6 +154,7 @@ apply `0009_public_status_and_market_state.sql` สำเร็จแล้ว�
 - แก้บั๊กผังใน iframe ที่อ่าน session token ไม่ได้หรือเผลอลบ token ของหน้าแม่ระหว่าง migration: ตัวเชื่อมต่อใช้ token ของหน้าแม่เป็น fallback และไม่ล้าง session จาก iframe อีก จึงทำให้ยอด 115 รายบนหน้าหลักกับข้อมูลในผังใช้ session เดียวกันจริง
 - เพิ่มการส่ง session แบบ `postMessage` จำกัด origin จากหน้าหลักไป iframe ผัง: จำเป็นสำหรับ WebView/Safari ที่แยก `sessionStorage` ของ iframe แม้โดเมนเดียวกัน; token ไม่ถูกใส่ใน URL และไม่ส่งออกนอก `github.io` ของตลาด
 - เมื่อ iframe รับ session แล้ว จะสั่งโหลดผู้ค้าซ้ำทันทีเพื่อไม่ให้ retry ที่เริ่มก่อน token มาถึงจบด้วย 401
+- **ตรวจเว็บจริง 29 ก.ค. 2569:** ปิดบั๊ก iframe-session ด้วยการให้ iframe ขอ session จากหน้าแม่เองและใช้ session bridge เป็น fallback; THU แสดงผู้ค้าจริง 115 รายในผัง และ TUE โหลดผัง 216 ล็อคว่างโดยไม่มี error ตามฐานข้อมูลว่าง.
 
 ## ขั้นต่อไป (ยังไม่ได้ทำ)
 
