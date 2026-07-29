@@ -153,6 +153,7 @@ apply `0009_public_status_and_market_state.sql` สำเร็จแล้ว�
 - migration `0010_fix_api_session_ambiguity.sql` ถูก apply ทั้งสองโปรเจกต์: แก้ตัวแปร `expires_at`/`token_hash` ชื่อชนกับคอลัมน์ ซึ่งเดิมทำให้ทุกคำสั่งหลังล็อกอินตอบ HTTP 400
 - แก้บั๊กผังใน iframe ที่อ่าน session token ไม่ได้หรือเผลอลบ token ของหน้าแม่ระหว่าง migration: ตัวเชื่อมต่อใช้ token ของหน้าแม่เป็น fallback และไม่ล้าง session จาก iframe อีก จึงทำให้ยอด 115 รายบนหน้าหลักกับข้อมูลในผังใช้ session เดียวกันจริง
 - เพิ่มการส่ง session แบบ `postMessage` จำกัด origin จากหน้าหลักไป iframe ผัง: จำเป็นสำหรับ WebView/Safari ที่แยก `sessionStorage` ของ iframe แม้โดเมนเดียวกัน; token ไม่ถูกใส่ใน URL และไม่ส่งออกนอก `github.io` ของตลาด
+- เมื่อ iframe รับ session แล้ว จะสั่งโหลดผู้ค้าซ้ำทันทีเพื่อไม่ให้ retry ที่เริ่มก่อน token มาถึงจบด้วย 401
 
 ## ขั้นต่อไป (ยังไม่ได้ทำ)
 
