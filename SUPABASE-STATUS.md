@@ -197,6 +197,17 @@ node tools/test_sheets_guard.js
 - `0008` `api_sessions_and_authorization` — session token อายุ 12 ชั่วโมง + บังคับสิทธิ์ใน API
 - `0009` `public_status_and_market_state` — คืนลา/ขาดและหมายเลขล็อคค้างชำระเฉพาะที่อนุมัติให้หน้าสาธารณะ
 - `0010` `fix_api_session_ambiguity` — แก้ชื่อตัวแปร session ที่ชนคอลัมน์ จนคำสั่งหลังล็อกอินตอบ HTTP 400
+- `0011` `persist_unpaid_and_block_termination` — คงค้างชำระจนปิดยอด และห้ามยกเลิกการเช่าขณะยังมียอดค้าง
+
+## กติกาค้างชำระถาวร ✅ (29 ก.ค. 2026)
+
+apply `0011_persist_unpaid_and_block_termination.sql` สำเร็จแล้วทั้ง TUE
+(`jrsuxrzyxiqqvzjftpms`) และ THU (`atvxajfwazrswdlhnosh`) โดยไม่แก้ข้อมูลผู้ค้าจริง
+
+- รอบรีเซ็ต 3 วันล้างเฉพาะลา/ขาด/ล็อคจร ไม่แก้ `vendors.status='unpaid'`
+- trigger `vendors_guard_unpaid_state` ปฏิเสธการเปลี่ยนเป็น `terminated` หากสถานะเดิมยังค้างชำระหรือยอดค้างมากกว่าศูนย์
+- การเปลี่ยน `unpaid` กลับ `active` ทำได้เมื่อ `unpaid_penalty` และ `unpaid_other` เป็นศูนย์แล้ว
+- หน้าเว็บทั้งสองตลาดใช้กติกาเดียวกันและเผยแพร่แล้ว: TUE `66398ac`, THU `8b64058`
 
 > ⚠️ `0001` และ `0003` เคยเป็นไฟล์เปล่า (มีแต่คอมเมนต์) เพราะตอนย้ายส่ง SQL เข้าไปตรง ๆ
 > ผ่านเครื่องมือ แล้วลืมเขียนกลับลงไฟล์ — ดึงจาก `supabase_migrations.schema_migrations`
