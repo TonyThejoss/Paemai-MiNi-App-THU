@@ -427,6 +427,10 @@ input, select, textarea, button { font-family: inherit; max-width: 100%; }
       if (event.origin !== window.location.origin) return;
       if (event.data && event.data.type === 'pmthu-session' && typeof event.data.session === 'string') {
         embeddedSession = event.data.session;
+        /* ผังเริ่มโหลดข้อมูลตั้งแต่ window.onload ซึ่งอาจเร็วกว่าข้อความจากหน้าแม่
+           จึงต้องสั่งดึงใหม่ทันทีหลังรับ token ไม่รอ retry รอบเดิมหมดก่อน. */
+        if (typeof window.loadVendorOccupancy === 'function') window.loadVendorOccupancy();
+        else if (typeof window.syncRealVendors === 'function') window.syncRealVendors();
       }
     } catch (e) {}
   });
@@ -1332,6 +1336,7 @@ function showMapDetailFor(lockId){
 // ─── Toast ────────────────────────────────────────────────────────────────────
 function showToast(msg,type='info'){const t=document.getElementById('toast');t.innerHTML=msg;t.className=`toast ${type} show`;clearTimeout(t._t);t._t=setTimeout(()=>t.classList.remove('show'),3500);}
 </script>
+
 
 
 

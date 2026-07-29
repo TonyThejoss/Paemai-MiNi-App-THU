@@ -559,6 +559,10 @@ input, select, textarea, button { font-family: inherit; max-width: 100%; }
       if (event.origin !== window.location.origin) return;
       if (event.data && event.data.type === 'pmthu-session' && typeof event.data.session === 'string') {
         embeddedSession = event.data.session;
+        /* ผังเริ่มโหลดข้อมูลตั้งแต่ window.onload ซึ่งอาจเร็วกว่าข้อความจากหน้าแม่
+           จึงต้องสั่งดึงใหม่ทันทีหลังรับ token ไม่รอ retry รอบเดิมหมดก่อน. */
+        if (typeof window.loadVendorOccupancy === 'function') window.loadVendorOccupancy();
+        else if (typeof window.syncRealVendors === 'function') window.syncRealVendors();
       }
     } catch (e) {}
   });
@@ -1621,6 +1625,7 @@ async function persistVendorElec(v){
 // ══════════════════════════════════════
 window.onload = () => { pmBuildBillMonths(); renderTable(); initUpdateTab(); loadVendorsFromSheets(); };
 </script>
+
 
 
 

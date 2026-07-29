@@ -504,6 +504,10 @@ input, select, textarea, button { font-family: inherit; max-width: 100%; }
       if (event.origin !== window.location.origin) return;
       if (event.data && event.data.type === 'pm-session' && typeof event.data.session === 'string') {
         embeddedSession = event.data.session;
+        /* ผังเริ่มโหลดข้อมูลตั้งแต่ window.onload ซึ่งอาจเร็วกว่าข้อความจากหน้าแม่
+           จึงต้องสั่งดึงใหม่ทันทีหลังรับ token ไม่รอ retry รอบเดิมหมดก่อน. */
+        if (typeof window.loadVendorOccupancy === 'function') window.loadVendorOccupancy();
+        else if (typeof window.syncRealVendors === 'function') window.syncRealVendors();
       }
     } catch (e) {}
   });
@@ -1953,6 +1957,7 @@ function toast(msg,type){
 window.onload=function(){buildAll();setTimeout(checkThursdayCycle,400);};
 
 </script>
+
 
 
 

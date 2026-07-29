@@ -575,6 +575,10 @@ window.PM_FILTER = (function () {
       if (event.origin !== window.location.origin) return;
       if (event.data && event.data.type === 'pmthu-session' && typeof event.data.session === 'string') {
         embeddedSession = event.data.session;
+        /* ผังเริ่มโหลดข้อมูลตั้งแต่ window.onload ซึ่งอาจเร็วกว่าข้อความจากหน้าแม่
+           จึงต้องสั่งดึงใหม่ทันทีหลังรับ token ไม่รอ retry รอบเดิมหมดก่อน. */
+        if (typeof window.loadVendorOccupancy === 'function') window.loadVendorOccupancy();
+        else if (typeof window.syncRealVendors === 'function') window.syncRealVendors();
       }
     } catch (e) {}
   });
@@ -829,6 +833,7 @@ function toggleDark(){const h=document.documentElement,d=h.getAttribute('data-th
 (()=>{const s=localStorage.getItem('pmthu-t');if(s)document.documentElement.setAttribute('data-theme',s);else if(window.matchMedia('(prefers-color-scheme:dark)').matches)document.documentElement.setAttribute('data-theme','dark');})();
 </script>
 <!-- ==== PM_THEME_JS:END ==== -->
+
 
 
 
