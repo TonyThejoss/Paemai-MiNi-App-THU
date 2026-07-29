@@ -362,6 +362,9 @@ input, select, textarea, button { font-family: inherit; max-width: 100%; }
       if ((!sess || !sess.apiToken) && embeddedSession) {
         sess = JSON.parse(embeddedSession);
       }
+      if ((!sess || !sess.apiToken) && window.parent && window.parent !== window && window.parent.__pmSessionBridge) {
+        sess = JSON.parse(window.parent.__pmSessionBridge);
+      }
       if ((!sess || !sess.apiToken) && window.parent && window.parent !== window) {
         sess = JSON.parse(window.parent.sessionStorage.getItem('pmthu-session') || 'null');
       }
@@ -767,6 +770,7 @@ window.onload=()=>{
   loadAll();
 };
 </script>
+
 
 
 

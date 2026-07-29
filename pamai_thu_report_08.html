@@ -609,6 +609,9 @@ window.PM_FILTER = (function () {
       if ((!sess || !sess.apiToken) && embeddedSession) {
         sess = JSON.parse(embeddedSession);
       }
+      if ((!sess || !sess.apiToken) && window.parent && window.parent !== window && window.parent.__pmSessionBridge) {
+        sess = JSON.parse(window.parent.__pmSessionBridge);
+      }
       if ((!sess || !sess.apiToken) && window.parent && window.parent !== window) {
         sess = JSON.parse(window.parent.sessionStorage.getItem('pmthu-session') || 'null');
       }
@@ -901,6 +904,7 @@ async function render(){
 PM_FILTER.mount({ date: true, zone: true, onChange: render });  // PM_WIRED_MOUNT
 render();
 </script>
+
 
 
 
