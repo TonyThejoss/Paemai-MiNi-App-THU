@@ -430,7 +430,9 @@ input, select, textarea, button { font-family: inherit; max-width: 100%; }
         /* ผังเริ่มโหลดข้อมูลตั้งแต่ window.onload ซึ่งอาจเร็วกว่าข้อความจากหน้าแม่
            จึงต้องสั่งดึงใหม่ทันทีหลังรับ token ไม่รอ retry รอบเดิมหมดก่อน. */
         if (typeof window.loadVendorOccupancy === 'function') window.loadVendorOccupancy();
-        else if (typeof window.syncRealVendors === 'function') window.syncRealVendors();
+        if (typeof window.syncRealVendors === 'function') window.syncRealVendors();
+        if (typeof window.loadFromSheets === 'function') window.loadFromSheets();
+        if (typeof window.loadAll === 'function') window.loadAll();
       }
     } catch (e) {}
   });
@@ -1272,6 +1274,10 @@ async function doPayInstallment(){
     amount:amt, method, note, date:now.toISOString().split('T')[0], time:now.toTimeString().slice(0,5)
   });
   if(!res||res.status!=='ok'){showToast('บันทึกการชำระไม่สำเร็จ ลองใหม่อีกครั้ง','error');return;}
+  const remainingBefore=Math.max(0,v.total_debt-v.collected);
+  if(amt>=remainingBefore){
+    await apiPost('saveVendor',{data:{lock:payTarget.lock,status:'active',unpaid_penalty:0,unpaid_other:0,unpaid_other_label:''}});
+  }
   closeModal();
   await loadData();
   renderOv();renderTracking();buildMap();updateKPI();
@@ -1345,6 +1351,9 @@ function showMapDetailFor(lockId){
 // ─── Toast ────────────────────────────────────────────────────────────────────
 function showToast(msg,type='info'){const t=document.getElementById('toast');t.innerHTML=msg;t.className=`toast ${type} show`;clearTimeout(t._t);t._t=setTimeout(()=>t.classList.remove('show'),3500);}
 </script>
+
+
+
 
 
 

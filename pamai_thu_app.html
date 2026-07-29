@@ -1005,7 +1005,7 @@ function toggleDark(){
   else if(window.matchMedia('(prefers-color-scheme:dark)').matches) document.documentElement.setAttribute('data-theme','dark');
 })();
 
-const APP_BUILD='20260729-2320'; // cache-buster — build.py แทนค่าอัตโนมัติ
+const APP_BUILD='20260729-2347'; // cache-buster — build.py แทนค่าอัตโนมัติ
 const DAYS=['อาทิตย์','จันทร์','อังคาร','พุธ','พฤหัสบดี','ศุกร์','เสาร์'];
 const MONS=['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
 const PM_CLOCK_KEY='pm-system-clock';
@@ -1612,14 +1612,17 @@ async function loadDashboardRevenue(){
 }
 
 async function confirmDelete(lock){
+  const vendor=VENDORS.find(v=>v.lock===lock);
+  const hasDebt=vendor&&(vendor.status==='unpaid'||(parseFloat(vendor.unpaidPenalty)||0)>0||(parseFloat(vendor.unpaidOther)||0)>0);
+  if(hasDebt){showToast('⛔ ยกเลิกการเช่าไม่ได้ — ล็อค '+lock+' ยังมียอดค้างชำระ ต้องปิดยอดก่อน','e');return;}
   if(!confirm('ลบข้อมูลล็อค '+lock+' ออกจากระบบ?'))return;
   const idx=VENDORS.findIndex(v=>v.lock===lock);
   if(idx>=0){
-    VENDORS.splice(idx,1);renderVDB();showToast('🗑️ ลบล็อค '+lock+' แล้ว','i');logAct('vendor','ลบผู้ค้า ล็อค '+lock);
     if(getApiUrl()){
       const res=await apiPost('deleteVendor',{lockId:lock});
-      if(!res||res.status!=='ok') showToast('⚠️ ลบใน Google Sheets ไม่สำเร็จ — กรุณาลบด้วยตนเองในชีต','e');
+      if(!res||res.status!=='ok'){showToast('⛔ ยกเลิกการเช่าไม่สำเร็จ — '+(res&&res.message?res.message:'กรุณาลองใหม่'),'e');return;}
     }
+    VENDORS.splice(idx,1);renderVDB();showToast('🗑️ ลบล็อค '+lock+' แล้ว','i');logAct('vendor','ลบผู้ค้า ล็อค '+lock);
   }
 }
 
@@ -1725,6 +1728,10 @@ function saveVendor(){
   const special=sp.split(',').map(p=>{const pts=p.trim().split(':');const nm=pts[0]?.trim();const pr=parseFloat(pts[1])||0;return nm&&pr>0?{name:nm,price:pr}:null;}).filter(Boolean);
   const elec={bulb:parseInt(document.getElementById('em-bulb')?.value)||0,fan:parseInt(document.getElementById('em-fan')?.value)||0,small:parseInt(document.getElementById('em-small')?.value)||0,large:parseInt(document.getElementById('em-large')?.value)||0,special};
   const status=document.getElementById('em-status')?.value||'active';
+  const existingVendor=editingLock?VENDORS.find(v=>v.lock===editingLock):null;
+  const existingDebt=existingVendor&&(existingVendor.status==='unpaid'||(parseFloat(existingVendor.unpaidPenalty)||0)>0||(parseFloat(existingVendor.unpaidOther)||0)>0);
+  if(existingVendor?.status==='unpaid'&&status==='active'){showToast('⛔ ปิดสถานะค้างชำระจากหน้าแก้ไขไม่ได้ — กรุณาบันทึกปิดยอดที่หน้ารับชำระ','e');return;}
+  if(status==='terminated'&&existingDebt){showToast('⛔ เปลี่ยนเป็นสิ้นสุดไม่ได้ — ต้องปิดยอดค้างชำระก่อน','e');return;}
   const unpaidPenalty=status==='unpaid' ? (parseFloat(document.getElementById('em-unpaid-penalty')?.value)||0) : 0;
   const unpaidOther=status==='unpaid' ? (parseFloat(document.getElementById('em-unpaid-other')?.value)||0) : 0;
   const unpaidOtherLabel=status==='unpaid' ? (document.getElementById('em-unpaid-other-label')?.value?.trim()||'') : '';
@@ -2180,6 +2187,7 @@ window.onload=function(){
   logAct('system','ระบบเริ่มทำงาน — แพไม้มินิ v1.0');
 };
 </script>
+
 
 
 

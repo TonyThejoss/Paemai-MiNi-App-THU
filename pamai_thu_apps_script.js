@@ -545,6 +545,13 @@ function saveVendor(data) {
     updated_at: now,
   };
 
+  const existingHasDebt = existing.status === 'unpaid'
+    || (parseFloat(existing.unpaid_penalty) || 0) > 0
+    || (parseFloat(existing.unpaid_other) || 0) > 0;
+  if (merged.status === 'terminated' && existingHasDebt) {
+    return makeErr('ยกเลิกการเช่าไม่ได้ — ต้องปิดยอดค้างชำระก่อน');
+  }
+
   const rowData = headers.map(h => merged[h] !== undefined ? merged[h] : '');
 
   _forceTextCol(sheet, 'phone');   // บั๊ก #29: กันเลข 0 นำหน้าเบอร์โทรหาย
@@ -560,8 +567,15 @@ function deleteVendor(lockId) {
   const sheet = getSheet(S.VENDORS);
   const rows  = sheet.getDataRange().getValues();
   const lockIdx = rows[0].indexOf('lock');
+  const statusIdx = rows[0].indexOf('status');
+  const penaltyIdx = rows[0].indexOf('unpaid_penalty');
+  const otherIdx = rows[0].indexOf('unpaid_other');
   for (let i = rows.length - 1; i >= 1; i--) {
     if (rows[i][lockIdx] === lockId) {
+      const hasDebt = rows[i][statusIdx] === 'unpaid'
+        || (parseFloat(rows[i][penaltyIdx]) || 0) > 0
+        || (parseFloat(rows[i][otherIdx]) || 0) > 0;
+      if (hasDebt) return makeErr('ยกเลิกการเช่าไม่ได้ — ต้องปิดยอดค้างชำระก่อน');
       sheet.deleteRow(i + 1);
       return makeRes({ deleted: lockId });
     }

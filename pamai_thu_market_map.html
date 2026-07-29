@@ -954,7 +954,7 @@ function clearMarketState(){
     el.querySelectorAll('.lk-badges').forEach(b=>b.remove());
   });
   hideBanner(); updateStats();
-  toast('ล้างสถานะทั้งหมดแล้ว — พร้อมวันพฤหัสบดีถัดไป','i');
+  toast('ล้างเฉพาะสถานะลา/ขาด/ล็อคจรแล้ว — สถานะค้างชำระยังคงอยู่','i');
 }
 
 function updateExpireBanner(){
@@ -981,7 +981,7 @@ function showStateBanner(tue,dl){
   const dStr=d.getDate()+' '+MONS[d.getMonth()]+' '+(d.getFullYear()+543);
   const col=dl<=1?'#fca5a5':dl<=2?'#fde68a':'#fed7aa';
   b.innerHTML='<span>📅 สถานะวันพฤหัสบดี <strong>'+dStr+'</strong> · รีเซ็ตอีก <span style="color:'+col+'">'+dl+' วัน</span></span>'
-    +'<button onclick="if(confirm(\'ล้างสถานะทั้งหมด?\'))clearMarketState()" style="background:rgba(255,255,255,.18);border:1.5px solid rgba(255,255,255,.28);color:#fff;padding:3px 10px;border-radius:8px;cursor:pointer;font-size:.64rem;font-weight:700;font-family:inherit">🔄 รีเซ็ต</button>';
+    +'<button onclick="if(confirm(\'ล้างเฉพาะสถานะลา/ขาด/ล็อคจร? สถานะค้างชำระจะไม่ถูกล้าง\'))clearMarketState()" style="background:rgba(255,255,255,.18);border:1.5px solid rgba(255,255,255,.28);color:#fff;padding:3px 10px;border-radius:8px;cursor:pointer;font-size:.64rem;font-weight:700;font-family:inherit">🔄 รีเซ็ตรายวัน</button>';
 }
 function hideBanner(){const b=document.getElementById('state-banner');if(b)b.remove();}
 
@@ -1246,6 +1246,12 @@ function openCancelLeaseModal(lockId){
   pendingCancelId=lockId;
   const el=document.querySelector('.lk[data-id="'+lockId+'"]');
   const isDaily=!!dailyBookings[lockId];
+  if(!isDaily&&el?.dataset.status==='unpaid'){
+    pendingCancelId=null;
+    closePopup();
+    toast('⛔ ยกเลิกการเช่าไม่ได้ — ล็อค '+lockId+' ยังมียอดค้างชำระ ต้องปิดยอดก่อน','e');
+    return;
+  }
   const db=dailyBookings[lockId];
   document.getElementById('cl-title').textContent='🚫 ยกเลิกการเช่า — '+lockId;
   document.getElementById('cl-sub').textContent=(isDaily?'ผู้ค้าจร':el?.dataset.status==='unpaid'?'ผู้ค้าประจำ (ค้างชำระ)':'ผู้ค้าประจำ')+': '+(el?.dataset.shop||'—');
@@ -1262,6 +1268,10 @@ async function confirmCancelLease(){
   const lockId=pendingCancelId;
   const el=document.querySelector('.lk[data-id="'+lockId+'"]');
   const isDaily=!!dailyBookings[lockId];
+  if(!isDaily&&el?.dataset.status==='unpaid'){
+    toast('⛔ ยกเลิกการเช่าไม่ได้ — ต้องปิดยอดค้างชำระก่อน','e');
+    return;
+  }
   const note=document.getElementById('cl-note').value.trim();
   const btn=document.querySelector('#cancelLeaseModal .m-btn:not(.secondary)');
   if(btn){btn.disabled=true;btn.dataset.origHtml=btn.innerHTML;btn.innerHTML='กำลังบันทึก...';}
@@ -1992,6 +2002,7 @@ function toast(msg,type){
 window.onload=function(){buildAll();setTimeout(checkThursdayCycle,400);};
 
 </script>
+
 
 
 

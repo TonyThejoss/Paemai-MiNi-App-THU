@@ -516,7 +516,9 @@ input, select, textarea, button { font-family: inherit; max-width: 100%; }
         /* ผังเริ่มโหลดข้อมูลตั้งแต่ window.onload ซึ่งอาจเร็วกว่าข้อความจากหน้าแม่
            จึงต้องสั่งดึงใหม่ทันทีหลังรับ token ไม่รอ retry รอบเดิมหมดก่อน. */
         if (typeof window.loadVendorOccupancy === 'function') window.loadVendorOccupancy();
-        else if (typeof window.syncRealVendors === 'function') window.syncRealVendors();
+        if (typeof window.syncRealVendors === 'function') window.syncRealVendors();
+        if (typeof window.loadFromSheets === 'function') window.loadFromSheets();
+        if (typeof window.loadAll === 'function') window.loadAll();
       }
     } catch (e) {}
   });
@@ -1021,6 +1023,9 @@ async function loadLocksFromSheets(){
       rentBase: rentBase,
       dailyRate: parseFloat(v.dailyRate)||0,
       electric: Math.round(calcElecFromVendor(v) * tuesdays), // ค่าไฟรายเดือน = ราคา/วันพฤหัสบดี × จำนวนวันพฤหัสบดี (บั๊ก #27)
+      unpaidPenalty: parseFloat(v.unpaid_penalty)||0,
+      unpaidOther: parseFloat(v.unpaid_other)||0,
+      unpaidOtherLabel: v.unpaid_other_label||'',
     };
     // due = ค่าเช่าสุทธิหลังบวกค่าธรรมเนียมรายปี (เดือนมีนาคม) และหักส่วนลดของเดือนนั้น
     const bd = pmRentBreakdown(lock);
@@ -1070,7 +1075,7 @@ function renderLockList() {
   });
 
   const html = filteredLocks.map(l => {
-    const totalDue = l.due + l.electric;
+    const totalDue = l.due + l.electric + l.unpaidPenalty + l.unpaidOther;
     const statusMap = {unpaid:'status-unpaid', paid:'status-paid', partial:'status-partial'};
     const statusLabel = {unpaid:'ค้างชำระ', paid:'ชำระแล้ว', partial:'บางส่วน'};
     const itemClass = {unpaid:'unpaid-item', paid:'paid-item', partial:'partial-item'};
@@ -1109,7 +1114,12 @@ function toggleLock(id) {
     selectedIds.add(id);
     // auto-fill with total due
     const lock = ALL_LOCKS.find(l => l.id === id);
-    if (lock) payAmounts[id] = String(lock.due + lock.electric);
+    if (lock) {
+      payPenalties[id]=lock.unpaidPenalty;
+      payOthers[id]=lock.unpaidOther;
+      payOtherLabels[id]=lock.unpaidOtherLabel;
+      payAmounts[id] = String(lock.due + lock.electric + lock.unpaidPenalty + lock.unpaidOther);
+    }
   }
   renderLockList();
   renderTable();
@@ -1126,7 +1136,12 @@ function toggleAll() {
       selectedIds.add(id);
       if (!payAmounts[id]) {
         const lock = ALL_LOCKS.find(l => l.id === id);
-        if (lock) payAmounts[id] = String(lock.due + lock.electric);
+        if (lock) {
+          payPenalties[id]=lock.unpaidPenalty;
+          payOthers[id]=lock.unpaidOther;
+          payOtherLabels[id]=lock.unpaidOtherLabel;
+          payAmounts[id] = String(lock.due + lock.electric + lock.unpaidPenalty + lock.unpaidOther);
+        }
       }
     });
   }
@@ -1401,9 +1416,11 @@ async function confirmSave() {
     }
     if(res && res.status==='ok'){
       okCount++;
-      l.status='paid';
-      // อัปเดตสถานะผู้ค้าใน Sheets ด้วย ถ้าก่อนหน้านี้ค้างชำระ ให้เปลี่ยนเป็นปกติ
-      apiPost('saveVendor',{data:{lock:l.id, status:'active'}});
+      const fullDue=l.due+l.electric+penalty+other;
+      const isClosed=amount>=fullDue;
+      l.status=isClosed?'paid':'unpaid';
+      // สถานะค้างชำระคงอยู่จนกว่าจะรับครบยอดที่ต้องชำระเท่านั้น
+      if(isClosed) await apiPost('saveVendor',{data:{lock:l.id,status:'active',unpaid_penalty:0,unpaid_other:0,unpaid_other_label:''}});
     } else {
       failCount++;
     }
@@ -1652,6 +1669,9 @@ function toggleDark(){const h=document.documentElement,d=h.getAttribute('data-th
 (()=>{const s=localStorage.getItem('pmthu-t');if(s)document.documentElement.setAttribute('data-theme',s);else if(window.matchMedia('(prefers-color-scheme:dark)').matches)document.documentElement.setAttribute('data-theme','dark');})();
 </script>
 <!-- ==== PM_THEME_JS:END ==== -->
+
+
+
 
 
 
