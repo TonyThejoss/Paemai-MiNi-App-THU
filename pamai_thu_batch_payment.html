@@ -494,6 +494,86 @@ input, select, textarea, button { font-family: inherit; max-width: 100%; }
 })();
 </script>
 <!-- ==== PM_MOBILE_KIT:END ==== -->
+<!-- ==== PM_API_CLIENT:START (สร้างโดย tools/inject_api_client.py — ห้ามแก้ในไฟล์นี้) ==== -->
+<script id="pm-api-client">
+/* ═══════════════════════════════════════════════════════════════════════════
+   PM_API_CLIENT (v3.0) — ตัวเชื่อมต่อฐานข้อมูลชุดกลาง
+   แก้ที่ tools/inject_api_client.py เท่านั้น แล้วรันใหม่ · ห้ามแก้ในไฟล์นี้
+   ═══════════════════════════════════════════════════════════════════════════ */
+(function () {
+  var SB_URL = 'https://atvxajfwazrswdlhnosh.supabase.co';
+  var SB_KEY = 'sb_publishable_kGSsjrQvDa9EKaw7CDPeQg_UnkKtCLa';
+  var MODE_KEY = 'pm-thu-backend';
+  var MODE_MIGRATION_KEY = MODE_KEY + '-migration-v3.2';
+
+  /* โหมดปัจจุบัน: sheets (เดิม) · parallel (อ่าน Supabase เขียนสองที่) · supabase (ใหม่ล้วน)
+     เปลี่ยนได้จาก console ด้วย PM_API.setMode('parallel') โดยไม่ต้อง deploy ใหม่ */
+  function migrateExistingDevice() {
+    try {
+      /* เครื่องที่เคยใช้รุ่นก่อนจะมีค่า `sheets` ค้างอยู่ใน localStorage.
+         การตั้ง default ในโค้ดอย่างเดียวจึงไม่พอ เพราะค่านั้นชนะ default เสมอและทำให้
+         แอพดูเหมือนต่อ Supabase ไม่ได้. ย้ายค่าอัตโนมัติครั้งเดียวเมื่อรับรุ่น v3.2;
+         หลังจากนั้น setMode('sheets') ยังใช้เป็นทางถอยฉุกเฉินได้ตามปกติ. */
+      if (!localStorage.getItem(MODE_MIGRATION_KEY)) {
+        localStorage.setItem(MODE_KEY, 'supabase');
+        localStorage.setItem(MODE_MIGRATION_KEY, 'done');
+        /* session เดิมมาจาก Sheets และไม่มี Supabase session token. ลบทิ้งหนึ่งครั้ง
+           เพื่อบังคับให้ล็อกอินใหม่อย่างถูกต้อง แทนที่จะเปิดผังแล้วโดน 401 เงียบ ๆ. */
+        try { sessionStorage.removeItem('pmthu-session'); } catch (e) {}
+      }
+    } catch (e) {}
+  }
+  /* ต้องทำทันทีใน head ก่อนโค้ดเดิมเริ่ม restore session/โหลดข้อมูล ไม่ใช่รอให้
+     apiGet ถูกเรียกครั้งแรก (ซึ่งช้าเกินไปและทำให้ Sheets ชนะในรอบแรก). */
+  migrateExistingDevice();
+  function mode() {
+    migrateExistingDevice();
+    try { return localStorage.getItem(MODE_KEY) || 'supabase'; } catch (e) { return 'supabase'; }
+  }
+
+  function sbFetch(action, payload) {
+    /* ทุก action วิ่งผ่านฟังก์ชัน api() ตัวเดียวที่ฐานข้อมูล — ตารางทั้งหมดถูกปิดจาก
+       การเข้าถึงตรง ๆ ไว้แล้ว ต่อให้ key หลุดก็อ่าน/เขียนตารางเองไม่ได้ */
+    var body = Object.assign({}, payload || {});
+    /* token อยู่ใน sessionStorage เท่านั้น (ไม่ใช้ localStorage) และฐานข้อมูลเก็บแค่ hash
+       ของมัน — action สาธารณะ/verifyUser ไม่ต้องมี token ส่วน action อื่นจะถูกปฏิเสธที่ RPC */
+    try {
+      var sess = JSON.parse(sessionStorage.getItem('pmthu-session') || 'null');
+      if (sess && sess.apiToken) body.sessionToken = sess.apiToken;
+    } catch (e) {}
+    return fetch(SB_URL + '/rest/v1/rpc/api', {
+      method: 'POST',
+      headers: { apikey: SB_KEY, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: action, payload: body })
+    }).then(function (r) {
+      if (!r.ok) return r.text().then(function (t) { throw new Error('HTTP ' + r.status + ' ' + t.slice(0, 160)); });
+      return r.json();
+    });
+  }
+
+  window.PM_API = {
+    mode: mode,
+    setMode: function (m) {
+      if (['sheets', 'parallel', 'supabase'].indexOf(m) < 0) { console.error('โหมดไม่ถูกต้อง:', m); return; }
+      try { localStorage.setItem(MODE_KEY, m); } catch (e) {}
+      console.log('PM_API: สลับเป็นโหมด', m, '— รีเฟรชหน้าเพื่อให้มีผลทุกส่วน');
+    },
+    supabase: sbFetch,
+    url: SB_URL,
+    /* เทียบผลลัพธ์ Sheets กับ Supabase ของ action เดียวกัน — ใช้ตอนทดสอบคู่ขนาน */
+    compare: async function (action, params) {
+      var a = null, b = null;
+      try { a = await window.__pmSheetsGet(action, params || {}); } catch (e) { a = 'ERROR ' + e.message; }
+      try { b = (await sbFetch(action, params || {})).data; } catch (e) { b = 'ERROR ' + e.message; }
+      var la = Array.isArray(a) ? a.length : typeof a;
+      var lb = Array.isArray(b) ? b.length : typeof b;
+      console.log('[' + action + '] Sheets:', la, ' Supabase:', lb, la === lb ? '✅ ตรงกัน' : '⚠️ ต่างกัน');
+      return { sheets: a, supabase: b };
+    }
+  };
+})();
+</script>
+<!-- ==== PM_API_CLIENT:END ==== -->
 </head>
 <body>
 
@@ -1539,80 +1619,7 @@ function toggleDark(){const h=document.documentElement,d=h.getAttribute('data-th
 (()=>{const s=localStorage.getItem('pmthu-t');if(s)document.documentElement.setAttribute('data-theme',s);else if(window.matchMedia('(prefers-color-scheme:dark)').matches)document.documentElement.setAttribute('data-theme','dark');})();
 </script>
 <!-- ==== PM_THEME_JS:END ==== -->
-<!-- ==== PM_API_CLIENT:START (สร้างโดย tools/inject_api_client.py — ห้ามแก้ในไฟล์นี้) ==== -->
-<script id="pm-api-client">
-/* ═══════════════════════════════════════════════════════════════════════════
-   PM_API_CLIENT (v3.0) — ตัวเชื่อมต่อฐานข้อมูลชุดกลาง
-   แก้ที่ tools/inject_api_client.py เท่านั้น แล้วรันใหม่ · ห้ามแก้ในไฟล์นี้
-   ═══════════════════════════════════════════════════════════════════════════ */
-(function () {
-  var SB_URL = 'https://atvxajfwazrswdlhnosh.supabase.co';
-  var SB_KEY = 'sb_publishable_kGSsjrQvDa9EKaw7CDPeQg_UnkKtCLa';
-  var MODE_KEY = 'pm-thu-backend';
-  var MODE_MIGRATION_KEY = MODE_KEY + '-migration-v3.1';
 
-  /* โหมดปัจจุบัน: sheets (เดิม) · parallel (อ่าน Supabase เขียนสองที่) · supabase (ใหม่ล้วน)
-     เปลี่ยนได้จาก console ด้วย PM_API.setMode('parallel') โดยไม่ต้อง deploy ใหม่ */
-  function mode() {
-    try {
-      /* เครื่องที่เคยใช้รุ่นก่อนจะมีค่า `sheets` ค้างอยู่ใน localStorage.
-         การตั้ง default ในโค้ดอย่างเดียวจึงไม่พอ เพราะค่านั้นชนะ default เสมอและทำให้
-         แอพดูเหมือนต่อ Supabase ไม่ได้. ย้ายค่าอัตโนมัติครั้งเดียวเมื่อรับรุ่น v3.1;
-         หลังจากนั้น setMode('sheets') ยังใช้เป็นทางถอยฉุกเฉินได้ตามปกติ. */
-      if (!localStorage.getItem(MODE_MIGRATION_KEY)) {
-        localStorage.setItem(MODE_KEY, 'supabase');
-        localStorage.setItem(MODE_MIGRATION_KEY, 'done');
-        /* session เดิมมาจาก Sheets และไม่มี Supabase session token. ลบทิ้งหนึ่งครั้ง
-           เพื่อบังคับให้ล็อกอินใหม่อย่างถูกต้อง แทนที่จะเปิดผังแล้วโดน 401 เงียบ ๆ. */
-        try { sessionStorage.removeItem('pmthu-session'); } catch (e) {}
-      }
-      return localStorage.getItem(MODE_KEY) || 'supabase';
-    } catch (e) { return 'supabase'; }
-  }
-
-  function sbFetch(action, payload) {
-    /* ทุก action วิ่งผ่านฟังก์ชัน api() ตัวเดียวที่ฐานข้อมูล — ตารางทั้งหมดถูกปิดจาก
-       การเข้าถึงตรง ๆ ไว้แล้ว ต่อให้ key หลุดก็อ่าน/เขียนตารางเองไม่ได้ */
-    var body = Object.assign({}, payload || {});
-    /* token อยู่ใน sessionStorage เท่านั้น (ไม่ใช้ localStorage) และฐานข้อมูลเก็บแค่ hash
-       ของมัน — action สาธารณะ/verifyUser ไม่ต้องมี token ส่วน action อื่นจะถูกปฏิเสธที่ RPC */
-    try {
-      var sess = JSON.parse(sessionStorage.getItem('pmthu-session') || 'null');
-      if (sess && sess.apiToken) body.sessionToken = sess.apiToken;
-    } catch (e) {}
-    return fetch(SB_URL + '/rest/v1/rpc/api', {
-      method: 'POST',
-      headers: { apikey: SB_KEY, 'Content-Type': 'application/json' },
-      body: JSON.stringify({ action: action, payload: body })
-    }).then(function (r) {
-      if (!r.ok) return r.text().then(function (t) { throw new Error('HTTP ' + r.status + ' ' + t.slice(0, 160)); });
-      return r.json();
-    });
-  }
-
-  window.PM_API = {
-    mode: mode,
-    setMode: function (m) {
-      if (['sheets', 'parallel', 'supabase'].indexOf(m) < 0) { console.error('โหมดไม่ถูกต้อง:', m); return; }
-      try { localStorage.setItem(MODE_KEY, m); } catch (e) {}
-      console.log('PM_API: สลับเป็นโหมด', m, '— รีเฟรชหน้าเพื่อให้มีผลทุกส่วน');
-    },
-    supabase: sbFetch,
-    url: SB_URL,
-    /* เทียบผลลัพธ์ Sheets กับ Supabase ของ action เดียวกัน — ใช้ตอนทดสอบคู่ขนาน */
-    compare: async function (action, params) {
-      var a = null, b = null;
-      try { a = await window.__pmSheetsGet(action, params || {}); } catch (e) { a = 'ERROR ' + e.message; }
-      try { b = (await sbFetch(action, params || {})).data; } catch (e) { b = 'ERROR ' + e.message; }
-      var la = Array.isArray(a) ? a.length : typeof a;
-      var lb = Array.isArray(b) ? b.length : typeof b;
-      console.log('[' + action + '] Sheets:', la, ' Supabase:', lb, la === lb ? '✅ ตรงกัน' : '⚠️ ต่างกัน');
-      return { sheets: a, supabase: b };
-    }
-  };
-})();
-</script>
-<!-- ==== PM_API_CLIENT:END ==== -->
 <script id="pm-api-shim">
 /* apiGet/apiPost เวอร์ชันที่รองรับสามโหมด — เก็บของเดิมไว้เป็น __pmSheets* เพื่อใช้เทียบผล
    และเพื่อให้ย้อนกลับไปใช้ Google Sheets ได้ทันทีถ้าพบปัญหาหน้างาน (ทางถอย) */
