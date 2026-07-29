@@ -547,6 +547,12 @@ input, select, textarea, button { font-family: inherit; max-width: 100%; }
       }
     } catch (e) {}
   });
+  /* ขอ token แบบ active เพื่อกันกรณี parent ส่งตอน iframe ยังไม่พร้อมรับข้อความ */
+  try {
+    if (window.parent && window.parent !== window) {
+      window.parent.postMessage({ type: 'pm-session-request' }, window.location.origin);
+    }
+  } catch (e) {}
 
   /* โหมดปัจจุบัน: sheets (เดิม) · parallel (อ่าน Supabase เขียนสองที่) · supabase (ใหม่ล้วน)
      เปลี่ยนได้จาก console ด้วย PM_API.setMode('parallel') โดยไม่ต้อง deploy ใหม่ */
@@ -977,7 +983,7 @@ function toggleDark(){
   else if(window.matchMedia('(prefers-color-scheme:dark)').matches) document.documentElement.setAttribute('data-theme','dark');
 })();
 
-const APP_BUILD='20260729-2205'; // cache-buster — build.py แทนค่าอัตโนมัติ
+const APP_BUILD='20260729-2212'; // cache-buster — build.py แทนค่าอัตโนมัติ
 const DAYS=['อาทิตย์','จันทร์','อังคาร','พุธ','พฤหัสบดี','ศุกร์','เสาร์'];
 const MONS=['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
 function tick(){
@@ -1912,6 +1918,13 @@ function showToast(msg,type='i'){
 // ════════════════════════════════════════════════════
 // รองรับสัญญาณจาก iframe ผังตลาด (ปุ่มเพิ่มผู้ค้าใน popup)
 window.addEventListener('message', function(e){
+  // iframe ขอ session ใหม่เองได้: บาง WebView ทำให้ข้อความที่ parent ส่งตอน onload หลุดไป
+  if(e && e.data && e.data.type==='pm-session-request' && e.origin===window.location.origin){
+    try {
+      const session=sessionStorage.getItem('pmthu-session');
+      if(session && e.source) e.source.postMessage({type:'pmthu-session',session:session}, e.origin);
+    } catch(err) {}
+  }
   // โมดูลใน iframe แจ้งกิจกรรมมาให้ shell บันทึก (PM_ACTLOG_SHEET ข้อ 3)
   if(e && e.data && e.data.type==='pm-activity' && e.data.payload){
     const q=e.data.payload;
@@ -2085,6 +2098,7 @@ window.onload=function(){
   logAct('system','ระบบเริ่มทำงาน — แพไม้มินิ v1.0');
 };
 </script>
+
 
 
 

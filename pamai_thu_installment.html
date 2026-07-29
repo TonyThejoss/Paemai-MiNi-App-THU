@@ -434,6 +434,12 @@ input, select, textarea, button { font-family: inherit; max-width: 100%; }
       }
     } catch (e) {}
   });
+  /* ขอ token แบบ active เพื่อกันกรณี parent ส่งตอน iframe ยังไม่พร้อมรับข้อความ */
+  try {
+    if (window.parent && window.parent !== window) {
+      window.parent.postMessage({ type: 'pm-session-request' }, window.location.origin);
+    }
+  } catch (e) {}
 
   /* โหมดปัจจุบัน: sheets (เดิม) · parallel (อ่าน Supabase เขียนสองที่) · supabase (ใหม่ล้วน)
      เปลี่ยนได้จาก console ด้วย PM_API.setMode('parallel') โดยไม่ต้อง deploy ใหม่ */
@@ -1336,6 +1342,7 @@ function showMapDetailFor(lockId){
 // ─── Toast ────────────────────────────────────────────────────────────────────
 function showToast(msg,type='info'){const t=document.getElementById('toast');t.innerHTML=msg;t.className=`toast ${type} show`;clearTimeout(t._t);t._t=setTimeout(()=>t.classList.remove('show'),3500);}
 </script>
+
 
 
 

@@ -583,6 +583,12 @@ window.PM_FILTER = (function () {
       }
     } catch (e) {}
   });
+  /* ขอ token แบบ active เพื่อกันกรณี parent ส่งตอน iframe ยังไม่พร้อมรับข้อความ */
+  try {
+    if (window.parent && window.parent !== window) {
+      window.parent.postMessage({ type: 'pm-session-request' }, window.location.origin);
+    }
+  } catch (e) {}
 
   /* โหมดปัจจุบัน: sheets (เดิม) · parallel (อ่าน Supabase เขียนสองที่) · supabase (ใหม่ล้วน)
      เปลี่ยนได้จาก console ด้วย PM_API.setMode('parallel') โดยไม่ต้อง deploy ใหม่ */
@@ -844,6 +850,7 @@ function toggleDark(){const h=document.documentElement,d=h.getAttribute('data-th
 (()=>{const s=localStorage.getItem('pmthu-t');if(s)document.documentElement.setAttribute('data-theme',s);else if(window.matchMedia('(prefers-color-scheme:dark)').matches)document.documentElement.setAttribute('data-theme','dark');})();
 </script>
 <!-- ==== PM_THEME_JS:END ==== -->
+
 
 
 

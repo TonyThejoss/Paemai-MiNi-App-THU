@@ -34,6 +34,12 @@
       }
     } catch (e) {}
   });
+  /* ขอ token แบบ active เพื่อกันกรณี parent ส่งตอน iframe ยังไม่พร้อมรับข้อความ */
+  try {
+    if (window.parent && window.parent !== window) {
+      window.parent.postMessage({ type: 'pm-session-request' }, window.location.origin);
+    }
+  } catch (e) {}
 
   /* โหมดปัจจุบัน: sheets (เดิม) · parallel (อ่าน Supabase เขียนสองที่) · supabase (ใหม่ล้วน)
      เปลี่ยนได้จาก console ด้วย PM_API.setMode('parallel') โดยไม่ต้อง deploy ใหม่ */
@@ -127,6 +133,7 @@ function esc(s){return String(s??'').replace(/[&<>"']/g,x=>({'&':'&amp;','<':'&l
 async function render(){const out=document.getElementById('rows');out.innerHTML='<tr><td colspan="9" class="empty">กำลังโหลดข้อมูล…</td></tr>';const all=await apiGet('getVendors');if(!Array.isArray(all)){out.innerHTML='<tr><td colspan="9" class="error">โหลดข้อมูลไม่สำเร็จ — กรุณาเข้าสู่ระบบและลองใหม่</td></tr>';return}const vs=all.filter(v=>v.status!=='terminated').sort((a,b)=>(a.zone||'').localeCompare(b.zone||'')||String(a.lock).localeCompare(String(b.lock),undefined,{numeric:true}));let rent=0,power=0;out.innerHTML=vs.length?vs.map(v=>{const r=(Number(v.dailyRate)||0)*daysInMonth(),e=elec(v);rent+=r;power+=e;const unpaid=v.status==='unpaid';return '<tr><td>'+esc(v.zone)+'</td><td><b>'+esc(v.lock)+'</b></td><td>'+esc(v.name||'—')+'</td><td>'+esc(v.phone||'—')+'</td><td>'+esc(v.product||'—')+'</td><td class="num">'+baht(r)+'</td><td class="num">'+baht(e)+'</td><td class="num"><b>'+baht(r+e)+'</b></td><td><span class="status '+(unpaid?'unpaid':'')+'">'+(unpaid?'ค้างชำระ':'ปกติ')+'</span></td></tr>'}).join(''):'<tr><td colspan="9" class="empty">ยังไม่มีผู้ค้าปัจจุบัน</td></tr>';document.getElementById('summary').innerHTML='<div class="stat"><b>'+vs.length+'</b><span>ผู้ค้าปัจจุบัน</span></div><div class="stat"><b>'+daysInMonth()+'</b><span>วันตลาดในเดือนนี้</span></div><div class="stat"><b>'+baht(rent)+'</b><span>ค่าเช่า/เดือน</span></div><div class="stat"><b>'+baht(rent+power)+'</b><span>รวมค่าเช่า+ค่าไฟ/เดือน</span></div>';document.getElementById('stamp').textContent='ข้อมูล ณ '+new Date().toLocaleString('th-TH')}
 render();
 </script>
+
 
 
 
