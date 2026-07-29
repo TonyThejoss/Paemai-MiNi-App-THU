@@ -768,8 +768,8 @@ function toggleDark(){const h=document.documentElement,d=h.getAttribute('data-th
 // ════════════════════════════════════════════════════
 const lockHistory={}, dailyBookings={}, lockAbsent={};
 const MONS=['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
-function nowTH(){const n=new Date();return n.getDate()+' '+MONS[n.getMonth()]+' '+(n.getFullYear()+543);}
-function nowTime(){const n=new Date();return String(n.getHours()).padStart(2,'0')+':'+String(n.getMinutes()).padStart(2,'0');}
+function nowTH(){const n=pmMapNow();return n.getDate()+' '+MONS[n.getMonth()]+' '+(n.getFullYear()+543);}
+function nowTime(){const n=pmMapNow();return String(n.getHours()).padStart(2,'0')+':'+String(n.getMinutes()).padStart(2,'0');}
 // แปลงวันที่รูปแบบไทยที่บันทึกไว้ "6 ก.ค. 2569" (วัน เดือนย่อ ปี พ.ศ.) → Date object จริง
 function parseThaiFullDate(dstr){
   const parts=(dstr||'').trim().split(/\s+/);
@@ -818,9 +818,13 @@ function getCurrentUserName(){ try{const s=sessionStorage.getItem('pm-session');
 
 const STATE_KEY='pmthu-mkt-state';
 const STATE_EXPIRE_DAYS=3;
+let PM_MAP_CLOCK={manual:false,offsetMs:0};
+try{const c=JSON.parse(localStorage.getItem('pm-system-clock')||'null');if(c)PM_MAP_CLOCK={manual:!!c.manual,offsetMs:parseInt(c.offsetMs,10)||0};}catch(e){}
+function pmMapNow(){try{if(window.parent&&window.parent!==window&&typeof window.parent.pmNow==='function')return window.parent.pmNow();}catch(e){}return new Date(Date.now()+(PM_MAP_CLOCK.manual?PM_MAP_CLOCK.offsetMs:0));}
+window.addEventListener('message',function(e){if(e&&e.data&&e.data.type==='pm-system-clock'){PM_MAP_CLOCK=e.data.clock||PM_MAP_CLOCK;loadFromSheets();}});
 
 function getLastThursday(){
-  const d=new Date();
+  const d=pmMapNow();
   const dow=d.getDay(); // 0=Sun,4=Thu
   d.setDate(d.getDate()-(dow>=4?dow-4:7-(4-dow)));
   d.setHours(0,0,0,0); return d;
@@ -844,10 +848,12 @@ async function loadFromSheets(){
   if(!pmHasBackend()) return;              // ยังไม่เชื่อมต่อฐานข้อมูลใด ๆ — ใช้ state ในเครื่องอย่างเดียว
   const day=marketDayTH();
   try{
-    const [leaveRows,dailyRows]=await Promise.all([
-      apiGet('getLeaveLog',{date:day}),
-      apiGet('getDailyBookings',{date:day}),
-    ]);
+    const snapshot=await apiGet('getPublicStatus',{date:day});
+    let leaveRows=snapshot&&snapshot.leave,dailyRows=snapshot&&snapshot.sold,vendorRows=snapshot&&snapshot.vendors;
+    if(!Array.isArray(leaveRows)||!Array.isArray(dailyRows)){
+      [leaveRows,dailyRows]=await Promise.all([apiGet('getLeaveLog',{date:day}),apiGet('getDailyBookings',{date:day})]);
+    }
+    if(!Array.isArray(leaveRows)||!Array.isArray(dailyRows))throw new Error('โหลดสถานะผังตลาดไม่สำเร็จ');
     // Reconcile จากฐานข้อมูลทั้งชุด: การยกเลิกล็อคหนึ่งจึงไม่แตะสถานะของล็อคอื่น
     const nextLeave={}, nextDaily={};
     if(Array.isArray(leaveRows) && isMarketStatusActive()){
@@ -871,10 +877,17 @@ async function loadFromSheets(){
     Object.keys(dailyBookings).forEach(id=>delete dailyBookings[id]);
     Object.assign(lockAbsent,nextLeave);
     Object.assign(dailyBookings,nextDaily);
+    if(Array.isArray(vendorRows)) vendorRows.forEach(v=>{
+      const el=document.querySelector('.lk[data-id="'+v.lock+'"]');if(!el)return;
+      const st=(v.status==='terminated'||v.status==='vacant')?'vacant':(v.status==='unpaid'?'unpaid':'occupied');
+      el.dataset.status=st;el.dataset.shop=v.product||el.dataset.shop||'ผู้ค้า';
+      ['vacant','occupied','unpaid','cancelled'].forEach(c=>el.classList.remove(c));el.classList.add(st);
+      const shop=el.querySelector('.lk-shop');if(shop)shop.textContent=st==='vacant'?'—':el.dataset.shop;
+    });
     document.querySelectorAll('.lk').forEach(el=>refreshLk(el));
     updateStats();
     saveMarketState();
-  }catch(e){ console.error('loadFromSheets error:',e); }
+  }catch(e){ console.error('loadFromSheets error:',e);toast('โหลดสถานะผังตลาดไม่สำเร็จ — คงข้อมูลล่าสุดไว้และกรุณาลองซิงค์อีกครั้ง','e'); }
 }
 // รีเฟรชเมื่อ shell แจ้งว่ามีการบันทึกข้อมูลจากแท็บอื่น (กลไก postMessage ที่เพิ่มไว้ 2026-07-23)
 window.addEventListener('message',function(e){
@@ -884,7 +897,7 @@ window.addEventListener('message',function(e){
 function addDays(date,n){const d=new Date(date);d.setDate(d.getDate()+n);return d;}
 // สถานะลา/ขาดแสดงถึงก่อน 00:00 ของวันอาทิตย์ (สามวันหลังวันพฤหัสบดี)
 // ประวัติในฐานข้อมูลไม่ถูกลบ เพื่อให้รายงานย้อนหลังยังครบ
-function isMarketStatusActive(){ return new Date() < addDays(getLastThursday(),STATE_EXPIRE_DAYS); }
+function isMarketStatusActive(){ return pmMapNow() < addDays(getLastThursday(),STATE_EXPIRE_DAYS); }
 
 function saveMarketState(){
   try{
@@ -902,7 +915,7 @@ function loadMarketState(){
   try{
     const data=JSON.parse(saved);
     const expiry=addDays(new Date(data.tuesdayISO),STATE_EXPIRE_DAYS);
-    if(new Date()>expiry){
+    if(pmMapNow()>expiry){
       localStorage.removeItem(STATE_KEY);
       toast('รีเซ็ตสถานะวันพฤหัสบดี (ครบ '+STATE_EXPIRE_DAYS+' วัน)','i');
       return;
@@ -966,7 +979,7 @@ function checkThursdayCycle(){
   if(saved){
     try{
       const data=JSON.parse(saved);
-      if(new Date()>addDays(new Date(data.tuesdayISO),STATE_EXPIRE_DAYS)){
+      if(pmMapNow()>addDays(new Date(data.tuesdayISO),STATE_EXPIRE_DAYS)){
         localStorage.removeItem(STATE_KEY); return;
       }
     }catch(e){}

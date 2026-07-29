@@ -954,7 +954,7 @@ function purgeOldActivity(days) {
 // เก็บเป็น key/value เพื่อให้เพิ่มค่าใหม่ในอนาคตได้โดยไม่ต้องแก้ schema
 // คีย์ที่ระบบใช้ตอนนี้: annual_fee (อัตราค่าธรรมเนียมรายปีกลางทั้งตลาด), entry_fee (ค่าแรกเข้าเริ่มต้น)
 // ════════════════════════════════════════
-const DEFAULT_SETTINGS = { annual_fee: 0, entry_fee: 0 };
+const DEFAULT_SETTINGS = { annual_fee: 0, entry_fee: 0, system_clock_mode: 'device', system_clock_offset_ms: 0 };
 function getSettings() {
   const rows = _sheetToObjects(S.SETTINGS);
   const out = {};

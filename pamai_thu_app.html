@@ -890,6 +890,23 @@ input, select, textarea, button { font-family: inherit; max-width: 100%; }
     <div id="fees" class="pane" style="overflow-y:auto;background:var(--bg)">
       <div class="dw" style="max-width:720px">
         <div class="dc" style="margin-bottom:12px">
+          <div class="dch"><div class="dct">🕐 วันที่และเวลาของระบบ</div></div>
+          <div class="dcb">
+            <div style="font-size:.82rem;color:var(--txl);line-height:1.65;margin-bottom:12px">ระบบใช้เวลานี้คำนวณวันตลาดและแสดงสถานะลา ขาดล็อค ขายล็อคจร และค้างจ่ายในผังตลาดทั้งสอง</div>
+            <div id="clock-readonly" style="display:none;margin-bottom:12px;padding:9px 12px;background:var(--yl);border:1.5px solid var(--y);border-radius:9px;color:var(--y);font-size:.78rem;font-weight:700">เฉพาะผู้ดูแลระบบ (admin) เท่านั้นที่แก้วันที่และเวลาได้</div>
+            <div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:10px">
+              <div><label for="set-system-date" style="display:block;font-size:.80rem;font-weight:800;margin-bottom:5px">วันที่</label><input class="sbox" type="date" id="set-system-date" style="width:180px"></div>
+              <div><label for="set-system-time" style="display:block;font-size:.80rem;font-weight:800;margin-bottom:5px">เวลา</label><input class="sbox" type="time" id="set-system-time" step="60" style="width:140px"></div>
+            </div>
+            <label style="display:flex;align-items:center;gap:8px;font-size:.80rem;font-weight:700;margin-bottom:12px"><input type="checkbox" id="set-system-manual"> ใช้วันที่และเวลาที่ตั้งเอง (เวลาจะเดินต่ออัตโนมัติ)</label>
+            <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+              <button class="btn btn-p" id="clock-save-btn" onclick="saveSystemClock()">บันทึกวันที่และเวลา</button>
+              <button class="btn btn-s" id="clock-device-btn" onclick="useDeviceClock()">กลับไปใช้เวลาอุปกรณ์</button>
+              <span id="clock-status" style="font-size:.78rem;color:var(--txl)"></span>
+            </div>
+          </div>
+        </div>
+        <div class="dc" style="margin-bottom:12px">
           <div class="dch"><div class="dct"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .34 1.87l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.7 1.7 0 0 0-1.87-.34 1.7 1.7 0 0 0-1.04 1.56V21a2 2 0 0 1-4 0v-.09A1.7 1.7 0 0 0 9 19.37a1.7 1.7 0 0 0-1.87.34l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.7 1.7 0 0 0 4.63 15a1.7 1.7 0 0 0-1.56-1.04H3a2 2 0 0 1 0-4h.09A1.7 1.7 0 0 0 4.63 9a1.7 1.7 0 0 0-.34-1.87l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.7 1.7 0 0 0 9 4.63a1.7 1.7 0 0 0 1.04-1.56V3a2 2 0 0 1 4 0v.09a1.7 1.7 0 0 0 1.04 1.56 1.7 1.7 0 0 0 1.87-.34l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.7 1.7 0 0 0 19.37 9a1.7 1.7 0 0 0 1.56 1.04H21a2 2 0 0 1 0 4h-.09A1.7 1.7 0 0 0 19.4 15Z"/></svg> อัตราค่าธรรมเนียมกลางของตลาด</div></div>
           <div class="dcb">
             <div style="font-size:.82rem;color:var(--txl);line-height:1.65;margin-bottom:14px">
@@ -986,11 +1003,16 @@ function toggleDark(){
   else if(window.matchMedia('(prefers-color-scheme:dark)').matches) document.documentElement.setAttribute('data-theme','dark');
 })();
 
-const APP_BUILD='20260729-2215'; // cache-buster — build.py แทนค่าอัตโนมัติ
+const APP_BUILD='20260729-2251'; // cache-buster — build.py แทนค่าอัตโนมัติ
 const DAYS=['อาทิตย์','จันทร์','อังคาร','พุธ','พฤหัสบดี','ศุกร์','เสาร์'];
 const MONS=['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
+const PM_CLOCK_KEY='pm-system-clock';
+let PM_SYSTEM_CLOCK={manual:false,offsetMs:0};
+try{const c=JSON.parse(localStorage.getItem(PM_CLOCK_KEY)||'null');if(c)PM_SYSTEM_CLOCK={manual:!!c.manual,offsetMs:parseInt(c.offsetMs,10)||0};}catch(e){}
+function pmNow(){return new Date(Date.now()+(PM_SYSTEM_CLOCK.manual?PM_SYSTEM_CLOCK.offsetMs:0));}
+window.pmNow=pmNow;
 function tick(){
-  const n=new Date();
+  const n=pmNow();
   const hh=String(n.getHours()).padStart(2,'0'), mm=String(n.getMinutes()).padStart(2,'0'), ss=String(n.getSeconds()).padStart(2,'0');
   const el=document.getElementById('htime'); if(el) el.textContent=hh+':'+mm+':'+ss;
   const cl=document.getElementById('clock'); if(cl) cl.textContent=hh+':'+mm;
@@ -998,6 +1020,8 @@ function tick(){
   const dt=document.getElementById('hdate'); if(dt) dt.textContent=n.getDate()+' '+MONS[n.getMonth()]+' '+(n.getFullYear()+543);
 }
 tick(); setInterval(tick,1000);
+const settingsNavOnBoot=document.getElementById('ni-fees');
+if(settingsNavOnBoot&&settingsNavOnBoot.lastChild)settingsNavOnBoot.lastChild.nodeValue='ตั้งค่าระบบ';
 
 // ── Sidebar (mobile toggle) ──
 function toggleSidebar(){
@@ -1045,7 +1069,7 @@ function goTab(id){
                leavehist:'ประวัติลา/ขาด/จร',
                floatingqueue:'คิวจองล็อคจร',rules:'กฎระเบียบตลาด',
                reports:'รายงาน',actlog:'บันทึกกิจกรรม',vdb:'ทะเบียนผู้ค้า',
-               fees:'ตั้งค่าค่าธรรมเนียม'};
+               fees:'ตั้งค่าระบบ'};
   if(id!=='actlog') logAct('nav','เปิดหน้า: '+(names[id]||id));
   // Lazy load iframe module when first accessed
   const moduleIds=['map','payment','install','electric','register','leavehist','floatingqueue','rules','reports'];
@@ -1136,6 +1160,8 @@ async function doLogin(){
 
 function loginSuccess(user){
   currentUser=user;
+  const settingsNav=document.getElementById('ni-fees');
+  if(settingsNav&&settingsNav.lastChild)settingsNav.lastChild.nodeValue='ตั้งค่าระบบ';
   // bridge สำหรับ iframe ผัง: Safari/WebView บางแบบไม่ให้ iframe อ่าน sessionStorage แม้ origin เดียวกัน
   try{ window.__pmSessionBridge=sessionStorage.getItem('pmthu-session')||''; }catch(e){}
   const ls=document.getElementById('login-screen');
@@ -1151,6 +1177,7 @@ function loginSuccess(user){
   updateDbStatus();
   logAct('system','เข้าสู่ระบบ: '+user.displayName);
   if(getApiUrl()) setTimeout(loadVendorsFromSheets,600);
+  setTimeout(()=>loadSystemSettings(false),800);
 }
 
 function applyRole(role){
@@ -1744,6 +1771,52 @@ function getApiToken(){return (localStorage.getItem('pm-thu-api-token')||localSt
 // ══════════════════════════════════════════════════════════════════════════════
 let PM_FEE_SETTINGS = { entry_fee: 0, annual_fee: 0 };
 
+function pmClockLocalValue(d){
+  const p=n=>String(n).padStart(2,'0');
+  return {date:d.getFullYear()+'-'+p(d.getMonth()+1)+'-'+p(d.getDate()),time:p(d.getHours())+':'+p(d.getMinutes())};
+}
+function pmSetClockStatus(msg,kind){
+  const el=document.getElementById('clock-status');if(!el)return;
+  el.textContent=msg||'';el.style.color=kind==='e'?'var(--r)':kind==='s'?'var(--gm)':'var(--txl)';
+}
+function pmApplyClockSetting(st){
+  PM_SYSTEM_CLOCK={manual:String(st.system_clock_mode||'device')==='manual',offsetMs:parseInt(st.system_clock_offset_ms,10)||0};
+  try{localStorage.setItem(PM_CLOCK_KEY,JSON.stringify(PM_SYSTEM_CLOCK));}catch(e){}
+  const shown=pmClockLocalValue(pmNow());
+  const d=document.getElementById('set-system-date'),t=document.getElementById('set-system-time'),c=document.getElementById('set-system-manual');
+  if(d)d.value=shown.date;if(t)t.value=shown.time;if(c)c.checked=PM_SYSTEM_CLOCK.manual;
+  pmSetClockStatus(PM_SYSTEM_CLOCK.manual?'กำลังใช้เวลาที่ตั้งเอง':'กำลังใช้เวลาอุปกรณ์',PM_SYSTEM_CLOCK.manual?'s':'');
+  document.querySelectorAll('.pane iframe').forEach(f=>{try{f.contentWindow.postMessage({type:'pm-system-clock',clock:PM_SYSTEM_CLOCK},'*');}catch(e){}});
+}
+function pmApplySystemPermission(){
+  const admin=pmIsAdmin();
+  ['set-system-date','set-system-time','set-system-manual','clock-save-btn','clock-device-btn'].forEach(id=>{const el=document.getElementById(id);if(el)el.disabled=!admin;});
+  const w=document.getElementById('clock-readonly');if(w)w.style.display=admin?'none':'block';
+}
+async function loadSystemSettings(manualNotice){
+  pmApplySystemPermission();
+  if(!getApiUrl())return;
+  const st=await apiGet('getSettings');
+  if(st&&typeof st==='object'){pmApplyClockSetting(st);if(manualNotice)pmSetClockStatus('โหลดวันที่และเวลาล่าสุดแล้ว','s');}
+  else if(manualNotice)pmSetClockStatus('โหลดวันที่และเวลาไม่สำเร็จ','e');
+}
+async function saveSystemClock(){
+  if(!pmIsAdmin()){showToast('เฉพาะผู้ดูแลระบบเท่านั้นที่แก้วันที่และเวลาได้','e');return;}
+  const date=document.getElementById('set-system-date').value,time=document.getElementById('set-system-time').value,manual=document.getElementById('set-system-manual').checked;
+  if(manual&&(!date||!time)){showToast('กรุณาระบุวันที่และเวลาให้ครบ','e');return;}
+  const target=manual?new Date(date+'T'+time+':00'):new Date();
+  if(isNaN(target.getTime())){showToast('วันที่หรือเวลาไม่ถูกต้อง','e');return;}
+  const next={system_clock_mode:manual?'manual':'device',system_clock_offset_ms:manual?target.getTime()-Date.now():0};
+  const res=await apiPost('saveSettings',{data:next,updatedBy:currentUser?.displayName||currentUser?.username||'ผู้ดูแลระบบ'});
+  if(!res||res.status!=='ok'){showToast('บันทึกวันที่และเวลาไม่สำเร็จ','e');return;}
+  pmApplyClockSetting(next);tick();broadcastRefreshToModules();showToast('บันทึกวันที่และเวลาของระบบแล้ว','s');
+  logAct('system','ตั้งวันที่และเวลาของระบบเป็น '+date+' '+time+(manual?' (ตั้งเอง)':' (ตามอุปกรณ์)'));
+}
+function useDeviceClock(){
+  const v=pmClockLocalValue(new Date());
+  document.getElementById('set-system-date').value=v.date;document.getElementById('set-system-time').value=v.time;document.getElementById('set-system-manual').checked=false;saveSystemClock();
+}
+
 function pmIsAdmin(){ return !!currentUser && currentUser.role === 'admin'; }
 
 function pmSetFeeStatus(msg, kind){
@@ -1770,6 +1843,7 @@ function pmApplyFeePermission(){
 
 async function loadFeeSettings(manual){
   pmApplyFeePermission();
+  loadSystemSettings(!!manual);
   if(!getApiUrl()){
     pmSetFeeStatus('ยังไม่ได้เชื่อมต่อ Google Sheets — ตั้งค่าการเชื่อมต่อก่อนจึงจะบันทึกอัตราได้','e');
     return;
@@ -2049,6 +2123,7 @@ function loadModule(id) {
         try {
           const session = sessionStorage.getItem('pmthu-session');
           if (session) iframe.contentWindow.postMessage({type:'pmthu-session', session:session}, window.location.origin);
+          iframe.contentWindow.postMessage({type:'pm-system-clock',clock:PM_SYSTEM_CLOCK},window.location.origin);
         } catch(e) {}
         finish(true);
         return;
