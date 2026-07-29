@@ -567,6 +567,17 @@ window.PM_FILTER = (function () {
   var SB_KEY = 'sb_publishable_kGSsjrQvDa9EKaw7CDPeQg_UnkKtCLa';
   var MODE_KEY = 'pm-thu-backend';
   var MODE_MIGRATION_KEY = MODE_KEY + '-migration-v3.2';
+  /* iframe ไม่ควรเดาเองว่าเข้าถึง sessionStorage ของหน้าแม่ได้เสมอ: Safari/WebView
+     บางแบบแยก storage แม้ URL เดียวกัน. หน้าแม่จะส่ง session ผ่าน postMessage ที่ระบุ origin. */
+  var embeddedSession = '';
+  window.addEventListener('message', function (event) {
+    try {
+      if (event.origin !== window.location.origin) return;
+      if (event.data && event.data.type === 'pmthu-session' && typeof event.data.session === 'string') {
+        embeddedSession = event.data.session;
+      }
+    } catch (e) {}
+  });
 
   /* โหมดปัจจุบัน: sheets (เดิม) · parallel (อ่าน Supabase เขียนสองที่) · supabase (ใหม่ล้วน)
      เปลี่ยนได้จาก console ด้วย PM_API.setMode('parallel') โดยไม่ต้อง deploy ใหม่ */
@@ -604,6 +615,9 @@ window.PM_FILTER = (function () {
       var sess = JSON.parse(sessionStorage.getItem('pmthu-session') || 'null');
       /* iframe บางบริบทมี sessionStorage แยกจากหน้าแม่ แม้เป็น origin เดียวกัน.
          ใช้ token ของหน้าแม่เป็น fallback โดยไม่ส่งออกไปที่ใดนอกจาก RPC ของตลาดเดียวกัน. */
+      if ((!sess || !sess.apiToken) && embeddedSession) {
+        sess = JSON.parse(embeddedSession);
+      }
       if ((!sess || !sess.apiToken) && window.parent && window.parent !== window) {
         sess = JSON.parse(window.parent.sessionStorage.getItem('pmthu-session') || 'null');
       }
@@ -815,6 +829,7 @@ function toggleDark(){const h=document.documentElement,d=h.getAttribute('data-th
 (()=>{const s=localStorage.getItem('pmthu-t');if(s)document.documentElement.setAttribute('data-theme',s);else if(window.matchMedia('(prefers-color-scheme:dark)').matches)document.documentElement.setAttribute('data-theme','dark');})();
 </script>
 <!-- ==== PM_THEME_JS:END ==== -->
+
 
 
 
