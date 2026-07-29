@@ -32,8 +32,9 @@
         localStorage.setItem(MODE_KEY, 'supabase');
         localStorage.setItem(MODE_MIGRATION_KEY, 'done');
         /* session เดิมมาจาก Sheets และไม่มี Supabase session token. ลบทิ้งหนึ่งครั้ง
-           เพื่อบังคับให้ล็อกอินใหม่อย่างถูกต้อง แทนที่จะเปิดผังแล้วโดน 401 เงียบ ๆ. */
-        try { sessionStorage.removeItem('pmthu-session'); } catch (e) {}
+           เฉพาะหน้าหลักเท่านั้น: iframe ผังใช้ sessionStorage ร่วมกับหน้าหลักในบางเบราว์เซอร์
+           จึงห้าม iframe ลบ token ของหน้าที่ผู้ใช้เพิ่งล็อกอินอยู่ ไม่เช่นนั้นผังจะตอบ 401/ว่าง. */
+        if (window.top === window) try { sessionStorage.removeItem('pmthu-session'); } catch (e) {}
       }
     } catch (e) {}
   }
@@ -53,6 +54,11 @@
        ของมัน — action สาธารณะ/verifyUser ไม่ต้องมี token ส่วน action อื่นจะถูกปฏิเสธที่ RPC */
     try {
       var sess = JSON.parse(sessionStorage.getItem('pmthu-session') || 'null');
+      /* iframe บางบริบทมี sessionStorage แยกจากหน้าแม่ แม้เป็น origin เดียวกัน.
+         ใช้ token ของหน้าแม่เป็น fallback โดยไม่ส่งออกไปที่ใดนอกจาก RPC ของตลาดเดียวกัน. */
+      if ((!sess || !sess.apiToken) && window.parent && window.parent !== window) {
+        sess = JSON.parse(window.parent.sessionStorage.getItem('pmthu-session') || 'null');
+      }
       if (sess && sess.apiToken) body.sessionToken = sess.apiToken;
     } catch (e) {}
     return fetch(SB_URL + '/rest/v1/rpc/api', {
@@ -103,6 +109,7 @@ function esc(s){return String(s??'').replace(/[&<>"']/g,x=>({'&':'&amp;','<':'&l
 async function render(){const out=document.getElementById('rows');out.innerHTML='<tr><td colspan="9" class="empty">กำลังโหลดข้อมูล…</td></tr>';const all=await apiGet('getVendors');if(!Array.isArray(all)){out.innerHTML='<tr><td colspan="9" class="error">โหลดข้อมูลไม่สำเร็จ — กรุณาเข้าสู่ระบบและลองใหม่</td></tr>';return}const vs=all.filter(v=>v.status!=='terminated').sort((a,b)=>(a.zone||'').localeCompare(b.zone||'')||String(a.lock).localeCompare(String(b.lock),undefined,{numeric:true}));let rent=0,power=0;out.innerHTML=vs.length?vs.map(v=>{const r=(Number(v.dailyRate)||0)*daysInMonth(),e=elec(v);rent+=r;power+=e;const unpaid=v.status==='unpaid';return '<tr><td>'+esc(v.zone)+'</td><td><b>'+esc(v.lock)+'</b></td><td>'+esc(v.name||'—')+'</td><td>'+esc(v.phone||'—')+'</td><td>'+esc(v.product||'—')+'</td><td class="num">'+baht(r)+'</td><td class="num">'+baht(e)+'</td><td class="num"><b>'+baht(r+e)+'</b></td><td><span class="status '+(unpaid?'unpaid':'')+'">'+(unpaid?'ค้างชำระ':'ปกติ')+'</span></td></tr>'}).join(''):'<tr><td colspan="9" class="empty">ยังไม่มีผู้ค้าปัจจุบัน</td></tr>';document.getElementById('summary').innerHTML='<div class="stat"><b>'+vs.length+'</b><span>ผู้ค้าปัจจุบัน</span></div><div class="stat"><b>'+daysInMonth()+'</b><span>วันตลาดในเดือนนี้</span></div><div class="stat"><b>'+baht(rent)+'</b><span>ค่าเช่า/เดือน</span></div><div class="stat"><b>'+baht(rent+power)+'</b><span>รวมค่าเช่า+ค่าไฟ/เดือน</span></div>';document.getElementById('stamp').textContent='ข้อมูล ณ '+new Date().toLocaleString('th-TH')}
 render();
 </script>
+
 
 
 

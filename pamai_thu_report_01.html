@@ -581,8 +581,9 @@ window.PM_FILTER = (function () {
         localStorage.setItem(MODE_KEY, 'supabase');
         localStorage.setItem(MODE_MIGRATION_KEY, 'done');
         /* session เดิมมาจาก Sheets และไม่มี Supabase session token. ลบทิ้งหนึ่งครั้ง
-           เพื่อบังคับให้ล็อกอินใหม่อย่างถูกต้อง แทนที่จะเปิดผังแล้วโดน 401 เงียบ ๆ. */
-        try { sessionStorage.removeItem('pmthu-session'); } catch (e) {}
+           เฉพาะหน้าหลักเท่านั้น: iframe ผังใช้ sessionStorage ร่วมกับหน้าหลักในบางเบราว์เซอร์
+           จึงห้าม iframe ลบ token ของหน้าที่ผู้ใช้เพิ่งล็อกอินอยู่ ไม่เช่นนั้นผังจะตอบ 401/ว่าง. */
+        if (window.top === window) try { sessionStorage.removeItem('pmthu-session'); } catch (e) {}
       }
     } catch (e) {}
   }
@@ -602,6 +603,11 @@ window.PM_FILTER = (function () {
        ของมัน — action สาธารณะ/verifyUser ไม่ต้องมี token ส่วน action อื่นจะถูกปฏิเสธที่ RPC */
     try {
       var sess = JSON.parse(sessionStorage.getItem('pmthu-session') || 'null');
+      /* iframe บางบริบทมี sessionStorage แยกจากหน้าแม่ แม้เป็น origin เดียวกัน.
+         ใช้ token ของหน้าแม่เป็น fallback โดยไม่ส่งออกไปที่ใดนอกจาก RPC ของตลาดเดียวกัน. */
+      if ((!sess || !sess.apiToken) && window.parent && window.parent !== window) {
+        sess = JSON.parse(window.parent.sessionStorage.getItem('pmthu-session') || 'null');
+      }
       if (sess && sess.apiToken) body.sessionToken = sess.apiToken;
     } catch (e) {}
     return fetch(SB_URL + '/rest/v1/rpc/api', {
@@ -820,6 +826,7 @@ function toggleDark(){const h=document.documentElement,d=h.getAttribute('data-th
 (()=>{const s=localStorage.getItem('pmthu-t');if(s)document.documentElement.setAttribute('data-theme',s);else if(window.matchMedia('(prefers-color-scheme:dark)').matches)document.documentElement.setAttribute('data-theme','dark');})();
 </script>
 <!-- ==== PM_THEME_JS:END ==== -->
+
 
 
 
