@@ -502,12 +502,14 @@ input, select, textarea, button { font-family: inherit; max-width: 100%; }
   window.addEventListener('message', function (event) {
     try {
       if (event.origin !== window.location.origin) return;
-      if (event.data && event.data.type === 'pm-session' && typeof event.data.session === 'string') {
+      if (event.data && event.data.type === 'pmthu-session' && typeof event.data.session === 'string') {
         embeddedSession = event.data.session;
         /* ผังเริ่มโหลดข้อมูลตั้งแต่ window.onload ซึ่งอาจเร็วกว่าข้อความจากหน้าแม่
            จึงต้องสั่งดึงใหม่ทันทีหลังรับ token ไม่รอ retry รอบเดิมหมดก่อน. */
         if (typeof window.loadVendorOccupancy === 'function') window.loadVendorOccupancy();
-        else if (typeof window.syncRealVendors === 'function') window.syncRealVendors();
+        if (typeof window.syncRealVendors === 'function') window.syncRealVendors();
+        if (typeof window.loadFromSheets === 'function') window.loadFromSheets();
+        if (typeof window.loadAll === 'function') window.loadAll();
       }
     } catch (e) {}
   });
@@ -532,7 +534,7 @@ input, select, textarea, button { font-family: inherit; max-width: 100%; }
         /* session เดิมมาจาก Sheets และไม่มี Supabase session token. ลบทิ้งหนึ่งครั้ง
            เฉพาะหน้าหลักเท่านั้น: iframe ผังใช้ sessionStorage ร่วมกับหน้าหลักในบางเบราว์เซอร์
            จึงห้าม iframe ลบ token ของหน้าที่ผู้ใช้เพิ่งล็อกอินอยู่ ไม่เช่นนั้นผังจะตอบ 401/ว่าง. */
-        if (window.top === window) try { sessionStorage.removeItem('pm-session'); } catch (e) {}
+        if (window.top === window) try { sessionStorage.removeItem('pmthu-session'); } catch (e) {}
       }
     } catch (e) {}
   }
@@ -551,7 +553,7 @@ input, select, textarea, button { font-family: inherit; max-width: 100%; }
     /* token อยู่ใน sessionStorage เท่านั้น (ไม่ใช้ localStorage) และฐานข้อมูลเก็บแค่ hash
        ของมัน — action สาธารณะ/verifyUser ไม่ต้องมี token ส่วน action อื่นจะถูกปฏิเสธที่ RPC */
     try {
-      var sess = JSON.parse(sessionStorage.getItem('pm-session') || 'null');
+      var sess = JSON.parse(sessionStorage.getItem('pmthu-session') || 'null');
       /* iframe บางบริบทมี sessionStorage แยกจากหน้าแม่ แม้เป็น origin เดียวกัน.
          ใช้ token ของหน้าแม่เป็น fallback โดยไม่ส่งออกไปที่ใดนอกจาก RPC ของตลาดเดียวกัน. */
       if ((!sess || !sess.apiToken) && embeddedSession) {
@@ -561,7 +563,7 @@ input, select, textarea, button { font-family: inherit; max-width: 100%; }
         sess = JSON.parse(window.parent.__pmSessionBridge);
       }
       if ((!sess || !sess.apiToken) && window.parent && window.parent !== window) {
-        sess = JSON.parse(window.parent.sessionStorage.getItem('pm-session') || 'null');
+        sess = JSON.parse(window.parent.sessionStorage.getItem('pmthu-session') || 'null');
       }
       if (sess && sess.apiToken) body.sessionToken = sess.apiToken;
     } catch (e) {}
@@ -814,7 +816,7 @@ async function apiPost(action,data={}){
 window.addEventListener('message', function(e){
   if(e && e.data && e.data.type==='pm-refresh' && typeof loadVendorOccupancy==='function') loadVendorOccupancy();
 });
-function getCurrentUserName(){ try{const s=sessionStorage.getItem('pm-session');if(s){const u=JSON.parse(s);return u.username||'ผู้ใช้';}}catch(e){} return 'ผู้ใช้'; }
+function getCurrentUserName(){ try{const s=sessionStorage.getItem('pmthu-session');if(s){const u=JSON.parse(s);return u.username||'ผู้ใช้';}}catch(e){} return 'ผู้ใช้'; }
 
 const STATE_KEY='pmthu-mkt-state';
 const STATE_EXPIRE_DAYS=3;
@@ -826,7 +828,9 @@ window.addEventListener('message',function(e){if(e&&e.data&&e.data.type==='pm-sy
 function getLastThursday(){
   const d=pmMapNow();
   const dow=d.getDay(); // 0=Sun,4=Thu
-  d.setDate(d.getDate()-(dow>=4?dow-4:7-(4-dow)));
+  // รอบตลาดพฤหัสฯ เริ่มวันอาทิตย์: อา.–พ. ใช้พฤหัสฯ ที่กำลังจะถึง,
+  // พฤ.–ส. ใช้พฤหัสฯ ของสัปดาห์นี้ แล้วหมดอายุเมื่อเข้าวันอาทิตย์
+  d.setDate(d.getDate()+(dow<=3?4-dow:4-dow));
   d.setHours(0,0,0,0); return d;
 }
 
@@ -850,6 +854,10 @@ async function loadFromSheets(){
   try{
     const snapshot=await apiGet('getPublicStatus',{date:day});
     let leaveRows=snapshot&&snapshot.leave,dailyRows=snapshot&&snapshot.sold,vendorRows=snapshot&&snapshot.vendors;
+    // Supabase public endpoint ส่งสถานะลา/ขาดแบบ object keyed by lock เพื่อไม่เปิดข้อมูลส่วนตัว
+    if(!Array.isArray(leaveRows)&&snapshot&&snapshot.leaveStatus&&typeof snapshot.leaveStatus==='object'){
+      leaveRows=Object.entries(snapshot.leaveStatus).map(([lock_id,v])=>({lock_id,type:v&&v.type}));
+    }
     if(!Array.isArray(leaveRows)||!Array.isArray(dailyRows)){
       [leaveRows,dailyRows]=await Promise.all([apiGet('getLeaveLog',{date:day}),apiGet('getDailyBookings',{date:day})]);
     }
@@ -877,9 +885,10 @@ async function loadFromSheets(){
     Object.keys(dailyBookings).forEach(id=>delete dailyBookings[id]);
     Object.assign(lockAbsent,nextLeave);
     Object.assign(dailyBookings,nextDaily);
+    const unpaidLocks=new Set(snapshot&&Array.isArray(snapshot.unpaidLocks)?snapshot.unpaidLocks:[]);
     if(Array.isArray(vendorRows)) vendorRows.forEach(v=>{
       const el=document.querySelector('.lk[data-id="'+v.lock+'"]');if(!el)return;
-      const st=(v.status==='terminated'||v.status==='vacant')?'vacant':(v.status==='unpaid'?'unpaid':'occupied');
+      const st=(v.status==='terminated'||v.status==='vacant')?'vacant':(v.status==='unpaid'||unpaidLocks.has(v.lock)?'unpaid':'occupied');
       el.dataset.status=st;el.dataset.shop=v.product||el.dataset.shop||'ผู้ค้า';
       ['vacant','occupied','unpaid','cancelled'].forEach(c=>el.classList.remove(c));el.classList.add(st);
       const shop=el.querySelector('.lk-shop');if(shop)shop.textContent=st==='vacant'?'—':el.dataset.shop;
@@ -1037,12 +1046,13 @@ async function confirmLeave(){
   if(!pendingLeaveId)return;
   const id=pendingLeaveId;
   const note=document.getElementById('lm-note').value.trim();
+  const el=document.querySelector('.lk[data-id="'+id+'"]');
+  const shop=el?.dataset.shop||'';
+  const res=await apiPost('logLeave',{data:{lock_id:id,zone:el?.dataset.zone||'',shop,type:'leave',note:note||'',manager:getCurrentUserName(),date:marketDayTH(),time:nowTime()}});
+  if(!res||res.status!=='ok'){toast('บันทึกแจ้งลาไม่สำเร็จ — กรุณาลองใหม่','e');return;}
   lockAbsent[id]='leave';
   addHist(id,{type:'leave',label:'📋 แจ้งลา',note:note||'—'});
-  const el=document.querySelector('.lk[data-id="'+id+'"]');
   if(el) refreshLk(el);
-  const shop=el?.dataset.shop||'';
-  await apiPost('logLeave',{data:{lock_id:id,zone:el?.dataset.zone||'',shop,type:'leave',note:note||'',manager:getCurrentUserName(),date:marketDayTH(),time:nowTime()}});
   document.getElementById('leaveModal').classList.remove('show');
   saveMarketState(); updateExpireBanner();
   toast('✅ บันทึกแจ้งลาล็อค '+id+' (คงอยู่ 3 วัน)','s');
@@ -1051,12 +1061,13 @@ async function confirmLeave(){
 }
 async function doAbsent(lockId){
   if(!confirm('บันทึกล็อค '+lockId+' เป็น "ขาดล็อค (ไม่แจ้ง)" ใช่หรือไม่?'))return;
+  const el=document.querySelector('.lk[data-id="'+lockId+'"]');
+  const shop=el?.dataset.shop||'';
+  const res=await apiPost('logLeave',{data:{lock_id:lockId,zone:el?.dataset.zone||'',shop,type:'absent',note:'บันทึกโดยผู้ดูแล',manager:getCurrentUserName(),date:marketDayTH(),time:nowTime()}});
+  if(!res||res.status!=='ok'){toast('บันทึกขาดล็อคไม่สำเร็จ — กรุณาลองใหม่','e');return;}
   lockAbsent[lockId]='absent';
   addHist(lockId,{type:'absent',label:'⚠️ ขาดล็อค (ไม่แจ้ง)',note:'บันทึกโดยผู้ดูแล'});
-  const el=document.querySelector('.lk[data-id="'+lockId+'"]');
   if(el) refreshLk(el);
-  const shop=el?.dataset.shop||'';
-  await apiPost('logLeave',{data:{lock_id:lockId,zone:el?.dataset.zone||'',shop,type:'absent',note:'บันทึกโดยผู้ดูแล',manager:getCurrentUserName(),date:marketDayTH(),time:nowTime()}});
   saveMarketState(); updateExpireBanner();
   closePopup();
   toast('⚠️ บันทึกขาดล็อค '+lockId+' (คงอยู่ 3 วัน)','e');
@@ -1979,6 +1990,8 @@ function toast(msg,type){
 window.onload=function(){buildAll();setTimeout(checkThursdayCycle,400);};
 
 </script>
+
+
 
 
 

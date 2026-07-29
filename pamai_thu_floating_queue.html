@@ -339,7 +339,9 @@ input, select, textarea, button { font-family: inherit; max-width: 100%; }
         /* ผังเริ่มโหลดข้อมูลตั้งแต่ window.onload ซึ่งอาจเร็วกว่าข้อความจากหน้าแม่
            จึงต้องสั่งดึงใหม่ทันทีหลังรับ token ไม่รอ retry รอบเดิมหมดก่อน. */
         if (typeof window.loadVendorOccupancy === 'function') window.loadVendorOccupancy();
-        else if (typeof window.syncRealVendors === 'function') window.syncRealVendors();
+        if (typeof window.syncRealVendors === 'function') window.syncRealVendors();
+        if (typeof window.loadFromSheets === 'function') window.loadFromSheets();
+        if (typeof window.loadAll === 'function') window.loadAll();
       }
     } catch (e) {}
   });
@@ -612,18 +614,31 @@ function getCurrentUserRole(){
 // HELPERS
 // ════════════════════════════════════════════════════
 const MONS=['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
-function nowTH(){const n=new Date();return n.getDate()+' '+MONS[n.getMonth()]+' '+(n.getFullYear()+543);}
-function nowTime(){const n=new Date();return String(n.getHours()).padStart(2,'0')+':'+String(n.getMinutes()).padStart(2,'0');}
+let PM_PAGE_CLOCK={manual:false,offsetMs:0};
+try{const c=JSON.parse(localStorage.getItem('pm-system-clock')||'null');if(c)PM_PAGE_CLOCK={manual:!!c.manual,offsetMs:parseInt(c.offsetMs,10)||0};}catch(e){}
+function pmPageNow(){try{if(window.parent&&window.parent!==window&&typeof window.parent.pmNow==='function')return window.parent.pmNow();}catch(e){}return new Date(Date.now()+(PM_PAGE_CLOCK.manual?PM_PAGE_CLOCK.offsetMs:0));}
+function nowTH(){const n=pmPageNow();return n.getDate()+' '+MONS[n.getMonth()]+' '+(n.getFullYear()+543);}
+function nowTime(){const n=pmPageNow();return String(n.getHours()).padStart(2,'0')+':'+String(n.getMinutes()).padStart(2,'0');}
 function fmt(n){return '฿'+Math.round(n||0).toLocaleString();}
 function esc(s){return String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));}
 // เกณฑ์วันตลาดเดียวกับที่ใช้ทั้งระบบ — build.py จะแปลง getDay()===4 เป็น ===4 ให้อัตโนมัติฝั่งวันพฤหัสฯ
 // ห้ามเขียนเป็น !==2 หรือรูปแบบอื่น เพราะ build.py จะจับคู่แปลงไม่ได้ (ดูคู่มือหัวข้อ 7)
 function isMarketDay(d){ return d.getDay()===4; }
 function nextMarketDateStr(){
-  const d=new Date();
+  const d=pmPageNow();
   for(let i=0;i<7;i++){ if(isMarketDay(d)) break; d.setDate(d.getDate()+1); }
   return d.getDate()+' '+MONS[d.getMonth()]+' '+(d.getFullYear()+543);
 }
+window.addEventListener('message',function(e){
+  if(e&&e.data&&e.data.type==='pm-system-clock'){
+    PM_PAGE_CLOCK=e.data.clock||PM_PAGE_CLOCK;
+    setTimeout(function(){
+      CURRENT_DATE=nextMarketDateStr();
+      const input=document.getElementById('market-date-input');if(input)input.value=CURRENT_DATE;
+      if(typeof loadAll==='function')loadAll();
+    },0);
+  }
+});
 function toast(msg,type){
   const t=document.getElementById('toast');
   t.innerHTML=msg;t.className='toast '+(type||'i')+' show';
@@ -1023,6 +1038,8 @@ window.onload=function(){
   loadAll();
 };
 </script>
+
+
 
 
 
