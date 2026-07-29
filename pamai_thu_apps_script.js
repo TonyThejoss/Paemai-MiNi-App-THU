@@ -726,10 +726,31 @@ function cancelDailyBooking(lockId, date) {
   for (let i = rows.length - 1; i >= 1; i--) {
     if (rows[i][lockIdx] === lockId && _normDate(rows[i][dateIdx]) === target && rows[i][canIdx] !== true) {
       sheet.getRange(i+1, canIdx+1).setValue(true);
+      _cancelSoldQueueForDailyLock(lockId, target);
       return makeRes({ cancelled: lockId });
     }
   }
   return makeErr('Booking not found');
+}
+
+function _cancelSoldQueueForDailyLock(lockId, date) {
+  const sheet = getSheet(S.QUEUE);
+  const rows = sheet.getDataRange().getValues();
+  if (rows.length < 2) return;
+  const headers = rows[0];
+  const lockIdx = headers.indexOf('assigned_lock');
+  const dateIdx = headers.indexOf('market_date');
+  const statusIdx = headers.indexOf('status');
+  const updatedIdx = headers.indexOf('updated_at');
+  if (lockIdx < 0 || dateIdx < 0 || statusIdx < 0) return;
+  const target = _normDate(date);
+  const now = new Date().toISOString();
+  for (let i = rows.length - 1; i >= 1; i--) {
+    if (rows[i][lockIdx] === lockId && _normDate(rows[i][dateIdx]) === target && rows[i][statusIdx] === 'sold') {
+      sheet.getRange(i + 1, statusIdx + 1).setValue('cancelled');
+      if (updatedIdx >= 0) sheet.getRange(i + 1, updatedIdx + 1).setValue(now);
+    }
+  }
 }
 
 // ════════════════════════════════════════
