@@ -873,7 +873,7 @@ function toggleDark(){
   else if(window.matchMedia('(prefers-color-scheme:dark)').matches) document.documentElement.setAttribute('data-theme','dark');
 })();
 
-const APP_BUILD='20260729-1817'; // cache-buster — build.py แทนค่าอัตโนมัติ
+const APP_BUILD='20260729-2049'; // cache-buster — build.py แทนค่าอัตโนมัติ
 const DAYS=['อาทิตย์','จันทร์','อังคาร','พุธ','พฤหัสบดี','ศุกร์','เสาร์'];
 const MONS=['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
 function tick(){
@@ -1983,11 +1983,25 @@ window.onload=function(){
   var SB_URL = 'https://atvxajfwazrswdlhnosh.supabase.co';
   var SB_KEY = 'sb_publishable_kGSsjrQvDa9EKaw7CDPeQg_UnkKtCLa';
   var MODE_KEY = 'pm-thu-backend';
+  var MODE_MIGRATION_KEY = MODE_KEY + '-migration-v3.1';
 
   /* โหมดปัจจุบัน: sheets (เดิม) · parallel (อ่าน Supabase เขียนสองที่) · supabase (ใหม่ล้วน)
      เปลี่ยนได้จาก console ด้วย PM_API.setMode('parallel') โดยไม่ต้อง deploy ใหม่ */
   function mode() {
-    try { return localStorage.getItem(MODE_KEY) || 'supabase'; } catch (e) { return 'supabase'; }
+    try {
+      /* เครื่องที่เคยใช้รุ่นก่อนจะมีค่า `sheets` ค้างอยู่ใน localStorage.
+         การตั้ง default ในโค้ดอย่างเดียวจึงไม่พอ เพราะค่านั้นชนะ default เสมอและทำให้
+         แอพดูเหมือนต่อ Supabase ไม่ได้. ย้ายค่าอัตโนมัติครั้งเดียวเมื่อรับรุ่น v3.1;
+         หลังจากนั้น setMode('sheets') ยังใช้เป็นทางถอยฉุกเฉินได้ตามปกติ. */
+      if (!localStorage.getItem(MODE_MIGRATION_KEY)) {
+        localStorage.setItem(MODE_KEY, 'supabase');
+        localStorage.setItem(MODE_MIGRATION_KEY, 'done');
+        /* session เดิมมาจาก Sheets และไม่มี Supabase session token. ลบทิ้งหนึ่งครั้ง
+           เพื่อบังคับให้ล็อกอินใหม่อย่างถูกต้อง แทนที่จะเปิดผังแล้วโดน 401 เงียบ ๆ. */
+        try { sessionStorage.removeItem('pmthu-session'); } catch (e) {}
+      }
+      return localStorage.getItem(MODE_KEY) || 'supabase';
+    } catch (e) { return 'supabase'; }
   }
 
   function sbFetch(action, payload) {
