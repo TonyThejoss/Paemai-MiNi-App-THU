@@ -953,7 +953,7 @@ function toggleDark(){
   else if(window.matchMedia('(prefers-color-scheme:dark)').matches) document.documentElement.setAttribute('data-theme','dark');
 })();
 
-const APP_BUILD='20260729-2108'; // cache-buster — build.py แทนค่าอัตโนมัติ
+const APP_BUILD='20260729-2112'; // cache-buster — build.py แทนค่าอัตโนมัติ
 const DAYS=['อาทิตย์','จันทร์','อังคาร','พุธ','พฤหัสบดี','ศุกร์','เสาร์'];
 const MONS=['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
 function tick(){
@@ -1810,22 +1810,24 @@ function showLoading(msg){
 function hideLoading(){const el=document.getElementById('db-loading');if(el)el.style.display='none';}
 async function loadVendorsFromSheets(){
   if(!getApiUrl())return;
-  showLoading('กำลังโหลดข้อมูลผู้ค้าจาก Google Sheets...');
+  const sourceName=(window.PM_API&&window.PM_API.mode&&window.PM_API.mode()==='supabase')?'Supabase':'Google Sheets';
+  showLoading('กำลังโหลดข้อมูลผู้ค้าจาก '+sourceName+'...');
   const data=await apiGet('getVendors');
   hideLoading();
   if(!data)return;
   VENDORS.length=0;
   data.forEach(row=>{VENDORS.push({lock:row.lock,zone:row.zone,name:row.name||'(ยังไม่ระบุ)',phone:row.phone||'—',line:row.line||'—',product:row.product||'—',type:row.type||'regular',dailyRate:parseInt(row.dailyRate||row.daily_rate||row.rent)||0,elec:{bulb:parseInt(row.elec_bulb)||0,fan:parseInt(row.elec_fan)||0,small:parseInt(row.elec_small)||0,large:parseInt(row.elec_large)||0,special:Array.isArray(row.elec_special)?row.elec_special:[]},status:row.status||'active',unpaidPenalty:parseFloat(row.unpaid_penalty)||0,unpaidOther:parseFloat(row.unpaid_other)||0,unpaidOtherLabel:row.unpaid_other_label||''});});
   renderDashboard();
-  showToast('<svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg> โหลดข้อมูล '+VENDORS.length+' ราย จาก Sheets','s');
+  showToast('<svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg> โหลดข้อมูล '+VENDORS.length+' ราย จาก '+sourceName,'s');
 }
 function updateDbStatus(){
   const url=getApiUrl();
+  const isSupabase=!!(window.PM_API&&window.PM_API.mode&&window.PM_API.mode()==='supabase');
   const badge=document.getElementById('db-status-badge');
   const sb=document.getElementById('sb-db-badge');
   if(url){
-    if(badge){badge.innerHTML='<svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M17.5 19H9a5 5 0 1 1 1.6-9.7A6 6 0 0 1 22 11.5 4.5 4.5 0 0 1 17.5 19Z"/></svg> Sheets';badge.style.background='rgba(82,183,136,.22)';badge.style.color='#efac86';}
-    if(sb) sb.innerHTML='<svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M17.5 19H9a5 5 0 1 1 1.6-9.7A6 6 0 0 1 22 11.5 4.5 4.5 0 0 1 17.5 19Z"/></svg> เชื่อมต่อ Google Sheets แล้ว';
+    if(badge){badge.innerHTML='<svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M17.5 19H9a5 5 0 1 1 1.6-9.7A6 6 0 0 1 22 11.5 4.5 4.5 0 0 1 17.5 19Z"/></svg> '+(isSupabase?'Supabase':'Sheets');badge.style.background='rgba(82,183,136,.22)';badge.style.color='#efac86';}
+    if(sb) sb.innerHTML='<svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M17.5 19H9a5 5 0 0 1 1.6-9.7A6 6 0 0 1 22 11.5 4.5 4.5 0 0 1 17.5 19Z"/></svg> เชื่อมต่อ '+(isSupabase?'Supabase':'Google Sheets')+' แล้ว';
   } else {
     if(badge){badge.innerHTML='<svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="4" width="16" height="18" rx="2"/><path d="M9 3h6a1 1 0 0 1 1 1v1H8V4a1 1 0 0 1 1-1Z"/></svg> Local';badge.style.background='rgba(255,255,255,.14)';badge.style.color='rgba(255,255,255,.82)';}
     if(sb) sb.innerHTML='<svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="4" width="16" height="18" rx="2"/><path d="M9 3h6a1 1 0 0 1 1 1v1H8V4a1 1 0 0 1 1-1Z"/></svg> Local — คลิกเชื่อมต่อ Google Sheets';
@@ -2053,6 +2055,7 @@ window.onload=function(){
   logAct('system','ระบบเริ่มทำงาน — แพไม้มินิ v1.0');
 };
 </script>
+
 
 
 <script id="pm-api-shim">
