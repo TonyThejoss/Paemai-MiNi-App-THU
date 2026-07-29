@@ -1865,8 +1865,8 @@ function pmHasBackend(){
   return pmBackendMode()!=='sheets' ? true : !!getApiUrl();
 }
 /** ดึง getVendors พร้อม timeout + retry — คืน array ถ้าสำเร็จ, null ถ้าไม่สำเร็จ
-    โหมด supabase/parallel เรียกผ่าน apiGet ชุดกลาง (PM_API_CLIENT) เพื่อไม่ให้มีทางเข้า
-    ฐานข้อมูลสองทางในไฟล์เดียว — เปลี่ยนแบ็กเอนด์ทีเดียวมีผลทุกจุดจริง ๆ */
+    โหมด Supabase เรียก PM_API โดยตรง: ผังเป็น iframe และ apiGet ของหน้าเดิมอาจยังชี้
+    ไปที่ Apps Script/คืน null ได้ แม้หน้าแม่ดึง Supabase สำเร็จแล้ว */
 async function pmFetchVendors(){
   const viaApi = pmBackendMode()!=='sheets';
   if(!viaApi && !getApiUrl()) return null;
@@ -1875,11 +1875,14 @@ async function pmFetchVendors(){
     const timer=setTimeout(function(){ if(ctl) ctl.abort(); }, PM_FETCH_TIMEOUT_MS);
     try{
       if(viaApi){
-        const rows=await Promise.race([
-          window.apiGet('getVendors', {}),
+        const response=await Promise.race([
+          window.PM_API && typeof window.PM_API.supabase==='function'
+            ? window.PM_API.supabase('getVendors', {})
+            : window.apiGet('getVendors', {}),
           new Promise(function(_,rej){ setTimeout(function(){ rej(new Error('timeout')); }, PM_FETCH_TIMEOUT_MS); })
         ]);
         clearTimeout(timer);
+        const rows=Array.isArray(response) ? response : (response && Array.isArray(response.data) ? response.data : null);
         if(Array.isArray(rows)) return rows;
         throw new Error('payload ไม่ถูกต้อง');
       }
@@ -1930,6 +1933,8 @@ function toast(msg,type){
 window.onload=function(){buildAll();setTimeout(checkThursdayCycle,400);};
 
 </script>
+
+
 
 
 
