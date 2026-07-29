@@ -440,6 +440,51 @@ input, select, textarea, button { font-family: inherit; max-width: 100%; }
 .leg-dot.d-unpaid{ background:var(--st-up-bg); border-color:var(--st-up-bd); }
 </style>
 <!-- ==== PM_STATUS_COLORS:END ==== -->
+<style id="pm-mapfit">
+/* ==== PM_MAPFIT (v2.5) — ผังตลาดบนมือถือต้องไม่ล้นกรอบการ์ด และต้องเลื่อนไปดูได้จริง ====
+   อาการที่ผู้ดูแลตลาดแจ้ง: "ผังโซนโรงหน้า (SA) ของแอพฝั่ง TUE ล้นขอบบนมือถือ"
+   (หมายเหตุ: ไฟล์ผังตลาดถูก build.py คัดลอกตรง ๆ ไม่แปลงคำ — ห้ามพิมพ์ชื่อวันของอีกตลาดในไฟล์นี้
+    ไม่งั้น verify() จะฟ้องว่ามีข้อมูลข้ามตลาดรั่ว)
+   ต้นเหตุ 2 ชั้น:
+     1) แถวล็อค (.lrow เป็น flex + .lk เป็น flex-shrink:0) กว้างกว่าจอเสมอ แต่การ์ด .bld ถูกบีบ
+        ให้เท่าความกว้างจอ ล็อคจึงทะลุออกไปนอกเส้นขอบการ์ด ดูเหมือนผังพัง
+     2) PM_MOBILE_KIT ตั้ง body{overflow-x:hidden} ส่วนที่ล้นจึงถูกตัดทิ้ง เลื่อนนิ้วไปดูไม่ได้เลย
+        (และด้วยเหตุผลเดียวกัน test_responsive.js ก็ไม่ฟ้อง เพราะ scrollWidth ไม่เกิน clientWidth)
+   วิธีแก้: ให้การ์ดขยายตามเนื้อหาจริง (width:max-content) แล้วปล่อยให้ .map-area ซึ่งมี
+   overflow:auto อยู่แล้วเป็น "ตัวเลื่อนตัวเดียว" ของทั้งผัง
+   ⚠️ กฎเหล็กข้อ 12: .bld / .map-area / .zone-map เป็นคลาสของ "ไฟล์ผังตลาดเท่านั้น"
+      (ตรวจแล้วไม่มีในอีก 18 ไฟล์) จึงเขียนเป็นตัวเลือกตรง ๆ ได้ ไม่ต้อง opt-in
+      ห้ามย้ายกฎก้อนนี้ไป inject_mobile_kit.py เด็ดขาด เพราะสคริปต์นั้นฝังลงทุกไฟล์ */
+.map-area{ -webkit-overflow-scrolling:touch; overscroll-behavior-x:contain; }
+.bld{ width:max-content; min-width:100%; box-sizing:border-box; }
+@media (max-width:640px){
+  /* เผื่อขอบขวาให้เส้นกรอบการ์ดไม่ชิดล็อคตัวสุดท้าย และให้เห็นว่ายังเลื่อนต่อได้ */
+  .bld{ padding-right:16px; }
+  .map-area{ padding:12px; }
+}
+</style>
+<style id="pm-vendor-sync">
+/* ==== PM_VENDOR_SYNC:CSS (v2.5) — ห้ามแก้ในไฟล์ผัง แก้ที่ tools/patch_market_maps.py ==== */
+#pmVendorBar{display:none;align-items:center;gap:8px;flex-wrap:wrap;padding:8px 16px;
+  font-size:.72rem;font-weight:700;border-bottom:1px solid var(--bd);line-height:1.5;}
+#pmVendorBar.show{display:flex;}
+#pmVendorBar.s-loading{background:var(--bl,#e0edff);color:var(--b,#1d4ed8);}
+#pmVendorBar.s-cache{background:#fef3c7;color:#78350f;}
+#pmVendorBar.s-error,#pmVendorBar.s-noapi{background:var(--rl,#fee2e2);color:var(--r,#b91c1c);}
+#pmVendorBar button{font-family:inherit;font-size:.72rem;font-weight:800;cursor:pointer;
+  border-radius:7px;padding:6px 12px;min-height:36px;border:1.5px solid currentColor;
+  background:rgba(255,255,255,.55);color:inherit;}
+[data-theme="dark"] #pmVendorBar button{background:rgba(0,0,0,.25);}
+#pmVendorBar button:disabled{opacity:.55;cursor:progress;}
+/* สถานะ "ยังไม่ทราบ" — ต้องดูไม่เหมือนล็อคว่างเด็ดขาด ไม่งั้นก็กลับไปเป็นบั๊กเดิม */
+.map-area.pm-nodata .lk{opacity:.45;border-style:dotted !important;
+  background:repeating-linear-gradient(45deg,var(--bd,#d8dee6) 0 6px,transparent 6px 12px) !important;
+  color:var(--txl,#64748b) !important;}
+.map-area.pm-nodata .lk:hover{transform:none;box-shadow:none;}
+.map-area.pm-loading .lk{animation:pmSkel 1.1s ease-in-out infinite;}
+@keyframes pmSkel{0%,100%{opacity:1}50%{opacity:.55}}
+@media (prefers-reduced-motion: reduce){.map-area.pm-loading .lk{animation:none;opacity:.7;}}
+</style>
 </head>
 <body>
 <div class="topbar">
@@ -462,6 +507,7 @@ input, select, textarea, button { font-family: inherit; max-width: 100%; }
     <div class="leg" onclick="setFilter('leave',this)"><div class="leg-dot d-leave"></div>แจ้งลา</div>
     <div class="leg" onclick="setFilter('absent',this)"><div class="leg-dot d-absent"></div>ขาดล็อค</div>
     <div class="leg" onclick="setFilter('daily',this)"><div class="leg-dot d-daily"></div>ล็อคจร</div>
+  </div><!-- PM_TOOLBAR_FIX: ปิดกล่องครอบ legend — ห้ามลบ ไม่งั้น </div> ตัวถัดไปจะไปปิดกล่องนี้แทน .toolbar แล้วผังตลาดจะกลายเป็นลูกของ .toolbar -->
   <input class="sbox" id="searchBox" aria-label="ค้นหาล็อค / ร้าน" placeholder="🔍 ค้นหาล็อค / ร้านค้า..." oninput="doSearch(this.value)">
   <div class="stats-bar" id="statsBar"></div>
 </div>
@@ -501,30 +547,30 @@ input, select, textarea, button { font-family: inherit; max-width: 100%; }
   <div id="zone-out" class="zone-map active">
     <div class="bld out">
       <div class="bld-label" style="color:var(--b);border-color:var(--b)"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2 7 9h3l-4 6h4v6h4v-6h4l-4-6h3z"/></svg> โซนด้านนอก A–F</div>
-      <div id="out-grid" style="margin-top:6px;overflow-x:auto"></div>
+      <div id="out-grid" style="margin-top:6px"></div>
       <div class="sec-title" style="margin-top:18px">โซน F</div>
-      <div id="out-f-grid" style="overflow-x:auto"></div>
+      <div id="out-f-grid"></div>
     </div>
   </div>
   <!-- BESIDE 7-ELEVEN ZONE -->
   <div id="zone-b7" class="zone-map">
     <div class="bld">
       <div class="bld-label"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 10h16v9a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1v-9z"/><path d="M3 6l1.5-3h15L21 6M3 6l.8 3.2A1.7 1.7 0 0 0 8 9.4M8 9.4a1.7 1.7 0 0 0 3.3 0M11.3 9.4a1.7 1.7 0 0 0 3.4 0M14.7 9.4a1.7 1.7 0 0 0 3.3 0M18 9.4A1.7 1.7 0 0 0 21.2 9.2L22 6"/></svg> โซนข้าง 7-Eleven (G·J·K·N·U)</div>
-      <div id="b7-grid" style="margin-top:6px;overflow-x:auto"></div>
+      <div id="b7-grid" style="margin-top:6px"></div>
     </div>
   </div>
   <!-- BESIDE LOTUS ZONE -->
   <div id="zone-lt" class="zone-map">
     <div class="bld">
       <div class="bld-label"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="20" r="1.3" fill="currentColor" stroke="none"/><circle cx="17" cy="20" r="1.3" fill="currentColor" stroke="none"/><path d="M2.5 3h2.5L8 14h9l2.5-8H6.5"/></svg> โซนข้างโลตัส (O·M·H·L·T·AB)</div>
-      <div id="lt-grid" style="margin-top:6px;overflow-x:auto"></div>
+      <div id="lt-grid" style="margin-top:6px"></div>
     </div>
   </div>
   <!-- TAILGATE ZONE -->
   <div id="zone-tg" class="zone-map">
     <div class="bld out" style="border-color:var(--bl)">
       <div class="bld-label" style="color:var(--b);border-color:var(--b)"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="12" height="9" rx="1"/><path d="M14 10h4l3 3v3h-7z"/><circle cx="7" cy="18.5" r="1.6"/><circle cx="17.5" cy="18.5" r="1.6"/></svg> โซนเปิดท้าย (TA·TB·TC)</div>
-      <div id="tg-grid" style="margin-top:6px;overflow-x:auto"></div>
+      <div id="tg-grid" style="margin-top:6px"></div>
     </div>
   </div>
 </div>
@@ -682,7 +728,7 @@ function marketDayTH(){
 }
 window.PM_MARKET_DAY_TH = marketDayTH;
 async function loadFromSheets(){
-  if(!getApiUrl()) return;                 // ยังไม่เชื่อมต่อ Sheets — ใช้ state ในเครื่องอย่างเดียว
+  if(!pmHasBackend()) return;              // ยังไม่เชื่อมต่อฐานข้อมูลใด ๆ — ใช้ state ในเครื่องอย่างเดียว
   const day=marketDayTH();
   try{
     const [leaveRows,dailyRows]=await Promise.all([
@@ -931,62 +977,124 @@ function cancelDaily(lockId){
 // ════════════════════════════════════════════════════
 // MOVE LOCK
 // ════════════════════════════════════════════════════
-let pendingMoveId=null;
-function openMoveModal(lockId){
-  pendingMoveId=lockId;
+// ════════════════════════════════════════════════════
+// PM_MOVE_V2:START (v2.5) — สร้างโดย tools/patch_market_maps.py ห้ามแก้ในไฟล์นี้
+// ย้ายล็อคจร / ย้ายผู้ค้าประจำ — บันทึกลงฐานข้อมูลก่อนเสมอ แล้วค่อยแตะหน้าจอ
+// (บทเรียน v2.2: หน้าจอที่เปลี่ยนก่อนโดยไม่รอผลจาก backend = หน้าจอที่โกหกผู้ใช้)
+// ════════════════════════════════════════════════════
+let pendingMoveId=null, pendingMoveKind='daily';
+
+/** kind: 'daily' = ย้ายผู้ค้าจรของวันตลาดนี้ · 'vendor' = ย้ายผู้ค้าประจำ (ย้ายถาวร) */
+function openMoveModal(lockId, kind){
   const src=document.querySelector('.lk[data-id="'+lockId+'"]');
-  const isDaily=!!dailyBookings[lockId];
-  document.getElementById('mv-title').textContent='🔄 ย้ายล็อค '+lockId;
-  document.getElementById('mv-sub').textContent=(isDaily?'ผู้ค้าจร':'ผู้ค้าประจำ')+': '+(src?.dataset.shop||'—');
+  const hasDaily=!!dailyBookings[lockId];
+  pendingMoveKind = kind || (hasDaily ? 'daily' : 'vendor');
+  pendingMoveId=lockId;
+  const isDaily = pendingMoveKind==='daily';
+  if(isDaily && !hasDaily){ toast('ล็อคนี้ยังไม่มีการขายล็อคจรในวันตลาดนี้','e'); return; }
+
+  document.getElementById('mv-title').textContent=(isDaily?'ย้ายล็อคจร ':'ย้ายผู้ค้าประจำ ')+lockId;
+  document.getElementById('mv-sub').textContent=
+    (isDaily ? ('ผู้ค้าจร: '+((dailyBookings[lockId]&&dailyBookings[lockId].name)||'—'))
+             : ('ผู้ค้าประจำ: '+((src&&src.dataset.shop)||'—')));
+
   const sel=document.getElementById('mv-target');
   sel.innerHTML='';
-  const vacants=[...document.querySelectorAll('.lk')].filter(el=>{
-    if(el.dataset.id===lockId||el.dataset.status==='cancelled') return false;
-    if(dailyBookings[el.dataset.id]) return false;
+  // "ล็อคว่างที่มีอยู่ ณ ขณะนี้" ตามที่ผู้ดูแลตลาดกำหนด:
+  //   · ต้องไม่ใช่ล็อคเดิม / ไม่ใช่ล็อคที่ยกเลิก / ไม่ใช่ล็อคที่ไม่เปิดขาย
+  //   · ต้องไม่มีผู้ค้าจรจองอยู่แล้วในวันตลาดนี้ (กันขายซ้ำล็อค)
+  //   · ล็อคว่างใช้ได้เสมอ · เฉพาะการย้าย "จร" ที่ใช้ล็อคของผู้ค้าประจำที่แจ้งลา/ขาดล็อควันนี้ได้ด้วย
+  //     (ผู้ค้าประจำยังถือสัญญาเช่าอยู่ จึงย้ายผู้ค้าประจำอีกคนเข้าไปทับไม่ได้)
+  const targets=[...document.querySelectorAll('.lk[data-id]')].filter(function(el){
+    const id=el.dataset.id;
+    if(id===lockId) return false;
+    if(el.dataset.status==='cancelled'||el.dataset.status==='excluded') return false;
+    if(dailyBookings[id]) return false;
     if(el.dataset.status==='vacant') return true;
-    if(isDaily&&(lockAbsent[el.dataset.id]==='leave'||lockAbsent[el.dataset.id]==='absent')) return true;
+    if(isDaily&&(lockAbsent[id]==='leave'||lockAbsent[id]==='absent')) return true;
     return false;
   });
-  if(!vacants.length){sel.innerHTML='<option value="">ไม่มีล็อคว่าง</option>';}
-  else{vacants.forEach(el=>{const o=document.createElement('option');o.value=el.dataset.id;o.textContent=el.dataset.id+' — '+el.dataset.shop+' ('+el.dataset.zone+')';sel.appendChild(o);});}
+  if(!targets.length){
+    sel.innerHTML='<option value="">ไม่มีล็อคว่างให้ย้ายไปในขณะนี้</option>';
+  } else {
+    targets.forEach(function(el){
+      const o=document.createElement('option');
+      o.value=el.dataset.id;
+      const note=(lockAbsent[el.dataset.id]==='leave')?' · ผู้ค้าประจำแจ้งลาวันนี้'
+                :(lockAbsent[el.dataset.id]==='absent')?' · ผู้ค้าประจำขาดล็อควันนี้':'';
+      o.textContent=el.dataset.id+' ('+el.dataset.zone+')'+note;
+      sel.appendChild(o);
+    });
+  }
   const info=document.getElementById('mv-target-info');
-  sel.onchange=()=>{const t=document.querySelector('.lk[data-id="'+sel.value+'"]');if(t){info.textContent='ปลายทาง: '+sel.value+' · ค่าเช่า ฿'+parseInt(t.dataset.rent||0)+'/เดือน';info.style.display='block';}else info.style.display='none';};
+  sel.onchange=function(){
+    const t=document.querySelector('.lk[data-id="'+sel.value+'"]');
+    if(t){ info.textContent='ปลายทาง: '+sel.value+' · โซน '+t.dataset.zone; info.style.display='block'; }
+    else info.style.display='none';
+  };
   info.style.display='none';
   closePopup();
   document.getElementById('moveModal').classList.add('show');
 }
-function confirmMove(){
-  if(!pendingMoveId)return;
+
+async function confirmMove(){
+  if(!pendingMoveId) return;
   const targetId=document.getElementById('mv-target').value;
-  if(!targetId){toast('กรุณาเลือกล็อคปลายทาง','e');return;}
+  if(!targetId){ toast('กรุณาเลือกล็อคปลายทาง','e'); return; }
+  if(!pmHasBackend()){ toast('ยังไม่ได้เชื่อมต่อฐานข้อมูล — ย้ายล็อคไม่ได้ในโหมดออฟไลน์','e'); return; }
   const srcEl=document.querySelector('.lk[data-id="'+pendingMoveId+'"]');
   const tgtEl=document.querySelector('.lk[data-id="'+targetId+'"]');
-  if(!srcEl||!tgtEl){toast('ไม่พบล็อค','e');return;}
-  const isDaily=!!dailyBookings[pendingMoveId];
+  if(!srcEl||!tgtEl){ toast('ไม่พบล็อค','e'); return; }
+
+  const btn=document.querySelector('#moveModal .m-btn.primary');
+  const orig=btn?btn.innerHTML:'';
+  if(btn){ btn.disabled=true; btn.textContent='กำลังย้าย…'; }
+
+  const isDaily=pendingMoveKind==='daily';
+  const res = isDaily
+    ? await apiPost('moveDailyBooking',{data:{
+        from_lock:pendingMoveId, to_lock:targetId, to_zone:tgtEl.dataset.zone||'',
+        date:(typeof marketDayTH==='function'?marketDayTH():nowTH()), moved_by:getCurrentUserName(),
+      }})
+    : await apiPost('moveVendorLock',{data:{
+        from_lock:pendingMoveId, to_lock:targetId, to_zone:tgtEl.dataset.zone||'',
+        moved_by:getCurrentUserName(),
+      }});
+
+  if(btn){ btn.disabled=false; btn.innerHTML=orig; }
+
+  // ❗ ห้ามแตะหน้าจอถ้า backend ไม่ตอบ ok — ไม่งั้นผู้จัดจะเชื่อว่าย้ายแล้วทั้งที่ฐานข้อมูลไม่เปลี่ยน
+  if(!res || res.status!=='ok'){
+    toast('ย้ายล็อคไม่สำเร็จ'+((res&&res.message)?(' — '+res.message):' — กรุณาลองใหม่'),'e');
+    return;
+  }
+
   if(isDaily){
     const db=dailyBookings[pendingMoveId];
-    dailyBookings[targetId]={...db,lockId:targetId};
-    delete dailyBookings[pendingMoveId];
-    addHist(targetId,{type:'daily',label:'🔄 รับย้ายจาก '+pendingMoveId,note:'จร: '+db.name});
-    addHist(pendingMoveId,{type:'daily',label:'🔄 ย้ายออกไป '+targetId,note:'จร: '+db.name});
+    if(db){
+      dailyBookings[targetId]=Object.assign({},db,{lockId:targetId});
+      delete dailyBookings[pendingMoveId];
+      addHist(targetId,{type:'daily',label:'ย้ายล็อคจรมาจาก '+pendingMoveId,note:'จร: '+db.name});
+      addHist(pendingMoveId,{type:'daily',label:'ย้ายล็อคจรออกไปที่ '+targetId,note:'จร: '+db.name});
+    }
+    refreshLk(srcEl); refreshLk(tgtEl);
+    saveMarketState();
+    // ⚠️ ห้ามเรียก updateExpireBanner() ตรงนี้ — ถ้าวันที่กดย้ายห่างจากวันตลาดเกิน STATE_EXPIRE_DAYS
+    // ฟังก์ชันนั้นจะเรียก clearMarketState() ล้าง dailyBookings ทั้งก้อนทิ้งทันทีที่ย้ายเสร็จ
+    // (เจอตอนทดสอบ: ย้ายสำเร็จในฐานข้อมูลแล้ว แต่หน้าจอกลับว่างทั้งสองล็อค)
   } else {
-    const os=srcEl.dataset.shop,or=srcEl.dataset.rent,oSt=srcEl.dataset.status;
-    srcEl.dataset.shop=tgtEl.dataset.shop; srcEl.dataset.rent=tgtEl.dataset.rent; srcEl.dataset.status=tgtEl.dataset.status;
-    tgtEl.dataset.shop=os; tgtEl.dataset.rent=or; tgtEl.dataset.status=oSt;
-    srcEl.querySelector('.lk-shop').textContent=srcEl.dataset.shop;
-    tgtEl.querySelector('.lk-shop').textContent=tgtEl.dataset.shop;
-    ['occupied','vacant','cancelled','unpaid'].forEach(c=>{srcEl.classList.remove(c);tgtEl.classList.remove(c);});
-    srcEl.classList.add(srcEl.dataset.status); tgtEl.classList.add(tgtEl.dataset.status);
-    if(lockAbsent[pendingMoveId]){lockAbsent[targetId]=lockAbsent[pendingMoveId];lockAbsent[pendingMoveId]='';}
-    addHist(targetId,{type:'leave',label:'🔄 ย้ายมาจากล็อค '+pendingMoveId,note:'ย้ายล็อค'});
-    addHist(pendingMoveId,{type:'leave',label:'🔄 ย้ายไปล็อค '+targetId,note:'ย้ายล็อค'});
+    // ผู้ค้าประจำ: ให้ backend เป็นแหล่งความจริง แล้วโหลดผังใหม่ทั้งผืน
+    addHist(targetId,{type:'leave',label:'ย้ายผู้ค้าประจำมาจากล็อค '+pendingMoveId,note:'ย้ายล็อค'});
+    addHist(pendingMoveId,{type:'leave',label:'ย้ายผู้ค้าประจำไปล็อค '+targetId,note:'ย้ายล็อค'});
+    await loadVendorOccupancy();
   }
-  refreshLk(srcEl); refreshLk(tgtEl);
-  saveMarketState();
+
   document.getElementById('moveModal').classList.remove('show');
-  toast('✅ ย้ายล็อค '+pendingMoveId+' → '+targetId+' สำเร็จ','s');
-  updateStats(); pendingMoveId=null;
+  toast('ย้าย'+(isDaily?'ล็อคจร':'ผู้ค้าประจำ')+' '+pendingMoveId+' → '+targetId+' เรียบร้อยแล้ว','s');
+  updateStats();
+  pendingMoveId=null;
 }
+// PM_MOVE_V2:END
 
 // ════════════════════════════════════════════════════
 // CANCEL LEASE
@@ -1156,7 +1264,10 @@ function showPopup(el,ev){
   if(isVacant) acts+='<button class="pp-btn" style="background:#ffedd5;color:#c2410c" onclick="goRegisterLock(\''+lockId+'\',\''+(d.zone||'')+'\')">➕ เพิ่มผู้ค้าประจำ</button>';
   if(isOccupied||isDaily){
     acts+='<button class="pp-btn" style="background:var(--gll);color:var(--gm);flex-basis:100%" onclick="openEditVendorModal(\''+lockId+'\')">✏️ แก้ไขข้อมูลผู้ค้า</button>';
-    acts+='<button class="pp-btn" style="background:var(--bl);color:var(--b)" onclick="openMoveModal(\''+lockId+'\')">🔄 ย้ายล็อค</button>';
+    // PM_MOVE_BTNS (v2.5): แยกเป็นสองปุ่ม — "ย้ายล็อคจร" แสดงเฉพาะล็อคที่ขายล็อคจรไปแล้ว
+    // ตามที่ผู้ดูแลตลาดสั่ง ส่วนล็อคที่มีทั้งผู้ค้าประจำและขายจรทับ จะเห็นทั้งสองปุ่มแยกกันชัดเจน
+    if(isDaily) acts+='<button class="pp-btn" style="background:var(--yl);color:#78350f" onclick="openMoveModal(\''+lockId+'\',\'daily\')">\u{1F504} ย้ายล็อคจร</button>';
+    if(isOccupied) acts+='<button class="pp-btn" style="background:var(--bl);color:var(--b)" onclick="openMoveModal(\''+lockId+'\',\'vendor\')">\u{1F504} ย้ายผู้ค้าประจำ</button>';
     acts+='<button class="pp-btn" style="background:var(--rl);color:var(--r)" onclick="openCancelLeaseModal(\''+lockId+'\')">🚫 ยกเลิกเช่า</button>';
   }
   const actEl=document.getElementById('ppActions');
@@ -1322,9 +1433,22 @@ async function confirmEditVendor(){
 }
 
 async function loadVendorOccupancy(){
-  if(!getApiUrl()) return;
-  const vendors = await apiGet('getVendors');
-  if(!Array.isArray(vendors)) return;
+  // PM_VENDOR_SYNC (v2.5 บั๊ก B): ห้าม return เงียบ ๆ อีก — ทุกทางออกต้องบอกผู้ใช้เสมอ
+  if(!pmHasBackend()){ pmVendorState('noapi'); pmMarkUnknown(); return; }
+  pmVendorState('loading');
+  const vendors = await pmFetchVendors();          // มี timeout + retry ในตัว
+  if(!Array.isArray(vendors)){
+    const c = pmLoadVendorCache();
+    if(c){ pmApplyVendorRows(c.rows); pmVendorLoaded=true; pmVendorState('cache',{at:c.at}); }
+    else { pmVendorState('error'); pmMarkUnknown(); }
+    return;
+  }
+  pmSaveVendorCache(vendors);
+  pmApplyVendorRows(vendors);
+  pmVendorLoaded=true;
+  pmVendorState('ok');
+}
+function pmApplyVendorRows(vendors){
   const monthlyThursdays = thisMonthThursdays();
   vendors.forEach(v=>{
     // แก้บั๊ก 2569-07-23: เดิมเช็ค status==='cancelled' ซึ่งไม่ตรงกับค่ามาตรฐานของระบบ ('terminated'
@@ -1554,6 +1678,154 @@ function updateStats(){
     '<div class="sm"><div class="n" style="color:var(--b)">฿'+(rent/1000).toFixed(0)+'K</div><div class="l">รายได้/เดือน</div></div>';
 }
 
+
+// ════════════════════════════════════════════════════
+// PM_VENDOR_SYNC:START (v2.5 — บั๊ก B) — สร้างโดย tools/patch_market_maps.py ห้ามแก้ในไฟล์นี้
+// ทำให้ "โหลดข้อมูลผู้ค้าไม่สำเร็จ" มองเห็นได้ แทนที่จะแสดงทุกล็อคเป็นว่างแบบเงียบ ๆ
+// ════════════════════════════════════════════════════
+const PM_VCACHE_KEY='pm-thu-vendors-cache';
+const PM_APIURL_KEY='pm-thu-api-url';
+const PM_FETCH_TIMEOUT_MS=15000;     // Apps Script ช้ากว่านี้ถือว่าไม่ไหวแล้วบนหน้างาน
+const PM_FETCH_RETRIES=2;            // รวมทั้งหมด 3 ครั้ง (1 + retry 2) แบบ backoff
+let pmVendorLoaded=false;            // เคยได้ข้อมูลจริง (หรือจากแคช) แล้วหรือยัง
+
+function pmVendorBarEl(){
+  let el=document.getElementById('pmVendorBar');
+  if(el) return el;
+  el=document.createElement('div');
+  el.id='pmVendorBar';
+  el.setAttribute('role','status');
+  el.setAttribute('aria-live','polite');
+  const tb=document.querySelector('.toolbar');
+  if(tb && tb.parentNode) tb.parentNode.insertBefore(el, tb.nextSibling);
+  else document.body.insertBefore(el, document.body.firstChild);
+  return el;
+}
+function pmFmtTime(iso){
+  try{ const d=new Date(iso);
+    return String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0')
+         + ' น. วันที่ '+d.getDate()+'/'+(d.getMonth()+1); }catch(e){ return '—'; }
+}
+/** state: loading | ok | cache | error | noapi */
+function pmVendorState(state, info){
+  const el=pmVendorBarEl();
+  const map=document.getElementById('mapArea');
+  el.className='';
+  if(map){ map.classList.remove('pm-loading','pm-nodata'); }
+  if(state==='ok'){ el.classList.remove('show'); el.innerHTML=''; return; }
+  el.classList.add('show','s-'+state);
+  if(state==='loading'){
+    if(map && !pmVendorLoaded) map.classList.add('pm-loading');
+    el.innerHTML='<span>⏳ กำลังโหลดข้อมูลผู้ค้าจากฐานข้อมูล…</span>';
+    return;
+  }
+  if(state==='cache'){
+    if(map) map.classList.remove('pm-nodata');
+    el.innerHTML='<span>⚠️ โหลดข้อมูลล่าสุดไม่สำเร็จ — กำลังแสดง<strong>ข้อมูลที่บันทึกไว้ในเครื่อง</strong>'
+      +' (ณ '+pmFmtTime(info&&info.at)+')</span>'
+      +'<button type="button" onclick="pmRetryVendors(this)">ลองใหม่</button>';
+    return;
+  }
+  if(state==='noapi'){
+    if(map) map.classList.add('pm-nodata');
+    el.innerHTML='<span>🔌 <strong>เครื่องนี้ยังไม่ได้เชื่อมต่อฐานข้อมูล</strong> — ผังนี้ยังไม่ใช่ข้อมูลจริง'
+      +' (ล็อคที่มีผู้ค้าประจำจะยังไม่แสดง)</span>'
+      +'<button type="button" onclick="pmSetupApiUrl()">ตั้งค่าการเชื่อมต่อ</button>';
+    return;
+  }
+  // error
+  if(map) map.classList.add('pm-nodata');
+  el.innerHTML='<span>⚠️ <strong>โหลดข้อมูลผู้ค้าไม่สำเร็จ</strong> — ผังนี้ยังไม่ใช่ข้อมูลจริง'
+    +' อย่าเพิ่งใช้ตัดสินใจขายล็อคจร</span>'
+    +'<button type="button" onclick="pmRetryVendors(this)">ลองใหม่</button>';
+}
+/** ล็อคทุกช่องต้องไม่อ่านว่า "ว่าง" ตอนที่ระบบยังไม่รู้ความจริง */
+function pmMarkUnknown(){
+  document.querySelectorAll('.lk[data-id]').forEach(function(el){
+    if(el.dataset.status==='excluded') return;
+    const s=el.querySelector('.lk-shop');
+    if(s) s.textContent='—';
+    el.title='ยังโหลดข้อมูลผู้ค้าไม่สำเร็จ — ไม่ทราบสถานะจริงของล็อคนี้';
+  });
+}
+function pmSaveVendorCache(rows){
+  try{ localStorage.setItem(PM_VCACHE_KEY, JSON.stringify({at:new Date().toISOString(), rows:rows})); }
+  catch(e){ /* โควตาเต็ม — ไม่ใช่เรื่องคอขาดบาดตาย ข้ามไป */ }
+}
+function pmLoadVendorCache(){
+  try{ const raw=localStorage.getItem(PM_VCACHE_KEY); if(!raw) return null;
+       const o=JSON.parse(raw); return (o && Array.isArray(o.rows) && o.rows.length) ? o : null; }
+  catch(e){ return null; }
+}
+/** โหมดฐานข้อมูลปัจจุบัน — sheets (เดิม) · parallel · supabase (ดู PM_API_CLIENT) */
+function pmBackendMode(){
+  try{ return (window.PM_API && window.PM_API.mode) ? window.PM_API.mode() : 'sheets'; }
+  catch(e){ return 'sheets'; }
+}
+/** มีฐานข้อมูลให้คุยด้วยหรือยัง
+    ⚠️ ห้ามกลับไปใช้ getApiUrl() เดี่ยว ๆ อีก — URL ของ Apps Script มีความหมายเฉพาะโหมด sheets
+    พอย้ายมา Supabase แล้วเครื่องที่ไม่เคยตั้งค่า Apps Script จะถูกตัดสินว่า "ยังไม่เชื่อมต่อ"
+    ทั้งที่ต่อฐานข้อมูลใหม่ได้ปกติ → ผังจะกลายเป็นว่างทั้งตลาด ซึ่งคือบั๊ก B กลับมาอีกรอบ */
+function pmHasBackend(){
+  return pmBackendMode()!=='sheets' ? true : !!getApiUrl();
+}
+/** ดึง getVendors พร้อม timeout + retry — คืน array ถ้าสำเร็จ, null ถ้าไม่สำเร็จ
+    โหมด supabase/parallel เรียกผ่าน apiGet ชุดกลาง (PM_API_CLIENT) เพื่อไม่ให้มีทางเข้า
+    ฐานข้อมูลสองทางในไฟล์เดียว — เปลี่ยนแบ็กเอนด์ทีเดียวมีผลทุกจุดจริง ๆ */
+async function pmFetchVendors(){
+  const viaApi = pmBackendMode()!=='sheets';
+  if(!viaApi && !getApiUrl()) return null;
+  for(let attempt=0; attempt<=PM_FETCH_RETRIES; attempt++){
+    const ctl=(typeof AbortController!=='undefined') ? new AbortController() : null;
+    const timer=setTimeout(function(){ if(ctl) ctl.abort(); }, PM_FETCH_TIMEOUT_MS);
+    try{
+      if(viaApi){
+        const rows=await Promise.race([
+          window.apiGet('getVendors', {}),
+          new Promise(function(_,rej){ setTimeout(function(){ rej(new Error('timeout')); }, PM_FETCH_TIMEOUT_MS); })
+        ]);
+        clearTimeout(timer);
+        if(Array.isArray(rows)) return rows;
+        throw new Error('payload ไม่ถูกต้อง');
+      }
+      const qs=new URLSearchParams({action:'getVendors', token:getApiToken()});
+      const r=await fetch(getApiUrl()+'?'+qs, ctl?{signal:ctl.signal}:undefined);
+      clearTimeout(timer);
+      if(!r.ok) throw new Error('HTTP '+r.status);
+      const j=await r.json();
+      if(j && j.status==='ok' && Array.isArray(j.data)) return j.data;
+      throw new Error('payload ไม่ถูกต้อง');
+    }catch(e){
+      clearTimeout(timer);
+      console.warn('pmFetchVendors ครั้งที่ '+(attempt+1)+' ไม่สำเร็จ:', e && e.message);
+      if(attempt<PM_FETCH_RETRIES) await new Promise(function(res){ setTimeout(res, 900*(attempt+1)); });
+    }
+  }
+  return null;
+}
+async function pmRetryVendors(btn){
+  if(btn){ btn.disabled=true; btn.textContent='กำลังลองใหม่…'; }
+  try{ await loadVendorOccupancy(); }
+  finally{ if(btn){ btn.disabled=false; btn.textContent='ลองใหม่'; } }
+}
+/** ให้ผู้จัดตั้งค่า Web App URL ได้เองหน้างาน โดยไม่ต้องรอผู้ดูแลระบบ
+    (เคสจริง: เปิดแอพจากไอคอนหน้าจอโฮมบน iOS ซึ่งใช้ localStorage คนละถังกับ Safari) */
+function pmSetupApiUrl(){
+  const cur=getApiUrl();
+  const v=prompt('วาง Web App URL ของ Google Apps Script ที่นี่\n'
+    +'(ขอจากผู้ดูแลระบบ หรือคัดลอกจากเครื่องที่ใช้งานได้อยู่แล้ว)', cur||'https://script.google.com/macros/s/');
+  if(v===null) return;
+  const url=v.trim();
+  if(!/^https:\/\/script\.google\.com\/macros\/s\/.+/.test(url)){
+    toast('URL ไม่ถูกต้อง — ต้องขึ้นต้นด้วย https://script.google.com/macros/s/','e'); return;
+  }
+  try{ localStorage.setItem(PM_APIURL_KEY, url); }catch(e){}
+  toast('บันทึกการเชื่อมต่อแล้ว — กำลังโหลดข้อมูล…','s');
+  loadVendorOccupancy();
+  if(typeof loadFromSheets==='function') loadFromSheets();
+}
+// PM_VENDOR_SYNC:END
+
 function toast(msg,type){
   const t=document.getElementById('toast');
   t.textContent=msg;t.className='toast '+type+' show';
@@ -1562,6 +1834,129 @@ function toast(msg,type){
 
 window.onload=function(){buildAll();setTimeout(checkThursdayCycle,400);};
 
+</script>
+<!-- ==== PM_API_CLIENT:START (สร้างโดย tools/inject_api_client.py — ห้ามแก้ในไฟล์นี้) ==== -->
+<script id="pm-api-client">
+/* ═══════════════════════════════════════════════════════════════════════════
+   PM_API_CLIENT (v3.0) — ตัวเชื่อมต่อฐานข้อมูลชุดกลาง
+   แก้ที่ tools/inject_api_client.py เท่านั้น แล้วรันใหม่ · ห้ามแก้ในไฟล์นี้
+   ═══════════════════════════════════════════════════════════════════════════ */
+(function () {
+  var SB_URL = 'https://atvxajfwazrswdlhnosh.supabase.co';
+  var SB_KEY = 'sb_publishable_kGSsjrQvDa9EKaw7CDPeQg_UnkKtCLa';
+  var MODE_KEY = 'pm-thu-backend';
+
+  /* โหมดปัจจุบัน: sheets (เดิม) · parallel (อ่าน Supabase เขียนสองที่) · supabase (ใหม่ล้วน)
+     เปลี่ยนได้จาก console ด้วย PM_API.setMode('parallel') โดยไม่ต้อง deploy ใหม่ */
+  function mode() {
+    try { return localStorage.getItem(MODE_KEY) || 'sheets'; } catch (e) { return 'sheets'; }
+  }
+
+  function sbFetch(action, payload) {
+    /* ทุก action วิ่งผ่านฟังก์ชัน api() ตัวเดียวที่ฐานข้อมูล — ตารางทั้งหมดถูกปิดจาก
+       การเข้าถึงตรง ๆ ไว้แล้ว ต่อให้ key หลุดก็อ่าน/เขียนตารางเองไม่ได้ */
+    var body = Object.assign({}, payload || {});
+    /* token อยู่ใน sessionStorage เท่านั้น (ไม่ใช้ localStorage) และฐานข้อมูลเก็บแค่ hash
+       ของมัน — action สาธารณะ/verifyUser ไม่ต้องมี token ส่วน action อื่นจะถูกปฏิเสธที่ RPC */
+    try {
+      var sess = JSON.parse(sessionStorage.getItem('pm-session') || 'null');
+      if (sess && sess.apiToken) body.sessionToken = sess.apiToken;
+    } catch (e) {}
+    return fetch(SB_URL + '/rest/v1/rpc/api', {
+      method: 'POST',
+      headers: { apikey: SB_KEY, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: action, payload: body })
+    }).then(function (r) {
+      if (!r.ok) return r.text().then(function (t) { throw new Error('HTTP ' + r.status + ' ' + t.slice(0, 160)); });
+      return r.json();
+    });
+  }
+
+  window.PM_API = {
+    mode: mode,
+    setMode: function (m) {
+      if (['sheets', 'parallel', 'supabase'].indexOf(m) < 0) { console.error('โหมดไม่ถูกต้อง:', m); return; }
+      try { localStorage.setItem(MODE_KEY, m); } catch (e) {}
+      console.log('PM_API: สลับเป็นโหมด', m, '— รีเฟรชหน้าเพื่อให้มีผลทุกส่วน');
+    },
+    supabase: sbFetch,
+    url: SB_URL,
+    /* เทียบผลลัพธ์ Sheets กับ Supabase ของ action เดียวกัน — ใช้ตอนทดสอบคู่ขนาน */
+    compare: async function (action, params) {
+      var a = null, b = null;
+      try { a = await window.__pmSheetsGet(action, params || {}); } catch (e) { a = 'ERROR ' + e.message; }
+      try { b = (await sbFetch(action, params || {})).data; } catch (e) { b = 'ERROR ' + e.message; }
+      var la = Array.isArray(a) ? a.length : typeof a;
+      var lb = Array.isArray(b) ? b.length : typeof b;
+      console.log('[' + action + '] Sheets:', la, ' Supabase:', lb, la === lb ? '✅ ตรงกัน' : '⚠️ ต่างกัน');
+      return { sheets: a, supabase: b };
+    }
+  };
+})();
+</script>
+<!-- ==== PM_API_CLIENT:END ==== -->
+<script id="pm-api-shim">
+/* apiGet/apiPost เวอร์ชันที่รองรับสามโหมด — เก็บของเดิมไว้เป็น __pmSheets* เพื่อใช้เทียบผล
+   และเพื่อให้ย้อนกลับไปใช้ Google Sheets ได้ทันทีถ้าพบปัญหาหน้างาน (ทางถอย) */
+(function () {
+  if (typeof apiGet !== 'function' || typeof apiPost !== 'function') return;
+  var _get = apiGet, _post = apiPost;
+  window.__pmSheetsGet = _get;
+  window.__pmSheetsPost = _post;
+
+  window.apiGet = async function (action, params) {
+    var m = window.PM_API ? window.PM_API.mode() : 'sheets';
+    if (m === 'sheets') return _get(action, params);
+    try {
+      var r = await window.PM_API.supabase(action, params || {});
+      return (r && r.status === 'ok') ? r.data : null;
+    } catch (e) {
+      console.error('Supabase apiGet ล้มเหลว:', action, e);
+      /* โหมด parallel ยังมี Sheets เป็นตาข่ายรองรับ · โหมด supabase ล้วนต้องคืน null
+         ให้ชั้นบน (PM_VENDOR_SYNC) แสดงแถบเตือนตามปกติ ไม่แอบกลับไปอ่านของเก่าเงียบ ๆ */
+      return (m === 'parallel') ? _get(action, params) : null;
+    }
+  };
+
+  window.apiPost = async function (action, data) {
+    var m = window.PM_API ? window.PM_API.mode() : 'sheets';
+    if (m === 'sheets') return _post(action, data);
+    var sbRes = null, sbErr = null;
+    try { sbRes = await window.PM_API.supabase(action, data || {}); }
+    catch (e) { sbErr = e; console.error('Supabase apiPost ล้มเหลว:', action, e); }
+    if (m === 'parallel') {
+      /* เขียนลง Sheets ด้วยเพื่อให้ข้อมูลสองที่ตรงกันระหว่างช่วงทดสอบ
+         ถ้าฝั่ง Supabase พลาด ให้ยึดผลจาก Sheets เป็นคำตอบ (ยังไม่ตัดของเก่าทิ้ง) */
+      var shRes = null;
+      try { shRes = await _post(action, data); } catch (e) {}
+      return (sbRes && sbRes.status === 'ok') ? sbRes : shRes;
+    }
+    if (sbErr) return { status: 'error', message: String(sbErr.message || sbErr) };
+    return sbRes;
+  };
+
+  /* ── ด่านที่ลืมไม่ได้: getApiUrl() ──
+     ทั้งระบบใช้ `if(!getApiUrl())` เป็นตัวตัดสินว่า "เชื่อมต่อฐานข้อมูลแล้วหรือยัง"
+     รวม 89 จุดใน 20 ไฟล์ (นับเมื่อ 28 ก.ค. 2026) — ไม่ใช่แค่ใช้เป็น URL เท่านั้น
+     พอย้ายมา Supabase ค่าที่คืนคือ URL ของ Apps Script ซึ่งเครื่องใหม่ไม่มี ทุกด่านจึงตัด
+     ฟีเจอร์ทิ้งเงียบ ๆ (ผังขึ้นว่างทั้งตลาด · ปุ่มบันทึกเตือนว่ายังไม่เชื่อมต่อ)
+     จึงต้องครอบที่ฟังก์ชันนี้ด้วย ไม่ใช่แค่ apiGet/apiPost
+
+     ⚠️ โหมด parallel ห้ามแทนค่า — เพราะ __pmSheetsPost ยังต้องยิงไป URL จริงของ Apps Script
+        ถ้าคืน URL ของ Supabase ไปแทน ข้อมูลจะถูกส่งผิดที่ */
+  if (typeof getApiUrl === 'function') {
+    var _url = getApiUrl;
+    window.__pmSheetsUrl = _url;
+    window.getApiUrl = function () {
+      var m = window.PM_API ? window.PM_API.mode() : 'sheets';
+      var real = '';
+      try { real = _url() || ''; } catch (e) {}
+      if (m === 'supabase') return real || (window.PM_API ? window.PM_API.url : '');
+      if (m === 'parallel' && !real) console.warn('PM_API: โหมด parallel ต้องตั้งค่า URL ของ Apps Script ด้วย');
+      return real;
+    };
+  }
+})();
 </script>
 </body>
 </html>

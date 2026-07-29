@@ -873,7 +873,7 @@ function toggleDark(){
   else if(window.matchMedia('(prefers-color-scheme:dark)').matches) document.documentElement.setAttribute('data-theme','dark');
 })();
 
-const APP_BUILD='20260727-0632'; // cache-buster — build.py แทนค่าอัตโนมัติ
+const APP_BUILD='20260729-1726'; // cache-buster — build.py แทนค่าอัตโนมัติ
 const DAYS=['อาทิตย์','จันทร์','อังคาร','พุธ','พฤหัสบดี','ศุกร์','เสาร์'];
 const MONS=['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
 function tick(){
@@ -990,18 +990,22 @@ async function doLogin(){
   if(!uv||!pv){err.textContent='กรุณากรอก Username และ Password';err.style.display='block';return;}
 
   let user=null;
-  const apiUrl=(localStorage.getItem('pm-thu-api-url')||localStorage.getItem('pm-api-url'));
+  const apiUrl=getApiUrl();
   if(apiUrl){
     // บัญชีจริงของทีมงาน: ตรวจสอบผ่าน backend (verifyUser) — รหัสผ่านถูก hash เก็บไว้ที่ Sheet ไม่ใช่ plain text ในโค้ด
     if(btn){btn.disabled=true;btn.style.opacity='.6';}
     try{
       const res=await apiPost('verifyUser',{username:uv,password:pv});
-      if(res && res.status==='ok' && res.data) user=res.data;
+      if(res && res.status==='ok' && res.data){
+        // Supabase v3.0 ส่ง {profile,sessionToken}; Sheets รุ่นเดิมส่ง profile ตรง ๆ
+        user=res.data.profile||res.data;
+        if(res.data.sessionToken) user.apiToken=res.data.sessionToken;
+      }
     }catch(e){ /* เชื่อมต่อ backend ไม่ได้ — จะลอง local fallback ด้านล่างต่อ */ }
     if(btn){btn.disabled=false;btn.style.opacity='';}
   }
-  if(!user){
-    // Local/offline fallback — ใช้ได้เฉพาะบัญชีสาธิตใน DEFAULT_USERS เท่านั้น (ดูคอมเมนต์ด้านบน)
+  if(!user && !getApiUrl()){
+    // Local/offline fallback — เข้าได้เฉพาะตอนยังไม่เชื่อมต่อฐานข้อมูลใด ๆ (ดู tools/inject_api_client.py) — ใช้ได้เฉพาะบัญชีสาธิตใน DEFAULT_USERS เท่านั้น (ดูคอมเมนต์ด้านบน)
     const local=getUsers().find(u=>u.username===uv&&u.password===pv);
     if(local) user=local;
   }
@@ -1013,7 +1017,7 @@ async function doLogin(){
     document.getElementById('login-pass').value='';
     return;
   }
-  sessionStorage.setItem('pmthu-session',JSON.stringify({username:user.username,role:user.role,displayName:user.displayName,roleLabel:user.roleLabel}));
+  sessionStorage.setItem('pmthu-session',JSON.stringify({username:user.username,role:user.role,displayName:user.displayName,roleLabel:user.roleLabel,apiToken:user.apiToken||''}));
   loginSuccess(user);
 }
 
@@ -1031,7 +1035,7 @@ function loginSuccess(user){
   applyRole(user.role);
   updateDbStatus();
   logAct('system','เข้าสู่ระบบ: '+user.displayName);
-  if((localStorage.getItem('pm-thu-api-url')||localStorage.getItem('pm-api-url'))) setTimeout(loadVendorsFromSheets,600);
+  if(getApiUrl()) setTimeout(loadVendorsFromSheets,600);
 }
 
 function applyRole(role){
@@ -1102,7 +1106,7 @@ async function confirmChPw(){
   if(n.length<6){err.textContent='Password ใหม่ต้องมีอย่างน้อย 6 ตัว';return;}
   if(n!==c){err.textContent='Password ใหม่ไม่ตรงกัน';return;}
 
-  const apiUrl=(localStorage.getItem('pm-thu-api-url')||localStorage.getItem('pm-api-url'));
+  const apiUrl=getApiUrl();
   if(apiUrl){
     // บัญชีจริง: เปลี่ยนรหัสผ่านที่ backend (hash ใหม่เก็บที่ Sheet) — sync ข้ามอุปกรณ์ได้ทันที
     // (แก้ 2026-07-14: เดิมบันทึกแค่ localStorage เครื่องเดียว เปิดเครื่องอื่นแล้วรหัสผ่านเก่ายังใช้ได้)
@@ -1147,7 +1151,7 @@ function logAct(type,msg,detail='',opts={}){
   const n=new Date();
   const ts=String(n.getHours()).padStart(2,'0')+':'+String(n.getMinutes()).padStart(2,'0')+':'+String(n.getSeconds()).padStart(2,'0');
   // เขียนลงชีตจริง (ยิงแบบไม่รอผล เพื่อไม่ให้หน่วง UI ของผู้จัดตลาดที่กำลังเดินเก็บเงิน)
-  if(!opts.fromSheet && typeof apiPost==='function' && (localStorage.getItem('pm-thu-api-url')||localStorage.getItem('pm-api-url'))){
+  if(!opts.fromSheet && typeof apiPost==='function' && getApiUrl()){
     try{
       apiPost('logActivity',{data:{
         user:pmCurrentUserName(),
@@ -1163,7 +1167,7 @@ function logAct(type,msg,detail='',opts={}){
 
 // ดึงบันทึกกิจกรรมจากชีตจริง (ทุกคน/ทุกอุปกรณ์) — backend ลบของเก่าเกิน 30 วันให้เองตอนอ่าน
 async function loadActLogFromSheets(){
-  if(!(localStorage.getItem('pm-thu-api-url')||localStorage.getItem('pm-api-url'))) return;
+  if(!getApiUrl()) return;
   const listEl=document.getElementById('al-list');
   if(listEl && !ACT_LOG.length) listEl.innerHTML='<div style="text-align:center;padding:24px;color:var(--txl);font-size:.78rem">⏳ กำลังโหลดบันทึกกิจกรรม...</div>';
   const rows=await apiGet('getActivityLog');
@@ -1598,7 +1602,7 @@ function saveVendor(){
     savedLock=lock;
   }
   closeVModal(); renderVDB();
-  if((localStorage.getItem('pm-thu-api-url')||localStorage.getItem('pm-api-url'))&&currentUser&&savedLock) syncSaveVendor(VENDORS.find(v=>v.lock===savedLock));
+  if(getApiUrl()&&currentUser&&savedLock) syncSaveVendor(VENDORS.find(v=>v.lock===savedLock));
 }
 function closeVModal(){document.getElementById('vendor-modal').classList.remove('show');}
 document.getElementById('vendor-modal').addEventListener('click',e=>{if(e.target.id==='vendor-modal')closeVModal();});
@@ -1968,6 +1972,129 @@ window.onload=function(){
   updateDbStatus();
   logAct('system','ระบบเริ่มทำงาน — แพไม้มินิ v1.0');
 };
+</script>
+<!-- ==== PM_API_CLIENT:START (สร้างโดย tools/inject_api_client.py — ห้ามแก้ในไฟล์นี้) ==== -->
+<script id="pm-api-client">
+/* ═══════════════════════════════════════════════════════════════════════════
+   PM_API_CLIENT (v3.0) — ตัวเชื่อมต่อฐานข้อมูลชุดกลาง
+   แก้ที่ tools/inject_api_client.py เท่านั้น แล้วรันใหม่ · ห้ามแก้ในไฟล์นี้
+   ═══════════════════════════════════════════════════════════════════════════ */
+(function () {
+  var SB_URL = 'https://atvxajfwazrswdlhnosh.supabase.co';
+  var SB_KEY = 'sb_publishable_kGSsjrQvDa9EKaw7CDPeQg_UnkKtCLa';
+  var MODE_KEY = 'pm-thu-backend';
+
+  /* โหมดปัจจุบัน: sheets (เดิม) · parallel (อ่าน Supabase เขียนสองที่) · supabase (ใหม่ล้วน)
+     เปลี่ยนได้จาก console ด้วย PM_API.setMode('parallel') โดยไม่ต้อง deploy ใหม่ */
+  function mode() {
+    try { return localStorage.getItem(MODE_KEY) || 'sheets'; } catch (e) { return 'sheets'; }
+  }
+
+  function sbFetch(action, payload) {
+    /* ทุก action วิ่งผ่านฟังก์ชัน api() ตัวเดียวที่ฐานข้อมูล — ตารางทั้งหมดถูกปิดจาก
+       การเข้าถึงตรง ๆ ไว้แล้ว ต่อให้ key หลุดก็อ่าน/เขียนตารางเองไม่ได้ */
+    var body = Object.assign({}, payload || {});
+    /* token อยู่ใน sessionStorage เท่านั้น (ไม่ใช้ localStorage) และฐานข้อมูลเก็บแค่ hash
+       ของมัน — action สาธารณะ/verifyUser ไม่ต้องมี token ส่วน action อื่นจะถูกปฏิเสธที่ RPC */
+    try {
+      var sess = JSON.parse(sessionStorage.getItem('pmthu-session') || 'null');
+      if (sess && sess.apiToken) body.sessionToken = sess.apiToken;
+    } catch (e) {}
+    return fetch(SB_URL + '/rest/v1/rpc/api', {
+      method: 'POST',
+      headers: { apikey: SB_KEY, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: action, payload: body })
+    }).then(function (r) {
+      if (!r.ok) return r.text().then(function (t) { throw new Error('HTTP ' + r.status + ' ' + t.slice(0, 160)); });
+      return r.json();
+    });
+  }
+
+  window.PM_API = {
+    mode: mode,
+    setMode: function (m) {
+      if (['sheets', 'parallel', 'supabase'].indexOf(m) < 0) { console.error('โหมดไม่ถูกต้อง:', m); return; }
+      try { localStorage.setItem(MODE_KEY, m); } catch (e) {}
+      console.log('PM_API: สลับเป็นโหมด', m, '— รีเฟรชหน้าเพื่อให้มีผลทุกส่วน');
+    },
+    supabase: sbFetch,
+    url: SB_URL,
+    /* เทียบผลลัพธ์ Sheets กับ Supabase ของ action เดียวกัน — ใช้ตอนทดสอบคู่ขนาน */
+    compare: async function (action, params) {
+      var a = null, b = null;
+      try { a = await window.__pmSheetsGet(action, params || {}); } catch (e) { a = 'ERROR ' + e.message; }
+      try { b = (await sbFetch(action, params || {})).data; } catch (e) { b = 'ERROR ' + e.message; }
+      var la = Array.isArray(a) ? a.length : typeof a;
+      var lb = Array.isArray(b) ? b.length : typeof b;
+      console.log('[' + action + '] Sheets:', la, ' Supabase:', lb, la === lb ? '✅ ตรงกัน' : '⚠️ ต่างกัน');
+      return { sheets: a, supabase: b };
+    }
+  };
+})();
+</script>
+<!-- ==== PM_API_CLIENT:END ==== -->
+<script id="pm-api-shim">
+/* apiGet/apiPost เวอร์ชันที่รองรับสามโหมด — เก็บของเดิมไว้เป็น __pmSheets* เพื่อใช้เทียบผล
+   และเพื่อให้ย้อนกลับไปใช้ Google Sheets ได้ทันทีถ้าพบปัญหาหน้างาน (ทางถอย) */
+(function () {
+  if (typeof apiGet !== 'function' || typeof apiPost !== 'function') return;
+  var _get = apiGet, _post = apiPost;
+  window.__pmSheetsGet = _get;
+  window.__pmSheetsPost = _post;
+
+  window.apiGet = async function (action, params) {
+    var m = window.PM_API ? window.PM_API.mode() : 'sheets';
+    if (m === 'sheets') return _get(action, params);
+    try {
+      var r = await window.PM_API.supabase(action, params || {});
+      return (r && r.status === 'ok') ? r.data : null;
+    } catch (e) {
+      console.error('Supabase apiGet ล้มเหลว:', action, e);
+      /* โหมด parallel ยังมี Sheets เป็นตาข่ายรองรับ · โหมด supabase ล้วนต้องคืน null
+         ให้ชั้นบน (PM_VENDOR_SYNC) แสดงแถบเตือนตามปกติ ไม่แอบกลับไปอ่านของเก่าเงียบ ๆ */
+      return (m === 'parallel') ? _get(action, params) : null;
+    }
+  };
+
+  window.apiPost = async function (action, data) {
+    var m = window.PM_API ? window.PM_API.mode() : 'sheets';
+    if (m === 'sheets') return _post(action, data);
+    var sbRes = null, sbErr = null;
+    try { sbRes = await window.PM_API.supabase(action, data || {}); }
+    catch (e) { sbErr = e; console.error('Supabase apiPost ล้มเหลว:', action, e); }
+    if (m === 'parallel') {
+      /* เขียนลง Sheets ด้วยเพื่อให้ข้อมูลสองที่ตรงกันระหว่างช่วงทดสอบ
+         ถ้าฝั่ง Supabase พลาด ให้ยึดผลจาก Sheets เป็นคำตอบ (ยังไม่ตัดของเก่าทิ้ง) */
+      var shRes = null;
+      try { shRes = await _post(action, data); } catch (e) {}
+      return (sbRes && sbRes.status === 'ok') ? sbRes : shRes;
+    }
+    if (sbErr) return { status: 'error', message: String(sbErr.message || sbErr) };
+    return sbRes;
+  };
+
+  /* ── ด่านที่ลืมไม่ได้: getApiUrl() ──
+     ทั้งระบบใช้ `if(!getApiUrl())` เป็นตัวตัดสินว่า "เชื่อมต่อฐานข้อมูลแล้วหรือยัง"
+     รวม 89 จุดใน 20 ไฟล์ (นับเมื่อ 28 ก.ค. 2026) — ไม่ใช่แค่ใช้เป็น URL เท่านั้น
+     พอย้ายมา Supabase ค่าที่คืนคือ URL ของ Apps Script ซึ่งเครื่องใหม่ไม่มี ทุกด่านจึงตัด
+     ฟีเจอร์ทิ้งเงียบ ๆ (ผังขึ้นว่างทั้งตลาด · ปุ่มบันทึกเตือนว่ายังไม่เชื่อมต่อ)
+     จึงต้องครอบที่ฟังก์ชันนี้ด้วย ไม่ใช่แค่ apiGet/apiPost
+
+     ⚠️ โหมด parallel ห้ามแทนค่า — เพราะ __pmSheetsPost ยังต้องยิงไป URL จริงของ Apps Script
+        ถ้าคืน URL ของ Supabase ไปแทน ข้อมูลจะถูกส่งผิดที่ */
+  if (typeof getApiUrl === 'function') {
+    var _url = getApiUrl;
+    window.__pmSheetsUrl = _url;
+    window.getApiUrl = function () {
+      var m = window.PM_API ? window.PM_API.mode() : 'sheets';
+      var real = '';
+      try { real = _url() || ''; } catch (e) {}
+      if (m === 'supabase') return real || (window.PM_API ? window.PM_API.url : '');
+      if (m === 'parallel' && !real) console.warn('PM_API: โหมด parallel ต้องตั้งค่า URL ของ Apps Script ด้วย');
+      return real;
+    };
+  }
+})();
 </script>
 </body>
 </html>

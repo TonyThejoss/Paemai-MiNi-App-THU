@@ -253,6 +253,8 @@ const AUTO_LOG_LABELS = {
   logLeave:                'บันทึกสถานะแจ้งลา/ขาดล็อค',
   saveDailyBooking:        'บันทึกผู้ค้าจร',
   cancelDailyBooking:      'ยกเลิกผู้ค้าจร',
+  moveDailyBooking:        'ย้ายล็อคจร',
+  moveVendorLock:          'ย้ายล็อคผู้ค้าประจำ',
   savePayment:             'รับชำระเงิน',
   changePassword:          'เปลี่ยนรหัสผ่าน',
   saveInstallmentPlan:     'ตั้ง/แก้ไขแผนผ่อนชำระ',
@@ -329,6 +331,8 @@ function _routePost(action, body) {
       case 'logLeave':         return logLeave(body.data);
       case 'saveDailyBooking': return saveDailyBooking(body.data);
       case 'cancelDailyBooking': return cancelDailyBooking(body.lockId, body.date);
+      case 'moveDailyBooking': return moveDailyBooking(body.data);
+      case 'moveVendorLock':   return moveVendorLock(body.data);
       case 'savePayment':      return savePayment(body.data);
       case 'logActivity':      return logActivity(body.data);
       case 'changePassword':   return changePassword(body.username, body.oldPw, body.newPw);
@@ -369,6 +373,8 @@ function getSheet(name) {
 // INIT — สร้าง headers ทุก sheet
 // ════════════════════════════════════════
 function initSheets() {
+  // เก็บรหัสผ่านที่สุ่มให้ผู้ใช้ตั้งต้น เพื่อคืนกลับใน response ครั้งเดียว (ดูหมายเหตุความปลอดภัยด้านล่าง)
+  let createdUsers = [];
   // vendors
   const vSheet = getSheet(S.VENDORS);
   if (vSheet.getLastRow() === 0) {
@@ -407,17 +413,24 @@ function initSheets() {
   const uSheet = getSheet(S.USERS);
   if (uSheet.getLastRow() === 0) {
     uSheet.appendRow(['username','password','salt','role','display_name','role_label','created_at']);
-    // Insert default users (รหัสผ่านเริ่มต้น — ควรให้ผู้ใช้เปลี่ยนทันทีหลัง deploy ครั้งแรก)
+    // ── ผู้ใช้ตั้งต้น (เฉพาะตอนชีต users ยังว่างเท่านั้น) ──
+    // ⚠️ แก้ความปลอดภัย v2.5 (2026-07-28): เดิมบรรทัดนี้ฝัง **รหัสผ่านจริงของทีมงานเป็น plain text**
+    // ไว้ 4 บัญชี ทั้งที่ไฟล์นี้ถูก build ลง dist/ แล้วอัปขึ้น GitHub **public repo** ทุกครั้ง
+    // บั๊ก #20 เคยแก้ปัญหาเดียวกันที่ pamai_thu_app.html ไปแล้วเมื่อ 14 ก.ค. 2026 แต่ตกหล่นไฟล์นี้
+    // วิธีแก้: สุ่มรหัสผ่านตอนสร้างชีต แล้วคืนค่ากลับใน response **ครั้งเดียว** ไม่เก็บลงโค้ด
+    // ผู้ที่รัน initSheets ต้องจดรหัสที่ได้ทันที แล้วให้ทุกคนเปลี่ยนรหัสของตัวเองหลังล็อกอินครั้งแรก
     const now = new Date().toISOString();
     const seed = [
-      ['tony2568','pm246810','admin','โทนี่','ผู้ดูแลระบบ'],
-      ['fon12345','fn135790','admin','คุณฝน','ผู้จัดการ'],
-      ['too56789','tu975310','admin','คุณตู่','ผู้จัดการ'],
-      ['aew98765','ae864209','viewer','คุณแอ๋ว','ผู้ดูแลโซนนอก (ดูอย่างเดียว)'],
+      ['tony2568','admin', 'โทนี่',    'ผู้ดูแลระบบ'],
+      ['fon12345','admin', 'คุณฝน',    'ผู้จัดการ'],
+      ['too56789','admin', 'คุณตู่',    'ผู้จัดการ'],
+      ['aew98765','viewer','คุณแอ๋ว',  'ผู้ดูแลโซนนอก (ดูอย่างเดียว)'],
     ];
-    seed.forEach(function(u) {
+    createdUsers = seed.map(function(u) {
+      const pw   = _randomPassword();
       const salt = generateSalt();
-      uSheet.appendRow([u[0], hashPassword(u[1], salt), salt, u[2], u[3], u[4], now]);
+      uSheet.appendRow([u[0], hashPassword(pw, salt), salt, u[1], u[2], u[3], now]);
+      return { username: u[0], password: pw, role: u[1], displayName: u[2] };
     });
   }
   // installment_plans (เพิ่ม 2026-07-14 — แก้บั๊ก #19: โมดูลผ่อนชำระเดิมใช้ข้อมูลจำลองทั้งหมด)
@@ -460,6 +473,15 @@ function initSheets() {
   _forceTextCol(dSheet,  'time');
   _forceTextCol(pSheet,  'time');
   _forceTextCol(aSheet,  'time');
+  // คืนรหัสผ่านที่สุ่มให้ **ครั้งเดียวเท่านั้น** — เรียก initSheets ซ้ำจะไม่ได้ค่านี้อีก
+  // (ชีต users ไม่ว่างแล้ว ระบบจะไม่สร้างผู้ใช้ซ้ำ) จดไว้ทันทีแล้วให้ทุกคนเปลี่ยนรหัสหลังล็อกอินครั้งแรก
+  if (createdUsers.length) {
+    return makeRes({
+      message: 'Sheets initialized',
+      note: 'สร้างผู้ใช้ตั้งต้นแล้ว — รหัสผ่านด้านล่างแสดงเพียงครั้งเดียว กรุณาจดไว้และเปลี่ยนรหัสทันทีหลังล็อกอินครั้งแรก',
+      created_users: createdUsers,
+    });
+  }
   return makeRes('Sheets initialized');
 }
 
@@ -697,6 +719,155 @@ function cancelDailyBooking(lockId, date) {
 }
 
 // ════════════════════════════════════════
+// MOVE — ย้ายล็อค (เพิ่ม v2.5, 2026-07-28)
+//
+// ที่มา: ผู้ดูแลตลาดขอ "ปุ่มย้ายล็อคจร" และตรวจพบว่าฟังก์ชัน confirmMove() ที่หน้าผังตลาด
+// ทั้งสองตลาด **ไม่เคยเรียก backend เลยแม้แต่บรรทัดเดียว** (grep apiPost ในฟังก์ชันนั้น = 0 ครั้ง)
+// การย้ายจึงเป็นแค่การสลับ dataset ใน DOM + localStorage — รีเฟรชแล้วเด้งกลับที่เดิม
+// เครื่องอื่นไม่เห็น และกรณีผู้ค้าประจำยังทำให้บิลเดือนถัดไปออกผิดล็อค
+// (บั๊กตระกูลเดียวกับ v2.2 ข้อ 2 "ยกเลิกการเช่ากดไม่ติด" ที่เหลือตกค้างอยู่อีกจุด)
+//
+// หลักการที่ยึด:
+//   · ไม่ลบข้อมูลถาวร — ใช้ธง cancelled แล้วเขียนแถวใหม่ (กฎเหล็กข้อ 6) ประวัติจึงตรวจย้อนได้
+//   · เขียนแถวใหม่ "ก่อน" ยกเลิกแถวเดิมเสมอ — ถ้าพังกลางทางจะเหลือข้อมูลซ้ำซึ่งเห็นและแก้ได้
+//     ดีกว่าลำดับกลับกันซึ่งทำให้ผู้ค้าจรหายไปทั้งรายการ
+//   · กันย้ายทับล็อคที่มีคนอยู่แล้ว — ตรวจที่ backend ด้วย ไม่เชื่อหน้าเว็บอย่างเดียว
+//     (หน้าเว็บถูก bypass ได้ และผู้จัดสองคนอาจกดพร้อมกันคนละเครื่อง)
+// ════════════════════════════════════════
+function moveDailyBooking(data) {
+  // data: { from_lock, to_lock, to_zone, date, moved_by }
+  if (!data || !data.from_lock || !data.to_lock) return makeErr('ต้องระบุล็อคต้นทางและล็อคปลายทาง');
+  if (data.from_lock === data.to_lock)           return makeErr('ล็อคต้นทางและปลายทางเป็นล็อคเดียวกัน');
+
+  const sheet   = getSheet(S.DAILY);
+  const rows    = sheet.getDataRange().getValues();
+  const headers = rows[0];
+  const iLock   = headers.indexOf('lock_id');
+  const iDate   = headers.indexOf('date');
+  const iCan    = headers.indexOf('cancelled');
+  if (iLock < 0 || iDate < 0 || iCan < 0) return makeErr('โครงสร้างชีต daily_bookings ไม่ถูกต้อง');
+
+  const target = _normDate(data.date);
+  const active = (r) => r[iCan] !== true && r[iCan] !== 'TRUE' && r[iCan] !== 'true';
+
+  // แถวจรล่าสุดของล็อคต้นทางในวันตลาดนั้น (ไล่จากล่างขึ้นบน = รายการล่าสุดชนะ)
+  let srcRow = -1;
+  for (let i = rows.length - 1; i >= 1; i--) {
+    if (rows[i][iLock] === data.from_lock && _normDate(rows[i][iDate]) === target && active(rows[i])) {
+      srcRow = i; break;
+    }
+  }
+  if (srcRow < 0) return makeErr('ไม่พบรายการล็อคจรของล็อค ' + data.from_lock + ' ในวันตลาดนี้');
+
+  // ล็อคปลายทางต้องยังไม่มีผู้ค้าจรในวันเดียวกัน
+  for (let i = 1; i < rows.length; i++) {
+    if (rows[i][iLock] === data.to_lock && _normDate(rows[i][iDate]) === target && active(rows[i])) {
+      return makeErr('ล็อค ' + data.to_lock + ' มีผู้ค้าจรอยู่แล้วในวันตลาดนี้');
+    }
+  }
+
+  const src = {}; headers.forEach((h, i) => src[h] = rows[srcRow][i]);
+
+  // 1) เขียนแถวใหม่ที่ล็อคปลายทาง (คงข้อมูลผู้ค้า/ยอดเงินเดิมทุกอย่าง)
+  saveDailyBooking({
+    lock_id: data.to_lock,
+    zone: data.to_zone || src.zone || '',
+    vendor_name: src.vendor_name, phone: src.phone, product: src.product,
+    price: src.price, elec: src.elec, total: src.total, method: src.method,
+    date: src.date, time: src.time,
+    original_status: src.original_status || '',
+  });
+
+  // 2) ยกเลิกแถวเดิม — ถ้าพลาด ต้องย้อนแถวใหม่ทิ้ง ไม่ปล่อยให้เหลือจรซ้ำสองล็อค
+  try {
+    sheet.getRange(srcRow + 1, iCan + 1).setValue(true);
+  } catch (err) {
+    try { cancelDailyBooking(data.to_lock, src.date); } catch (err2) {}
+    return makeErr('ย้ายไม่สำเร็จ (ยกเลิกล็อคเดิมไม่ได้) — ข้อมูลถูกคืนสภาพเดิมแล้ว: ' + err);
+  }
+
+  // 3) ถ้ารายการจรนี้มาจากคิว ต้องย้ายเลขล็อคในชีต floating_queue ให้ตรงกันด้วย
+  //    ไม่งั้นหน้า "คิวจองล็อคจร" จะยังโชว์ล็อคเดิม = ข้อมูลสองที่ขัดกันเอง
+  let queueSynced = false;
+  try {
+    const q = getSheet(S.QUEUE);
+    const qRows = q.getDataRange().getValues();
+    if (qRows.length > 1) {
+      const qh    = qRows[0];
+      const iAss  = qh.indexOf('assigned_lock');
+      const iSt   = qh.indexOf('status');
+      const iMd   = qh.indexOf('market_date');
+      const iZone = qh.indexOf('zone');
+      const iUpd  = qh.indexOf('updated_at');
+      if (iAss >= 0 && iSt >= 0) {
+        for (let i = qRows.length - 1; i >= 1; i--) {
+          const dateOk = iMd < 0 || _normDate(qRows[i][iMd]) === target;
+          if (qRows[i][iAss] === data.from_lock && qRows[i][iSt] === 'sold' && dateOk) {
+            q.getRange(i + 1, iAss + 1).setValue(data.to_lock);
+            if (iZone >= 0 && data.to_zone) q.getRange(i + 1, iZone + 1).setValue(data.to_zone);
+            if (iUpd  >= 0) q.getRange(i + 1, iUpd + 1).setValue(new Date().toISOString());
+            queueSynced = true;
+            break;
+          }
+        }
+      }
+    }
+  } catch (err) { /* คิวไม่ซิงก์ไม่ควรทำให้การย้ายล้มเหลว — daily_bookings คือแหล่งความจริงของผัง */ }
+
+  return makeRes({
+    from_lock: data.from_lock, to_lock: data.to_lock,
+    queue_synced: queueSynced,
+    vendor_name: src.vendor_name,
+  });
+}
+
+function moveVendorLock(data) {
+  // data: { from_lock, to_lock, to_zone, moved_by }
+  // ย้ายผู้ค้า "ประจำ" ไปล็อคใหม่ — ต้องทำที่ backend เป็นขั้นตอนเดียว ไม่งั้นถ้าหน้าเว็บ
+  // ยิงสองคำสั่งแล้วคำสั่งที่สองพลาด จะได้ผู้ค้าคนเดียวกันอยู่สองล็อคพร้อมกัน (บิลออกซ้ำ)
+  if (!data || !data.from_lock || !data.to_lock) return makeErr('ต้องระบุล็อคต้นทางและล็อคปลายทาง');
+  if (data.from_lock === data.to_lock)           return makeErr('ล็อคต้นทางและปลายทางเป็นล็อคเดียวกัน');
+
+  const sheet   = getSheet(S.VENDORS);
+  const rows    = sheet.getDataRange().getValues();
+  const headers = rows[0];
+  const iLock   = headers.indexOf('lock');
+  const iStatus = headers.indexOf('status');
+  if (iLock < 0) return makeErr('โครงสร้างชีต vendors ไม่ถูกต้อง');
+
+  let srcRow = -1, dstRow = -1;
+  for (let i = 1; i < rows.length; i++) {
+    if (rows[i][iLock] === data.from_lock) srcRow = i;
+    if (rows[i][iLock] === data.to_lock)   dstRow = i;
+  }
+  if (srcRow < 0) return makeErr('ไม่พบผู้ค้าประจำที่ล็อค ' + data.from_lock);
+  if (dstRow >= 0 && iStatus >= 0 && rows[dstRow][iStatus] !== 'terminated') {
+    return makeErr('ล็อค ' + data.to_lock + ' มีผู้ค้าประจำอยู่แล้ว — ต้องยกเลิกการเช่าก่อนจึงจะย้ายมาได้');
+  }
+
+  const src = {}; headers.forEach((h, i) => src[h] = rows[srcRow][i]);
+  try { src.elec_special = JSON.parse(src.elec_special || '[]'); } catch (e) { src.elec_special = []; }
+
+  // 1) สร้าง/อัปเดตผู้ค้าที่ล็อคปลายทางก่อน (saveVendor เป็น upsert แบบ partial merge อยู่แล้ว)
+  const moved = Object.assign({}, src, {
+    lock: data.to_lock,
+    zone: data.to_zone || src.zone || '',
+    status: src.status === 'terminated' ? 'active' : src.status,
+  });
+  saveVendor(moved);
+
+  // 2) ปิดล็อคเดิมเป็น terminated — ผังจะแสดงเป็น "ล็อคว่าง" ทันทีตามกติกาที่ตกลงไว้ v2.3
+  try {
+    saveVendor({ lock: data.from_lock, status: 'terminated' });
+  } catch (err) {
+    try { saveVendor({ lock: data.to_lock, status: 'terminated' }); } catch (err2) {}
+    return makeErr('ย้ายไม่สำเร็จ (ปิดล็อคเดิมไม่ได้) — ข้อมูลถูกคืนสภาพเดิมแล้ว: ' + err);
+  }
+
+  return makeRes({ from_lock: data.from_lock, to_lock: data.to_lock, name: src.name || '' });
+}
+
+// ════════════════════════════════════════
 // PAYMENTS
 // ════════════════════════════════════════
 function getPayments(opt, lockId) {
@@ -904,6 +1075,18 @@ function hashPassword(password, salt) {
   const bytes = Utilities.computeDigest(Utilities.DigestAlgorithm.SHA_256, String(password) + String(salt), Utilities.Charset.UTF_8);
   return bytes.map(function(b) { return ((b < 0 ? b + 256 : b).toString(16)).padStart(2, '0'); }).join('');
 }
+/** สุ่มรหัสผ่านตั้งต้นที่อ่าน/พิมพ์ได้ง่ายหน้างาน (ไม่มี 0/O/1/l/I ที่สับสน) ยาว 12 ตัว
+ *  ใช้แทนการ hardcode รหัสผ่านในโค้ด ซึ่งเป็นช่องโหว่ที่แก้ในรอบ v2.5 */
+function _randomPassword(len) {
+  const abc = 'abcdefghijkmnpqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+  const raw = (Utilities.getUuid() + Utilities.getUuid()).replace(/-/g, '');
+  let out = '';
+  for (let i = 0; i < (len || 12); i++) {
+    out += abc.charAt(parseInt(raw.charAt(i), 16) * 3 + (i % 3));
+  }
+  return out;
+}
+
 function generateSalt() {
   return Utilities.getUuid().replace(/-/g, '');
 }
