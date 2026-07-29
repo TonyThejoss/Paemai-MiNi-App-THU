@@ -1445,9 +1445,11 @@ function getPublicStatus(date) {
   if (hit) return ContentService.createTextOutput(hit).setMimeType(ContentService.MimeType.JSON);
 
   // ── ผู้ค้าประจำ: whitelist ฟิลด์ (ไม่ใช่ blacklist) เพื่อกันข้อมูลอ่อนไหวหลุดในอนาคต ──
-  const vendorsPublic = _sheetToObjects(S.VENDORS)
-    .filter(v => v.status !== 'terminated')
-    .map(v => ({ lock: v.lock, zone: v.zone, name: v.name, product: v.product, status: v.status }));
+  const vendorRowsPublic = _sheetToObjects(S.VENDORS).filter(v => v.status !== 'terminated');
+  const unpaidLocks = vendorRowsPublic.filter(v => v.status === 'unpaid').map(v => v.lock);
+  const vendorsPublic = vendorRowsPublic
+    .map(v => ({ lock: v.lock, zone: v.zone, name: v.name, product: v.product,
+      status: v.status === 'unpaid' ? 'active' : v.status }));
 
   // ── ลา/ขาดล็อค: หาสถานะล่าสุดของแต่ละล็อคในวันที่ระบุ (ตรรกะเดียวกับที่ผังตลาดใช้ในฝั่ง frontend) ──
   let leaveRows = _sheetToObjects(S.LEAVE);
@@ -1477,7 +1479,7 @@ function getPublicStatus(date) {
   // ต้องแสดงทั้ง 2 ช่องทาง: (ก) ขายผ่านคิวรอในระบบ (ข) ผู้จัดขายตรงไม่ผ่านคิว
   // แหล่งข้อมูลจริงคือ daily_bookings (ทุกการขายลงที่นี่เสมอ ทั้งสองช่องทาง — ดูหมายเหตุ sellFloatingQueueEntry)
   // แล้วเทียบกับ floating_queue เพื่อบอกช่องทางว่ามาจากคิวหรือขายตรง
-  // whitelist: เลขล็อค + ชื่อร้าน + สินค้า + ช่องทาง เท่านั้น — ห้ามส่ง phone/price/total/method ออกหน้าสาธารณะ
+  // whitelist: เลขล็อค + ชื่อร้าน + สินค้า + ราคาขาย + ช่องทาง — ห้ามส่ง phone/method ออกหน้าสาธารณะ
   let soldRows = _rowsWithTime(getSheet(S.DAILY)).list
     .filter(r => r.cancelled !== true && String(r.cancelled).toUpperCase() !== 'TRUE');
   if (date) soldRows = soldRows.filter(r => _normDate(r.date) === _normDate(date));
@@ -1498,6 +1500,7 @@ function getPublicStatus(date) {
   });
   const soldPublic = soldRows.map(r => ({
     lock: r.lock_id, zone: r.zone || '', vendor_name: r.vendor_name || '', product: r.product || '',
+    price: Number(r.price) || 0, total: Number(r.total || r.price) || 0,
     via: queueSoldLocks[r.lock_id] === 'queue' ? 'queue' : 'direct',
     time: r.time || '',
   }));
@@ -1514,6 +1517,7 @@ function getPublicStatus(date) {
     leaveStatus: lockLeaveStatus,
     queue: queuePublic,
     sold: soldPublic,
+    unpaidLocks: unpaidLocks,
     rules: rules,
     generatedAt: new Date().toISOString(),
   };

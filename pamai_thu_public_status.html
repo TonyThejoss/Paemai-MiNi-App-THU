@@ -311,7 +311,9 @@ input, select, textarea, button { font-family: inherit; max-width: 100%; }
         /* ผังเริ่มโหลดข้อมูลตั้งแต่ window.onload ซึ่งอาจเร็วกว่าข้อความจากหน้าแม่
            จึงต้องสั่งดึงใหม่ทันทีหลังรับ token ไม่รอ retry รอบเดิมหมดก่อน. */
         if (typeof window.loadVendorOccupancy === 'function') window.loadVendorOccupancy();
-        else if (typeof window.syncRealVendors === 'function') window.syncRealVendors();
+        if (typeof window.syncRealVendors === 'function') window.syncRealVendors();
+        if (typeof window.loadFromSheets === 'function') window.loadFromSheets();
+        if (typeof window.loadAll === 'function') window.loadAll();
       }
     } catch (e) {}
   });
@@ -432,30 +434,31 @@ input, select, textarea, button { font-family: inherit; max-width: 100%; }
 <div class="wrap" id="content-wrap" style="display:none">
 
   <div class="section">
-    <div class="section-title"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M9 12l2 2 4-4"/></svg> คิวจองล็อคจร (รอคิว)</div>
+    <div class="section-title"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M9 12l2 2 4-4"/></svg> 1. คิวจองล็อคจร รอคิว</div>
     <div id="queue-waiting-list"></div>
   </div>
 
   <div class="section">
-    <div class="section-title"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg> ล็อคจรที่จำหน่ายแล้ววันนี้ <span class="cnt" id="cnt-sold">0</span></div>
+    <div class="section-title"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg> 2. ล็อคจรที่จำหน่ายแล้ววันนี้ <span class="cnt" id="cnt-sold">0</span></div>
     <div class="sub-note">แสดงทั้งล็อคที่ขายผ่านคิวรอในระบบ และล็อคที่ผู้จัดขายตรงโดยไม่ผ่านคิว</div>
     <div id="queue-sold-list"></div>
   </div>
 
   <div class="section">
-    <div class="section-title"><svg class="ic ic-dot" viewBox="0 0 24 24" aria-hidden="true" style="color:var(--txl);stroke:none"><circle cx="12" cy="12" r="8" fill="currentColor"/></svg> 1. ล็อคว่าง — ไม่มีผู้ค้าประจำ <span class="cnt" id="cnt-vac1">0</span></div>
-    <div class="lockchips" id="vacant-none-list"></div>
-  </div>
-
-  <div class="section">
-    <div class="section-title"><svg class="ic ic-dot" viewBox="0 0 24 24" aria-hidden="true" style="color:#7c3aed;stroke:none"><circle cx="12" cy="12" r="8" fill="currentColor"/></svg> 2. ล็อคว่าง — ผู้ค้าประจำลาล็อค / ขาดล็อค <span class="cnt" id="cnt-vac2">0</span></div>
+    <div class="section-title"><svg class="ic ic-dot" viewBox="0 0 24 24" aria-hidden="true" style="color:#7c3aed;stroke:none"><circle cx="12" cy="12" r="8" fill="currentColor"/></svg> 3. ล็อคว่าง — ผู้ค้าประจำลาล็อค / ขาดล็อค <span class="cnt" id="cnt-vac2">0</span></div>
     <div class="lockchips" id="vacant-leave-list"></div>
   </div>
 
   <div class="section">
-    <div class="section-title"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true" style="color:#b45309"><circle cx="12" cy="12" r="9"/><path d="M12 7v5"/><path d="M12 16h.01"/></svg> 3. ล็อคที่ค้างชำระ <span class="cnt" id="cnt-unpaid">0</span></div>
+    <div class="section-title"><svg class="ic ic-dot" viewBox="0 0 24 24" aria-hidden="true" style="color:var(--txl);stroke:none"><circle cx="12" cy="12" r="8" fill="currentColor"/></svg> 4. ล็อคว่าง — ไม่มีผู้ค้าประจำ <span class="cnt" id="cnt-vac1">0</span></div>
+    <div class="lockchips" id="vacant-none-list"></div>
+  </div>
+
+  <div class="section">
+    <div class="section-title"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true" style="color:#b45309"><circle cx="12" cy="12" r="9"/><path d="M12 7v5"/><path d="M12 16h.01"/></svg> 5. ล็อคที่ค้างชำระ <span class="cnt" id="cnt-unpaid">0</span></div>
     <div class="lockchips" id="unpaid-lock-list"></div>
     <div class="section-note">แสดงเฉพาะหมายเลขล็อค ไม่แสดงชื่อผู้ค้าหรือยอดค้างชำระ</div>
+    <div class="section-note"><strong>หมายเหตุ:</strong> ผู้ค้าโปรดทำความเข้าใจกฎตลาดที่แนบมาด้านล่างนี้เพื่อประโยชน์ของท่าน และให้ท่านยังคงรักษาสิทธิผู้ค้าประจำอยู่</div>
   </div>
 
   <div class="section">
@@ -498,22 +501,40 @@ function getApiUrl(){return localStorage.getItem('pm-thu-pub-api-url')||(localSt
 // ถูกออกแบบให้เรียกได้โดยไม่ต้องมี token (ดู PUBLIC_ACTIONS ฝั่ง backend) — ป้องกันไม่ให้ token ที่มีสิทธิ์เขียนข้อมูล
 // หลุดไปอยู่ในหน้าที่เปิดสู่สาธารณะโดยไม่ได้ตั้งใจ
 async function apiGetPublic(action,params={}){
-  const url=getApiUrl(); if(!url) return null;
   try{
+    // หน้าสาธารณะต้องอ่านแหล่งเดียวกับแอพหลัก มิฉะนั้นแอพใช้ Supabase แต่ลิงก์ ?api=
+    // ยังอ่าน Sheets และแสดงคิว/ขาย/ลา/ค้างชำระเป็นคนละชุดกัน
+    if(window.PM_API && PM_API.mode()!=='sheets'){
+      const j=await PM_API.supabase(action,params);
+      return j&&j.status==='ok'?j.data:null;
+    }
+    const url=getApiUrl(); if(!url) return null;
     const r=await fetch(url+'?'+new URLSearchParams({action,...params}));
     const j=await r.json();
     return j.status==='ok'?j.data:null;
   }catch(e){ console.error('apiGetPublic error:',action,e); return null; }
 }
+function hasPublicBackend(){return !!((window.PM_API&&PM_API.mode()!=='sheets')||getApiUrl());}
 function esc(s){return String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));}
 const MONS=['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
 function isMarketDay(d){ return d.getDay()===4; } // build.py แปลงเป็น ===4 ฝั่งวันพฤหัสฯ อัตโนมัติ — ห้ามเขียนเป็น !==2
-function nextMarketDateStr(){
-  const d=new Date();
-  for(let i=0;i<7;i++){ if(isMarketDay(d)) break; d.setDate(d.getDate()+1); }
+function publicNow(){
+  let c={manual:false,offsetMs:0};
+  try{c=JSON.parse(localStorage.getItem('pm-system-clock')||'null')||c;}catch(e){}
+  return new Date(Date.now()+(c.manual?(parseInt(c.offsetMs,10)||0):0));
+}
+function currentMarketDateStr(){
+  const d=publicNow();
+  let daysUntil=0;
+  for(;daysUntil<7;daysUntil++){
+    const probe=new Date(d); probe.setDate(d.getDate()+daysUntil);
+    if(isMarketDay(probe)) break;
+  }
+  // หลังวันตลาด 1–2 วันยังเป็นรอบเดิม; วันถัดไปเริ่มรอบตลาดใหม่
+  d.setDate(d.getDate()+(daysUntil>4?daysUntil-7:daysUntil));
   return d.getDate()+' '+MONS[d.getMonth()]+' '+(d.getFullYear()+543);
 }
-function nowClock(){const n=new Date();return String(n.getHours()).padStart(2,'0')+':'+String(n.getMinutes()).padStart(2,'0')+':'+String(n.getSeconds()).padStart(2,'0');}
+function nowClock(){const n=publicNow();return String(n.getHours()).padStart(2,'0')+':'+String(n.getMinutes()).padStart(2,'0')+':'+String(n.getSeconds()).padStart(2,'0');}
 
 // ผังล็อคทั้งหมดของตลาดนี้ — ใช้คำนวณ "ล็อคที่ไม่มีผู้ค้าประจำ" ฝั่ง client เท่านั้น (backend ไม่ทราบผังล็อค)
 //== MARKET_BLOCK:LOCKS ==//
@@ -564,13 +585,13 @@ async function manualRefresh(){
 }
 
 async function loadStatus(){
-  if(!getApiUrl()){
+  if(!hasPublicBackend()){
     document.getElementById('content-wrap').style.display='none';
     document.getElementById('offline-box').style.display='block';
     document.getElementById('updated-txt').textContent='ยังไม่ได้เชื่อมต่อ';
     return;
   }
-  const data=await apiGetPublic('getPublicStatus',{date:nextMarketDateStr()});
+  const data=await apiGetPublic('getPublicStatus',{date:currentMarketDateStr()});
   if(!data){
     document.getElementById('updated-txt').textContent='⚠ โหลดข้อมูลไม่สำเร็จ กำลังลองใหม่...';
     return;
@@ -594,7 +615,10 @@ async function loadStatus(){
   // แหล่งข้อมูล "ขายแล้ว" คือ data.sold (มาจาก daily_bookings = ทุกการขายทั้งสองช่องทาง)
   // จึงครบกว่าเดิมที่อ่านจาก queue อย่างเดียว (ซึ่งไม่มีรายการขายตรงที่ผู้จัดไม่ได้ลงคิวไว้)
   // ══════════════════════════════════════════════════════════════════════
-  const soldRows = Array.isArray(data.sold) ? data.sold : [];
+  const soldRows = Array.isArray(data.sold) ? data.sold.map(r=>({
+    ...r, lock:r.lock||r.lock_id||r.assigned_lock||'',
+    total:parseFloat(r.total||r.price)||0,
+  })).filter(r=>r.lock) : [];
   // เผื่อ backend เวอร์ชันเก่าที่ยังไม่มี data.sold — ถอยไปใช้ queue เหมือนเดิม (ไม่ให้หน้าว่างเปล่า)
   const soldList = soldRows.length ? soldRows : sold.map(q=>({
     lock:q.assigned_lock, zone:'', vendor_name:q.vendor_name, product:q.product||'', via:'queue', time:''
@@ -621,7 +645,8 @@ async function loadStatus(){
       const zone = r.zone||ZONE_OF[r.lock]||'';
       return '<div class="row"><span class="lk">'+esc(r.lock)+'</span>'
         +'<span>'+esc(r.vendor_name||'—')+(r.product?(' <span class="zone">· '+esc(r.product)+'</span>'):'')
-        +(zone?(' <span class="zone">โซน '+esc(zone)+'</span>'):'')+'</span>'
+        +(zone?(' <span class="zone">โซน '+esc(zone)+'</span>'):'')
+        +(r.total?(' <strong>· ฿'+Math.round(r.total).toLocaleString()+'</strong>'):'')+'</span>'
         +via+'</div>';
     }).join('') : '<div class="empty-note">ยังไม่มีล็อคจรที่จำหน่ายในวันนี้</div>';
 
@@ -662,6 +687,13 @@ window.onload=function(){
   AUTO_TIMER=setInterval(loadStatus,25000);
 };
 </script>
+
+
+
+
+
+
+
 
 
 

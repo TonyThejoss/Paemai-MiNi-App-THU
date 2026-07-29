@@ -875,8 +875,8 @@ async function loadFromSheets(){
         const id=row.lock_id; if(!id) return;
         nextDaily[id]={
           lockId:id, name:row.vendor_name, product:row.product,
-          phone:row.phone||'—', price:parseFloat(row.price)||0,
-          elec:parseFloat(row.elec)||0, total:parseFloat(row.total)||0,
+          phone:row.phone||'—', price:parseFloat(row.price||row.total)||0,
+          elec:parseFloat(row.elec)||0, total:parseFloat(row.total||row.price)||0,
           method:row.method, date:row.date||row.market_date||row.date_iso||day, time:row.time,
         };
       });
@@ -2007,6 +2007,7 @@ function toast(msg,type){
 window.onload=function(){buildAll();setTimeout(checkThursdayCycle,400);};
 
 </script>
+
 
 
 
