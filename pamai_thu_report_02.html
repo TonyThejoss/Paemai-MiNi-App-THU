@@ -591,7 +591,9 @@ window.PM_FILTER = (function () {
         /* ผังเริ่มโหลดข้อมูลตั้งแต่ window.onload ซึ่งอาจเร็วกว่าข้อความจากหน้าแม่
            จึงต้องสั่งดึงใหม่ทันทีหลังรับ token ไม่รอ retry รอบเดิมหมดก่อน. */
         if (typeof window.loadVendorOccupancy === 'function') window.loadVendorOccupancy();
-        else if (typeof window.syncRealVendors === 'function') window.syncRealVendors();
+        if (typeof window.syncRealVendors === 'function') window.syncRealVendors();
+        if (typeof window.loadFromSheets === 'function') window.loadFromSheets();
+        if (typeof window.loadAll === 'function') window.loadAll();
       }
     } catch (e) {}
   });
@@ -884,20 +886,54 @@ function toggleDark(){const h=document.documentElement,d=h.getAttribute('data-th
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
 <script id="pm-api-shim">
 /* apiGet/apiPost เวอร์ชันที่รองรับสามโหมด — เก็บของเดิมไว้เป็น __pmSheets* เพื่อใช้เทียบผล
    และเพื่อให้ย้อนกลับไปใช้ Google Sheets ได้ทันทีถ้าพบปัญหาหน้างาน (ทางถอย) */
 (function () {
-  if (typeof apiGet !== 'function' || typeof apiPost !== 'function') return;
-  var _get = apiGet, _post = apiPost;
+  /* ══════════════════════════════════════════════════════════════════════
+     บั๊กร้ายแรงที่พบ 3 ส.ค. 2569 (ผู้ใช้แจ้งแค่อาการเดียว แต่ต้นเหตุกินไป 10 ไฟล์)
+
+     เดิมบรรทัดนี้เขียนว่า:
+         if (typeof apiGet !== 'function' || typeof apiPost !== 'function') return;
+
+     หน้าที่ "อ่านอย่างเดียว" ไม่มีเหตุให้เขียนฟังก์ชัน apiPost เลย —
+     ประวัติแจ้งลา และรายงาน 01–09 รวม 10 ไฟล์ มีแต่ apiGet
+     shim ทั้งก้อนจึง return ทิ้งตั้งแต่บรรทัดแรกในไฟล์เหล่านั้น ผลคือ:
+       · apiGet ไม่ถูกครอบ → ยังยิงไป Google Apps Script ทั้งที่ทั้งระบบย้ายมา Supabase แล้ว
+       · getApiUrl() ไม่ถูกครอบ → คืนค่าว่าง (เครื่องใหม่ไม่มี URL ของ Apps Script)
+         ทุกหน้าจึงตัดสินว่า "ยังไม่เชื่อมต่อ" แล้วขึ้นข้อความชวนไปตั้งค่า โดยไม่มี error ใด ๆ
+     → หน้าประวัติแจ้งลาและรายงานทุกฉบับ **ไม่เคยเห็นข้อมูลจาก Supabase เลย** ตั้งแต่วันตัดจริง
+       (อาการที่ผู้ใช้แจ้ง: "แจ้งลาแล้วแต่ประวัติไม่อัปเดต")
+
+     เข้าเงื่อนไขกฎเหล็กข้อ 18 เป๊ะ ๆ อีกครั้ง — คราวนี้ตัวด่านเองเป็นคนปิดสวิตช์
+     แก้: บังคับแค่ apiGet เท่านั้น ส่วน apiPost ครอบเมื่อมีจริง
+     ══════════════════════════════════════════════════════════════════════ */
+  if (typeof apiGet !== 'function') return;
+  var _get = apiGet;
+  var _post = (typeof apiPost === 'function') ? apiPost : null;
   window.__pmSheetsGet = _get;
-  window.__pmSheetsPost = _post;
+  if (_post) window.__pmSheetsPost = _post;
   function notifySaved(action, result) {
     if (!result || result.status !== 'ok' || window.parent === window) return;
     try { window.parent.postMessage({ type: 'pm-data-changed', action: action }, '*'); } catch (e) {}
   }
 
+  var _everFetched = false;   /* ใช้ตรวจว่าหน้านี้ "เคยขอข้อมูลผ่าน shim" แล้วหรือยัง (ดู kickIfNeverFetched) */
+
   window.apiGet = async function (action, params) {
+    _everFetched = true;
     var m = window.PM_API ? window.PM_API.mode() : 'supabase';
     if (m === 'sheets') return _get(action, params);
     try {
@@ -911,7 +947,9 @@ function toggleDark(){const h=document.documentElement,d=h.getAttribute('data-th
     }
   };
 
-  window.apiPost = async function (action, data) {
+  /* หน้าอ่านอย่างเดียว (ประวัติแจ้งลา · รายงาน 01–09) ไม่มี apiPost — ข้ามส่วนนี้ไปได้เลย
+     แต่ต้องไม่ข้ามทั้ง shim เหมือนเดิม เพราะ apiGet และ getApiUrl ยังต้องถูกครอบ */
+  if (_post) window.apiPost = async function (action, data) {
     var m = window.PM_API ? window.PM_API.mode() : 'supabase';
     if (m === 'sheets') return _post(action, data);
     var sbRes = null, sbErr = null;
@@ -964,6 +1002,70 @@ function toggleDark(){const h=document.documentElement,d=h.getAttribute('data-th
     if (side) side.innerHTML = cloud + ' เชื่อมต่อ Supabase แล้ว';
   }
   setTimeout(refreshConnectionLabels, 1200);
+
+  /* ══════════════════════════════════════════════════════════════════════
+     PM_REFRESH_BUS (เพิ่ม 2026-08-03) — แก้บั๊ก "บันทึกแล้วแต่หน้าอื่นยังเป็นข้อมูลเก่า"
+
+     ระบบมีสายส่งสัญญาณอยู่แล้วตั้งแต่ v2.2: โมดูลที่บันทึกสำเร็จยิง 'pm-data-changed'
+     ขึ้นไปที่ shell → shell กระจาย 'pm-refresh' กลับลงมาทุก iframe
+     แต่ "ปลายทาง" มีแค่ 2 ไฟล์ที่เขียน listener ไว้เอง (ผังตลาด + คิวจองล็อคจร)
+     อีก 6 โมดูลไม่มีเลย — หน้าประวัติแจ้งลาจึงค้างข้อมูลเก่าจนกว่าจะกด F5 (อาการที่ผู้ใช้แจ้ง)
+
+     แทนที่จะไล่ก๊อป listener ทีละไฟล์ (ซึ่งจะ drift แน่นอนตามกฎเหล็กข้อ 12/20)
+     ฝังตัวรับกลางไว้ที่ shim นี้ ซึ่งถูก inject ลง "ทุกไฟล์" อยู่แล้ว
+     แต่ละหน้าไม่ต้องรู้อะไรเลย — แค่มีฟังก์ชันโหลดข้อมูลชื่อใดชื่อหนึ่งใน RELOADERS
+
+     ไฟล์ที่เขียน listener ของตัวเองไว้แล้วยังทำงานได้ปกติ (โหลดซ้ำสองรอบไม่เสียหาย
+     เพราะทุกตัวเป็นการอ่านข้อมูลอย่างเดียว) และมี throttle 400ms กันยิงรัว
+     ══════════════════════════════════════════════════════════════════════ */
+  /* เรียงจาก "ชื่อเฉพาะของหน้านั้น" ก่อน — แต่ละหน้ามีตัวเดียวเท่านั้นในทางปฏิบัติ
+     loadAll: ประวัติแจ้งลา, คิวจองล็อคจร · loadData: ผ่อนชำระ · loadStatus: หน้าสถานะสาธารณะ
+     syncRealVendors: ผังตลาด · loadVendorsFromSheets: ค่าไฟฟ้า
+     loadLocksFromSheets: รับชำระ · loadRealOccupancy: ลงทะเบียนผู้ค้า · loadRules: กฎระเบียบตลาด */
+  var RELOADERS = ['loadAll', 'loadData', 'loadStatus', 'render', 'syncRealVendors',
+                   'loadVendorsFromSheets', 'loadLocksFromSheets', 'loadRealOccupancy', 'loadRules'];
+  function callReloader(why) {
+    for (var i = 0; i < RELOADERS.length; i++) {
+      var fn = window[RELOADERS[i]];
+      if (typeof fn === 'function') {
+        try { fn(); } catch (err) { console.error(why + ':', RELOADERS[i], err); }
+        return true;   /* เรียกตัวแรกที่หน้านั้นมีจริงพอ — ตัวถัดไปเป็นของหน้าอื่น */
+      }
+    }
+    return false;
+  }
+
+  var _lastRefresh = 0;
+  window.addEventListener('message', function (e) {
+    if (!e || !e.data || e.data.type !== 'pm-refresh') return;
+    var now = Date.now();
+    if (now - _lastRefresh < 400) return;   /* กันสัญญาณซ้ำจากการบันทึกรัว ๆ */
+    _lastRefresh = now;
+    callReloader('pm-refresh');
+  });
+
+  /* ══════════════════════════════════════════════════════════════════════
+     บั๊กครึ่งหลังที่พบ 3 ส.ค. 2569 — เรื่อง "ลำดับเวลา" ไม่ใช่เรื่องเงื่อนไข
+
+     shim นี้ถูกฝังไว้ท้าย <body> จึงทำงาน "หลัง" สคริปต์หลักของหน้าเสมอ
+     หน้าที่โหลดข้อมูลตอน window.onload ไม่มีปัญหา (onload มาทีหลัง shim)
+     แต่รายงาน 01–09 เรียก render() แบบ inline ท้ายสคริปต์ของตัวเอง
+     ซึ่งเกิด "ก่อน" shim ติดตั้ง → ตอนนั้น getApiUrl() ยังเป็นตัวเดิมที่คืนค่าว่าง
+     render() จึงขึ้นข้อความ "ยังไม่ได้เชื่อมต่อ" แล้วจบ และไม่มีอะไรเรียกซ้ำอีกเลย
+     ผลคือรายงานทุกฉบับว่างเปล่าถาวรจนกว่าผู้ใช้จะกดปุ่มรีเฟรชเอง
+
+     แก้แบบไม่ต้องแตะไฟล์รายงานทีละไฟล์: ถ้าหลังหน้าโหลดเสร็จแล้วยังไม่เคยมีคำขอ
+     ผ่าน shim เลย แปลว่าหน้านั้น "ตัดสินใจตอนที่ยังไม่มีข้อมูลจริง" → สั่งโหลดใหม่ให้ 1 ครั้ง
+     (เช็ค _everFetched จึงไม่ทำให้หน้าที่ทำงานถูกอยู่แล้วยิงซ้ำ)
+     ══════════════════════════════════════════════════════════════════════ */
+  function kickIfNeverFetched() {
+    if (_everFetched) return;
+    if (callReloader('pm-late-init')) {
+      console.info('PM_API: หน้านี้โหลดข้อมูลก่อน shim พร้อม — สั่งโหลดใหม่ให้อัตโนมัติ');
+    }
+  }
+  if (document.readyState === 'complete') setTimeout(kickIfNeverFetched, 0);
+  else window.addEventListener('load', function () { setTimeout(kickIfNeverFetched, 0); });
 })();
 </script>
 </body>

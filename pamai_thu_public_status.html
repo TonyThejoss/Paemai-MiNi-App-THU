@@ -84,6 +84,17 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(
 .cnt{display:inline-block;background:var(--gm);color:#fff;border-radius:10px;font-size:.66rem;
   font-weight:900;padding:1px 8px;margin-left:6px;vertical-align:middle;}
 .lockchips{display:flex;flex-wrap:wrap;gap:6px;}
+/* PM_PUBLIC_V3 (2026-08-03) — แยกหมวดโซนให้ชัดเจนในทุกช่องที่แสดงเลขล็อค
+   ผู้ค้าที่เปิดจากกลุ่มไลน์ต้องกวาดตาหาโซนของตัวเองได้ทันทีโดยไม่ต้องไล่อ่านเลขทีละตัว */
+.zgrp{margin:10px 0 0;padding:8px 10px;border:1px solid var(--bd);border-radius:10px;background:var(--sf2);}
+.zgrp:first-child{margin-top:4px;}
+.zgrp-head{display:flex;align-items:center;flex-wrap:wrap;gap:6px;margin-bottom:7px;}
+.zgrp-name{font-size:.84rem;font-weight:900;color:var(--tx);}
+.zgrp-cnt{display:inline-block;background:var(--gm);color:#fff;border-radius:10px;
+  font-size:.64rem;font-weight:900;padding:1px 7px;}
+/* ใช้ตัวแปรธีม (ไม่ใช่ hex ตรง ๆ) เพื่อให้อ่านออกทั้งธีมสว่าง/มืด และไม่ชนกฎแปลงสีใน build.py */
+.zgrp-note{display:block;width:100%;font-size:.7rem;font-weight:800;color:var(--o);
+  background:var(--ol);border:1px solid var(--o);border-radius:8px;padding:3px 8px;}
 .section-note{font-size:.72rem;color:var(--txl);margin-top:8px;}
 .lockchip{display:inline-flex;align-items:center;gap:4px;font-size:.92rem;font-weight:900;
   border-radius:9px;padding:6px 10px;min-width:52px;justify-content:center;}
@@ -440,7 +451,7 @@ input, select, textarea, button { font-family: inherit; max-width: 100%; }
 
   <div class="section">
     <div class="section-title"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg> 2. ล็อคจรที่จำหน่ายแล้ววันนี้ <span class="cnt" id="cnt-sold">0</span></div>
-    <div class="sub-note">แสดงทั้งล็อคที่ขายผ่านคิวรอในระบบ และล็อคที่ผู้จัดขายตรงโดยไม่ผ่านคิว</div>
+    <div class="sub-note">แสดงล็อคจรที่จำหน่ายแล้วทั้งหมดของวันนี้</div>
     <div id="queue-sold-list"></div>
   </div>
 
@@ -457,7 +468,6 @@ input, select, textarea, button { font-family: inherit; max-width: 100%; }
   <div class="section">
     <div class="section-title"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true" style="color:#b45309"><circle cx="12" cy="12" r="9"/><path d="M12 7v5"/><path d="M12 16h.01"/></svg> 5. ล็อคที่ค้างชำระ <span class="cnt" id="cnt-unpaid">0</span></div>
     <div class="lockchips" id="unpaid-lock-list"></div>
-    <div class="section-note">แสดงเฉพาะหมายเลขล็อค ไม่แสดงชื่อผู้ค้าหรือยอดค้างชำระ</div>
     <div class="section-note"><strong>หมายเหตุ:</strong> ผู้ค้าโปรดทำความเข้าใจกฎตลาดที่แนบมาด้านล่างนี้เพื่อประโยชน์ของท่าน และให้ท่านยังคงรักษาสิทธิผู้ค้าประจำอยู่</div>
   </div>
 
@@ -565,6 +575,63 @@ const LOCKS = {
 function arr(n,p,vacant){ return Array.from({length:n},(_,i)=>({id:`${p}${i+1}`,o:!vacant.includes(i+1)?1:0})); }
 const ALL_LOCK_IDS=[]; const ZONE_OF={};
 Object.keys(LOCKS).forEach(z=>{ LOCKS[z].data.forEach(l=>{ ALL_LOCK_IDS.push(l.id); ZONE_OF[l.id]=z; }); });
+const ZONE_ORDER=Object.keys(LOCKS);
+
+// ══════════════════════════════════════════════════════════════════════
+// PM_PUBLIC_V3 (2026-08-03) — ข้อกำหนดจากผู้ดูแลตลาด
+//  · ทุกช่องที่แสดงเลขล็อค ต้องแยกหมวดตามโซนให้ชัดเจน
+//  · โซนที่ขึ้นต้นด้วย T แล้วตามด้วยตัวอักษร (TA/TB/TC) = โซนเปิดท้าย ต้องมีหมายเหตุกำกับ
+//    หมายเหตุ: โซน "T" เดี่ยว ๆ (ข้างโลตัส T1-T2 ของตลาดวันพฤหัสฯ) ไม่ใช่โซนเปิดท้าย จึงไม่เข้าเงื่อนไข
+//    ตลาดวันพฤหัสบดีไม่มีโซนขึ้นต้นด้วย T เลย โค้ดชุดนี้จึงไม่มีผลกับฝั่งนั้น
+// ══════════════════════════════════════════════════════════════════════
+/* คิวจองเลือกได้หลายโซน (เพิ่ม 2026-08-03) — zone_pref เก็บเป็นข้อความคั่นด้วย ","
+   ข้อมูลเก่าที่เป็นโซนเดียวยังอ่านได้ปกติ (คือ list ที่มีสมาชิกเดียว) */
+function parseZonePref(v){
+  return String(v==null?'':v).split(',').map(s=>s.trim())
+    .filter(s=>s && s!=='ได้ทุกโซน' && s!=='ทุกโซน');
+}
+function formatZonePref(v){
+  const zs=parseZonePref(v);
+  return zs.length ? ('โซน '+zs.join(', ')) : 'ทุกโซน';
+}
+
+const ZONE_NOTE_OPENTRUNK='โซนเปิดท้าย ของใช้ เสื้อผ้า สินค้าอุปโภค';
+function zoneNote(zone){ return /^T[A-Z]/.test(String(zone||'')) ? ZONE_NOTE_OPENTRUNK : ''; }
+function zoneLabel(zone){ return (LOCKS[zone]&&LOCKS[zone].label) ? LOCKS[zone].label : ('โซน '+zone); }
+
+/* จัดกลุ่มเลขล็อคตามโซน แล้วคืน HTML — ใช้ร่วมกันทั้ง 3 ช่อง (ลา/ขาด · ไม่มีผู้ค้าประจำ · ค้างชำระ)
+   items = [{id, cls, title}] · โซนที่ไม่มีล็อคเลยจะไม่แสดงหัวข้อ */
+function renderLockChipsByZone(items, emptyText){
+  if(!items.length) return '<div class="empty-note">'+emptyText+'</div>';
+  const byZone={};
+  const UNKNOWN='—';
+  items.forEach(it=>{
+    const z=ZONE_OF[it.id]||UNKNOWN;
+    (byZone[z]=byZone[z]||[]).push(it);
+  });
+  const sortLockId=(a,b)=>String(a.id).localeCompare(String(b.id),undefined,{numeric:true});
+  const zones=Object.keys(byZone).sort((a,b)=>{
+    const ia=ZONE_ORDER.indexOf(a), ib=ZONE_ORDER.indexOf(b);
+    if(ia<0&&ib<0) return a.localeCompare(b);
+    if(ia<0) return 1;
+    if(ib<0) return -1;
+    return ia-ib;
+  });
+  return zones.map(z=>{
+    const list=byZone[z].slice().sort(sortLockId);
+    const note=zoneNote(z);
+    return '<div class="zgrp">'
+      +'<div class="zgrp-head">'
+        +'<span class="zgrp-name">'+esc(z===UNKNOWN?'ไม่ระบุโซน':zoneLabel(z))+'</span>'
+        +'<span class="zgrp-cnt">'+list.length+' ล็อค</span>'
+        +(note?('<span class="zgrp-note">'+esc(note)+'</span>'):'')
+      +'</div>'
+      +'<div class="lockchips">'
+      +list.map(it=>'<span class="lockchip '+it.cls+'"'+(it.title?(' title="'+esc(it.title)+'"'):'')+'>'+esc(it.id)+'</span>').join('')
+      +'</div>'
+    +'</div>';
+  }).join('');
+}
 
 let AUTO_TIMER=null;
 
@@ -600,7 +667,22 @@ async function loadStatus(){
   document.getElementById('offline-box').style.display='none';
   document.getElementById('updated-txt').textContent='อัปเดตล่าสุด '+nowClock()+' · รีเฟรชอัตโนมัติทุก 25 วิ';
 
-  const vendorLockSet=new Set((data.vendors||[]).map(v=>v.lock));
+  // ══════════════════════════════════════════════════════════════════════
+  // บั๊ก (แก้ 2026-08-03) — ช่อง "ล็อคว่าง ไม่มีผู้ค้าประจำ" ไม่เคยอัปเดตหลังยกเลิกการเช่า
+  //   เดิม: new Set(data.vendors.map(v=>v.lock)) — นับ "ทุกแถวที่ backend ส่งมา" ว่ามีผู้ค้าประจำ
+  //   แต่ฝั่ง Supabase (migration 0013) ส่งล็อคที่ยกเลิกการเช่าแล้วมาด้วย โดยแปลง status เป็น 'vacant'
+  //   ขณะที่ฝั่ง Apps Script กรอง terminated ทิ้งไปเลย → สอง backend ให้ผลไม่ตรงกัน
+  //   และในโหมด Supabase (โหมดที่ใช้จริง) ล็อคที่เลิกเช่าแล้วจะไม่มีวันโผล่ในช่องนี้
+  // แก้ที่หน้าเว็บให้ตัดสินจาก status เสมอ → ถูกต้องทั้งสอง backend โดยไม่ต้องรอ deploy ฝั่งใดฝั่งหนึ่ง
+  // (ฝั่ง SQL ก็ทำให้ตรงนิยามเพิ่มใน migration 0014 อีกชั้นหนึ่ง)
+  // ══════════════════════════════════════════════════════════════════════
+  const VACANT_VENDOR_STATUS=['vacant','terminated','cancelled','canceled','ยกเลิก'];
+  const vendorLockSet=new Set(
+    (data.vendors||[])
+      .filter(v=>VACANT_VENDOR_STATUS.indexOf(String(v&&v.status||'').trim().toLowerCase())<0)
+      .map(v=>String((v&&(v.lock||v.lock_id||v.assigned_lock))||'').trim())
+      .filter(Boolean)
+  );
   const queue=data.queue||[];
   const waiting=queue.filter(q=>q.status==='waiting');
   const sold=queue.filter(q=>q.status==='sold');
@@ -630,7 +712,7 @@ async function loadStatus(){
   const wEl=document.getElementById('queue-waiting-list');
   wEl.innerHTML = waiting.length ? waiting.map(q=>
     '<div class="row"><span>'+esc(q.vendor_name)+(q.note?(' <span class="zone">('+esc(q.note)+')</span>'):'')+'</span>'
-    +'<span class="badge b-purple">รอคิว · '+(q.zone_pref&&q.zone_pref!=='ได้ทุกโซน'?('โซน '+esc(q.zone_pref)):'ทุกโซน')+'</span></div>'
+    +'<span class="badge b-purple">รอคิว · '+esc(formatZonePref(q.zone_pref))+'</span></div>'
   ).join('') : '<div class="empty-note">ไม่มีคิวรอในขณะนี้</div>';
 
   // ── ล็อคจรที่จำหน่ายแล้ว (ทั้งผ่านคิว และขายตรงไม่ผ่านคิว) ──
@@ -639,14 +721,14 @@ async function loadStatus(){
   sEl.innerHTML = soldList.length ? soldList
     .slice().sort((a,b)=>String(a.lock).localeCompare(String(b.lock),undefined,{numeric:true}))
     .map(r=>{
-      const via = r.via==='queue'
-        ? '<span class="via via-queue">ขายผ่านคิวรอ</span>'
-        : '<span class="via via-direct">ผู้จัดขายตรง (ไม่ผ่านคิว)</span>';
+      // แก้ 2026-08-03 ตามคำสั่งผู้ดูแลตลาด:
+      //  · เอาป้าย "ผู้จัดขายตรง (ไม่ผ่านคิว)" ออก — คงไว้เฉพาะป้าย "ขายผ่านคิวรอ"
+      //  · ไม่แสดงราคาขายล็อคจรบนหน้าสาธารณะอีกต่อไป (payload ฝั่ง SQL ก็ตัด price/total ออกด้วย)
+      const via = r.via==='queue' ? '<span class="via via-queue">ขายผ่านคิวรอ</span>' : '';
       const zone = r.zone||ZONE_OF[r.lock]||'';
       return '<div class="row"><span class="lk">'+esc(r.lock)+'</span>'
         +'<span>'+esc(r.vendor_name||'—')+(r.product?(' <span class="zone">· '+esc(r.product)+'</span>'):'')
-        +(zone?(' <span class="zone">โซน '+esc(zone)+'</span>'):'')
-        +(r.total?(' <strong>· ฿'+Math.round(r.total).toLocaleString()+'</strong>'):'')+'</span>'
+        +(zone?(' <span class="zone">โซน '+esc(zone)+'</span>'):'')+'</span>'
         +via+'</div>';
     }).join('') : '<div class="empty-note">ยังไม่มีล็อคจรที่จำหน่ายในวันนี้</div>';
 
@@ -661,20 +743,20 @@ async function loadStatus(){
   const sortLock=(a,b)=>String(a).localeCompare(String(b),undefined,{numeric:true});
   document.getElementById('cnt-vac1').textContent=vacNone.length;
   document.getElementById('cnt-vac2').textContent=vacLeave.length;
-  document.getElementById('vacant-none-list').innerHTML = vacNone.length
-    ? vacNone.sort(sortLock).map(id=>'<span class="lockchip c-none">'+esc(id)+'</span>').join('')
-    : '<div class="empty-note">ไม่มีล็อคว่างประเภทนี้ในขณะนี้</div>';
-  document.getElementById('vacant-leave-list').innerHTML = vacLeave.length
-    ? vacLeave.sort((a,b)=>sortLock(a.id,b.id)).map(v=>
-        '<span class="lockchip '+(v.type==='leave'?'c-leave':'c-absent')+'" title="'+(v.type==='leave'?'ผู้ค้าประจำแจ้งลา':'ผู้ค้าประจำขาดล็อค')+'">'+esc(v.id)+'</span>'
-      ).join('')
-    : '<div class="empty-note">ไม่มีล็อคว่างประเภทนี้ในขณะนี้</div>';
+  // PM_PUBLIC_V3 — ทั้ง 3 ช่องแยกหมวดตามโซนด้วยตัวช่วยตัวเดียวกัน (โซน T? = โซนเปิดท้าย มีหมายเหตุกำกับ)
+  document.getElementById('vacant-none-list').innerHTML = renderLockChipsByZone(
+    vacNone.map(id=>({id,cls:'c-none',title:'ไม่มีผู้ค้าประจำ'})),
+    'ไม่มีล็อคว่างประเภทนี้ในขณะนี้');
+  document.getElementById('vacant-leave-list').innerHTML = renderLockChipsByZone(
+    vacLeave.map(v=>({id:v.id, cls:(v.type==='leave'?'c-leave':'c-absent'),
+      title:(v.type==='leave'?'ผู้ค้าประจำแจ้งลา':'ผู้ค้าประจำขาดล็อค')})),
+    'ไม่มีล็อคว่างประเภทนี้ในขณะนี้');
 
   // ผู้ดูแลอนุมัติให้หน้าสาธารณะเปิดเผยได้เพียงเลขล็อคที่ค้างชำระเท่านั้น
   document.getElementById('cnt-unpaid').textContent=unpaidLocks.length;
-  document.getElementById('unpaid-lock-list').innerHTML = unpaidLocks.length
-    ? unpaidLocks.slice().sort(sortLock).map(id=>'<span class="lockchip c-unpaid">'+esc(id)+'</span>').join('')
-    : '<div class="empty-note">ไม่มีล็อคค้างชำระในขณะนี้</div>';
+  document.getElementById('unpaid-lock-list').innerHTML = renderLockChipsByZone(
+    unpaidLocks.slice().sort(sortLock).map(id=>({id,cls:'c-unpaid',title:'ค้างชำระ'})),
+    'ไม่มีล็อคค้างชำระในขณะนี้');
 
   // ── กฎระเบียบ ──
   const rules=data.rules||{};
@@ -704,20 +786,47 @@ window.onload=function(){
 
 
 
+
+
+
+
+
 <script id="pm-api-shim">
 /* apiGet/apiPost เวอร์ชันที่รองรับสามโหมด — เก็บของเดิมไว้เป็น __pmSheets* เพื่อใช้เทียบผล
    และเพื่อให้ย้อนกลับไปใช้ Google Sheets ได้ทันทีถ้าพบปัญหาหน้างาน (ทางถอย) */
 (function () {
-  if (typeof apiGet !== 'function' || typeof apiPost !== 'function') return;
-  var _get = apiGet, _post = apiPost;
+  /* ══════════════════════════════════════════════════════════════════════
+     บั๊กร้ายแรงที่พบ 3 ส.ค. 2569 (ผู้ใช้แจ้งแค่อาการเดียว แต่ต้นเหตุกินไป 10 ไฟล์)
+
+     เดิมบรรทัดนี้เขียนว่า:
+         if (typeof apiGet !== 'function' || typeof apiPost !== 'function') return;
+
+     หน้าที่ "อ่านอย่างเดียว" ไม่มีเหตุให้เขียนฟังก์ชัน apiPost เลย —
+     ประวัติแจ้งลา และรายงาน 01–09 รวม 10 ไฟล์ มีแต่ apiGet
+     shim ทั้งก้อนจึง return ทิ้งตั้งแต่บรรทัดแรกในไฟล์เหล่านั้น ผลคือ:
+       · apiGet ไม่ถูกครอบ → ยังยิงไป Google Apps Script ทั้งที่ทั้งระบบย้ายมา Supabase แล้ว
+       · getApiUrl() ไม่ถูกครอบ → คืนค่าว่าง (เครื่องใหม่ไม่มี URL ของ Apps Script)
+         ทุกหน้าจึงตัดสินว่า "ยังไม่เชื่อมต่อ" แล้วขึ้นข้อความชวนไปตั้งค่า โดยไม่มี error ใด ๆ
+     → หน้าประวัติแจ้งลาและรายงานทุกฉบับ **ไม่เคยเห็นข้อมูลจาก Supabase เลย** ตั้งแต่วันตัดจริง
+       (อาการที่ผู้ใช้แจ้ง: "แจ้งลาแล้วแต่ประวัติไม่อัปเดต")
+
+     เข้าเงื่อนไขกฎเหล็กข้อ 18 เป๊ะ ๆ อีกครั้ง — คราวนี้ตัวด่านเองเป็นคนปิดสวิตช์
+     แก้: บังคับแค่ apiGet เท่านั้น ส่วน apiPost ครอบเมื่อมีจริง
+     ══════════════════════════════════════════════════════════════════════ */
+  if (typeof apiGet !== 'function') return;
+  var _get = apiGet;
+  var _post = (typeof apiPost === 'function') ? apiPost : null;
   window.__pmSheetsGet = _get;
-  window.__pmSheetsPost = _post;
+  if (_post) window.__pmSheetsPost = _post;
   function notifySaved(action, result) {
     if (!result || result.status !== 'ok' || window.parent === window) return;
     try { window.parent.postMessage({ type: 'pm-data-changed', action: action }, '*'); } catch (e) {}
   }
 
+  var _everFetched = false;   /* ใช้ตรวจว่าหน้านี้ "เคยขอข้อมูลผ่าน shim" แล้วหรือยัง (ดู kickIfNeverFetched) */
+
   window.apiGet = async function (action, params) {
+    _everFetched = true;
     var m = window.PM_API ? window.PM_API.mode() : 'supabase';
     if (m === 'sheets') return _get(action, params);
     try {
@@ -731,7 +840,9 @@ window.onload=function(){
     }
   };
 
-  window.apiPost = async function (action, data) {
+  /* หน้าอ่านอย่างเดียว (ประวัติแจ้งลา · รายงาน 01–09) ไม่มี apiPost — ข้ามส่วนนี้ไปได้เลย
+     แต่ต้องไม่ข้ามทั้ง shim เหมือนเดิม เพราะ apiGet และ getApiUrl ยังต้องถูกครอบ */
+  if (_post) window.apiPost = async function (action, data) {
     var m = window.PM_API ? window.PM_API.mode() : 'supabase';
     if (m === 'sheets') return _post(action, data);
     var sbRes = null, sbErr = null;
@@ -784,6 +895,70 @@ window.onload=function(){
     if (side) side.innerHTML = cloud + ' เชื่อมต่อ Supabase แล้ว';
   }
   setTimeout(refreshConnectionLabels, 1200);
+
+  /* ══════════════════════════════════════════════════════════════════════
+     PM_REFRESH_BUS (เพิ่ม 2026-08-03) — แก้บั๊ก "บันทึกแล้วแต่หน้าอื่นยังเป็นข้อมูลเก่า"
+
+     ระบบมีสายส่งสัญญาณอยู่แล้วตั้งแต่ v2.2: โมดูลที่บันทึกสำเร็จยิง 'pm-data-changed'
+     ขึ้นไปที่ shell → shell กระจาย 'pm-refresh' กลับลงมาทุก iframe
+     แต่ "ปลายทาง" มีแค่ 2 ไฟล์ที่เขียน listener ไว้เอง (ผังตลาด + คิวจองล็อคจร)
+     อีก 6 โมดูลไม่มีเลย — หน้าประวัติแจ้งลาจึงค้างข้อมูลเก่าจนกว่าจะกด F5 (อาการที่ผู้ใช้แจ้ง)
+
+     แทนที่จะไล่ก๊อป listener ทีละไฟล์ (ซึ่งจะ drift แน่นอนตามกฎเหล็กข้อ 12/20)
+     ฝังตัวรับกลางไว้ที่ shim นี้ ซึ่งถูก inject ลง "ทุกไฟล์" อยู่แล้ว
+     แต่ละหน้าไม่ต้องรู้อะไรเลย — แค่มีฟังก์ชันโหลดข้อมูลชื่อใดชื่อหนึ่งใน RELOADERS
+
+     ไฟล์ที่เขียน listener ของตัวเองไว้แล้วยังทำงานได้ปกติ (โหลดซ้ำสองรอบไม่เสียหาย
+     เพราะทุกตัวเป็นการอ่านข้อมูลอย่างเดียว) และมี throttle 400ms กันยิงรัว
+     ══════════════════════════════════════════════════════════════════════ */
+  /* เรียงจาก "ชื่อเฉพาะของหน้านั้น" ก่อน — แต่ละหน้ามีตัวเดียวเท่านั้นในทางปฏิบัติ
+     loadAll: ประวัติแจ้งลา, คิวจองล็อคจร · loadData: ผ่อนชำระ · loadStatus: หน้าสถานะสาธารณะ
+     syncRealVendors: ผังตลาด · loadVendorsFromSheets: ค่าไฟฟ้า
+     loadLocksFromSheets: รับชำระ · loadRealOccupancy: ลงทะเบียนผู้ค้า · loadRules: กฎระเบียบตลาด */
+  var RELOADERS = ['loadAll', 'loadData', 'loadStatus', 'render', 'syncRealVendors',
+                   'loadVendorsFromSheets', 'loadLocksFromSheets', 'loadRealOccupancy', 'loadRules'];
+  function callReloader(why) {
+    for (var i = 0; i < RELOADERS.length; i++) {
+      var fn = window[RELOADERS[i]];
+      if (typeof fn === 'function') {
+        try { fn(); } catch (err) { console.error(why + ':', RELOADERS[i], err); }
+        return true;   /* เรียกตัวแรกที่หน้านั้นมีจริงพอ — ตัวถัดไปเป็นของหน้าอื่น */
+      }
+    }
+    return false;
+  }
+
+  var _lastRefresh = 0;
+  window.addEventListener('message', function (e) {
+    if (!e || !e.data || e.data.type !== 'pm-refresh') return;
+    var now = Date.now();
+    if (now - _lastRefresh < 400) return;   /* กันสัญญาณซ้ำจากการบันทึกรัว ๆ */
+    _lastRefresh = now;
+    callReloader('pm-refresh');
+  });
+
+  /* ══════════════════════════════════════════════════════════════════════
+     บั๊กครึ่งหลังที่พบ 3 ส.ค. 2569 — เรื่อง "ลำดับเวลา" ไม่ใช่เรื่องเงื่อนไข
+
+     shim นี้ถูกฝังไว้ท้าย <body> จึงทำงาน "หลัง" สคริปต์หลักของหน้าเสมอ
+     หน้าที่โหลดข้อมูลตอน window.onload ไม่มีปัญหา (onload มาทีหลัง shim)
+     แต่รายงาน 01–09 เรียก render() แบบ inline ท้ายสคริปต์ของตัวเอง
+     ซึ่งเกิด "ก่อน" shim ติดตั้ง → ตอนนั้น getApiUrl() ยังเป็นตัวเดิมที่คืนค่าว่าง
+     render() จึงขึ้นข้อความ "ยังไม่ได้เชื่อมต่อ" แล้วจบ และไม่มีอะไรเรียกซ้ำอีกเลย
+     ผลคือรายงานทุกฉบับว่างเปล่าถาวรจนกว่าผู้ใช้จะกดปุ่มรีเฟรชเอง
+
+     แก้แบบไม่ต้องแตะไฟล์รายงานทีละไฟล์: ถ้าหลังหน้าโหลดเสร็จแล้วยังไม่เคยมีคำขอ
+     ผ่าน shim เลย แปลว่าหน้านั้น "ตัดสินใจตอนที่ยังไม่มีข้อมูลจริง" → สั่งโหลดใหม่ให้ 1 ครั้ง
+     (เช็ค _everFetched จึงไม่ทำให้หน้าที่ทำงานถูกอยู่แล้วยิงซ้ำ)
+     ══════════════════════════════════════════════════════════════════════ */
+  function kickIfNeverFetched() {
+    if (_everFetched) return;
+    if (callReloader('pm-late-init')) {
+      console.info('PM_API: หน้านี้โหลดข้อมูลก่อน shim พร้อม — สั่งโหลดใหม่ให้อัตโนมัติ');
+    }
+  }
+  if (document.readyState === 'complete') setTimeout(kickIfNeverFetched, 0);
+  else window.addEventListener('load', function () { setTimeout(kickIfNeverFetched, 0); });
 })();
 </script>
 </body>

@@ -103,6 +103,21 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(
 .m-row.c1{grid-template-columns:1fr;}
 .m-field{display:flex;flex-direction:column;gap:3px;min-width:0;}
 .m-field label{font-size:.86rem;font-weight:700;color:var(--txl);text-transform:uppercase;letter-spacing:.4px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+/* PM_QUEUE_MULTIZONE (2026-08-03) — ตัวเลือกโซนแบบติ๊กหลายโซน (mobile-first: ปุ่มสูง ≥40px แตะง่าย) */
+#aq-zone-label{white-space:normal;}
+.zpick-hint{font-weight:600;text-transform:none;letter-spacing:0;color:var(--txl);opacity:.85;}
+.zpick{display:flex;flex-wrap:wrap;gap:6px;max-height:190px;overflow-y:auto;
+  padding:8px;border:1px solid var(--bd);border-radius:10px;background:var(--sf2);}
+.zpick label{display:inline-flex;align-items:center;gap:6px;min-height:40px;padding:5px 10px;
+  border:2px solid var(--bd);border-radius:9px;background:var(--sf);cursor:pointer;
+  font-size:.88rem;font-weight:700;color:var(--tx);text-transform:none;letter-spacing:0;
+  white-space:nowrap;overflow:visible;}
+/* คลาส .on ถูกสลับด้วย JS (ไม่พึ่ง :has() ซึ่งเบราว์เซอร์เก่าบนมือถือบางรุ่นยังไม่รองรับ) */
+.zpick label.on{border-color:var(--gm);background:var(--gl);color:var(--g);}
+.zpick input{width:17px;height:17px;accent-color:var(--gm);margin:0;flex:none;}
+.zpick-bar{display:flex;align-items:center;flex-wrap:wrap;gap:8px;margin-top:6px;}
+.zpick-sum{font-size:.84rem;font-weight:800;color:var(--gm);}
+@media(max-width:480px){ .zpick{max-height:160px;} }
 .m-field input,.m-field select,.m-field textarea{padding:7px 9px;border:1.5px solid var(--bd);border-radius:7px;font-size:.78rem;background:var(--sf2);color:var(--tx);outline:none;font-family:inherit;transition:border-color .18s;width:100%;min-width:0;box-sizing:border-box;}
 .m-field input:focus,.m-field select:focus,.m-field textarea:focus{border-color:var(--gm);box-shadow:0 0 0 3px rgba(45,106,79,.15);}
 .m-footer{display:flex;gap:8px;margin-top:14px;justify-content:flex-end;}
@@ -511,13 +526,23 @@ input, select, textarea, button { font-family: inherit; max-width: 100%; }
 <!-- ADD QUEUE MODAL -->
 <div class="modal-bg" id="addQueueModal">
   <div class="modal-box">
-    <div class="m-title"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg> เพิ่มคิวจองล็อคจรใหม่</div>
-    <div class="m-sub">คีย์คำขอที่ผู้ค้าแจ้งเข้ามาในกลุ่มไลน์</div>
+    <div class="m-title" id="aq-title"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg> เพิ่มคิวจองล็อคจรใหม่</div>
+    <div class="m-sub" id="aq-sub">คีย์คำขอที่ผู้ค้าแจ้งเข้ามาในกลุ่มไลน์</div>
     <div class="m-row c1"><div class="m-field"><label for="aq-date">วันตลาด</label><input type="text" id="aq-date"></div></div>
     <div class="m-row"><div class="m-field"><label for="aq-name">ชื่อร้าน/ผู้ค้า *</label><input type="text" id="aq-name" placeholder="ชื่อร้านหรือผู้ค้า"></div><div class="m-field"><label for="aq-phone">เบอร์โทร</label><input type="tel" id="aq-phone" placeholder="0xx-xxx-xxxx"></div></div>
-    <div class="m-row"><div class="m-field"><label for="aq-line">LINE ID</label><input type="text" id="aq-line" placeholder="LINE ID (ถ้ามี)"></div><div class="m-field"><label for="aq-zone">โซนที่ต้องการ</label><select id="aq-zone"><option value="">ได้ทุกโซน</option></select></div></div>
-    <div class="m-row c1"><div class="m-field"><label for="aq-note">หมายเหตุ</label><input type="text" id="aq-note" placeholder="เช่น ขอใกล้ทางเข้า / ไม่ระบุ = ได้ทุกโซน"></div></div>
-    <div class="m-footer"><button class="m-btn secondary" onclick="closeAddQueueModal()">ยกเลิก</button><button class="m-btn primary" onclick="saveAddQueue()"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg> บันทึกลงคิว</button></div>
+    <div class="m-row c1"><div class="m-field"><label for="aq-line">LINE ID</label><input type="text" id="aq-line" placeholder="LINE ID (ถ้ามี)"></div></div>
+    <!-- PM_QUEUE_MULTIZONE (2026-08-03) — ผู้ค้าขอได้หลายโซน จึงเปลี่ยนจาก select เดี่ยวเป็นติ๊กหลายโซน
+         เก็บลง zone_pref เป็นข้อความคั่นด้วย "," (ข้อมูลคิวเดิมที่เป็นโซนเดียวยังอ่านได้ปกติ) -->
+    <div class="m-row c1"><div class="m-field">
+      <label id="aq-zone-label">โซนที่ต้องการ <span class="zpick-hint">(เลือกได้หลายโซน · ไม่เลือกเลย = ได้ทุกโซน)</span></label>
+      <div class="zpick" id="aq-zone" role="group" aria-labelledby="aq-zone-label"></div>
+      <div class="zpick-bar">
+        <button type="button" class="btn btn-secondary btn-sm" onclick="zpickAll(false)">ล้างการเลือก (ได้ทุกโซน)</button>
+        <span class="zpick-sum" id="aq-zone-sum">ได้ทุกโซน</span>
+      </div>
+    </div></div>
+    <div class="m-row c1"><div class="m-field"><label for="aq-note">หมายเหตุ</label><input type="text" id="aq-note" placeholder="เช่น ขอใกล้ทางเข้า"></div></div>
+    <div class="m-footer"><button class="m-btn secondary" onclick="closeAddQueueModal()">ยกเลิก</button><button class="m-btn primary" id="aq-save" onclick="saveAddQueue()"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg> บันทึกลงคิว</button></div>
   </div>
 </div>
 
@@ -765,10 +790,53 @@ async function loadAll(){
 // ════════════════════════════════════════════════════
 // LOCK <select> OPTIONS
 // ════════════════════════════════════════════════════
+// ══════════════════════════════════════════════════════════════════════
+// PM_QUEUE_MULTIZONE (2026-08-03) — คิวจองเลือกได้หลายโซน
+// zone_pref เก็บเป็นข้อความคั่นด้วย "," เช่น "A,B,TA" — ไม่ต้องแก้ schema
+// ข้อมูลคิวเดิมที่เก็บโซนเดียวไว้ยังอ่านได้ปกติ (คือ list ที่มีสมาชิกเดียว)
+// ══════════════════════════════════════════════════════════════════════
+function parseZonePref(v){
+  return String(v==null?'':v).split(',').map(s=>s.trim())
+    .filter(s=>s && s!=='ได้ทุกโซน' && s!=='ทุกโซน');
+}
+function formatZonePref(v){
+  const zs=parseZonePref(v);
+  return zs.length ? ('โซน '+zs.join(', ')) : 'ได้ทุกโซน';
+}
+/* สร้างช่องติ๊กโซนในกล่อง #aq-zone จากผัง LOCKS ของตลาดนั้น ๆ */
+function zpickBuild(selected){
+  const sel=new Set(parseZonePref(Array.isArray(selected)?selected.join(','):selected));
+  const box=document.getElementById('aq-zone');
+  box.innerHTML=Object.keys(LOCKS).map(z=>{
+    const on=sel.has(z);
+    const lbl=(LOCKS[z]&&LOCKS[z].label)?LOCKS[z].label:('โซน '+z);
+    return '<label class="'+(on?'on':'')+'" title="'+esc(lbl)+'">'
+      +'<input type="checkbox" value="'+esc(z)+'"'+(on?' checked':'')+' onchange="zpickSync(this)"> '
+      +esc(z)+'</label>';
+  }).join('');
+  zpickSync(null);
+}
+function zpickSync(input){
+  if(input){ const l=input.closest('label'); if(l) l.classList.toggle('on',input.checked); }
+  const sum=document.getElementById('aq-zone-sum');
+  if(sum) sum.textContent=formatZonePref(zpickValue());
+}
+function zpickValue(){
+  return Array.from(document.querySelectorAll('#aq-zone input:checked')).map(i=>i.value).join(',');
+}
+function zpickAll(checked){
+  document.querySelectorAll('#aq-zone input').forEach(i=>{
+    i.checked=!!checked; const l=i.closest('label'); if(l) l.classList.toggle('on',!!checked);
+  });
+  zpickSync(null);
+}
+
 function buildLockOptionsHtml(zonePref){
-  const pref=(zonePref||'').trim();
-  const match=AVAILABLE_LIST.filter(l=>pref&&l.zone===pref);
-  const rest=AVAILABLE_LIST.filter(l=>!(pref&&l.zone===pref));
+  const prefs=parseZonePref(zonePref);
+  const prefSet=new Set(prefs);
+  const match=AVAILABLE_LIST.filter(l=>prefSet.has(l.zone));
+  const rest=AVAILABLE_LIST.filter(l=>!prefSet.has(l.zone));
+  const pref=prefs.join(', ');
   let html='<option value="">— เลือกล็อคว่าง —</option>';
   if(match.length){
     html+='<optgroup label="ตรงโซนที่ขอ ('+esc(pref)+')">';
@@ -858,7 +926,7 @@ function renderWaiting(){
   const readOnly=isReadOnly();
   if(!waiting.length){ tbody.innerHTML='<tr><td colspan="7" class="empty-note">ยังไม่มีคิวรอ</td></tr>'; return; }
   tbody.innerHTML=waiting.map(r=>{
-    const zoneTxt=r.zone_pref?('โซน '+esc(r.zone_pref)):'ได้ทุกโซน';
+    const zoneTxt=esc(formatZonePref(r.zone_pref));
     const sellForm = readOnly ? '<span style="color:var(--txl)">ไม่มีสิทธิ์ขาย</span>' :
       '<div class="inline-form">'
       +'<select class="w-lock" id="q-lock-'+esc(r.id)+'">'+buildLockOptionsHtml(r.zone_pref)+'</select>'
@@ -866,8 +934,10 @@ function renderWaiting(){
       +'<input type="number" class="w-num" id="q-price-'+esc(r.id)+'" value="300" min="0" placeholder="ราคา">'
       +'<button class="btn btn-primary btn-sm" onclick="sellQueueRow(\''+esc(r.id)+'\')"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg> บันทึก &amp; ขาย</button>'
       +'</div>';
+    // เพิ่ม 2026-08-03: คิวรอต้องแก้ไขได้ทุกช่อง (เดิมมีปุ่มแก้ไขเฉพาะแถวที่ขายแล้ว)
     const mgmt = readOnly ? '—' :
-      '<button class="btn btn-danger btn-sm" onclick="cancelQueueEntry(\''+esc(r.id)+'\',false)"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg> ยกเลิก</button>';
+      '<button class="btn btn-secondary btn-sm" onclick="openEditQueueModal(\''+esc(r.id)+'\')"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.12 2.12 0 0 1 3 3L12 15l-4 1 1-4Z"/></svg> แก้ไข</button>'
+      +' <button class="btn btn-danger btn-sm" onclick="cancelQueueEntry(\''+esc(r.id)+'\',false)"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg> ยกเลิก</button>';
     return '<tr>'
       +'<td><b>'+esc(r.vendor_name)+'</b></td>'
       +'<td>'+esc(r.phone||'—')+(r.line?(' · '+esc(r.line)):'')+'</td>'
@@ -890,7 +960,9 @@ async function sellQueueRow(queueId){
   if(!product){ toast('กรุณากรอกสินค้าก่อนขาย','e'); return; }
   const row=QUEUE_ROWS.find(r=>r.id===queueId);
   if(!row){ toast('ไม่พบรายการคิวนี้แล้ว ลองรีเฟรช','e'); return; }
-  const zone=ZONE_OF[lockId]||row.zone_pref||'';
+  // zone ต้องเป็น "โซนของล็อคที่ขายจริง" เสมอ — ห้าม fallback ไป zone_pref อีก
+  // เพราะคิวเลือกได้หลายโซนแล้ว ค่าอย่าง "A,B,TA" จะไหลลงคอลัมน์ zone ของ daily_bookings
+  const zone=ZONE_OF[lockId]||(parseZonePref(row.zone_pref)[0]||'');
   const res=await apiPost('sellFloatingQueueEntry',{data:{
     id:queueId, assigned_lock:lockId, zone, vendor_name:row.vendor_name, phone:row.phone||'',
     product, price, elec:0, total:price, method:'เงินสด', date:CURRENT_DATE, time:nowTime(),
@@ -983,26 +1055,68 @@ async function saveEditSold(){
 // ════════════════════════════════════════════════════
 // ADD QUEUE MODAL
 // ════════════════════════════════════════════════════
+// กล่องเดียวใช้ทั้ง "เพิ่มคิวใหม่" และ "แก้ไขคิวรอ" — editingQueueId=null คือโหมดเพิ่ม
+let editingQueueId=null;
+
 function openAddQueueModal(){
   if(isReadOnly()) return;
+  editingQueueId=null;
+  document.getElementById('aq-title').innerHTML='<svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg> เพิ่มคิวจองล็อคจรใหม่';
+  document.getElementById('aq-sub').textContent='คีย์คำขอที่ผู้ค้าแจ้งเข้ามาในกลุ่มไลน์';
+  document.getElementById('aq-save').innerHTML='<svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg> บันทึกลงคิว';
   document.getElementById('aq-date').value=CURRENT_DATE;
   document.getElementById('aq-name').value='';
   document.getElementById('aq-phone').value='';
   document.getElementById('aq-line').value='';
   document.getElementById('aq-note').value='';
-  const zoneSel=document.getElementById('aq-zone');
-  zoneSel.innerHTML='<option value="">ได้ทุกโซน</option>'+Object.keys(LOCKS).map(z=>'<option value="'+esc(z)+'">โซน '+esc(z)+'</option>').join('');
+  zpickBuild('');
   document.getElementById('addQueueModal').classList.add('show');
 }
-function closeAddQueueModal(){ document.getElementById('addQueueModal').classList.remove('show'); }
+
+/* เพิ่ม 2026-08-03 ตามคำสั่งผู้ดูแลตลาด: "คิวจองต้องแก้ไขได้"
+   เดิมแถวคิวรอมีแค่ปุ่มยกเลิก ผู้จัดจึงต้องลบทิ้งแล้วคีย์ใหม่ทุกครั้งที่ผู้ค้าแจ้งเปลี่ยน */
+function openEditQueueModal(id){
+  if(isReadOnly()) return;
+  const row=QUEUE_ROWS.find(r=>r.id===id);
+  if(!row){ toast('ไม่พบรายการคิวนี้แล้ว ลองรีเฟรช','e'); return; }
+  editingQueueId=id;
+  document.getElementById('aq-title').innerHTML='<svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.12 2.12 0 0 1 3 3L12 15l-4 1 1-4Z"/></svg> แก้ไขคิวรอ';
+  document.getElementById('aq-sub').textContent='แก้ไขคำขอของ '+(row.vendor_name||'—');
+  document.getElementById('aq-save').innerHTML='<svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg> บันทึกการแก้ไข';
+  document.getElementById('aq-date').value=row.market_date||CURRENT_DATE;
+  document.getElementById('aq-name').value=row.vendor_name||'';
+  document.getElementById('aq-phone').value=row.phone||'';
+  document.getElementById('aq-line').value=row.line||'';
+  document.getElementById('aq-note').value=row.note||'';
+  zpickBuild(row.zone_pref||'');
+  document.getElementById('addQueueModal').classList.add('show');
+}
+
+function closeAddQueueModal(){
+  document.getElementById('addQueueModal').classList.remove('show');
+  editingQueueId=null;
+}
+
 async function saveAddQueue(){
+  if(isReadOnly()) return;
   const marketDate=(document.getElementById('aq-date').value||CURRENT_DATE).trim();
   const name=(document.getElementById('aq-name').value||'').trim();
   const phone=(document.getElementById('aq-phone').value||'').trim();
   const line=(document.getElementById('aq-line').value||'').trim();
-  const zonePref=document.getElementById('aq-zone').value;
+  const zonePref=zpickValue();      // "" = ได้ทุกโซน · "A,B,TA" = หลายโซน
   const note=(document.getElementById('aq-note').value||'').trim();
   if(!name){ toast('กรุณากรอกชื่อร้าน/ผู้ค้า','e'); return; }
+
+  if(editingQueueId){
+    // backend อ่านเฉพาะคีย์ที่ส่งมา (migration 0014) จึงล้างค่าเป็นว่างได้จริง
+    const res=await apiPost('editFloatingQueueEntry',{id:editingQueueId,data:{
+      market_date:marketDate, vendor_name:name, phone, line, zone_pref:zonePref, note,
+    }});
+    if(res&&res.status==='ok'){ toast('บันทึกการแก้ไขคิวแล้ว','s'); closeAddQueueModal(); loadAll(); }
+    else toast('แก้ไขคิวไม่สำเร็จ','e');
+    return;
+  }
+
   const res=await apiPost('saveFloatingQueueEntry',{data:{
     market_date:marketDate, vendor_name:name, phone, line, zone_pref:zonePref, note,
     requested_at:new Date().toISOString(),
@@ -1050,20 +1164,52 @@ window.onload=function(){
 
 
 
+
+
+
+
+
+
+
+
+
+
 <script id="pm-api-shim">
 /* apiGet/apiPost เวอร์ชันที่รองรับสามโหมด — เก็บของเดิมไว้เป็น __pmSheets* เพื่อใช้เทียบผล
    และเพื่อให้ย้อนกลับไปใช้ Google Sheets ได้ทันทีถ้าพบปัญหาหน้างาน (ทางถอย) */
 (function () {
-  if (typeof apiGet !== 'function' || typeof apiPost !== 'function') return;
-  var _get = apiGet, _post = apiPost;
+  /* ══════════════════════════════════════════════════════════════════════
+     บั๊กร้ายแรงที่พบ 3 ส.ค. 2569 (ผู้ใช้แจ้งแค่อาการเดียว แต่ต้นเหตุกินไป 10 ไฟล์)
+
+     เดิมบรรทัดนี้เขียนว่า:
+         if (typeof apiGet !== 'function' || typeof apiPost !== 'function') return;
+
+     หน้าที่ "อ่านอย่างเดียว" ไม่มีเหตุให้เขียนฟังก์ชัน apiPost เลย —
+     ประวัติแจ้งลา และรายงาน 01–09 รวม 10 ไฟล์ มีแต่ apiGet
+     shim ทั้งก้อนจึง return ทิ้งตั้งแต่บรรทัดแรกในไฟล์เหล่านั้น ผลคือ:
+       · apiGet ไม่ถูกครอบ → ยังยิงไป Google Apps Script ทั้งที่ทั้งระบบย้ายมา Supabase แล้ว
+       · getApiUrl() ไม่ถูกครอบ → คืนค่าว่าง (เครื่องใหม่ไม่มี URL ของ Apps Script)
+         ทุกหน้าจึงตัดสินว่า "ยังไม่เชื่อมต่อ" แล้วขึ้นข้อความชวนไปตั้งค่า โดยไม่มี error ใด ๆ
+     → หน้าประวัติแจ้งลาและรายงานทุกฉบับ **ไม่เคยเห็นข้อมูลจาก Supabase เลย** ตั้งแต่วันตัดจริง
+       (อาการที่ผู้ใช้แจ้ง: "แจ้งลาแล้วแต่ประวัติไม่อัปเดต")
+
+     เข้าเงื่อนไขกฎเหล็กข้อ 18 เป๊ะ ๆ อีกครั้ง — คราวนี้ตัวด่านเองเป็นคนปิดสวิตช์
+     แก้: บังคับแค่ apiGet เท่านั้น ส่วน apiPost ครอบเมื่อมีจริง
+     ══════════════════════════════════════════════════════════════════════ */
+  if (typeof apiGet !== 'function') return;
+  var _get = apiGet;
+  var _post = (typeof apiPost === 'function') ? apiPost : null;
   window.__pmSheetsGet = _get;
-  window.__pmSheetsPost = _post;
+  if (_post) window.__pmSheetsPost = _post;
   function notifySaved(action, result) {
     if (!result || result.status !== 'ok' || window.parent === window) return;
     try { window.parent.postMessage({ type: 'pm-data-changed', action: action }, '*'); } catch (e) {}
   }
 
+  var _everFetched = false;   /* ใช้ตรวจว่าหน้านี้ "เคยขอข้อมูลผ่าน shim" แล้วหรือยัง (ดู kickIfNeverFetched) */
+
   window.apiGet = async function (action, params) {
+    _everFetched = true;
     var m = window.PM_API ? window.PM_API.mode() : 'supabase';
     if (m === 'sheets') return _get(action, params);
     try {
@@ -1077,7 +1223,9 @@ window.onload=function(){
     }
   };
 
-  window.apiPost = async function (action, data) {
+  /* หน้าอ่านอย่างเดียว (ประวัติแจ้งลา · รายงาน 01–09) ไม่มี apiPost — ข้ามส่วนนี้ไปได้เลย
+     แต่ต้องไม่ข้ามทั้ง shim เหมือนเดิม เพราะ apiGet และ getApiUrl ยังต้องถูกครอบ */
+  if (_post) window.apiPost = async function (action, data) {
     var m = window.PM_API ? window.PM_API.mode() : 'supabase';
     if (m === 'sheets') return _post(action, data);
     var sbRes = null, sbErr = null;
@@ -1130,6 +1278,70 @@ window.onload=function(){
     if (side) side.innerHTML = cloud + ' เชื่อมต่อ Supabase แล้ว';
   }
   setTimeout(refreshConnectionLabels, 1200);
+
+  /* ══════════════════════════════════════════════════════════════════════
+     PM_REFRESH_BUS (เพิ่ม 2026-08-03) — แก้บั๊ก "บันทึกแล้วแต่หน้าอื่นยังเป็นข้อมูลเก่า"
+
+     ระบบมีสายส่งสัญญาณอยู่แล้วตั้งแต่ v2.2: โมดูลที่บันทึกสำเร็จยิง 'pm-data-changed'
+     ขึ้นไปที่ shell → shell กระจาย 'pm-refresh' กลับลงมาทุก iframe
+     แต่ "ปลายทาง" มีแค่ 2 ไฟล์ที่เขียน listener ไว้เอง (ผังตลาด + คิวจองล็อคจร)
+     อีก 6 โมดูลไม่มีเลย — หน้าประวัติแจ้งลาจึงค้างข้อมูลเก่าจนกว่าจะกด F5 (อาการที่ผู้ใช้แจ้ง)
+
+     แทนที่จะไล่ก๊อป listener ทีละไฟล์ (ซึ่งจะ drift แน่นอนตามกฎเหล็กข้อ 12/20)
+     ฝังตัวรับกลางไว้ที่ shim นี้ ซึ่งถูก inject ลง "ทุกไฟล์" อยู่แล้ว
+     แต่ละหน้าไม่ต้องรู้อะไรเลย — แค่มีฟังก์ชันโหลดข้อมูลชื่อใดชื่อหนึ่งใน RELOADERS
+
+     ไฟล์ที่เขียน listener ของตัวเองไว้แล้วยังทำงานได้ปกติ (โหลดซ้ำสองรอบไม่เสียหาย
+     เพราะทุกตัวเป็นการอ่านข้อมูลอย่างเดียว) และมี throttle 400ms กันยิงรัว
+     ══════════════════════════════════════════════════════════════════════ */
+  /* เรียงจาก "ชื่อเฉพาะของหน้านั้น" ก่อน — แต่ละหน้ามีตัวเดียวเท่านั้นในทางปฏิบัติ
+     loadAll: ประวัติแจ้งลา, คิวจองล็อคจร · loadData: ผ่อนชำระ · loadStatus: หน้าสถานะสาธารณะ
+     syncRealVendors: ผังตลาด · loadVendorsFromSheets: ค่าไฟฟ้า
+     loadLocksFromSheets: รับชำระ · loadRealOccupancy: ลงทะเบียนผู้ค้า · loadRules: กฎระเบียบตลาด */
+  var RELOADERS = ['loadAll', 'loadData', 'loadStatus', 'render', 'syncRealVendors',
+                   'loadVendorsFromSheets', 'loadLocksFromSheets', 'loadRealOccupancy', 'loadRules'];
+  function callReloader(why) {
+    for (var i = 0; i < RELOADERS.length; i++) {
+      var fn = window[RELOADERS[i]];
+      if (typeof fn === 'function') {
+        try { fn(); } catch (err) { console.error(why + ':', RELOADERS[i], err); }
+        return true;   /* เรียกตัวแรกที่หน้านั้นมีจริงพอ — ตัวถัดไปเป็นของหน้าอื่น */
+      }
+    }
+    return false;
+  }
+
+  var _lastRefresh = 0;
+  window.addEventListener('message', function (e) {
+    if (!e || !e.data || e.data.type !== 'pm-refresh') return;
+    var now = Date.now();
+    if (now - _lastRefresh < 400) return;   /* กันสัญญาณซ้ำจากการบันทึกรัว ๆ */
+    _lastRefresh = now;
+    callReloader('pm-refresh');
+  });
+
+  /* ══════════════════════════════════════════════════════════════════════
+     บั๊กครึ่งหลังที่พบ 3 ส.ค. 2569 — เรื่อง "ลำดับเวลา" ไม่ใช่เรื่องเงื่อนไข
+
+     shim นี้ถูกฝังไว้ท้าย <body> จึงทำงาน "หลัง" สคริปต์หลักของหน้าเสมอ
+     หน้าที่โหลดข้อมูลตอน window.onload ไม่มีปัญหา (onload มาทีหลัง shim)
+     แต่รายงาน 01–09 เรียก render() แบบ inline ท้ายสคริปต์ของตัวเอง
+     ซึ่งเกิด "ก่อน" shim ติดตั้ง → ตอนนั้น getApiUrl() ยังเป็นตัวเดิมที่คืนค่าว่าง
+     render() จึงขึ้นข้อความ "ยังไม่ได้เชื่อมต่อ" แล้วจบ และไม่มีอะไรเรียกซ้ำอีกเลย
+     ผลคือรายงานทุกฉบับว่างเปล่าถาวรจนกว่าผู้ใช้จะกดปุ่มรีเฟรชเอง
+
+     แก้แบบไม่ต้องแตะไฟล์รายงานทีละไฟล์: ถ้าหลังหน้าโหลดเสร็จแล้วยังไม่เคยมีคำขอ
+     ผ่าน shim เลย แปลว่าหน้านั้น "ตัดสินใจตอนที่ยังไม่มีข้อมูลจริง" → สั่งโหลดใหม่ให้ 1 ครั้ง
+     (เช็ค _everFetched จึงไม่ทำให้หน้าที่ทำงานถูกอยู่แล้วยิงซ้ำ)
+     ══════════════════════════════════════════════════════════════════════ */
+  function kickIfNeverFetched() {
+    if (_everFetched) return;
+    if (callReloader('pm-late-init')) {
+      console.info('PM_API: หน้านี้โหลดข้อมูลก่อน shim พร้อม — สั่งโหลดใหม่ให้อัตโนมัติ');
+    }
+  }
+  if (document.readyState === 'complete') setTimeout(kickIfNeverFetched, 0);
+  else window.addEventListener('load', function () { setTimeout(kickIfNeverFetched, 0); });
 })();
 </script>
 </body>

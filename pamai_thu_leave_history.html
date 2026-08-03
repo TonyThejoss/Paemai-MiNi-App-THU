@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ประวัติแจ้งลา/ขาดล็อค/ผู้ค้าจร — แพไม้มินิ</title>
+<title>ประวัติแจ้งลา/ขาดล็อค/ยกเลิก — แพไม้มินิ</title>
 <style>
 :root {
   --g:#7c2d12;--gm:#c2410c;--gb:#ea580c;--gl:#ffedd5;--gll:#fff7ed;
@@ -312,7 +312,9 @@ input, select, textarea, button { font-family: inherit; max-width: 100%; }
         /* ผังเริ่มโหลดข้อมูลตั้งแต่ window.onload ซึ่งอาจเร็วกว่าข้อความจากหน้าแม่
            จึงต้องสั่งดึงใหม่ทันทีหลังรับ token ไม่รอ retry รอบเดิมหมดก่อน. */
         if (typeof window.loadVendorOccupancy === 'function') window.loadVendorOccupancy();
-        else if (typeof window.syncRealVendors === 'function') window.syncRealVendors();
+        if (typeof window.syncRealVendors === 'function') window.syncRealVendors();
+        if (typeof window.loadFromSheets === 'function') window.loadFromSheets();
+        if (typeof window.loadAll === 'function') window.loadAll();
       }
     } catch (e) {}
   });
@@ -408,8 +410,8 @@ input, select, textarea, button { font-family: inherit; max-width: 100%; }
 
 <div class="topbar">
   <div>
-    <h1><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="4" width="16" height="18" rx="2"/><path d="M9 3h6a1 1 0 0 1 1 1v1H8V4a1 1 0 0 1 1-1Z"/></svg> ประวัติแจ้งลา / ขาดล็อค / ผู้ค้าจร</h1>
-    <p>ดึงข้อมูลจริงจาก Google Sheets (leave_log, daily_bookings) — ไม่ใช่ค่าจำลอง</p>
+    <h1><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="4" width="16" height="18" rx="2"/><path d="M9 3h6a1 1 0 0 1 1 1v1H8V4a1 1 0 0 1 1-1Z"/></svg> ประวัติแจ้งลา / ขาด / ยกเลิก</h1>
+    <p>ดึงข้อมูลจริงจากฐานข้อมูล (leave_log, daily_bookings, floating_queue) — ไม่ใช่ค่าจำลอง</p>
   </div>
   <div class="topbar-right">
     <span class="conn-badge" id="conn-badge">⏳ กำลังตรวจสอบ...</span>
@@ -421,6 +423,7 @@ input, select, textarea, button { font-family: inherit; max-width: 100%; }
 <div class="tabs">
   <button class="tab active" data-tab="leave" onclick="switchSub('leave')"><svg class="ic ic-dot" viewBox="0 0 24 24" aria-hidden="true" style="color:var(--pu)"><circle cx="12" cy="12" r="8" fill="currentColor"/></svg> ลา / ขาด / ยกเลิก</button>
   <button class="tab" data-tab="daily" onclick="switchSub('daily')"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 10 12 2H4v8l8 8 8-8Z" transform="translate(0 2)"/><circle cx="7.5" cy="7.5" r="1" transform="translate(0 2)"/></svg>️ ผู้ค้าจร</button>
+  <button class="tab" data-tab="cancel" onclick="switchSub('cancel')"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg> ยกเลิก</button>
 </div>
 
 <!-- ═══ TAB: LEAVE / ABSENT / CANCEL ═══ -->
@@ -509,6 +512,51 @@ input, select, textarea, button { font-family: inherit; max-width: 100%; }
   </div>
 </div>
 
+<!-- ═══ TAB: CANCELLATIONS (เพิ่ม 2026-08-03 ตามคำสั่งผู้ดูแลตลาด) ═══
+     รวม "ทุกการยกเลิก" ที่กระจายอยู่ 3 ตารางมาไว้ที่เดียว: leave_log (ยกเลิกแจ้งลา/ขาด/สิ้นสุดสัญญา),
+     daily_bookings ที่ cancelled=true (ยกเลิกล็อคจร) และ floating_queue ที่ status='cancelled' (ยกเลิกคิว)
+     ใช้ action ใหม่ getCancellations (migration 0014 + Apps Script) -->
+<div class="page" id="page-cancel">
+  <div class="kpi-grid">
+    <div class="kpi"><div class="kpi-num" id="cx-kpi-total">0</div><div class="kpi-label">รายการยกเลิกทั้งหมด</div></div>
+    <div class="kpi kp-gray"><div class="kpi-num" id="cx-kpi-leave" style="color:var(--txm)">0</div><div class="kpi-label">ยกเลิกแจ้งลา / ขาดล็อค</div></div>
+    <div class="kpi kp-red"><div class="kpi-num" id="cx-kpi-lease" style="color:var(--r)">0</div><div class="kpi-label">ยกเลิกการเช่า</div></div>
+    <div class="kpi kp-purple"><div class="kpi-num" id="cx-kpi-daily" style="color:var(--pu)">0</div><div class="kpi-label">ยกเลิกล็อคจร / คิวจอง</div></div>
+  </div>
+
+  <div class="card">
+    <div class="search-row">
+      <label for="cx-search" class="visually-hidden">ค้นหาประวัติการยกเลิก</label>
+      <input class="sbox" id="cx-search" placeholder="ค้นหา: เลขล็อค / ชื่อร้าน / โซน / เหตุผล / ผู้บันทึก" oninput="renderCancel()">
+      <label for="cx-kind" class="visually-hidden">กรองตามประเภทการยกเลิก</label>
+      <select class="fsel" id="cx-kind" onchange="renderCancel()">
+        <option value="">ทุกประเภทการยกเลิก</option>
+        <option value="leave_cancel">ยกเลิกแจ้งลา / ขาดล็อค</option>
+        <option value="lease_cancel">ยกเลิกการเช่า (สิ้นสุดสัญญา)</option>
+        <option value="daily_cancel">ยกเลิกล็อคจร</option>
+        <option value="queue_cancel">ยกเลิกคิวจอง</option>
+      </select>
+      <label for="cx-from" class="dlabel">จาก</label>
+      <input class="dinput" type="date" id="cx-from" onchange="renderCancel()">
+      <label for="cx-to" class="dlabel">ถึง</label>
+      <input class="dinput" type="date" id="cx-to" onchange="renderCancel()">
+      <button class="btn btn-secondary" onclick="resetCancelFilters()"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg> ล้างตัวกรอง</button>
+    </div>
+    <div class="filter-note">ใช้ตัวกรอง โซน / หมวดล็อค / ล็อค ร่วมกับแท็บลา-ขาด · เรียงจากล่าสุดไปเก่าสุด</div>
+  </div>
+
+  <div class="card" style="padding:0;overflow:hidden">
+    <div class="tbl-wrap">
+      <table class="tbl">
+        <thead><tr>
+          <th>วันที่ · เวลา</th><th>ล็อค</th><th>โซน</th><th>ร้าน/ผู้ค้า</th><th>ประเภทการยกเลิก</th><th>เหตุผล/หมายเหตุ</th><th>ผู้บันทึก</th>
+        </tr></thead>
+        <tbody id="cancel-tbody"><tr><td colspan="7" style="text-align:center;padding:24px;color:var(--txl)">กำลังโหลด...</td></tr></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
 <script>
 // ════════════════════════════════════════════════════
 // THEME — ใช้ key เดียวกับหน้าอื่นในระบบ
@@ -552,6 +600,7 @@ function switchSub(tab){
   document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('active',t.dataset.tab===tab));
   document.getElementById('page-leave').classList.toggle('active',tab==='leave');
   document.getElementById('page-daily').classList.toggle('active',tab==='daily');
+  document.getElementById('page-cancel').classList.toggle('active',tab==='cancel');
 }
 
 // ════════════════════════════════════════════════════
@@ -623,8 +672,8 @@ function rebuildLockOptions(){
     +locks.map(x=>'<option value="'+esc(x)+'">ล็อค '+esc(x)+'</option>').join('');
   if(locks.indexOf(keep)>=0) l.value=keep;
 }
-function onZoneChange(){ rebuildGroupOptions(); rebuildLockOptions(); renderLeave(); renderDaily(); }
-function onGroupChange(){ rebuildLockOptions(); renderLeave(); renderDaily(); }
+function onZoneChange(){ rebuildGroupOptions(); rebuildLockOptions(); renderLeave(); renderDaily(); renderCancel(); }
+function onGroupChange(){ rebuildLockOptions(); renderLeave(); renderDaily(); renderCancel(); }
 function lockPickFilter(rows){
   const zone=document.getElementById('lv-zone')?.value||'';
   const grp=document.getElementById('lv-group')?.value||'';
@@ -650,7 +699,7 @@ function nowClock(){const n=new Date();return String(n.getHours()).padStart(2,'0
 // ════════════════════════════════════════════════════
 // DATA
 // ════════════════════════════════════════════════════
-let ALL_LEAVE=[], ALL_DAILY=[];
+let ALL_LEAVE=[], ALL_DAILY=[], ALL_CANCEL=[];
 
 async function loadAll(){
   const badge=document.getElementById('conn-badge');
@@ -663,16 +712,23 @@ async function loadAll(){
   }
   badge.textContent='⏳ กำลังโหลดข้อมูล...';
   badge.className='conn-badge';
-  const [leave,daily]=await Promise.all([apiGet('getLeaveLog'),apiGet('getDailyBookings')]);
+  const [leave,daily,cancel]=await Promise.all([
+    apiGet('getLeaveLog'), apiGet('getDailyBookings'), apiGet('getCancellations')]);
   ALL_LEAVE=Array.isArray(leave)?leave:[];
   // สร้างตัวเลือก โซน/หมวด/ล็อค จากข้อมูลจริงหลังโหลดเสร็จ (PM_LOCKPICK)
   setTimeout(buildLockPickers,0);
   ALL_DAILY=Array.isArray(daily)?daily:[];
+  // backend รุ่นเก่า (ยังไม่ได้ apply migration 0014) จะคืน null — ไม่ทำให้ทั้งหน้าพัง
+  // แต่ต้องบอกผู้ใช้ว่า "ยังไม่มีข้อมูล" ต่างจาก "โหลดไม่สำเร็จ" ตามกฎเหล็กข้อ 15
+  CANCEL_SUPPORTED = Array.isArray(cancel);
+  ALL_CANCEL=CANCEL_SUPPORTED?cancel:[];
   badge.innerHTML='<svg class="ic ic-dot" viewBox="0 0 24 24" aria-hidden="true" style="color:var(--gm)"><circle cx="12" cy="12" r="8" fill="currentColor"/></svg> เชื่อมต่อแล้ว · ล่าสุด '+nowClock();
   badge.className='conn-badge on';
   renderLeave();
   renderDaily();
+  renderCancel();
 }
+let CANCEL_SUPPORTED=true;
 
 // ════════════════════════════════════════════════════
 // RENDER: LEAVE / ABSENT / CANCEL
@@ -739,8 +795,61 @@ function renderDaily(){
 }
 
 // ════════════════════════════════════════════════════
+// RENDER: CANCELLATIONS (เพิ่ม 2026-08-03)
+// ════════════════════════════════════════════════════
+const CX_LABEL={
+  leave_cancel:{txt:'ยกเลิกแจ้งลา / ขาดล็อค', cls:'b-gray'},
+  lease_cancel:{txt:'ยกเลิกการเช่า',          cls:'b-red'},
+  daily_cancel:{txt:'ยกเลิกล็อคจร',           cls:'b-purple'},
+  queue_cancel:{txt:'ยกเลิกคิวจอง',           cls:'b-purple'},
+};
+function renderCancel(){
+  const q=document.getElementById('cx-search').value.trim();
+  const kind=document.getElementById('cx-kind').value;
+  const from=document.getElementById('cx-from').value;
+  const to=document.getElementById('cx-to').value;
+  // ใช้ตัวกรอง โซน/หมวด/ล็อค ชุดเดียวกับแท็บลา-ขาด (PM_LOCKPICK) — ผู้ใช้ตั้งค่าที่เดียว
+  let rows=lockPickFilter(ALL_CANCEL)
+    .filter(r=>matchSearch(r,q,['lock_id','zone','shop','manager','note'])
+             &&inRange(r,from,to)&&(!kind||r.kind===kind));
+  rows=sortByCreated(rows);
+
+  document.getElementById('cx-kpi-total').textContent=rows.length;
+  document.getElementById('cx-kpi-leave').textContent=rows.filter(r=>r.kind==='leave_cancel').length;
+  document.getElementById('cx-kpi-lease').textContent=rows.filter(r=>r.kind==='lease_cancel').length;
+  document.getElementById('cx-kpi-daily').textContent=rows.filter(r=>r.kind==='daily_cancel'||r.kind==='queue_cancel').length;
+
+  const tbody=document.getElementById('cancel-tbody');
+  if(!getApiUrl()) return;
+  if(!CANCEL_SUPPORTED){
+    tbody.innerHTML=emptyRow('ฐานข้อมูลยังไม่รองรับรายการนี้ — ต้องติดตั้ง migration 0014 ก่อน (ดูคู่มือหัวข้อ 16.13)',7);
+    return;
+  }
+  if(!rows.length){ tbody.innerHTML=emptyRow('ไม่พบข้อมูลตามเงื่อนไขที่เลือก',7); return; }
+  tbody.innerHTML=rows.map(r=>{
+    const L=CX_LABEL[r.kind]||{txt:r.kind||'—',cls:'b-gray'};
+    return '<tr>'
+      +'<td>'+esc(lhDate(r))+' · '+esc(r.time||'—')+'</td>'
+      +'<td><b>'+esc(r.lock_id||'—')+'</b></td>'
+      +'<td>'+esc(r.zone||'—')+'</td>'
+      +'<td>'+esc(r.shop||'—')+'</td>'
+      +'<td><span class="badge '+L.cls+'">'+esc(L.txt)+'</span></td>'
+      +'<td>'+esc(r.note||'—')+'</td>'
+      +'<td>'+esc(r.manager||'—')+'</td>'
+      +'</tr>';
+  }).join('');
+}
+
+// ════════════════════════════════════════════════════
 // FILTER RESET
 // ════════════════════════════════════════════════════
+function resetCancelFilters(){
+  document.getElementById('cx-search').value='';
+  document.getElementById('cx-kind').value='';
+  document.getElementById('cx-from').value='';
+  document.getElementById('cx-to').value='';
+  renderCancel();
+}
 function resetLeaveFilters(){
   document.getElementById('lv-search').value='';
   document.getElementById('lv-type').value='';
@@ -749,6 +858,7 @@ function resetLeaveFilters(){
   renderLeave();
   ['lv-zone','lv-group','lv-lock'].forEach(id=>{const e=document.getElementById(id);if(e)e.value='';});
   rebuildGroupOptions(); rebuildLockOptions();
+  renderCancel();   // ตัวกรองล็อคใช้ร่วมกับแท็บยกเลิก จึงต้องวาดใหม่ด้วย
 }
 function resetDailyFilters(){
   document.getElementById('dl-search').value='';
@@ -780,20 +890,54 @@ window.onload=()=>{
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
 <script id="pm-api-shim">
 /* apiGet/apiPost เวอร์ชันที่รองรับสามโหมด — เก็บของเดิมไว้เป็น __pmSheets* เพื่อใช้เทียบผล
    และเพื่อให้ย้อนกลับไปใช้ Google Sheets ได้ทันทีถ้าพบปัญหาหน้างาน (ทางถอย) */
 (function () {
-  if (typeof apiGet !== 'function' || typeof apiPost !== 'function') return;
-  var _get = apiGet, _post = apiPost;
+  /* ══════════════════════════════════════════════════════════════════════
+     บั๊กร้ายแรงที่พบ 3 ส.ค. 2569 (ผู้ใช้แจ้งแค่อาการเดียว แต่ต้นเหตุกินไป 10 ไฟล์)
+
+     เดิมบรรทัดนี้เขียนว่า:
+         if (typeof apiGet !== 'function' || typeof apiPost !== 'function') return;
+
+     หน้าที่ "อ่านอย่างเดียว" ไม่มีเหตุให้เขียนฟังก์ชัน apiPost เลย —
+     ประวัติแจ้งลา และรายงาน 01–09 รวม 10 ไฟล์ มีแต่ apiGet
+     shim ทั้งก้อนจึง return ทิ้งตั้งแต่บรรทัดแรกในไฟล์เหล่านั้น ผลคือ:
+       · apiGet ไม่ถูกครอบ → ยังยิงไป Google Apps Script ทั้งที่ทั้งระบบย้ายมา Supabase แล้ว
+       · getApiUrl() ไม่ถูกครอบ → คืนค่าว่าง (เครื่องใหม่ไม่มี URL ของ Apps Script)
+         ทุกหน้าจึงตัดสินว่า "ยังไม่เชื่อมต่อ" แล้วขึ้นข้อความชวนไปตั้งค่า โดยไม่มี error ใด ๆ
+     → หน้าประวัติแจ้งลาและรายงานทุกฉบับ **ไม่เคยเห็นข้อมูลจาก Supabase เลย** ตั้งแต่วันตัดจริง
+       (อาการที่ผู้ใช้แจ้ง: "แจ้งลาแล้วแต่ประวัติไม่อัปเดต")
+
+     เข้าเงื่อนไขกฎเหล็กข้อ 18 เป๊ะ ๆ อีกครั้ง — คราวนี้ตัวด่านเองเป็นคนปิดสวิตช์
+     แก้: บังคับแค่ apiGet เท่านั้น ส่วน apiPost ครอบเมื่อมีจริง
+     ══════════════════════════════════════════════════════════════════════ */
+  if (typeof apiGet !== 'function') return;
+  var _get = apiGet;
+  var _post = (typeof apiPost === 'function') ? apiPost : null;
   window.__pmSheetsGet = _get;
-  window.__pmSheetsPost = _post;
+  if (_post) window.__pmSheetsPost = _post;
   function notifySaved(action, result) {
     if (!result || result.status !== 'ok' || window.parent === window) return;
     try { window.parent.postMessage({ type: 'pm-data-changed', action: action }, '*'); } catch (e) {}
   }
 
+  var _everFetched = false;   /* ใช้ตรวจว่าหน้านี้ "เคยขอข้อมูลผ่าน shim" แล้วหรือยัง (ดู kickIfNeverFetched) */
+
   window.apiGet = async function (action, params) {
+    _everFetched = true;
     var m = window.PM_API ? window.PM_API.mode() : 'supabase';
     if (m === 'sheets') return _get(action, params);
     try {
@@ -807,7 +951,9 @@ window.onload=()=>{
     }
   };
 
-  window.apiPost = async function (action, data) {
+  /* หน้าอ่านอย่างเดียว (ประวัติแจ้งลา · รายงาน 01–09) ไม่มี apiPost — ข้ามส่วนนี้ไปได้เลย
+     แต่ต้องไม่ข้ามทั้ง shim เหมือนเดิม เพราะ apiGet และ getApiUrl ยังต้องถูกครอบ */
+  if (_post) window.apiPost = async function (action, data) {
     var m = window.PM_API ? window.PM_API.mode() : 'supabase';
     if (m === 'sheets') return _post(action, data);
     var sbRes = null, sbErr = null;
@@ -860,6 +1006,70 @@ window.onload=()=>{
     if (side) side.innerHTML = cloud + ' เชื่อมต่อ Supabase แล้ว';
   }
   setTimeout(refreshConnectionLabels, 1200);
+
+  /* ══════════════════════════════════════════════════════════════════════
+     PM_REFRESH_BUS (เพิ่ม 2026-08-03) — แก้บั๊ก "บันทึกแล้วแต่หน้าอื่นยังเป็นข้อมูลเก่า"
+
+     ระบบมีสายส่งสัญญาณอยู่แล้วตั้งแต่ v2.2: โมดูลที่บันทึกสำเร็จยิง 'pm-data-changed'
+     ขึ้นไปที่ shell → shell กระจาย 'pm-refresh' กลับลงมาทุก iframe
+     แต่ "ปลายทาง" มีแค่ 2 ไฟล์ที่เขียน listener ไว้เอง (ผังตลาด + คิวจองล็อคจร)
+     อีก 6 โมดูลไม่มีเลย — หน้าประวัติแจ้งลาจึงค้างข้อมูลเก่าจนกว่าจะกด F5 (อาการที่ผู้ใช้แจ้ง)
+
+     แทนที่จะไล่ก๊อป listener ทีละไฟล์ (ซึ่งจะ drift แน่นอนตามกฎเหล็กข้อ 12/20)
+     ฝังตัวรับกลางไว้ที่ shim นี้ ซึ่งถูก inject ลง "ทุกไฟล์" อยู่แล้ว
+     แต่ละหน้าไม่ต้องรู้อะไรเลย — แค่มีฟังก์ชันโหลดข้อมูลชื่อใดชื่อหนึ่งใน RELOADERS
+
+     ไฟล์ที่เขียน listener ของตัวเองไว้แล้วยังทำงานได้ปกติ (โหลดซ้ำสองรอบไม่เสียหาย
+     เพราะทุกตัวเป็นการอ่านข้อมูลอย่างเดียว) และมี throttle 400ms กันยิงรัว
+     ══════════════════════════════════════════════════════════════════════ */
+  /* เรียงจาก "ชื่อเฉพาะของหน้านั้น" ก่อน — แต่ละหน้ามีตัวเดียวเท่านั้นในทางปฏิบัติ
+     loadAll: ประวัติแจ้งลา, คิวจองล็อคจร · loadData: ผ่อนชำระ · loadStatus: หน้าสถานะสาธารณะ
+     syncRealVendors: ผังตลาด · loadVendorsFromSheets: ค่าไฟฟ้า
+     loadLocksFromSheets: รับชำระ · loadRealOccupancy: ลงทะเบียนผู้ค้า · loadRules: กฎระเบียบตลาด */
+  var RELOADERS = ['loadAll', 'loadData', 'loadStatus', 'render', 'syncRealVendors',
+                   'loadVendorsFromSheets', 'loadLocksFromSheets', 'loadRealOccupancy', 'loadRules'];
+  function callReloader(why) {
+    for (var i = 0; i < RELOADERS.length; i++) {
+      var fn = window[RELOADERS[i]];
+      if (typeof fn === 'function') {
+        try { fn(); } catch (err) { console.error(why + ':', RELOADERS[i], err); }
+        return true;   /* เรียกตัวแรกที่หน้านั้นมีจริงพอ — ตัวถัดไปเป็นของหน้าอื่น */
+      }
+    }
+    return false;
+  }
+
+  var _lastRefresh = 0;
+  window.addEventListener('message', function (e) {
+    if (!e || !e.data || e.data.type !== 'pm-refresh') return;
+    var now = Date.now();
+    if (now - _lastRefresh < 400) return;   /* กันสัญญาณซ้ำจากการบันทึกรัว ๆ */
+    _lastRefresh = now;
+    callReloader('pm-refresh');
+  });
+
+  /* ══════════════════════════════════════════════════════════════════════
+     บั๊กครึ่งหลังที่พบ 3 ส.ค. 2569 — เรื่อง "ลำดับเวลา" ไม่ใช่เรื่องเงื่อนไข
+
+     shim นี้ถูกฝังไว้ท้าย <body> จึงทำงาน "หลัง" สคริปต์หลักของหน้าเสมอ
+     หน้าที่โหลดข้อมูลตอน window.onload ไม่มีปัญหา (onload มาทีหลัง shim)
+     แต่รายงาน 01–09 เรียก render() แบบ inline ท้ายสคริปต์ของตัวเอง
+     ซึ่งเกิด "ก่อน" shim ติดตั้ง → ตอนนั้น getApiUrl() ยังเป็นตัวเดิมที่คืนค่าว่าง
+     render() จึงขึ้นข้อความ "ยังไม่ได้เชื่อมต่อ" แล้วจบ และไม่มีอะไรเรียกซ้ำอีกเลย
+     ผลคือรายงานทุกฉบับว่างเปล่าถาวรจนกว่าผู้ใช้จะกดปุ่มรีเฟรชเอง
+
+     แก้แบบไม่ต้องแตะไฟล์รายงานทีละไฟล์: ถ้าหลังหน้าโหลดเสร็จแล้วยังไม่เคยมีคำขอ
+     ผ่าน shim เลย แปลว่าหน้านั้น "ตัดสินใจตอนที่ยังไม่มีข้อมูลจริง" → สั่งโหลดใหม่ให้ 1 ครั้ง
+     (เช็ค _everFetched จึงไม่ทำให้หน้าที่ทำงานถูกอยู่แล้วยิงซ้ำ)
+     ══════════════════════════════════════════════════════════════════════ */
+  function kickIfNeverFetched() {
+    if (_everFetched) return;
+    if (callReloader('pm-late-init')) {
+      console.info('PM_API: หน้านี้โหลดข้อมูลก่อน shim พร้อม — สั่งโหลดใหม่ให้อัตโนมัติ');
+    }
+  }
+  if (document.readyState === 'complete') setTimeout(kickIfNeverFetched, 0);
+  else window.addEventListener('load', function () { setTimeout(kickIfNeverFetched, 0); });
 })();
 </script>
 </body>

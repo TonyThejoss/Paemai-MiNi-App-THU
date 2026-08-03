@@ -229,6 +229,7 @@ function doGet(e) {
       case 'migrateHashPasswords': return migrateHashPasswords();
       case 'getInstallmentPlans': return getInstallmentPlans();
       case 'getFloatingQueue': return getFloatingQueue(_dateOpt(e));
+      case 'getCancellations': return getCancellations(_dateOpt(e), e.parameter.lockId, e.parameter.zone);
       case 'getMarketRules':   return getMarketRules();
       case 'getPublicStatus':  return getPublicStatus(e.parameter.date);
       // เพิ่ม 2026-07-26
@@ -612,6 +613,83 @@ function getLeaveLog(opt, lockId, zone) {
   return makeRes(data);
 }
 
+// ════════════════════════════════════════════════════════════════════════════
+// getCancellations (เพิ่ม 2026-08-03) — รวม "ทุกการยกเลิก" จาก 3 ตารางมาไว้ที่เดียว
+// ตามคำสั่งผู้ดูแลตลาด: หน้าประวัติต้องมีแท็บ "ยกเลิก"
+// ต้องมีทั้งที่นี่และที่ Supabase (migration 0014) ให้ผลตรงกัน — กติกาเดียวกันสองโหมด
+//
+//   leave_log  type ∈ cancel/leave_cancel/absent_cancel → kind = 'leave_cancel'
+//   leave_log  type = lease_cancel                      → kind = 'lease_cancel'
+//   daily_bookings ที่ cancelled = TRUE                  → kind = 'daily_cancel'
+//   floating_queue ที่ status = 'cancelled'              → kind = 'queue_cancel'
+//
+// คืนรูปแบบเดียวกับ getLeaveLog เพื่อให้หน้าเว็บใช้ตัวกรอง/ตัวเรียงชุดเดิมได้ทั้งหมด
+// ════════════════════════════════════════════════════════════════════════════
+function getCancellations(opt, lockId, zone) {
+  const out = [];
+
+  // 1) leave_log — ยกเลิกการเช่า (สิ้นสุดสัญญา) เป็นเหตุการณ์ถาวร จึงมีแถวเก็บไว้จริง
+  _rowsWithTime(getSheet(S.LEAVE)).list.forEach(r => {
+    if (String(r.type || '') !== 'lease_cancel') return;
+    out.push({
+      id: r.id || '', kind: 'lease_cancel', lock_id: r.lock_id || '', zone: r.zone || '',
+      shop: r.shop || '', note: r.note || '', manager: r.manager || '',
+      date: r.date || '', date_iso: _normDate(r.date), time: r.time || '',
+      created_at: r.created_at || '',
+    });
+  });
+
+  // 1b) activity_log — ยกเลิกแจ้งลา/ขาดล็อค
+  // ตามกฎธุรกิจ การปลดสถานะจะ "ลบแถวใน leave_log ทิ้งจริง" ไม่เหลือร่องรอยให้ค้น
+  // logLeave() จึงบันทึกไว้ที่ activity_log ด้วยรูปแบบ detail ที่กำหนดไว้ตายตัว (อ่านกลับตรงนี้)
+  // ข้อจำกัด: activity_log ถูกล้างอัตโนมัติเมื่อเกิน 30 วัน รายการส่วนนี้จึงย้อนได้ 1 เดือน
+  _sheetToObjects(S.ACTIVITY).forEach(r => {
+    if (String(r.message) !== 'ยกเลิกแจ้งลา/ขาดล็อค') return;
+    const d = String(r.detail || '');
+    const mLock = /ล็อค ([^ ·]+)/.exec(d), mZone = /โซน ([^ ·]+)/.exec(d), mShop = /ร้าน ([^·]+)/.exec(d);
+    out.push({
+      id: r.id || '', kind: 'leave_cancel',
+      lock_id: mLock ? mLock[1] : '', zone: mZone ? mZone[1] : '',
+      shop: mShop ? mShop[1].trim() : '', note: d, manager: r.user || '',
+      date: r.date || '', date_iso: _normDate(r.date), time: r.time || '',
+      created_at: String(r.date || '') + 'T' + String(r.time || ''),
+    });
+  });
+
+  // 2) daily_bookings — ล็อคจรที่ถูกยกเลิก
+  _rowsWithTime(getSheet(S.DAILY)).list.forEach(r => {
+    if (r.cancelled !== true && String(r.cancelled).toUpperCase() !== 'TRUE') return;
+    out.push({
+      id: r.id || '', kind: 'daily_cancel', lock_id: r.lock_id || '', zone: r.zone || '',
+      shop: r.vendor_name || '', note: r.product ? ('สินค้า: ' + r.product) : '',
+      manager: r.sold_by || '', date: r.date || '', date_iso: _normDate(r.date),
+      time: r.time || '', created_at: r.created_at || '',
+    });
+  });
+
+  // 3) floating_queue — คิวจองที่ถูกยกเลิก
+  _sheetToObjects(S.QUEUE).forEach(r => {
+    if (String(r.status) !== 'cancelled') return;
+    // zone ต้องเป็นโซนเดียวเท่านั้น (ตัวกรองโซนของหน้าเว็บใช้ค่านี้) — คิวที่ยังไม่ถูกขายยังไม่มีโซน
+    // ส่วนโซนที่ผู้ค้าขอไว้ (อาจหลายโซน) ไปแสดงในหมายเหตุแทน
+    const parts = [r.cancel_reason, r.note, r.zone_pref ? ('โซนที่ขอ: ' + r.zone_pref) : '']
+      .map(v => String(v || '').trim()).filter(Boolean);
+    out.push({
+      id: r.id || '', kind: 'queue_cancel', lock_id: r.assigned_lock || '',
+      zone: r.zone || '', shop: r.vendor_name || '',
+      note: parts.join(' · '), manager: r.sold_by || '',
+      date: r.market_date || '', date_iso: _normDate(r.market_date),
+      time: '', created_at: r.updated_at || r.requested_at || '',
+    });
+  });
+
+  let data = out;
+  if (opt)    data = data.filter(r => _matchDate(r.date, opt));
+  if (lockId) data = data.filter(r => r.lock_id === lockId);
+  if (zone)   data = data.filter(r => r.zone === zone);
+  return makeRes(data);
+}
+
 // ── ตรรกะประวัติการลา/ขาด (ปรับ 2026-07-26 ตามข้อกำหนดใหม่) ──
 // กติกา: 1 ล็อค + 1 วัน = ประวัติได้แค่ 1 รายการเท่านั้น
 //  · แจ้งลา/ขาดซ้ำในวันเดิม → เขียนทับแถวเดิม (ไม่เพิ่มแถวใหม่ ไม่ให้ประวัติซ้ำซ้อน)
@@ -646,7 +724,25 @@ function logLeave(data) {
   }
 
   if (isCancel) {
-    if (foundRow > 0) { sheet.deleteRow(foundRow); return makeRes({ cleared: true, lock: data.lock_id, date: targetDate }); }
+    if (foundRow > 0) {
+      // เพิ่ม 2026-08-03: กฎธุรกิจบังคับให้ลบแถวของวันนั้นทิ้งจริง (ประวัติต้องหายไปด้วย)
+      // แต่แท็บ "ยกเลิก" ต้องตอบได้ว่าใครปลดสถานะล็อคไหนเมื่อไร จึงเก็บร่องรอยไว้ที่ activity_log
+      // รูปแบบ detail ต้องตรงกับที่ getCancellations() อ่านกลับ และตรงกับฝั่ง Supabase (migration 0014)
+      const prevType = String(rows[foundRow - 1][iType] || '');
+      const iZone = headers.indexOf('zone'), iShop = headers.indexOf('shop');
+      const pZone = String(rows[foundRow - 1][iZone] || data.zone || '-');
+      const pShop = String(rows[foundRow - 1][iShop] || data.shop || '-');
+      try {
+        logActivity({
+          user: data.manager || 'ผู้ใช้ระบบ', type: 'leave', message: 'ยกเลิกแจ้งลา/ขาดล็อค',
+          detail: 'ล็อค ' + data.lock_id + ' · โซน ' + pZone + ' · ร้าน ' + pShop +
+                  ' · ปลดสถานะ' + (prevType === 'absent' ? 'ขาดล็อค' : 'แจ้งลา'),
+          date: targetDate, time: data.time || '',
+        });
+      } catch (e) { /* บันทึกร่องรอยไม่สำเร็จ ต้องไม่ทำให้การปลดสถานะล้มเหลว */ }
+      sheet.deleteRow(foundRow);
+      return makeRes({ cleared: true, lock: data.lock_id, date: targetDate });
+    }
     return makeRes({ cleared: false, note: 'ไม่พบประวัติของวันนั้น (อาจถูกลบไปแล้ว)' });
   }
 
@@ -1381,7 +1477,9 @@ function editFloatingQueueEntry(id, data) {
   if (existing.status === 'sold' && data.assigned_lock && data.assigned_lock !== prevLock) {
     cancelDailyBooking(prevLock, prevDate);
     saveDailyBooking({
-      lock_id: data.assigned_lock, zone: data.zone || existing.zone_pref || '',
+      // zone ต้องเป็นโซนของล็อคจริง — คิวเลือกได้หลายโซนแล้ว (zone_pref อาจเป็น "A,B,TA")
+      // ถ้า fallback ไป zone_pref ตรง ๆ ค่ารวมหลายโซนจะไหลลงคอลัมน์ zone ของ daily_bookings
+      lock_id: data.assigned_lock, zone: data.zone || String(existing.zone_pref || '').split(',')[0].trim() || '',
       vendor_name: merged.vendor_name, phone: merged.phone || '', product: data.product || '',
       price: merged.price || 0, elec: merged.elec || 0, total: merged.total || 0,
       method: merged.method || '', date: merged.market_date, time: data.time || '',
@@ -1480,6 +1578,9 @@ function getPublicStatus(date) {
   // แหล่งข้อมูลจริงคือ daily_bookings (ทุกการขายลงที่นี่เสมอ ทั้งสองช่องทาง — ดูหมายเหตุ sellFloatingQueueEntry)
   // แล้วเทียบกับ floating_queue เพื่อบอกช่องทางว่ามาจากคิวหรือขายตรง
   // whitelist: เลขล็อค + ชื่อร้าน + สินค้า + ราคาขาย + ช่องทาง — ห้ามส่ง phone/method ออกหน้าสาธารณะ
+  // หมายเหตุ (2026-08-03): ผู้ดูแลตลาดสั่งให้ "ไม่แสดง" ราคาขายล็อคจรบนหน้าสาธารณะ — แก้ที่หน้าเว็บแล้ว
+  // แต่ payload ยังต้องส่ง price/total ต่อไป เพราะ **ผังตลาด (หน้าผู้ดูแล) อ่านราคาจาก endpoint นี้**
+  // ถ้าตัดออกตรงนี้ ผังจะกลับไปแสดง ฿0 ซึ่งคือบั๊กที่เพิ่งแก้ไปในหัวข้อ 16.12 — ห้ามตัด
   let soldRows = _rowsWithTime(getSheet(S.DAILY)).list
     .filter(r => r.cancelled !== true && String(r.cancelled).toUpperCase() !== 'TRUE');
   if (date) soldRows = soldRows.filter(r => _normDate(r.date) === _normDate(date));
