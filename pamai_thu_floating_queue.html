@@ -117,7 +117,17 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(
 .zpick input{width:17px;height:17px;accent-color:var(--gm);margin:0;flex:none;}
 .zpick-bar{display:flex;align-items:center;flex-wrap:wrap;gap:8px;margin-top:6px;}
 .zpick-sum{font-size:.84rem;font-weight:800;color:var(--gm);}
-@media(max-width:480px){ .zpick{max-height:160px;} }
+.zone-filter{display:flex;flex-wrap:wrap;align-items:center;gap:6px;padding:8px 0 10px;}
+.zone-filter-title{font-size:.82rem;font-weight:800;color:var(--txl);margin-right:2px;}
+.zone-filter label{display:inline-flex;align-items:center;gap:5px;min-height:36px;padding:4px 9px;border:1.5px solid var(--bd);border-radius:8px;background:var(--sf2);font-size:.82rem;font-weight:700;cursor:pointer;}
+.zone-filter label.on{border-color:var(--gm);background:var(--gl);color:var(--g);}
+.zone-filter input{width:16px;height:16px;accent-color:var(--gm);margin:0;}
+@media(max-width:480px){
+  .zpick{max-height:160px;}
+  .m-title{line-height:1.35;}
+  #aq-zone-label{font-size:.80rem;line-height:1.45;overflow:visible;text-overflow:clip;}
+  .zpick-hint{display:block;margin-top:2px;font-size:.76rem;}
+}
 .m-field input,.m-field select,.m-field textarea{padding:7px 9px;border:1.5px solid var(--bd);border-radius:7px;font-size:.78rem;background:var(--sf2);color:var(--tx);outline:none;font-family:inherit;transition:border-color .18s;width:100%;min-width:0;box-sizing:border-box;}
 .m-field input:focus,.m-field select:focus,.m-field textarea:focus{border-color:var(--gm);box-shadow:0 0 0 3px rgba(45,106,79,.15);}
 .m-footer{display:flex;gap:8px;margin-top:14px;justify-content:flex-end;}
@@ -475,29 +485,15 @@ input, select, textarea, button { font-family: inherit; max-width: 100%; }
   </div>
 
   <div class="kpi-grid">
-    <div class="kpi"><div class="kpi-num" id="kpi-available">0</div><div class="kpi-label"><svg class="ic ic-dot" viewBox="0 0 24 24" aria-hidden="true" style="color:var(--gm)"><circle cx="12" cy="12" r="8" fill="currentColor"/></svg> ล็อคว่างขายได้ตอนนี้</div></div>
-    <div class="kpi kp-purple"><div class="kpi-num" id="kpi-waiting" style="color:var(--pu)">0</div><div class="kpi-label">คิวรอ</div></div>
-    <div class="kpi kp-o"><div class="kpi-num" id="kpi-sold" style="color:var(--o)">0</div><div class="kpi-label">ขายแล้ว</div></div>
-  </div>
-
-  <!-- ═══ ล็อคว่างขายได้ตอนนี้ ═══ -->
-  <div class="card">
-    <div class="card-title">
-      <div class="card-title-l"><svg class="ic ic-dot" viewBox="0 0 24 24" aria-hidden="true" style="color:var(--gm)"><circle cx="12" cy="12" r="8" fill="currentColor"/></svg> ล็อคว่างขายได้ตอนนี้ <span class="card-count" id="count-available">0</span></div>
-      <span style="font-size:.78rem;color:var(--txl)">รวมล็อคที่แจ้งลา/ขาด + ล็อคที่ยังไม่มีผู้ค้าประจำ — ขายตรงให้ผู้ค้าจรได้ทันทีโดยไม่ต้องผ่านคิว</span>
-    </div>
-    <div class="tbl-wrap">
-      <table class="tbl">
-        <thead><tr><th>ล็อค</th><th>โซน</th><th>เหตุผลที่ว่าง</th><th style="min-width:340px">ขายให้ผู้ค้าจร</th></tr></thead>
-        <tbody id="available-tbody"><tr><td colspan="4" class="empty-note">กำลังโหลด...</td></tr></tbody>
-      </table>
-    </div>
+    <div class="kpi kp-purple"><div class="kpi-num" id="kpi-waiting" style="color:var(--pu)">0</div><div class="kpi-label">1. คิวรอ</div></div>
+    <div class="kpi kp-o"><div class="kpi-num" id="kpi-sold" style="color:var(--o)">0</div><div class="kpi-label">2. ขายแล้ว</div></div>
+    <div class="kpi"><div class="kpi-num" id="kpi-available">0</div><div class="kpi-label"><svg class="ic ic-dot" viewBox="0 0 24 24" aria-hidden="true" style="color:var(--gm)"><circle cx="12" cy="12" r="8" fill="currentColor"/></svg> 3. ล็อคว่างขายได้ตอนนี้</div></div>
   </div>
 
   <!-- ═══ คิวรอ ═══ -->
   <div class="card">
     <div class="card-title">
-      <div class="card-title-l"><svg class="ic ic-dot" viewBox="0 0 24 24" aria-hidden="true" style="color:var(--pu)"><circle cx="12" cy="12" r="8" fill="currentColor"/></svg> คิวรอ <span class="card-count" id="count-waiting">0</span></div>
+      <div class="card-title-l"><svg class="ic ic-dot" viewBox="0 0 24 24" aria-hidden="true" style="color:var(--pu)"><circle cx="12" cy="12" r="8" fill="currentColor"/></svg> 1. คิวรอ <span class="card-count" id="count-waiting">0</span></div>
       <button class="btn btn-primary btn-sm" id="btn-add-queue" onclick="openAddQueueModal()"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg> เพิ่มคิวใหม่</button>
     </div>
     <div class="tbl-wrap">
@@ -511,12 +507,27 @@ input, select, textarea, button { font-family: inherit; max-width: 100%; }
   <!-- ═══ ขายแล้ว ═══ -->
   <div class="card">
     <div class="card-title">
-      <div class="card-title-l"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg> ขายแล้ว <span class="card-count" id="count-sold">0</span></div>
+      <div class="card-title-l"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg> 2. ขายแล้ว <span class="card-count" id="count-sold">0</span></div>
     </div>
     <div class="tbl-wrap">
       <table class="tbl">
         <thead><tr><th>ล็อคที่ได้</th><th>ผู้ค้า/สินค้า</th><th>ยอดรวม</th><th>ช่องทาง</th><th>ขายโดย/เวลา</th><th>จัดการ</th></tr></thead>
         <tbody id="sold-tbody"><tr><td colspan="6" class="empty-note">กำลังโหลด...</td></tr></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ═══ ล็อคว่างขายได้ตอนนี้ ═══ -->
+  <div class="card">
+    <div class="card-title">
+      <div class="card-title-l"><svg class="ic ic-dot" viewBox="0 0 24 24" aria-hidden="true" style="color:var(--gm)"><circle cx="12" cy="12" r="8" fill="currentColor"/></svg> 3. ล็อคว่างขายได้ตอนนี้ <span class="card-count" id="count-available">0</span></div>
+      <span style="font-size:.78rem;color:var(--txl)">รวมล็อคที่แจ้งลา/ขาด + ล็อคที่ยังไม่มีผู้ค้าประจำ — ขายตรงให้ผู้ค้าจรได้ทันทีโดยไม่ต้องผ่านคิว</span>
+    </div>
+    <div class="zone-filter" id="available-zone-filter" aria-label="กรองล็อคว่างตามโซน"></div>
+    <div class="tbl-wrap">
+      <table class="tbl">
+        <thead><tr><th>ล็อค</th><th>โซน</th><th>เหตุผลที่ว่าง</th><th style="min-width:340px">ขายให้ผู้ค้าจร</th></tr></thead>
+        <tbody id="available-tbody"><tr><td colspan="4" class="empty-note">กำลังโหลด...</td></tr></tbody>
       </table>
     </div>
   </div>
@@ -722,6 +733,7 @@ let VENDOR_LOCKS = new Set();     // ล็อคที่มีผู้ค้�
 let LEAVE_ABSENT = {};            // lockId -> 'leave' | 'absent'
 let DAILY_SOLD   = new Set();     // ล็อคที่ขายเป็นจรไปแล้วของวันนี้ (ผูกกับ daily_bookings)
 let AVAILABLE_LIST = [];          // [{id,zone,reason}]
+let AVAILABLE_ZONE_FILTER = new Set(); // ว่าง = แสดงทุกโซน
 let QUEUE_ROWS = [];               // ดิบจาก getFloatingQueue
 
 // ════════════════════════════════════════════════════
@@ -854,11 +866,16 @@ function buildLockOptionsHtml(zonePref){
 // ════════════════════════════════════════════════════
 function renderAvailable(){
   document.getElementById('kpi-available').textContent=AVAILABLE_LIST.length;
-  document.getElementById('count-available').textContent=AVAILABLE_LIST.length;
+  renderAvailableZoneFilter();
+  const visible=AVAILABLE_ZONE_FILTER.size
+    ? AVAILABLE_LIST.filter(l=>AVAILABLE_ZONE_FILTER.has(l.zone))
+    : AVAILABLE_LIST;
+  document.getElementById('count-available').textContent=visible.length+(visible.length!==AVAILABLE_LIST.length?' / '+AVAILABLE_LIST.length:'');
   const tbody=document.getElementById('available-tbody');
   const readOnly=isReadOnly();
   if(!AVAILABLE_LIST.length){ tbody.innerHTML='<tr><td colspan="4" class="empty-note">ไม่มีล็อคว่างในขณะนี้</td></tr>'; return; }
-  tbody.innerHTML=AVAILABLE_LIST.map(l=>{
+  if(!visible.length){ tbody.innerHTML='<tr><td colspan="4" class="empty-note">ไม่มีล็อคว่างในโซนที่เลือก</td></tr>'; return; }
+  tbody.innerHTML=visible.map(l=>{
     const reasonBadge = l.reason==='แจ้งลา' ? '<span class="badge b-purple">แจ้งลา</span>'
       : l.reason==='ขาดล็อค' ? '<span class="badge b-red">ขาดล็อค</span>'
       : '<span class="badge b-gray">ไม่มีผู้ค้าประจำ</span>';
@@ -874,14 +891,40 @@ function renderAvailable(){
   }).join('');
 }
 
+function renderAvailableZoneFilter(){
+  const wrap=document.getElementById('available-zone-filter');
+  if(!wrap) return;
+  const zones=[...new Set(AVAILABLE_LIST.map(l=>l.zone).filter(Boolean))]
+    .sort((a,b)=>a.localeCompare(b,undefined,{numeric:true}));
+  for(const z of [...AVAILABLE_ZONE_FILTER]) if(!zones.includes(z)) AVAILABLE_ZONE_FILTER.delete(z);
+  wrap.innerHTML='<span class="zone-filter-title">กรองโซน:</span>'
+    +zones.map(z=>'<label class="'+(AVAILABLE_ZONE_FILTER.has(z)?'on':'')+'"><input type="checkbox" value="'+esc(z)+'" '
+      +(AVAILABLE_ZONE_FILTER.has(z)?'checked ':'')+'onchange="toggleAvailableZone(this)"> '+esc(z)+'</label>').join('')
+    +'<button type="button" class="btn btn-secondary btn-sm" onclick="clearAvailableZoneFilter()">แสดงทุกโซน</button>';
+}
+function toggleAvailableZone(input){
+  if(input.checked) AVAILABLE_ZONE_FILTER.add(input.value); else AVAILABLE_ZONE_FILTER.delete(input.value);
+  renderAvailable();
+}
+function clearAvailableZoneFilter(){ AVAILABLE_ZONE_FILTER.clear(); renderAvailable(); }
+
 function isReadOnly(){ return getCurrentUserRole()==='viewer'; }
+function readSaleMoney(inputId,label){
+  const el=document.getElementById(inputId);
+  const raw=String(el?.value??'').trim();
+  if(raw===''){ toast('กรุณากรอก'+label+' — หากให้ฟรีให้กรอก 0','e'); return null; }
+  const value=Number(raw);
+  if(!Number.isFinite(value)||value<0){ toast(label+'ต้องเป็น 0 หรือจำนวนเงินที่ไม่ติดลบ','e'); return null; }
+  return value;
+}
 
 async function sellAvailableRow(lockId){
   if(isReadOnly()) return;
   const name=(document.getElementById('av-name-'+lockId).value||'').trim();
   const product=(document.getElementById('av-product-'+lockId).value||'').trim();
   const phone=(document.getElementById('av-phone-'+lockId).value||'').trim();
-  const price=parseFloat(document.getElementById('av-price-'+lockId).value)||0;
+  const price=readSaleMoney('av-price-'+lockId,'ราคาล็อคจร');
+  if(price===null) return;
   if(!name||!product){ toast('กรุณากรอกชื่อผู้ค้าและสินค้าก่อนขาย','e'); return; }
   const zone=ZONE_OF[lockId]||'';
   // ทุกรายการที่ขาย (ทั้งจากคิวหรือขายตรง) ต้องมีแถวใน floating_queue เพื่อให้ประวัติ/รายงานตรงกันเสมอ
@@ -955,7 +998,8 @@ async function sellQueueRow(queueId){
   const lockSel=document.getElementById('q-lock-'+queueId);
   const lockId=lockSel.value;
   const product=(document.getElementById('q-product-'+queueId).value||'').trim();
-  const price=parseFloat(document.getElementById('q-price-'+queueId).value)||0;
+  const price=readSaleMoney('q-price-'+queueId,'ราคาล็อคจร');
+  if(price===null) return;
   if(!lockId){ toast('กรุณาเลือกล็อคว่างก่อนขาย','e'); return; }
   if(!product){ toast('กรุณากรอกสินค้าก่อนขาย','e'); return; }
   const row=QUEUE_ROWS.find(r=>r.id===queueId);
@@ -1041,8 +1085,10 @@ async function saveEditSold(){
   if(!editingSoldId) return;
   const lockId=document.getElementById('es-lock').value;
   const product=(document.getElementById('es-product').value||'').trim();
-  const price=parseFloat(document.getElementById('es-price').value)||0;
-  const elec=parseFloat(document.getElementById('es-elec').value)||0;
+  const price=readSaleMoney('es-price','ราคาล็อคจร');
+  if(price===null) return;
+  const elec=readSaleMoney('es-elec','ค่าไฟเพิ่ม');
+  if(elec===null) return;
   const method=document.getElementById('es-method').value;
   if(!lockId){ toast('กรุณาเลือกล็อค','e'); return; }
   const res=await apiPost('editFloatingQueueEntry',{id:editingSoldId,data:{

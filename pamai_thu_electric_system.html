@@ -676,6 +676,7 @@ input, select, textarea, button { font-family: inherit; max-width: 100%; }
   <button class="tab-btn" onclick="showTab('tab-billing',this)"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M9.5 9.5c0-1.1 1.1-2 2.5-2s2.5.9 2.5 2-1.1 1.6-2.5 2-2.5.9-2.5 2 1.1 2 2.5 2 2.5-.9 2.5-2"/></svg> สรุปบิลประจำเดือน</button>
   <button class="tab-btn" onclick="showTab('tab-history',this)"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><line x1="6" y1="20" x2="6" y2="12"/><line x1="12" y1="20" x2="12" y2="6"/><line x1="18" y1="20" x2="18" y2="15"/></svg> ประวัติค่าไฟ</button>
 </div>
+<div id="electric-data-status" style="display:none;margin:10px 22px 0;padding:9px 12px;border-radius:9px;font-size:.78rem;font-weight:700;line-height:1.5"></div>
 
 <!-- ═══════════════════ TAB 1: VENDORS ═══════════════════ -->
 <div id="tab-vendors" class="page active">
@@ -828,7 +829,7 @@ input, select, textarea, button { font-family: inherit; max-width: 100%; }
     <!-- รายการเดือนสร้างอัตโนมัติตอนโหลดหน้า (ดู pmBuildBillMonths)
          แก้บั๊ก 2569-07-27: เดิม hardcode พ.ศ. 2568 ไว้ 3 บรรทัด และ renderBilling() ไม่เคย
          อ่านค่าจากช่องนี้ ทำให้เลือกเดือนแล้วยอดไม่เปลี่ยน (บั๊กชนิดเดียวกับหน้ารับชำระ) -->
-    <select class="month-select" id="billMonth" onchange="renderBilling()" aria-label="เดือนของบิล"></select>
+    <select class="month-select" id="billMonth" onchange="onElectricBillMonthChange()" aria-label="เดือนของบิล"></select>
     <div class="zone-filter-row" id="zoneFilterBill"></div>
     <button class="btn btn-primary" style="margin-left:auto;padding:7px 16px;font-size:.78rem" onclick="exportBill()"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> Export Excel</button>
   </div>
@@ -1010,7 +1011,7 @@ function renderTable() {
   });
 
   const tbody = document.getElementById('vendorTbody');
-  tbody.innerHTML = filtered.map(v => {
+  tbody.innerHTML = filtered.length ? filtered.map(v => {
     const elec = calcElecMonthly(v.elec); // คอลัมน์นี้คือ ค่าไฟ/เดือน (บั๊ก #27)
     const total = v.rent + elec;
     const sBadge = v.status==='paid'
@@ -1030,7 +1031,7 @@ function renderTable() {
         <button class="tbl-action btn-pay" onclick="openPayModal('${v.id}')" style="margin-left:4px"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M9.5 9.5c0-1.1 1.1-2 2.5-2s2.5.9 2.5 2-1.1 1.6-2.5 2-2.5.9-2.5 2 1.1 2 2.5 2 2.5-.9 2.5-2"/></svg> รับเงิน</button>
       </td>
     </tr>`;
-  }).join('');
+  }).join('') : '<tr><td colspan="9" style="padding:24px;text-align:center;color:var(--text-lo)">ไม่มีข้อมูลผู้ค้าที่ตรงกับเงื่อนไข</td></tr>';
 
   document.getElementById('tableCount').textContent = `แสดง ${filtered.length} จาก ${vendors.length} ราย`;
 
@@ -1132,7 +1133,7 @@ function updateEditTotal() {
   let spTotal = 0;
   editSpecials.forEach(id => { spTotal += parseFloat(document.getElementById(`sp-price-${id}`)?.value)||0; });
   const total = base + spTotal;                       // ราคา/วันพฤหัสบดี
-  const monthly = Math.round(total * thisMonthThursdays()); // ค่าไฟ/เดือน (บั๊ก #27)
+  const monthly = Math.round(total * billMonthThursdays()); // ค่าไฟ/เดือนของรอบบิลที่เลือก
 
   document.getElementById('editElecTotal').textContent = fmt(monthly);
   const parts = [];
@@ -1165,7 +1166,7 @@ function updateEditTotal() {
       const pr = parseFloat(document.getElementById(`sp-price-${id}`)?.value)||0;
       if(pr>0) rows += `<div class="bp-row bp-indent"><span><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><polygon points="12 2 15 9 22 9.3 16.5 14 18.2 21 12 17.3 5.8 21 7.5 14 2 9.3 9 9"/></svg> ${nm}</span><span>${fmt(pr)}</span></div>`;
     });
-    if (total > 0) rows += `<div class="bp-row"><span>ค่าไฟรวม/เดือน (${fmt(total)}/วันพฤหัสบดี × ${thisMonthThursdays()})</span><span style="color:var(--yellow);font-weight:700">${fmt(monthly)}</span></div>`;
+    if (total > 0) rows += `<div class="bp-row"><span>ค่าไฟรวม/เดือน (${fmt(total)}/วันพฤหัสบดี × ${billMonthThursdays()})</span><span style="color:var(--yellow);font-weight:700">${fmt(monthly)}</span></div>`;
     rows += `<div class="bp-row"><span>ยอดรวมที่ต้องชำระ</span><span>${fmt(grandTotal)}</span></div>`;
     document.getElementById('billPreview').innerHTML = `<div class="bp-title"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 2h12v20l-3-2-3 2-3-2-3 2Z"/><line x1="9" y1="7" x2="15" y2="7"/><line x1="9" y1="11" x2="15" y2="11"/></svg> ล็อค ${v.id} — ${v.shop}</div>${rows}`;
   }
@@ -1192,7 +1193,7 @@ function loadLockElec() {
   (v.elec.special||[]).forEach(s=>addSpecialItem(s.name,s.price));
 }
 
-function saveElectric() {
+async function saveElectric() {
   const lid = document.getElementById('editLockSel').value;
   if (!lid) { showToast('กรุณาเลือกล็อค','error'); return; }
   const v = vendors.find(v=>v.id===lid);
@@ -1201,9 +1202,11 @@ function saveElectric() {
     name: document.getElementById(`sp-name-${id}`)?.value||'พิเศษ',
     price: parseFloat(document.getElementById(`sp-price-${id}`)?.value)||0
   })).filter(s=>s.price>0);
-  v.elec = { ...editCounts, special: spData };
-  persistVendorElec(v);
-  showToast(getApiUrl()?`<svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M17.5 19H9a5 5 0 1 1 1.6-9.7A6 6 0 0 1 22 11.5 4.5 4.5 0 0 1 17.5 19Z"/></svg> บันทึกค่าไฟล็อค ${lid} ขึ้น Sheets แล้ว`:`<svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg> บันทึกค่าไฟล็อค ${lid} เรียบร้อย`, 'success');
+  const nextElec={ ...editCounts, special: spData };
+  const res=await persistVendorElec({id:v.id,elec:nextElec});
+  if(!res||res.status!=='ok'){ showToast((res&&res.message)||'บันทึกค่าไฟไม่สำเร็จ กรุณาลองใหม่','error'); return; }
+  v.elec = nextElec;
+  showToast(`<svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M17.5 19H9a5 5 0 1 1 1.6-9.7A6 6 0 0 1 22 11.5 4.5 4.5 0 0 1 17.5 19Z"/></svg> บันทึกค่าไฟล็อค ${lid} ลงฐานข้อมูลแล้ว`, 'success');
   renderTable();
 }
 
@@ -1273,7 +1276,7 @@ function addModalSpecial(name='', price='') {
   document.getElementById('modalSpecialItems').appendChild(div);
 }
 
-function saveFromModal() {
+async function saveFromModal() {
   if (!editModalLockId) return;
   const v = vendors.find(v=>v.id===editModalLockId);
   if (!v) return;
@@ -1282,11 +1285,13 @@ function saveFromModal() {
     name:document.getElementById(`mspn-${id}`)?.value||'พิเศษ',
     price:parseFloat(document.getElementById(`mspp-${id}`)?.value)||0
   })).filter(s=>s.price>0);
-  v.elec = {...modalCounts, special:spData};
-  persistVendorElec(v);
+  const nextElec={...modalCounts, special:spData};
+  const res=await persistVendorElec({id:v.id,elec:nextElec});
+  if(!res||res.status!=='ok'){ showToast((res&&res.message)||'บันทึกค่าไฟไม่สำเร็จ กรุณาลองใหม่','error'); return; }
+  v.elec = nextElec;
   closeModal('editModal');
   renderTable();
-  showToast(getApiUrl()?`<svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M17.5 19H9a5 5 0 1 1 1.6-9.7A6 6 0 0 1 22 11.5 4.5 4.5 0 0 1 17.5 19Z"/></svg> บันทึกค่าไฟล็อค ${editModalLockId} ขึ้น Sheets แล้ว`:`<svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg> บันทึกค่าไฟล็อค ${editModalLockId} เรียบร้อย`, 'success');
+  showToast(`<svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M17.5 19H9a5 5 0 1 1 1.6-9.7A6 6 0 0 1 22 11.5 4.5 4.5 0 0 1 17.5 19Z"/></svg> บันทึกค่าไฟล็อค ${editModalLockId} ลงฐานข้อมูลแล้ว`, 'success');
 }
 
 // ══════════════════════════════════════
@@ -1422,20 +1427,24 @@ function openPayModal(lid) {
   openModal('payModal');
 }
 
-function confirmPay() {
+async function confirmPay() {
   const v = vendors.find(v=>v.id===payLockId);
   if (v) {
-    v.status = 'paid';
     if (getApiUrl()) {
       const elec = calcElecMonthly(v.elec); // บันทึกรับชำระค่าไฟทั้งเดือน (บั๊ก #27)
       // อัปเดตสถานะผู้ค้าเป็นปกติ + บันทึกรายการค่าไฟลงชีต payments (วันที่แบบไทย ให้ตรงกับรายงาน)
-      apiPost('saveVendor', { data: { lock: v.id, status: 'active' } });
-      if (elec > 0) apiPost('savePayment', { data: {
+      const vRes=await apiPost('saveVendor', { data: { lock: v.id, status: 'active' } });
+      let pRes={status:'ok'};
+      if (elec > 0) pRes=await apiPost('savePayment', { data: {
         lock_id: v.id, vendor_name: v.shop, product: v.shop,
         type: 'ค่าไฟฟ้า', amount: elec, penalty: 0, other_fee: 0, other_label: '',
-        method: '<svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="12" cy="12" r="3"/></svg> เงินสด', note: 'รับชำระค่าไฟ (โมดูลค่าไฟฟ้า)', date: nowTH(), time: nowTime(),
+        method: document.getElementById('payMethodSel')?.value||'เงินสด', note: 'รับชำระค่าไฟ (โมดูลค่าไฟฟ้า)', date: nowTH(), time: nowTime(),
       }});
+      if(!vRes||vRes.status!=='ok'||!pRes||pRes.status!=='ok'){
+        showToast('บันทึกรับชำระไม่สำเร็จ ข้อมูลบนหน้าจอยังไม่ถูกเปลี่ยน','error'); return;
+      }
     }
+    v.status = 'paid';
   }
   closeModal('payModal');
   renderTable();
@@ -1596,7 +1605,8 @@ function mapSheetVendor(sv){
   return {
     id: sv.lock, zone: sv.zone || '',
     shop: sv.product || sv.name || '(ไม่ระบุ)',
-    rent: Math.round((parseFloat(sv.dailyRate)||0) * thisMonthThursdays()),
+    dailyRate: parseFloat(sv.dailyRate)||0,
+    rent: Math.round((parseFloat(sv.dailyRate)||0) * billMonthThursdays()),
     status: sv.status==='unpaid' ? 'unpaid' : 'paid',
     elec: {
       bulb:  parseInt(sv.elec_bulb)||0,  fan:  parseInt(sv.elec_fan)||0,
@@ -1607,23 +1617,40 @@ function mapSheetVendor(sv){
   };
 }
 
+function onElectricBillMonthChange(){
+  vendors.forEach(v=>{ v.rent=Math.round((parseFloat(v.dailyRate)||0)*billMonthThursdays()); });
+  renderTable();
+  renderBilling();
+  if(document.getElementById('tab-update').classList.contains('active')) loadLockElec();
+}
+
 async function loadVendorsFromSheets(){
-  if(!getApiUrl()) return; // ไม่ได้เชื่อมต่อ → ใช้ข้อมูลตัวอย่างในไฟล์
+  const status=document.getElementById('electric-data-status');
+  if(!getApiUrl()){
+    if(status){ status.style.display='block'; status.style.background='var(--red-l)'; status.style.color='var(--red)'; status.innerHTML='ยังไม่ได้เชื่อมต่อฐานข้อมูล — ไม่สามารถยืนยันข้อมูลค่าไฟล่าสุดได้'; }
+    return;
+  }
+  // เมื่อมีฐานข้อมูลจริง ห้ามแสดงข้อมูลตัวอย่างหรือ snapshot เก่าระหว่างรอคำตอบ
+  vendors=[]; renderTable(); initUpdateTab();
+  if(status){ status.style.display='block'; status.style.background='var(--blue-l)'; status.style.color='var(--blue)'; status.textContent='กำลังโหลดข้อมูลค่าไฟล่าสุดจากฐานข้อมูล…'; }
   const data = await apiGet('getVendors');
-  if(Array.isArray(data) && data.length){
-    vendors = data.filter(v=>v.lock).map(mapSheetVendor);
+  if(Array.isArray(data)){
+    vendors = data.filter(v=>v.lock && v.status!=='terminated').map(mapSheetVendor);
     renderTable(); initUpdateTab();
     const active = document.querySelector('.page.active')?.id;
     if(active==='tab-billing') renderBilling();
     if(active==='tab-history') renderHistory();
-    showToast(`<svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M17.5 19H9a5 5 0 1 1 1.6-9.7A6 6 0 0 1 22 11.5 4.5 4.5 0 0 1 17.5 19Z"/></svg> โหลดผู้ค้า ${vendors.length} รายจาก Google Sheets`, 'success');
+    if(status){ status.style.display='block'; status.style.background='var(--green-l)'; status.style.color='var(--green-m)'; status.textContent='ข้อมูลล่าสุดจากฐานข้อมูล · ผู้ค้าที่ใช้งาน '+vendors.length+' ราย · '+nowTime(); }
+  } else {
+    vendors=[]; renderTable(); initUpdateTab();
+    if(status){ status.style.display='block'; status.style.background='var(--red-l)'; status.style.color='var(--red)'; status.innerHTML='โหลดข้อมูลค่าไฟไม่สำเร็จ — ไม่แสดงข้อมูลเก่าเพื่อป้องกันความเข้าใจผิด <button class="btn btn-secondary" style="margin-left:8px;padding:4px 10px" onclick="loadVendorsFromSheets()">ลองใหม่</button>'; }
   }
 }
 
 // บันทึกค่าไฟกลับขึ้น Sheets (partial update — ส่งเฉพาะ field ค่าไฟ)
 async function persistVendorElec(v){
-  if(!getApiUrl()) return;
-  await apiPost('saveVendor', { data: {
+  if(!getApiUrl()) return {status:'error',message:'ยังไม่ได้เชื่อมต่อฐานข้อมูล'};
+  return await apiPost('saveVendor', { data: {
     lock: v.id,
     elec_bulb: v.elec.bulb||0, elec_fan: v.elec.fan||0,
     elec_small: v.elec.small||0, elec_large: v.elec.large||0,

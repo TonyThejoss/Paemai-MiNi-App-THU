@@ -828,14 +828,6 @@ input, select, textarea, button { font-family: inherit; max-width: 100%; }
         <div id="dcList" style="font-size:.76rem"></div>
       </div>
 
-      <div style="border-top:1px solid var(--border,#e2e8f0);margin-top:10px;padding-top:10px">
-        <div class="modal-label" style="margin-bottom:6px">อัตราค่าธรรมเนียมรายปีกลางของตลาด</div>
-        <div class="option-row" style="gap:8px;align-items:flex-end;flex-wrap:wrap">
-          <input class="form-input" type="number" id="dcAnnualFee" min="0" step="1" placeholder="0" style="max-width:130px">
-          <button class="btn btn-outline" onclick="saveAnnualFee()">บันทึกอัตรา</button>
-          <span style="font-size:.72rem;color:var(--text-lo,#718096)">ระบบจะบวกค่าธรรมเนียมนี้เข้าบิลค่าเช่า<strong>ทุกเดือนมีนาคม</strong>โดยอัตโนมัติ พร้อมหมายเหตุกำกับ</span>
-        </div>
-      </div>
     </div>
 
     <div class="modal-btns">
@@ -1448,7 +1440,7 @@ async function confirmSave() {
 
 
 // ══════════════════════════════════════════════════════════════════════════════
-// PM_DISCOUNT_UI — หน้าจอจัดการส่วนลด + อัตราค่าธรรมเนียมรายปี (เพิ่ม 2026-07-26)
+// PM_DISCOUNT_UI — หน้าจอจัดการส่วนลดค่าเช่า (เพิ่ม 2026-07-26)
 // ══════════════════════════════════════════════════════════════════════════════
 function pmThisMonthKey(){ const n=new Date(); return n.getFullYear()+'-'+String(n.getMonth()+1).padStart(2,'0'); }
 function pmMonthLabel(key){
@@ -1467,7 +1459,6 @@ async function openDiscountModal(){
   const mEl=document.getElementById('dcMonth');
   if(!mEl.value) mEl.value=pmBillMonthKey();
   mEl.min=pmThisMonthKey();          // กันเลือกเดือนย้อนหลังที่ระดับ UI (backend ตรวจซ้ำอีกชั้น)
-  document.getElementById('dcAnnualFee').value = pmAnnualFeeRate()||'';
   const lockSel=document.getElementById('dcLock');
   lockSel.innerHTML=ALL_LOCKS.slice().sort((a,b)=>a.id.localeCompare(b.id,undefined,{numeric:true}))
     .map(l=>'<option value="'+l.id+'">'+l.id+' — '+(l.vendor||'')+' (โซน '+(l.zone||'-')+')</option>').join('');
@@ -1552,16 +1543,6 @@ async function deleteDiscountEntry(id){
   } else {
     showToast((res&&res.message)||'ลบไม่สำเร็จ');
   }
-}
-
-async function saveAnnualFee(){
-  const v=parseFloat(document.getElementById('dcAnnualFee').value)||0;
-  if(v<0){ showToast('อัตราค่าธรรมเนียมต้องไม่ติดลบ'); return; }
-  const res=await apiPost('saveSettings',{data:{annual_fee:v},updatedBy:(document.getElementById('collector')?.value||'ผู้จัดตลาด')});
-  if(res && res.status==='ok'){
-    showToast('บันทึกอัตราค่าธรรมเนียมรายปี ฿'+v.toLocaleString()+' แล้ว');
-    await loadLocksFromSheets();
-  } else showToast('บันทึกอัตราไม่สำเร็จ');
 }
 
 // ══════════════════════════════════════════════════════════════════════════════

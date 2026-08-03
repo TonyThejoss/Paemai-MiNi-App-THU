@@ -211,6 +211,8 @@ body {
 .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 13px; margin-bottom: 13px; }
 .field-row.col3 { grid-template-columns: 1fr 1fr 1fr; }
 .field-row.col1 { grid-template-columns: 1fr; }
+.special-free-option{display:flex;align-items:flex-start;gap:9px;margin-top:8px;padding:9px 11px;border:1.5px solid var(--green-m);border-radius:9px;background:var(--green-l);color:var(--green);font-size:.78rem;font-weight:800;line-height:1.45;cursor:pointer;}
+.special-free-option input{width:20px;height:20px;margin:0;accent-color:var(--green-m);flex:none;}
 
 .field { display: flex; flex-direction: column; gap: 5px; }
 .field label {
@@ -990,17 +992,7 @@ input, select, textarea, button { font-family: inherit; max-width: 100%; }
     <div id="step2" class="step-content">
       <div class="card">
         <div class="card-title"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><circle cx="7.5" cy="15.5" r="5.5"/><path d="M21 2 11.5 11.5"/><path d="M15.5 7.5 19 11"/><path d="M13 10l2.5 2.5"/></svg> เลือกล็อค <span class="badge-section badge badge-blue">ขั้นตอน 2 / 4</span></div>
-        <div class="field-row col3" style="margin-bottom:16px">
-          <div class="field">
-            <label for="managerSelect">ผู้จัดรับผิดชอบ <span class="req">*</span></label>
-            <select id="managerSelect">
-              <option value="">-- เลือกผู้จัด --</option>
-              <option value="tony">โทนี่ (082-581-1144)</option>
-              <option value="fon">คุณฝน (097-236-8330)</option>
-              <option value="tu">คุณตู่ (097-236-8330)</option>
-              <option value="aew">คุณแอ๋ว (081-353-7693)</option>
-            </select>
-          </div>
+        <div class="field-row" style="margin-bottom:16px">
           <div class="field">
             <label for="startDate">วันเริ่มเช่า <span class="req">*</span></label>
             <input type="date" id="startDate">
@@ -1011,6 +1003,10 @@ input, select, textarea, button { font-family: inherit; max-width: 100%; }
             <input type="number" id="rentPrice" placeholder="450" min="0" oninput="livePreview();recalc();updateRentHint()">
             <span class="err-msg" id="errRent">กรุณากรอกราคา</span>
             <span class="hint" id="rentMonthlyHint">= ฿0/เดือน</span>
+            <label class="special-free-option" for="specialAdminFree">
+              <input type="checkbox" id="specialAdminFree" onchange="specialFreeChanged()">
+              <span>ผู้ค้าพิเศษจากผู้บริหาร (ฟรี)<br><span style="font-weight:600">ค่าเช่าและค่าธรรมเนียมทั้งหมดเป็น 0 · ค่าไฟและค่าใช้จ่ายอื่นคิดตามจริง</span></span>
+            </label>
           </div>
         </div>
         <div class="lock-zone-tabs" id="zoneTabs"></div>
@@ -1478,7 +1474,8 @@ function validate(s) {
     const date = document.getElementById('startDate').value;
     const rent = document.getElementById('rentPrice').value;
     show('errDate',!date);       if(!date)          ok=false;
-    show('errRent',!rent||rent<=0); if(!rent||rent<=0) ok=false;
+    const free=isSpecialFree();
+    show('errRent',!free&&(!rent||Number(rent)<=0)); if(!free&&(!rent||Number(rent)<=0)) ok=false;
     const noLock = !selectedLock;
     document.getElementById('errLock').style.display = noLock ? 'block' : 'none';
     if(noLock) ok=false;
@@ -1626,6 +1623,29 @@ function animateVal(id, newText) {
 //    เมนู ระบบ › ตั้งค่าค่าธรรมเนียม เสมอ — พนักงานไม่ต้องกรอกใหม่และกรอกผิดไม่ได้ ถ้าต้องการเปลี่ยน
 //    อัตราต้องไปแก้ที่หน้าตั้งค่า (ผู้ดูแลระบบเท่านั้น) แล้วอัตราใหม่จะถูกส่งมาที่หน้านี้ทันที
 let PM_REG_SETTINGS = {};
+function isSpecialFree(){ return !!document.getElementById('specialAdminFree')?.checked; }
+function specialFreeChanged(){
+  const free=isSpecialFree();
+  const rent=document.getElementById('rentPrice');
+  if(rent){
+    rent.readOnly=free;
+    rent.style.background=free?'var(--surface2)':'';
+    rent.style.cursor=free?'not-allowed':'';
+    if(free) rent.value='0';
+    else if(rent.value==='0') rent.value='';
+  }
+  const entry=parseFloat(PM_REG_SETTINGS.entry_fee)||0;
+  const annual=parseFloat(PM_REG_SETTINGS.annual_fee)||0;
+  pmSetLockedFee('feeEntryAmt', free?0:entry, true);
+  pmSetLockedFee('feeAnnualAmt', free?0:annual, true);
+  if(free){
+    document.getElementById('feeEntryAmt').value='0';
+    document.getElementById('feeAnnualAmt').value='0';
+  }
+  const first=document.getElementById('feeFirstRentAmt');
+  if(first) first.value=free?0:monthlyFromDaily(parseFloat(rent?.value)||0);
+  updateRentHint(); livePreview(); recalc();
+}
 function pmSetLockedFee(id, amount, connected){
   const el = document.getElementById(id);
   if(!el) return;
@@ -1670,6 +1690,7 @@ async function loadFeeSettings(){
   } else {
     srcNote('อัตรากลางของตลาด — แก้ได้ที่เมนู <strong>ระบบ › ตั้งค่าค่าธรรมเนียม</strong>');
   }
+  if(isSpecialFree()) specialFreeChanged();
   recalc();
 }
 async function checkEntryFeeHistory(lockId){
@@ -1738,6 +1759,7 @@ function buildConfirm() {
   const mMap    = {cash:'<svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="12" cy="12" r="3"/></svg> เงินสด',transfer:'<svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><rect x="6" y="2" width="12" height="20" rx="2"/><line x1="11" y1="18" x2="13" y2="18"/></svg> โอนเงิน',qr:'<svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 8h3l2-2h6l2 2h3v11H4Z"/><circle cx="12" cy="13.5" r="3.5"/></svg> QR Code'};
   const method  = mMap[document.getElementById('payMethod').value];
   const collector = document.getElementById('payCollector').value || '—';
+  const specialFree = isSpecialFree();
 
   document.getElementById('confirmContent').innerHTML = `
     <div class="confirm-block green-block">
@@ -1747,6 +1769,7 @@ function buildConfirm() {
       <div class="sum-row"><span class="sum-label">สินค้า</span><span class="sum-val">${product}</span></div>
       <div class="sum-row"><span class="sum-label">ล็อค</span><span class="sum-val green">${selectedLock} (โซน ${selectedZone})</span></div>
       <div class="sum-row"><span class="sum-label">ค่าเช่า/วัน</span><span class="sum-val">฿${dailyRent.toLocaleString()}</span></div>
+      ${specialFree?'<div class="sum-row"><span class="sum-label">สิทธิ์พิเศษ</span><span class="sum-val green">ผู้ค้าพิเศษจากผู้บริหาร (ฟรีค่าเช่าและค่าธรรมเนียม)</span></div>':''}
       <div class="sum-row"><span class="sum-label">ค่าเช่า/เดือน (× ${thisMonthThursdays()} วันพฤหัสบดี)</span><span class="sum-val">฿${rent.toLocaleString()}</span></div>
       <div class="sum-row"><span class="sum-label">วันเริ่มเช่า</span><span class="sum-val">${date}</span></div>
     </div>
@@ -1777,6 +1800,7 @@ async function submitForm(btn) {
   const product = document.getElementById('vendorProduct').value;
   const detail  = document.getElementById('vendorProductDetail')?.value || '';
   const dailyRate = parse('rentPrice'); // ช่องนี้คือค่าเช่ารายวันอยู่แล้ว ไม่ต้องแปลงกลับ
+  const specialFree = isSpecialFree();
   const entry   = parse('feeEntryAmt');
   const annual  = parse('feeAnnualAmt');
   const fRent   = parse('feeFirstRentAmt');
@@ -1807,7 +1831,7 @@ async function submitForm(btn) {
     // 1) สร้าง/อัปเดตผู้ค้าในชีต vendors — เก็บเป็น dailyRate (ค่าเช่ารายวันพฤหัสบดี) ตรง ๆ
     const vRes = await apiPost('saveVendor', { data: {
       lock: selectedLock, zone: selectedZone, name: fullName, phone, line,
-      product: fullProduct, type: 'regular', dailyRate,
+      product: fullProduct, type: specialFree ? 'special_admin_free' : 'regular', dailyRate: specialFree ? 0 : dailyRate,
       elec_bulb: ei.bulb, elec_fan: ei.fan, elec_small: ei.small, elec_large: ei.large, elec_special: ei.special,
       status: 'active',
     }});
@@ -1817,7 +1841,7 @@ async function submitForm(btn) {
     // ห้ามสร้างรายการรับชำระซ้ำ (จะทำให้ยอดในรายงานและชีต payments เกินความจริง)
     const baseNote = EDIT_ONLY_MODE
       ? ('แก้ไขข้อมูลผู้ค้า · โดย: ' + collector)
-      : ('ลงทะเบียนผู้ค้าใหม่ · ผู้รับเงิน: ' + collector);
+      : ('ลงทะเบียนผู้ค้าใหม่'+(specialFree?' · ผู้ค้าพิเศษจากผู้บริหาร (ฟรีค่าเช่าและค่าธรรมเนียม)':'')+' · ผู้รับเงิน: ' + collector);
     const payRows = [];
     if (!EDIT_ONLY_MODE) {
     if (entry  > 0) payRows.push({type:'ค่าแรกเข้า',        amount:entry});
@@ -1904,6 +1928,7 @@ function resetAll() {
   document.querySelectorAll('input[type=text],input[type=number],input[type=tel],input[type=email],textarea').forEach(el=>el.value='');
   document.querySelectorAll('#mainLayout select').forEach(el=>{ el.selectedIndex = 0; });
   document.querySelectorAll('#mainLayout input[type=checkbox],#mainLayout input[type=radio]').forEach(el=>{ el.checked = false; });
+  specialFreeChanged();
   const prev = document.getElementById('vendorPreviewCard'); if (prev) prev.style.display = 'none';
   // ดึงสถานะล็อคล่าสุดจาก Sheets เพื่อให้ล็อคที่เพิ่งลงทะเบียนไปแสดงเป็น "ไม่ว่าง" ทันที
   if (typeof loadRealOccupancy === 'function') { try { loadRealOccupancy(); } catch(e) {} }
