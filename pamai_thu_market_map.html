@@ -1370,7 +1370,8 @@ function showPopup(el,ev){
   if(phone&&isOccupied){phEl.innerHTML='<a href="tel:'+phone+'" style="color:var(--gm);font-weight:700">'+phone+'</a>';cBtn.href='tel:'+phone;cBtn.style.display='flex';}
   else{phEl.innerHTML='<span style="color:var(--txl)">'+(isOccupied?'ยังไม่ระบุเบอร์':'—')+'</span>';cBtn.style.display='none';}
 
-  document.getElementById('ppShop').textContent=d.shop||'—';
+  // d.shop คือข้อความย่อบนตัวล็อคและอาจถูกเปลี่ยนเพื่อการแสดงผล ต้องใช้ product จากผู้ค้าโดยตรง
+  document.getElementById('ppShop').textContent=isOccupied?(v.product||'—'):'—';
   document.getElementById('ppRoof').textContent=d.roof==='1'?'✅ มีหลังคา+โต๊ะ':'❌ ไม่มี';
   document.getElementById('ppRent').textContent=parseInt(d.rent)>0?fmt(parseInt(d.rent))+'/เดือน':'—';
   document.getElementById('ppMgr').textContent=v.manager||'—';
