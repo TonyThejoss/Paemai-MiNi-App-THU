@@ -901,7 +901,7 @@ input, select, textarea, button { font-family: inherit; max-width: 100%; }
     <button class="btn-back" onclick="history.back()"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><line x1="20" y1="12" x2="4" y2="12"/><polyline points="10 6 4 12 10 18"/></svg> กลับ</button>
     <div class="topbar-brand">
       <h1><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 9 4 4h16l1 5"/><path d="M4 9v11h16V9"/><path d="M9 20v-6h6v6"/></svg> ลงทะเบียนผู้ค้าประจำใหม่</h1>
-      <p>แพไม้มินิ · บันทึกข้อมูลและรับชำระค่าธรรมเนียมแรกเข้า</p>
+      <p>แพไม้มินิ · บันทึกข้อมูลและตั้งยอดค้างเริ่มต้น · ยังไม่ใช่การรับชำระ</p>
     </div>
   </div>
   <button class="dm-toggle" onclick="toggleDark()" aria-label="สลับโหมดมืด/สว่าง" title="เปลี่ยน Dark/Light mode">
@@ -916,7 +916,7 @@ input, select, textarea, button { font-family: inherit; max-width: 100%; }
   <div class="step-line" id="line1"></div>
   <div class="step" id="step2-tab"><div class="step-dot" id="dot2">2</div><span>เลือกล็อค</span></div>
   <div class="step-line" id="line2"></div>
-  <div class="step" id="step3-tab"><div class="step-dot" id="dot3">3</div><span>ค่าธรรมเนียม</span></div>
+  <div class="step" id="step3-tab"><div class="step-dot" id="dot3">3</div><span>ยอดค้างตั้งต้น</span></div>
   <div class="step-line" id="line3"></div>
   <div class="step" id="step4-tab"><div class="step-dot" id="dot4">4</div><span>ยืนยัน</span></div>
 </div>
@@ -1030,7 +1030,7 @@ input, select, textarea, button { font-family: inherit; max-width: 100%; }
     <!-- STEP 3 -->
     <div id="step3" class="step-content">
       <div class="card">
-        <div class="card-title"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M9.5 9.5c0-1.1 1.1-2 2.5-2s2.5.9 2.5 2-1.1 1.6-2.5 2-2.5.9-2.5 2 1.1 2 2.5 2 2.5-.9 2.5-2"/></svg> ค่าธรรมเนียม <span class="badge-section badge badge-red">ต้องชำระทันที</span></div>
+        <div class="card-title"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M9.5 9.5c0-1.1 1.1-2 2.5-2s2.5.9 2.5 2-1.1 1.6-2.5 2-2.5.9-2.5 2 1.1 2 2.5 2 2.5-.9 2.5-2"/></svg> ยอดค้างตั้งต้น <span class="badge-section badge badge-red">ยังไม่ได้รับชำระ</span></div>
 
         <!-- แรกเข้า -->
         <div class="fee-block required-fee">
@@ -1125,8 +1125,8 @@ input, select, textarea, button { font-family: inherit; max-width: 100%; }
           </div>
         </div>
 
-        <div class="section-divider"><span>ช่องทางชำระเงิน</span></div>
-        <div class="field-row col3">
+        <div class="section-divider" style="display:none"><span>ช่องทางชำระเงิน</span></div>
+        <div class="field-row col3" style="display:none">
           <div class="field">
             <label for="payMethod">ช่องทาง <span class="req">*</span></label>
             <select id="payMethod" onchange="recalc()">
@@ -1159,7 +1159,7 @@ input, select, textarea, button { font-family: inherit; max-width: 100%; }
         <div id="confirmContent"></div>
         <div style="display:flex;justify-content:space-between;margin-top:18px;gap:12px">
           <button class="btn btn-secondary" onclick="nextStep(3,this,true)"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><line x1="20" y1="12" x2="4" y2="12"/><polyline points="10 6 4 12 10 18"/></svg> แก้ไข</button>
-          <button class="btn btn-primary" onclick="submitForm(this)"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg> ยืนยันลงทะเบียน & รับชำระ</button>
+          <button class="btn btn-primary" onclick="submitForm(this)"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg> บันทึกข้อมูลผู้ค้า</button>
         </div>
       </div>
     </div>
@@ -1774,7 +1774,7 @@ function buildConfirm() {
       <div class="sum-row"><span class="sum-label">วันเริ่มเช่า</span><span class="sum-val">${date}</span></div>
     </div>
     <div class="confirm-block gray-block">
-      <div style="font-size:.80rem;font-weight:800;color:var(--text-hi);margin-bottom:10px"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M9.5 9.5c0-1.1 1.1-2 2.5-2s2.5.9 2.5 2-1.1 1.6-2.5 2-2.5.9-2.5 2 1.1 2 2.5 2 2.5-.9 2.5-2"/></svg> รายการชำระ</div>
+      <div style="font-size:.80rem;font-weight:800;color:var(--text-hi);margin-bottom:10px"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M9.5 9.5c0-1.1 1.1-2 2.5-2s2.5.9 2.5 2-1.1 1.6-2.5 2-2.5.9-2.5 2 1.1 2 2.5 2 2.5-.9 2.5-2"/></svg> ยอดค้างตั้งต้น (ยังไม่ได้รับชำระ)</div>
       <div class="sum-row"><span class="sum-label">ค่าธรรมเนียมแรกเข้า</span><span class="sum-val">฿${entry.toLocaleString()}</span></div>
       <div class="sum-row"><span class="sum-label">ค่าธรรมเนียมรายปี</span><span class="sum-val">฿${annual.toLocaleString()}</span></div>
       <div class="sum-row"><span class="sum-label">ค่าเช่าเดือนแรก</span><span class="sum-val">฿${fRent.toLocaleString()}</span></div>
@@ -1783,8 +1783,7 @@ function buildConfirm() {
       <div style="border-top:2px solid var(--border);margin-top:10px;padding-top:12px;display:flex;justify-content:space-between;font-size:1rem;font-weight:800">
         <span>ยอดรวม</span><span style="color:var(--green-m)">฿${grand.toLocaleString()}</span>
       </div>
-      <div class="sum-row" style="margin-top:6px"><span class="sum-label">ช่องทาง</span><span class="sum-val">${method}</span></div>
-      <div class="sum-row"><span class="sum-label">ผู้รับเงิน</span><span class="sum-val">${collector}</span></div>
+      <div class="sum-row" style="margin-top:6px"><span class="sum-label">สถานะ</span><span class="sum-val" style="color:var(--red)">ค้างชำระ</span></div>
     </div>`;
 }
 
@@ -1828,51 +1827,36 @@ async function submitForm(btn) {
     const fullName = name + (nick ? ` (${nick})` : '');
     const fullProduct = product + (detail ? ` · ${detail}` : '');
 
-    // 1) สร้าง/อัปเดตผู้ค้าในชีต vendors — เก็บเป็น dailyRate (ค่าเช่ารายวันพฤหัสบดี) ตรง ๆ
-    const vRes = await apiPost('saveVendor', { data: {
+    // บันทึกผู้ค้า + สร้างรอบการเช่า + ตั้งยอดค้างใน transaction เดียว
+    // ห้ามเรียก savePayment จากหน้านี้: การลงทะเบียนไม่ใช่การรับเงิน
+    const openingCharges = [];
+    if(entry>0) openingCharges.push({type:'ค่าแรกเข้า',amount:entry,description:document.getElementById('feeEntryNote')?.value||''});
+    if(annual>0) openingCharges.push({type:'ค่าธรรมเนียมรายปี',amount:annual,description:String(document.getElementById('feeAnnualYear')?.value||'')});
+    if(fRent>0) openingCharges.push({type:'ค่าเช่าประจำเดือน',amount:fRent,description:'ค่าเช่าเดือนแรก'});
+    if(elec>0) openingCharges.push({type:'ค่าไฟฟ้า',amount:elec,description:'ค่าไฟเดือนแรก'});
+    extItems.forEach(it=>openingCharges.push({type:it.label,amount:it.amount,description:''}));
+    const vRes = await apiPost('registerVendorAccount', { data: {
       lock: selectedLock, zone: selectedZone, name: fullName, phone, line,
       product: fullProduct, type: specialFree ? 'special_admin_free' : 'regular', dailyRate: specialFree ? 0 : dailyRate,
       elec_bulb: ei.bulb, elec_fan: ei.fan, elec_small: ei.small, elec_large: ei.large, elec_special: ei.special,
-      status: 'active',
+      status: 'active', start_date: document.getElementById('startDate').value,
+      charges: EDIT_ONLY_MODE ? [] : openingCharges,
     }});
 
-    // 2) บันทึกรายการรับชำระแต่ละประเภทลงชีต payments (วันที่แบบไทย ให้ตรงกับรายงาน)
-    // EDIT_ONLY_MODE = ผู้ใช้กด "ย้อนกลับไปแก้ไขข้อมูลผู้ค้า" จากหน้าสำเร็จ → อัปเดตข้อมูลเท่านั้น
-    // ห้ามสร้างรายการรับชำระซ้ำ (จะทำให้ยอดในรายงานและชีต payments เกินความจริง)
-    const baseNote = EDIT_ONLY_MODE
-      ? ('แก้ไขข้อมูลผู้ค้า · โดย: ' + collector)
-      : ('ลงทะเบียนผู้ค้าใหม่'+(specialFree?' · ผู้ค้าพิเศษจากผู้บริหาร (ฟรีค่าเช่าและค่าธรรมเนียม)':'')+' · ผู้รับเงิน: ' + collector);
-    const payRows = [];
-    if (!EDIT_ONLY_MODE) {
-    if (entry  > 0) payRows.push({type:'ค่าแรกเข้า',        amount:entry});
-    if (annual > 0) payRows.push({type:'ค่าธรรมเนียมรายปี', amount:annual});
-    if (fRent  > 0) payRows.push({type:'ค่าเช่าประจำเดือน',  amount:fRent});
-    if (elec   > 0) payRows.push({type:'ค่าไฟฟ้า',          amount:elec});
-    extItems.forEach(it => payRows.push({type: it.label, amount: it.amount}));
-    }
-
-    let payOk = true;
-    for (const row of payRows){
-      const pr = await apiPost('savePayment', { data: {
-        lock_id: selectedLock, vendor_name: fullName, product: fullProduct,
-        type: row.type, amount: row.amount, penalty: 0, other_fee: 0, other_label: '',
-        method, note: baseNote, date: payDateTH, time,
-      }});
-      if(!(pr && pr.status==='ok')) payOk = false;
-    }
+    const payOk = true;
 
     // 3) log กิจกรรม
     apiPost('logActivity', { data: {
       user: getCurrentUserName(), type: 'register',
       message: (EDIT_ONLY_MODE ? 'แก้ไขข้อมูลผู้ค้า: ' : 'ลงทะเบียนผู้ค้าใหม่: ') + fullName + ' (' + selectedLock + ')',
-      detail: 'ยอดรวม ฿' + grand.toLocaleString(), date: payDateTH, time,
+      detail: 'ตั้งยอดค้าง ฿' + grand.toLocaleString() + ' · ยังไม่ได้รับชำระ', date: payDateTH, time,
     }});
 
     const vOk = vRes && vRes.status==='ok';
     saveNote = (vOk && payOk)
       ? '<div style="margin-top:10px;padding:8px 12px;background:#e6f7ee;border-radius:8px;color:#7f3f1a;font-weight:700;font-size:.72rem"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M17.5 19H9a5 5 0 1 1 1.6-9.7A6 6 0 0 1 22 11.5 4.5 4.5 0 0 1 17.5 19Z"/></svg> บันทึกขึ้น Google Sheets แล้ว</div>'
       : '<div style="margin-top:10px;padding:8px 12px;background:#fff3cd;border-radius:8px;color:#92400e;font-weight:700;font-size:.72rem"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0Z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg> บันทึกบางส่วนไม่สำเร็จ กรุณาตรวจสอบการเชื่อมต่อ</div>';
-    if (btn){ btn.disabled = false; btn.innerHTML = '<svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg> ยืนยันลงทะเบียน & รับชำระ'; }
+    if (btn){ btn.disabled = false; btn.innerHTML = '<svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg> บันทึกข้อมูลผู้ค้า'; }
   } else if (!getApiUrl()) {
     saveNote = '<div style="margin-top:10px;padding:8px 12px;background:#fff3cd;border-radius:8px;color:#92400e;font-weight:700;font-size:.72rem"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0Z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg> ยังไม่ได้เชื่อมต่อ Google Sheets — รายการนี้ยังไม่ถูกบันทึกลงระบบกลาง</div>';
   }
@@ -1882,7 +1866,7 @@ async function submitForm(btn) {
   document.getElementById('successScreen').classList.add('show');
 
   document.getElementById('successReceipt').innerHTML = `
-    <div class="sr-title"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 2h12v20l-3-2-3 2-3-2-3 2Z"/><line x1="9" y1="7" x2="15" y2="7"/><line x1="9" y1="11" x2="15" y2="11"/></svg> ใบรับชำระค่าธรรมเนียม</div>
+    <div class="sr-title"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 2h12v20l-3-2-3 2-3-2-3 2Z"/><line x1="9" y1="7" x2="15" y2="7"/><line x1="9" y1="11" x2="15" y2="11"/></svg> สรุปยอดค้างเริ่มต้น</div>
     <div class="sr-row"><span>ชื่อผู้ค้า</span><span>${name}</span></div>
     <div class="sr-row"><span>สินค้า</span><span>${product}</span></div>
     <div class="sr-row"><span>ล็อค</span><span>${selectedLock} (${selectedZone})</span></div>
@@ -1969,6 +1953,7 @@ function showToast(msg, type='info') {
   t._timer = setTimeout(()=>t.classList.remove('show'), 3000);
 }
 </script>
+
 
 
 

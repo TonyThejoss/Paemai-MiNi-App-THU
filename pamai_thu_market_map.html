@@ -80,6 +80,7 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(
 /* POPUP */
 #popupWrap{display:none;position:absolute;z-index:500;}
 #popupWrap.show{display:block;}
+.pp-fin{margin:8px 10px;padding:10px;border:1px solid var(--bd);border-radius:9px;background:var(--sf2);font-size:.78rem}.pp-fin-title{font-weight:900;color:var(--gm);margin-bottom:7px}.pp-fin-row{display:flex;gap:6px;margin-top:7px}.pp-fin-row input,.pp-fin-row select{min-width:0;padding:6px;border:1px solid var(--bd2);border-radius:6px;font-family:inherit}.pp-fin-row input{width:90px}.pp-fin-row select{flex:1}.pp-fin-row button{border:0;border-radius:6px;background:var(--gm);color:#fff;font-weight:800;padding:6px 9px;cursor:pointer}.pp-fin-hist{margin-top:7px;display:grid;gap:3px;color:var(--txm)}
 .popup-card{background:var(--sf);border:1.5px solid var(--bd);border-radius:14px;width:290px;box-shadow:0 8px 32px rgba(0,0,0,.22);overflow:hidden;animation:popIn .17s var(--ease);}
 @keyframes popIn{from{transform:scale(.88) translateY(-6px);opacity:0}to{transform:scale(1);opacity:1}}
 .pp-hdr{display:flex;align-items:center;justify-content:space-between;padding:9px 13px;background:linear-gradient(135deg,var(--g),var(--gm));color:#fff;}
@@ -654,6 +655,7 @@ input, select, textarea, button { font-family: inherit; max-width: 100%; }
         <div id="ppLeaveBadge" style="display:none;margin-top:6px"></div>
         <div class="pp-daily-info" id="ppDailyInfo" style="display:none"></div>
       </div>
+      <div class="pp-fin" id="ppFinance" style="display:none"></div>
       <div class="pp-hist" id="ppHist"></div>
       <div class="pp-actions" id="ppActions"></div>
     </div>
@@ -1296,7 +1298,7 @@ async function confirmCancelLease(){
     // ซึ่งไม่ตรงกับ field ที่ backend (saveVendor) คาดหวัง (body.data) ทำให้ยกเลิกเช่าไม่ persist จริง
     // และ 'cancelled' ก็ไม่ตรงกับค่าที่หน้าอื่นของระบบ (แดชบอร์ดหลัก/ลงทะเบียนผู้ค้า/แบ็กเอนด์) ใช้
     // ใช้เป็นมาตรฐานเดียวกันคือ 'terminated' — แก้ให้ตรงกันทั้งระบบ พร้อม await + ตรวจผลลัพธ์จริง
-    const saveRes=await apiPost('deleteVendor',{lockId});
+    const saveRes=await apiPost('closeVendorLease',{data:{lock_id:lockId}});
     if(!saveRes||saveRes.status!=='ok'){
       toast('❌ บันทึกยกเลิกการเช่าไม่สำเร็จ — ตรวจสอบการเชื่อมต่อแล้วลองใหม่','e');
       if(btn){btn.disabled=false;btn.innerHTML=btn.dataset.origHtml;}
@@ -1403,6 +1405,7 @@ function showPopup(el,ev){
   // ACTIONS — ลา/ขาด เป็น toggle
   let acts='';
   if(isOccupied){
+    acts+='<div style="flex-basis:100%;font-size:.58rem;font-weight:900;color:var(--txl);border-bottom:1px solid var(--bd);padding:3px 0">การลาและการใช้ล็อค</div>';
     if(!at){
       acts+='<button class="pp-btn b-leave" onclick="openLeaveModal(\''+lockId+'\')">📋 แจ้งลา</button>';
       acts+='<button class="pp-btn b-absent" onclick="doAbsent(\''+lockId+'\')">⚠️ ขาดล็อค</button>';
@@ -1423,6 +1426,7 @@ function showPopup(el,ev){
   }
   if(isVacant) acts+='<button class="pp-btn" style="background:#ffedd5;color:#c2410c" onclick="goRegisterLock(\''+lockId+'\',\''+(d.zone||'')+'\')">➕ เพิ่มผู้ค้าประจำ</button>';
   if(isOccupied){
+    acts+='<div style="flex-basis:100%;font-size:.58rem;font-weight:900;color:var(--txl);border-bottom:1px solid var(--bd);padding:3px 0">จัดการผู้ค้าและสัญญา</div>';
     acts+='<button class="pp-btn" style="background:var(--gll);color:var(--gm);flex-basis:100%" onclick="openEditVendorModal(\''+lockId+'\')">✏️ แก้ไขข้อมูลผู้ค้า</button>';
     // PM_MOVE_BTNS (v2.5): แยกเป็นสองปุ่ม — "ย้ายล็อคจร" แสดงเฉพาะล็อคที่ขายล็อคจรไปแล้ว
     // ตามที่ผู้ดูแลตลาดสั่ง ส่วนล็อคที่มีทั้งผู้ค้าประจำและขายจรทับ จะเห็นทั้งสองปุ่มแยกกันชัดเจน
@@ -1431,6 +1435,7 @@ function showPopup(el,ev){
   }
   const actEl=document.getElementById('ppActions');
   actEl.innerHTML=acts||'<span style="font-size:.62rem;color:var(--txl)">ล็อคนี้ไม่มีผู้เช่า</span>';
+  loadPopupFinance(lockId,isOccupied);
 
   // POSITION
   const er=el.getBoundingClientRect(), ar=mapArea.getBoundingClientRect();
@@ -1445,6 +1450,17 @@ function showPopup(el,ev){
   popWrap.style.left=left+'px'; popWrap.style.top=top+'px';
   popWrap.classList.add('show');
 }
+async function loadPopupFinance(lockId,isOccupied){
+  const box=document.getElementById('ppFinance');if(!box)return;if(!isOccupied){box.style.display='none';box.innerHTML='';return}
+  box.style.display='block';box.innerHTML='<div class="pp-fin-title">การเงิน</div>กำลังโหลดยอดค้าง…';
+  const rent=parseFloat(document.querySelector('.lk[data-id="'+lockId+'"]')?.dataset.rent)||0;const n=new Date(),month=n.getFullYear()+'-'+String(n.getMonth()+1).padStart(2,'0')+'-01';
+  await apiPost('ensureVendorCharges',{data:{rows:[{lock_id:lockId,billing_month:month,type:'ยอดเรียกเก็บประจำเดือน',description:'ยอดรวมประจำเดือน',amount:rent}]}});
+  const accounts=await apiGet('getVendorAccounts',{lockId}),a=Array.isArray(accounts)?accounts.find(x=>!x.ended_at):null;if(!a){box.innerHTML='<div class="pp-fin-title">การเงิน</div><span style="color:var(--r)">โหลดบัญชีผู้ค้าไม่สำเร็จ</span>';return}
+  const due=parseFloat(a.outstanding)||0,hist=await apiGet('getVendorPaymentHistory',{leaseId:a.lease_id}),latest=(Array.isArray(hist)?hist:[]).slice(0,5);
+  box.innerHTML='<div class="pp-fin-title">การเงิน · ยอดค้าง <strong style="color:var(--r)">'+fmt(due)+'</strong></div>'+(due>0?'<div class="pp-fin-row"><input id="ppPayAmt" type="number" min="1" max="'+due+'" value="'+due+'"><select id="ppPayMethod"><option>เงินสด</option><option>โอนเงิน</option></select><button onclick="receivePopupPayment(\''+lockId+'\','+a.lease_id+','+due+')">รับชำระ</button></div>':'<div style="color:var(--gm);font-weight:800">✓ ไม่มียอดค้าง</div>')+'<div class="pp-fin-hist"><b>5 รายการล่าสุด</b>'+(latest.length?latest.map(x=>'<span>'+x.date+' · '+x.method+' · '+fmt(x.amount)+'</span>').join(''):'<span>ยังไม่มีประวัติรับชำระ</span>')+'<a href="#" onclick="openPaymentHistory(\''+lockId+'\','+a.lease_id+');return false">ดูประวัติการชำระทั้งหมด</a></div>';
+}
+async function receivePopupPayment(lockId,leaseId,due){const amount=parseFloat(document.getElementById('ppPayAmt')?.value)||0,method=document.getElementById('ppPayMethod')?.value||'';if(amount<=0||amount>due){toast('จำนวนเงินต้องไม่เกินยอดค้าง','e');return}const res=await apiPost('recordVendorPayment',{data:{lock_id:lockId,amount,method,date:nowTH(),time:nowTime(),note:'รับชำระจากป๊อปอัพผังตลาด · ผู้รับ: '+getCurrentUserName()}});if(!res||res.status!=='ok'){toast(res?.message||'รับชำระไม่สำเร็จ','e');return}toast('รับชำระ '+fmt(amount)+' สำเร็จ','s');await syncRealVendors();await loadPopupFinance(lockId,true)}
+function openPaymentHistory(lockId,leaseId){if(window.parent&&window.parent!==window&&typeof window.parent.openPaymentHistoryForLock==='function')window.parent.openPaymentHistoryForLock(lockId,leaseId);else window.open('pamai_thu_report_10.html?lock='+encodeURIComponent(lockId)+'&lease='+encodeURIComponent(leaseId),'_blank')}
 function closePopup(){if(popWrap)popWrap.classList.remove('show');curLk=null;}
 // click listener moved to initPopup()
 
@@ -1939,8 +1955,7 @@ function pmHasBackend(){
   return pmBackendMode()!=='sheets' ? true : !!getApiUrl();
 }
 /** ดึง getVendors พร้อม timeout + retry — คืน array ถ้าสำเร็จ, null ถ้าไม่สำเร็จ
-    โหมด Supabase เรียก PM_API โดยตรง: ผังเป็น iframe และ apiGet ของหน้าเดิมอาจยังชี้
-    ไปที่ Apps Script/คืน null ได้ แม้หน้าแม่ดึง Supabase สำเร็จแล้ว */
+    โหมด Supabase เรียก PM_API โดยตรง เพราะผังอยู่ใน iframe และ apiGet เดิมอาจคืน null */
 async function pmFetchVendors(){
   const viaApi = pmBackendMode()!=='sheets';
   if(!viaApi && !getApiUrl()) return null;
@@ -2007,6 +2022,7 @@ function toast(msg,type){
 window.onload=function(){buildAll();setTimeout(checkThursdayCycle,400);};
 
 </script>
+
 
 
 

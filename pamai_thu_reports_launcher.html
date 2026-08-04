@@ -270,7 +270,7 @@ input, select, textarea, button { font-family: inherit; max-width: 100%; }
 <div class="header">
   <div>
     <h1><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><line x1="6" y1="20" x2="6" y2="12"/><line x1="12" y1="20" x2="12" y2="6"/><line x1="18" y1="20" x2="18" y2="15"/></svg> รายงาน — แพไม้มินิ</h1>
-    <p>เปิดดูรายงานได้ทันทีในแอป · ข้อมูลสดจาก Google Sheets</p>
+    <p>เปิดดูรายงานได้ทันทีในแอป · ข้อมูลสดจากฐานข้อมูล</p>
   </div>
   <div style="display:flex;align-items:center;gap:10px">
     <div class="db-status" id="dbStatus" onclick="goSetupSheets()"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="4" width="16" height="18" rx="2"/><path d="M9 3h6a1 1 0 0 1 1 1v1H8V4a1 1 0 0 1 1-1Z"/></svg> ตรวจสอบสถานะ...</div>
@@ -282,7 +282,7 @@ input, select, textarea, button { font-family: inherit; max-width: 100%; }
 
   <div class="notice" id="apiNotice" style="display:none">
     <strong><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 18h6"/><path d="M10 22h4"/><path d="M12 2a7 7 0 0 0-4 12.7c.5.4.8 1 .8 1.6V17h6.4v-.7c0-.6.3-1.2.8-1.6A7 7 0 0 0 12 2Z"/></svg> วิธีใช้:</strong> รายงานทุกฉบับ <strong>เปิดดูได้ทันทีในแอป</strong> ไม่ต้องดาวน์โหลดก่อน ·
-    ข้อมูลดึงจาก Google Sheets แบบสด ทุกคนเห็นข้อมูลตรงกัน ·
+    ข้อมูลดึงจากฐานข้อมูลแบบสด ทุกคนเห็นข้อมูลตรงกัน ·
     หากต้องการเก็บไฟล์ ให้กดปุ่ม "<svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>️ พิมพ์ / บันทึกเป็น PDF" ในหน้ารายงานนั้นๆ
   </div>
 
@@ -459,7 +459,7 @@ input, select, textarea, button { font-family: inherit; max-width: 100%; }
         <div class="card-meta">
           <div class="card-num">รายงาน 08</div>
           <div class="card-title">รายงานส่วนลดค่าเช่า</div>
-          <div class="card-desc">สรุปส่วนลดค่าเช่าผู้ค้าประจำ — ดูแยกรายเดือน รายล็อค รายโซน และทั้งตลาด พร้อมระบุที่มาของส่วนลดและล็อคที่อยู่ระหว่างผ่อนชำระ</div>
+          <div class="card-desc">สรุปส่วนลดค่าเช่าผู้ค้าประจำ — ดูแยกรายเดือน รายล็อค รายโซน และทั้งตลาด พร้อมระบุที่มาของส่วนลด</div>
         </div>
       </div>
       <div class="card-tags">
@@ -468,15 +468,23 @@ input, select, textarea, button { font-family: inherit; max-width: 100%; }
         <span class="tag" style="background:var(--bl);color:var(--b)"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="5" width="17" height="16" rx="2"/><path d="M3.5 9.5h17M8 3v4M16 3v4"/></svg> รายเดือน</span>
       </div>
       <div class="card-footer">
-        <span class="card-info">ข้อมูลจริงจาก Google Sheets</span><!-- PM_LAUNCHER_0708_UPDATED -->
+        <span class="card-info">ข้อมูลจริงจากฐานข้อมูล</span><!-- PM_LAUNCHER_0708_UPDATED -->
         <span class="btn-open"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M7 3h7l4 4v14a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1z"/><path d="M14 3v4h4M9 12h6M9 16h6"/></svg> เปิดดูรายงาน</span>
       </div>
+    </div>
+
+    <!-- 10 -->
+    <div class="report-card" onclick="openReport('pamai_thu_report_10.html')">
+      <div class="card-header"><div class="card-icon" style="background:var(--gl)">🧾</div><div class="card-meta">
+        <div class="card-num">รายงาน 10</div><div class="card-title">ประวัติรับชำระผู้ค้าประจำแยกล็อค</div>
+        <div class="card-desc">กรองตามล็อค รอบการเช่า ชื่อผู้ค้าและช่วงวันที่ พร้อมยอดค้างปัจจุบัน</div>
+      </div></div><div class="card-footer"><span class="card-info">แสดงชื่อผู้ค้า ณ ขณะรับเงิน</span><span class="btn-open">เปิดดูรายงาน</span></div>
     </div>
 
   </div>
 
   <div class="footer-note">
-    ระบบบริหารจัดการแพไม้มินิ v2.0 · รายงานทั้งหมดอ่านสดจาก Google Sheets · ติดต่อผู้ดูแลระบบ 082-581-1144
+    ระบบบริหารจัดการแพไม้มินิ v2.8 · รายงานทั้งหมดอ่านสดจากฐานข้อมูล · ติดต่อผู้ดูแลระบบ 082-581-1144
   </div>
 </div>
 

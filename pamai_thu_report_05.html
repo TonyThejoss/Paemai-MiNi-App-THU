@@ -63,6 +63,8 @@ tbody tr:nth-child(even) td{background:var(--sf2);}
 
 
 
+
+
 /* ==== PM_THEME_KIT:START (สร้างโดย tools/inject_theme_kit.py — ห้ามแก้ในไฟล์นี้) ==== */
 [data-theme="dark"]{--bg:#090f0b;--sf:#0f1a13;--sf2:#141f17;--bd:#243028;--bd2:#534230;--tx:#eadad0;--txm:#b59a80;--txl:#b4997e;--gl:#2d1200;--gll:#1a0f06;--rl:#1f0a0a;--ol:#1a0f06;--bl:#091228;--yl:#120f06;}
 /* กระดาษรายงาน: เดิม background:#fff ตายตัว ทำให้โหมดมืดยังเป็นแผ่นขาวจ้ากลางจอดำ */
@@ -754,6 +756,7 @@ async function apiGet(action,params={}){
 const todayISO = new Date().toISOString().split('T')[0];
 // #dateInput เดิมถูกแทนด้วยแถบตัวกรองกลางแล้ว (PM_FILTER) — คง guard ไว้กันกรณีมีไฟล์เก่าค้าง
 if (document.getElementById('dateInput')) // #dateInput เดิมถูกแทนด้วยแถบตัวกรองกลางแล้ว (PM_FILTER) — คง guard ไว้กันกรณีมีไฟล์เก่าค้าง
+if (document.getElementById('dateInput')) // #dateInput เดิมถูกแทนด้วยแถบตัวกรองกลางแล้ว (PM_FILTER) — คง guard ไว้กันกรณีมีไฟล์เก่าค้าง
 if (document.getElementById('dateInput')) document.getElementById('dateInput').value = todayISO;
 
 const STATUS_LABEL = { leave:'<svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="4" width="16" height="18" rx="2"/><path d="M9 3h6a1 1 0 0 1 1 1v1H8V4a1 1 0 0 1 1-1Z"/></svg> แจ้งลา', absent:'<svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0Z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg> ขาดล็อค (ไม่แจ้ง)', cancel:'<svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><polyline points="9 14 4 9 9 4"/><path d="M20 20v-7a4 4 0 0 0-4-4H4"/></svg> ยกเลิกสถานะ' };
@@ -823,33 +826,35 @@ render();
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 <!-- ==== PM_THEME_JS:START (สร้างโดย tools/inject_theme_kit.py) ==== -->
 <script>
 function toggleDark(){const h=document.documentElement,d=h.getAttribute('data-theme')==='dark';h.setAttribute('data-theme',d?'light':'dark');localStorage.setItem('pmthu-t',d?'light':'dark');}
 (()=>{const s=localStorage.getItem('pmthu-t');if(s)document.documentElement.setAttribute('data-theme',s);else if(window.matchMedia('(prefers-color-scheme:dark)').matches)document.documentElement.setAttribute('data-theme','dark');})();
 </script>
 <!-- ==== PM_THEME_JS:END ==== -->
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 <script id="pm-api-shim">
 /* apiGet/apiPost เวอร์ชันที่รองรับสามโหมด — เก็บของเดิมไว้เป็น __pmSheets* เพื่อใช้เทียบผล

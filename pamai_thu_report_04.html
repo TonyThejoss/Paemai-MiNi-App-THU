@@ -63,6 +63,8 @@ tfoot.zone-total td{font-weight:800;background:var(--rl);border-top:2px solid va
 
 
 
+
+
 /* ==== PM_THEME_KIT:START (สร้างโดย tools/inject_theme_kit.py — ห้ามแก้ในไฟล์นี้) ==== */
 [data-theme="dark"]{--bg:#090f0b;--sf:#0f1a13;--sf2:#141f17;--bd:#243028;--bd2:#534230;--tx:#eadad0;--txm:#b59a80;--txl:#b4997e;--gl:#2d1200;--gll:#1a0f06;--rl:#1f0a0a;--ol:#1a0f06;--bl:#091228;--yl:#120f06;}
 /* กระดาษรายงาน: เดิม background:#fff ตายตัว ทำให้โหมดมืดยังเป็นแผ่นขาวจ้ากลางจอดำ */
@@ -779,16 +781,18 @@ async function render(){
   }
 
   // กรองตามโซนที่เลือกในแถบตัวกรองกลาง (ว่าง = ทุกโซน) — เพิ่ม 2026-07-26 /* PM_ZONE_WIRED */
-  const vendors = PM_FILTER.byZone(await apiGet('getVendors') || [], 'zone');
-  const unpaid = vendors.filter(v=>v.status==='unpaid');
+  const [vendorRows,accountRows]=await Promise.all([apiGet('getVendors'),apiGet('getVendorAccounts')]);
+  const vendors = PM_FILTER.byZone(Array.isArray(vendorRows)?vendorRows:[], 'zone');
+  const accountByLock=new Map((Array.isArray(accountRows)?accountRows:[]).map(a=>[a.lock_id,a]));
+  const unpaid = vendors.filter(v=>(parseFloat(accountByLock.get(v.lock)?.outstanding)||0)>0);
   const tuesdays = thisMonthThursdays();
 
   // คำนวณยอดค้างแต่ละล็อค: ค่าเช่ารายเดือน + ค่าไฟ + ค่าปรับค้างจ่าย + ค่าอื่นค้างจ่าย
   const withDebt = unpaid.map(v=>{
-    const rent = monthlyRent(v);
-    const elec = calcElec(v);
-    const penalty = parseFloat(v.unpaid_penalty)||0;
-    const other = parseFloat(v.unpaid_other)||0;
+    const rent = parseFloat(accountByLock.get(v.lock)?.outstanding)||0;
+    const elec = 0;
+    const penalty = 0;
+    const other = 0;
     const otherLabel = v.unpaid_other_label||'';
     const total = rent + elec + penalty + other;
     return {...v, rent, elec, penalty, other, otherLabel, total};
@@ -879,33 +883,35 @@ render();
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 <!-- ==== PM_THEME_JS:START (สร้างโดย tools/inject_theme_kit.py) ==== -->
 <script>
 function toggleDark(){const h=document.documentElement,d=h.getAttribute('data-theme')==='dark';h.setAttribute('data-theme',d?'light':'dark');localStorage.setItem('pmthu-t',d?'light':'dark');}
 (()=>{const s=localStorage.getItem('pmthu-t');if(s)document.documentElement.setAttribute('data-theme',s);else if(window.matchMedia('(prefers-color-scheme:dark)').matches)document.documentElement.setAttribute('data-theme','dark');})();
 </script>
 <!-- ==== PM_THEME_JS:END ==== -->
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 <script id="pm-api-shim">
 /* apiGet/apiPost เวอร์ชันที่รองรับสามโหมด — เก็บของเดิมไว้เป็น __pmSheets* เพื่อใช้เทียบผล

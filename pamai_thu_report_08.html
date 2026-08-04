@@ -658,7 +658,7 @@ window.PM_FILTER = (function () {
 <div class="toolbar">
   <div>
     <h1><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M20.6 3.4A2 2 0 0 0 19.2 3H15l-9.6 9.6a2 2 0 0 0 0 2.8l5.2 5.2a2 2 0 0 0 2.8 0L23 11V6.8a2 2 0 0 0-.6-1.4Z"/><circle cx="17.5" cy="8.5" r="1.3" fill="currentColor" stroke="none"/></svg> รายงานส่วนลดค่าเช่า</h1>
-    <p>แพไม้มินิ วันพฤหัสบดี · แยกรายเดือน / รายล็อค / รายโซน / ทั้งตลาด · ข้อมูลสดจาก Google Sheets</p>
+    <p>แพไม้มินิ วันพฤหัสบดี · แยกรายเดือน / รายล็อค / รายโซน / ทั้งตลาด · ข้อมูลสดจากฐานข้อมูล</p>
   </div>
   <div class="tb-actions">
     <button class="tb-btn refresh" onclick="render()"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 12a9 9 0 0 1-15.3 6.4L3 16"/><path d="M3 12a9 9 0 0 1 15.3-6.4L21 8"/><polyline points="3 20 3 16 7 16"/><polyline points="21 4 21 8 17 8"/></svg> รีเฟรช</button>
@@ -680,7 +680,7 @@ window.PM_FILTER = (function () {
   </div>
 
   <div id="dataWarn"></div>
-  <div id="reportBody" class="loading">⏳ กำลังโหลดข้อมูลจาก Google Sheets...</div>
+  <div id="reportBody" class="loading">⏳ กำลังโหลดข้อมูลจากฐานข้อมูล...</div>
 
   <div class="sign-area">
     <div class="sign-box"><div class="sign-line"></div>ผู้จัดทำ</div>
@@ -751,33 +751,29 @@ function marketDaysOfKey(key){
 // RENDER
 // ตรรกะส่วนลดต้องตรงกับที่หน้ารับชำระใช้คิดเงินเป๊ะ (ดู PM_DISCOUNT ใน pamai_thu_batch_payment)
 //   · ส่วนลดรายล็อคชนะส่วนลดทั้งตลาดเสมอ
-//   · ล็อคที่อยู่ระหว่างผ่อนชำระ ได้ส่วนลดทั้งตลาดเฉพาะเมื่อรายการนั้นติ๊ก "ให้ล็อคที่ผ่อนชำระด้วย"
 //   · ส่วนลดไม่เกินค่าเช่าจริงของเดือนนั้น (กันยอดสุทธิติดลบ)
 // ══════════════════════════════════════════════════════════════════════════
 async function render(){
   document.getElementById('r-date').textContent = nowTH();
   document.getElementById('r-stamp').textContent = nowTH()+' '+new Date().toLocaleTimeString('th-TH',{hour:'2-digit',minute:'2-digit'});
-  document.getElementById('reportBody').innerHTML = '<div class="loading">⏳ กำลังโหลดข้อมูลจาก Google Sheets...</div>';
+  document.getElementById('reportBody').innerHTML = '<div class="loading">⏳ กำลังโหลดข้อมูลจากฐานข้อมูล...</div>';
   document.getElementById('dataWarn').innerHTML = '';
 
   if(!getApiUrl()){
     document.getElementById('dataWarn').innerHTML =
-      '<div class="warn"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0Z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg> ยังไม่ได้เชื่อมต่อ Google Sheets — กรุณาตั้งค่าที่หน้าหลักของระบบก่อน</div>';
+      '<div class="warn"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0-1.71-3L13.71 3.86a2 2 0 0 0-3.42 0Z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg> ยังไม่ได้เชื่อมต่อฐานข้อมูล — กรุณาตั้งค่าที่หน้าหลักของระบบก่อน</div>';
     document.getElementById('reportBody').innerHTML='';
     return;
   }
 
   const monthKey = PM_FILTER.monthKey();
-  const [allDisc, vendorsRaw, plans] = await Promise.all([
+  const [allDisc, vendorsRaw] = await Promise.all([
     apiGet('getDiscounts'),
     apiGet('getVendors'),
-    apiGet('getInstallmentPlans'),
   ]);
   const discounts = Array.isArray(allDisc)?allDisc:[];
   const vendors = PM_FILTER.byZone((Array.isArray(vendorsRaw)?vendorsRaw:[])
     .filter(v=>v.status==='active'||v.status==='unpaid'), 'zone');
-  const installLocks = new Set((Array.isArray(plans)?plans:[])
-    .filter(p=>String(p.status||'active')==='active').map(p=>p.lock_id));
 
   if(!discounts.length){
     document.getElementById('dataWarn').innerHTML =
@@ -795,7 +791,6 @@ async function render(){
     if(perLock) return {amount:perLock.amount, src:'รายล็อค', note:perLock.note};
     const mk=discounts.find(d=>d.month===month&&d.scope==='market');
     if(!mk) return {amount:0, src:'—', note:''};
-    if(installLocks.has(lock) && !mk.apply_installment) return {amount:0, src:'ทั้งตลาด (ยกเว้นล็อคผ่อนชำระ)', note:mk.note};
     return {amount:mk.amount, src:'ทั้งตลาด', note:mk.note};
   }
 
@@ -826,7 +821,7 @@ async function render(){
   <div class="r-title">สรุปส่วนลดรายเดือน <span style="font-size:.66rem;font-weight:600;color:var(--txl)">${esc(PM_FILTER.label())}</span></div>
   <table>
     <thead><tr><th>เดือน</th><th style="text-align:center">วันตลาด</th><th>ส่วนลดทั้งตลาด</th>
-      <th style="text-align:center">ล็อคผ่อนชำระได้ด้วย</th><th style="text-align:center">ส่วนลดรายล็อค</th>
+      <th style="text-align:center">ส่วนลดทั้งตลาด</th><th style="text-align:center">ส่วนลดรายล็อค</th>
       <th style="text-align:center">ล็อคที่ได้ส่วนลด</th><th style="text-align:right">ส่วนลดรวม (฿)</th></tr></thead>
     <tbody>`;
   monthRows.forEach(r=>{
@@ -835,7 +830,7 @@ async function render(){
       <td><strong>${monthLabel(r.mk)}</strong></td>
       <td style="text-align:center">${r.days}</td>
       <td>${r.mkRow?baht(r.mkRow.amount)+'/ล็อค':'—'}</td>
-      <td style="text-align:center">${r.mkRow?(r.mkRow.apply_installment?'ได้':'ไม่ได้'):'—'}</td>
+      <td style="text-align:center">${r.mkRow?'ใช้กับผู้ค้าทุกราย':'—'}</td>
       <td style="text-align:center">${r.lockRows.length||'—'}</td>
       <td style="text-align:center">${r.nLock}</td>
       <td style="text-align:right;font-weight:800;color:var(--r)">${baht(r.total)}</td>
@@ -850,7 +845,7 @@ async function render(){
     const eff=effectiveFor(v.lock, monthKey);
     const amt=Math.min(eff.amount, rent);
     return {lock:v.lock, zone:v.zone, name:v.name||v.product||'(ยังไม่ระบุ)', rent, amt,
-            src:eff.src, note:eff.note, install:installLocks.has(v.lock)};
+            src:eff.src, note:eff.note};
   }).filter(r=>r.amt>0);
 
   html+=`<div class="r-title">รายละเอียดรายล็อค — ${monthLabel(monthKey)}</div>`;
@@ -876,7 +871,7 @@ async function render(){
           <tbody>`;
       list.forEach((r,i)=>{
         html+=`<tr>
-          <td>${i+1}</td><td><strong>${esc(r.lock)}</strong>${r.install?' <span style="font-size:.58rem;color:var(--o)">(ผ่อนชำระ)</span>':''}</td>
+          <td>${i+1}</td><td><strong>${esc(r.lock)}</strong></td>
           <td>${esc(r.name)}</td>
           <td style="text-align:right">${baht(r.rent)}</td>
           <td style="text-align:right;font-weight:800;color:var(--r)">-${baht(r.amt)}</td>
@@ -906,6 +901,7 @@ async function render(){
 PM_FILTER.mount({ date: true, zone: true, onChange: render });  // PM_WIRED_MOUNT
 render();
 </script>
+
 
 
 

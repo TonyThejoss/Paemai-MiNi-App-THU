@@ -723,7 +723,6 @@ input, select, textarea, button { font-family: inherit; max-width: 100%; }
     <div class="sb-sec">
       <div class="sb-lbl">การเงิน</div>
       <button class="ni" id="ni-payment" onclick="goTab('payment')"><span class="ico"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M9.5 9.5c0-1.1 1.1-2 2.5-2s2.5.9 2.5 2-1.1 1.6-2.5 2-2.5.9-2.5 2 1.1 2 2.5 2 2.5-.9 2.5-2"/></svg></span>รับชำระหลายล็อค</button>
-      <button class="ni" id="ni-install" onclick="goTab('install')"><span class="ico"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="4" width="16" height="18" rx="2"/><path d="M9 3h6a1 1 0 0 1 1 1v1H8V4a1 1 0 0 1 1-1Z"/></svg></span>ผ่อนชำระ</button>
       <button class="ni" id="ni-electric" onclick="goTab('electric')"><span class="ico"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><polygon points="13 2 3 14 11 14 10 22 21 10 13 10 13 2"/></svg></span>ค่าไฟฟ้า</button>
     </div>
     <div class="sb-div"></div>
@@ -803,7 +802,6 @@ input, select, textarea, button { font-family: inherit; max-width: 100%; }
             <div class="mgrid">
               <div class="mc" onclick="goTab('map')"><div class="mc-i"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><polygon points="3 6 9 3 15 6 21 3 21 18 15 21 9 18 3 21"/><line x1="9" y1="3" x2="9" y2="18"/><line x1="15" y1="6" x2="15" y2="21"/></svg>️</div><div class="mc-n">ผังตลาด</div><div class="mc-d">ดูตำแหน่งล็อค</div></div>
               <div class="mc" onclick="goTab('payment')"><div class="mc-i"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M9.5 9.5c0-1.1 1.1-2 2.5-2s2.5.9 2.5 2-1.1 1.6-2.5 2-2.5.9-2.5 2 1.1 2 2.5 2 2.5-.9 2.5-2"/></svg></div><div class="mc-n">รับชำระ</div><div class="mc-d">บันทึกชำระ + ค่าปรับ</div></div>
-              <div class="mc" onclick="goTab('install')"><div class="mc-i"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="4" width="16" height="18" rx="2"/><path d="M9 3h6a1 1 0 0 1 1 1v1H8V4a1 1 0 0 1 1-1Z"/></svg></div><div class="mc-n">ผ่อนชำระ</div><div class="mc-d">ติดตามการผ่อนชำระ</div></div>
               <div class="mc" onclick="goTab('electric')"><div class="mc-i"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><polygon points="13 2 3 14 11 14 10 22 21 10 13 10 13 2"/></svg></div><div class="mc-n">ค่าไฟฟ้า</div><div class="mc-d">บันทึกอุปกรณ์</div></div>
               <div class="mc" onclick="goTab('register')"><div class="mc-i">🆕</div><div class="mc-n">ผู้ค้าใหม่</div><div class="mc-d">รับค่าแรกเข้า + รายปี</div></div>
               <div class="mc" onclick="goTab('leavehist')"><div class="mc-i"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="4" width="16" height="18" rx="2"/><path d="M9 3h6a1 1 0 0 1 1 1v1H8V4a1 1 0 0 1 1-1Z"/></svg></div><div class="mc-n">ประวัติแจ้งลา/ขาด/ยกเลิก</div><div class="mc-d">ดูย้อนหลังรายล็อค</div></div>
@@ -954,7 +952,6 @@ input, select, textarea, button { font-family: inherit; max-width: 100%; }
     <!-- MODULE PANES (iframe with fallback) -->
     <div id="map"      class="pane" data-src="pamai_thu_market_map.html"><div class="module-loading">⏳ กำลังโหลด ผังตลาด...</div></div>
     <div id="payment"  class="pane" data-src="pamai_thu_batch_payment.html"><div class="module-loading">⏳ กำลังโหลด รับชำระ...</div></div>
-    <div id="install"  class="pane" data-src="pamai_thu_installment.html"><div class="module-loading">⏳ กำลังโหลด ผ่อนชำระ...</div></div>
     <div id="electric" class="pane" data-src="pamai_thu_electric_system.html"><div class="module-loading">⏳ กำลังโหลด ค่าไฟฟ้า...</div></div>
     <div id="register" class="pane" data-src="pamai_thu_vendor_registration.html"><div class="module-loading">⏳ กำลังโหลด ผู้ค้าใหม่...</div></div>
     <div id="leavehist" class="pane" data-src="pamai_thu_leave_history.html"><div class="module-loading">⏳ กำลังโหลด ประวัติแจ้งลา/ขาด/ยกเลิก...</div></div>
@@ -1005,7 +1002,7 @@ function toggleDark(){
   else if(window.matchMedia('(prefers-color-scheme:dark)').matches) document.documentElement.setAttribute('data-theme','dark');
 })();
 
-const APP_BUILD='20260803-2328'; // cache-buster — build.py แทนค่าอัตโนมัติ
+const APP_BUILD='20260804-2242'; // cache-buster — build.py แทนค่าอัตโนมัติ
 const DAYS=['อาทิตย์','จันทร์','อังคาร','พุธ','พฤหัสบดี','ศุกร์','เสาร์'];
 const MONS=['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
 const PM_CLOCK_KEY='pm-system-clock';
@@ -1067,7 +1064,7 @@ function goTab(id){
   if(window.innerWidth<=768) closeSidebar();
   // Log
   const names={dash:'หน้าหลัก',map:'ผังตลาด',payment:'รับชำระ',
-               install:'ผ่อนชำระ',electric:'ค่าไฟฟ้า',register:'ผู้ค้าใหม่',
+               electric:'ค่าไฟฟ้า',register:'ผู้ค้าใหม่',
                leavehist:'ประวัติแจ้งลา/ขาด/ยกเลิก',
                floatingqueue:'คิวจองล็อคจร',rules:'กฎระเบียบตลาด',
                reports:'รายงาน',actlog:'บันทึกกิจกรรม',vdb:'ทะเบียนผู้ค้า',
@@ -1192,7 +1189,7 @@ function applyRole(role){
       });
     },500);
     // Disable sidebar buttons that viewer can't access
-    ['ni-map','ni-payment','ni-install','ni-electric','ni-register','ni-leavehist'].forEach(id=>{
+    ['ni-map','ni-payment','ni-electric','ni-register','ni-leavehist'].forEach(id=>{
       const el=document.getElementById(id);
       if(el){el.style.opacity='.4';el.style.cursor='not-allowed';el.onclick=function(){showToast('<svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><line x1="5" y1="12" x2="19" y2="12"/></svg> ไม่มีสิทธิ์เข้าถึง','e');};}
     });
@@ -1213,7 +1210,7 @@ function doLogoutConfirmed(){
   document.getElementById('readonly-banner').style.display='none';
   // re-enable buttons
   document.querySelectorAll('.btn-p,.btn-d,.btn-icon').forEach(b=>{b.disabled=false;b.style.opacity='';b.style.cursor='';});
-  ['ni-map','ni-payment','ni-install','ni-electric','ni-register','ni-leavehist'].forEach(id=>{
+  ['ni-map','ni-payment','ni-electric','ni-register','ni-leavehist'].forEach(id=>{
     const el=document.getElementById(id);
     if(el){el.style.opacity='';el.style.cursor='';}
   });
@@ -1544,7 +1541,7 @@ function renderVDB(){
       <td>${sBadge[v.status]||''}</td>
       <td style="text-align:center;white-space:nowrap">
         <button class="btn-icon" onclick="editVendor('${v.lock}')">✏️</button>
-        ${v.status==='unpaid'?'<button class="btn-icon" style="color:var(--o);border-color:var(--o);margin-left:2px" onclick="goTab(\'install\')">📋</button>':''}
+        ${v.status==='unpaid'?'<button class="btn-icon" title="ไปหน้ารับชำระ" style="color:var(--o);border-color:var(--o);margin-left:2px" onclick="goTab(\'payment\')">🧾</button>':''}
         <button class="btn-icon del" style="margin-left:2px" onclick="confirmDelete('${v.lock}')">🗑️</button>
       </td>
     </tr>`;
@@ -1590,7 +1587,7 @@ async function loadDashboardRevenue(){
   const sumBy = (list, pred) => list.filter(pred).reduce((s,p)=>s+(parseFloat(p.amount)||0),0);
   const isThisMonth = p => (p.date||'').includes(curMonthTH);
   const monthRecs = payments.filter(isThisMonth);
-  const rent  = sumBy(monthRecs, p=>p.type==='ค่าเช่าประจำเดือน');
+  const rent  = sumBy(monthRecs, p=>p.type==='ค่าเช่าประจำเดือน'||p.type==='รับชำระผู้ค้าประจำ');
   const elec  = sumBy(monthRecs, p=>p.type==='ค่าไฟฟ้า');
   const daily = sumBy(monthRecs, p=>(p.type||'').includes('จร'));
   const entry = sumBy(monthRecs, p=>p.type==='ค่าแรกเข้า'||p.type==='ค่าธรรมเนียมรายปี');
@@ -1619,7 +1616,7 @@ async function confirmDelete(lock){
   const idx=VENDORS.findIndex(v=>v.lock===lock);
   if(idx>=0){
     if(getApiUrl()){
-      const res=await apiPost('deleteVendor',{lockId:lock});
+      const res=await apiPost('closeVendorLease',{data:{lock_id:lock}});
       if(!res||res.status!=='ok'){showToast('⛔ ยกเลิกการเช่าไม่สำเร็จ — '+(res&&res.message?res.message:'กรุณาลองใหม่'),'e');return;}
     }
     VENDORS.splice(idx,1);renderVDB();showToast('🗑️ ลบล็อค '+lock+' แล้ว','i');logAct('vendor','ลบผู้ค้า ล็อค '+lock);
@@ -2072,6 +2069,11 @@ function openLeaveHistoryForLock(lockId) {
   }
 }
 
+function openPaymentHistoryForLock(lockId, leaseId) {
+  const q='?lock='+encodeURIComponent(lockId)+(leaseId?'&lease='+encodeURIComponent(leaseId):'');
+  window.open('pamai_thu_report_10.html'+q,'_blank','noopener');
+}
+
 // ════════════════════════════════════════════════════
 // MODULE LOADER — load sub-modules into panes
 // ════════════════════════════════════════════════════
@@ -2171,10 +2173,10 @@ function loadModule(id) {
 
 function showModuleFallback(pane, src, id) {
   const names = {
-    map:'ผังตลาด', payment:'รับชำระหลายล็อค', install:'ผ่อนชำระ',
+    map:'ผังตลาด', payment:'รับชำระหลายล็อค',
     electric:'ค่าไฟฟ้า', register:'ลงทะเบียนผู้ค้าใหม่', reports:'รายงาน PDF'
   };
-  const icons = {map:'<svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><polygon points="3 6 9 3 15 6 21 3 21 18 15 21 9 18 3 21"/><line x1="9" y1="3" x2="9" y2="18"/><line x1="15" y1="6" x2="15" y2="21"/></svg>',payment:'<svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M9.5 9.5c0-1.1 1.1-2 2.5-2s2.5.9 2.5 2-1.1 1.6-2.5 2-2.5.9-2.5 2 1.1 2 2.5 2 2.5-.9 2.5-2"/></svg>',install:'<svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="4" width="16" height="18" rx="2"/><path d="M9 3h6a1 1 0 0 1 1 1v1H8V4a1 1 0 0 1 1-1Z"/></svg>',electric:'<svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><polygon points="13 2 3 14 11 14 10 22 21 10 13 10 13 2"/></svg>',register:'🆕',reports:'<svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><line x1="6" y1="20" x2="6" y2="12"/><line x1="12" y1="20" x2="12" y2="6"/><line x1="18" y1="20" x2="18" y2="15"/></svg>'};
+  const icons = {map:'<svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><polygon points="3 6 9 3 15 6 21 3 21 18 15 21 9 18 3 21"/><line x1="9" y1="3" x2="9" y2="18"/><line x1="15" y1="6" x2="15" y2="21"/></svg>',payment:'<svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M9.5 9.5c0-1.1 1.1-2 2.5-2s2.5.9 2.5 2-1.1 1.6-2.5 2-2.5.9-2.5 2 1.1 2 2.5 2 2.5-.9 2.5-2"/></svg>',electric:'<svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><polygon points="13 2 3 14 11 14 10 22 21 10 13 10 13 2"/></svg>',register:'🆕',reports:'<svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><line x1="6" y1="20" x2="6" y2="12"/><line x1="12" y1="20" x2="12" y2="6"/><line x1="18" y1="20" x2="18" y2="15"/></svg>'};
   pane.innerHTML = `
     <div class="module-error">
       <div style="font-size:2.5rem">${icons[id]||'<svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><polyline points="14 2 14 8 20 8"/></svg>'}</div>
@@ -2197,6 +2199,7 @@ window.onload=function(){
   logAct('system','ระบบเริ่มทำงาน — แพไม้มินิ v1.0');
 };
 </script>
+
 
 
 

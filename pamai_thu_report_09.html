@@ -8,6 +8,196 @@
 :root{--g:#7c2d12;--gm:#c2410c;--gl:#ffedd5;--bg:#eef2f0;--sf:#fff;--bd:#d0ddd5;--tx:#0a1a10;--txl:#9c7c5b;--r:#b91c1c;}
 *{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--tx);font:14px system-ui,-apple-system,"Sarabun",sans-serif}.toolbar{position:sticky;top:0;z-index:2;background:linear-gradient(135deg,var(--g),var(--gm));color:#fff;padding:11px 18px;display:flex;justify-content:space-between;gap:10px;align-items:center;flex-wrap:wrap}.toolbar h1{font-size:1rem;margin:0}.toolbar p{margin:2px 0 0;font-size:.75rem;opacity:.82}.btn{border:1px solid rgba(255,255,255,.35);border-radius:8px;padding:8px 12px;color:#fff;background:rgba(255,255,255,.14);font:inherit;font-weight:700;cursor:pointer}.page{max-width:1240px;margin:18px auto;background:var(--sf);padding:24px;border-radius:12px;box-shadow:0 2px 14px #0001}.head{display:flex;justify-content:space-between;gap:12px;border-bottom:3px solid var(--gm);padding-bottom:12px}.brand{font-weight:900;color:var(--g);font-size:1.1rem}.meta{font-size:.75rem;color:var(--txl);text-align:right}.summary{display:grid;grid-template-columns:repeat(4,1fr);gap:9px;margin:16px 0}.stat{background:#f4f8f5;border:1px solid var(--bd);border-radius:8px;padding:10px;text-align:center}.stat b{display:block;color:var(--gm);font-size:1.2rem}.stat span{font-size:.72rem;color:var(--txl)}.tablewrap{overflow:auto}table{width:100%;border-collapse:collapse;min-width:900px}th{background:#e8f0eb;color:var(--g);font-size:.72rem;text-align:left;padding:8px;border-bottom:2px solid var(--gm)}td{padding:8px;border-bottom:1px solid var(--bd);vertical-align:top}tbody tr:nth-child(even){background:#f8faf9}.num{text-align:right;white-space:nowrap}.status{font-size:.72rem;font-weight:800;padding:3px 7px;border-radius:999px;background:var(--gl);color:var(--g)}.status.unpaid{background:#fff0d8;color:#8a3b00}.empty,.error{padding:30px;text-align:center;color:var(--txl)}.error{color:var(--r)}@media(max-width:700px){.page{margin:0;padding:15px;border-radius:0}.summary{grid-template-columns:repeat(2,1fr)}.head{display:block}.meta{text-align:left;margin-top:7px}}@media print{body{background:#fff}.toolbar{display:none}.page{box-shadow:none;margin:0;padding:0;max-width:none}.tablewrap{overflow:visible}@page{size:A4 landscape;margin:10mm}}
 </style>
+<!-- ==== PM_MOBILE_KIT:START (สร้างโดย tools/inject_mobile_kit.py — ห้ามแก้ในไฟล์นี้) ==== -->
+<style id="pm-mobile-kit">
+/* ═══════════════════════════════════════════════════════════════════════════
+   PM MOBILE KIT — Mobile-First / Responsive / Thai typography (2026-07-26)
+   เป้าหมาย: ทุกหน้าใช้งานได้เต็มจอบนสมาร์ทโฟนทุกขนาด ไม่มีเนื้อหาล้นขอบจอด้านข้าง
+   (no horizontal overflow), ตัวอักษรไทยตัดบรรทัดถูกต้อง, ปุ่มกดง่ายด้วยนิ้วโป้ง,
+   เว้นระยะขอบบน-ล่างไม่ให้ชิดจอ
+   หมายเหตุเชิงเทคนิค: ตั้งใจ "ไม่" ใส่ viewport-fit=cover เพราะถ้าไม่ใส่ เบราว์เซอร์จะกันพื้นที่
+   รอยบาก (notch) ให้อยู่แล้วโดยอัตโนมัติ การใส่ cover แล้วจัดการ env() เองมีความเสี่ยงที่เนื้อหา
+   จะไปอยู่ใต้รอยบากถ้าพลาดจุดใดจุดหนึ่ง — เราจึงใช้ env() เป็น "ระยะเสริม" (max()) เท่านั้น
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* ── 1) พื้นฐาน: กันล้นขอบจอ + ฟอนต์ไทย ── */
+html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
+*, *::before, *::after { min-width: 0; }               /* ตัวการอันดับ 1 ของ overflow ใน flex/grid */
+body {
+  overflow-x: hidden;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Sarabun",
+               "Noto Sans Thai", "Leelawadee UI", "Thonburi", system-ui,
+               "Helvetica Neue", Arial, sans-serif;
+  overflow-wrap: break-word;                           /* ตัดเฉพาะเมื่อคำเดียวยาวเกินกรอบ */
+  word-break: normal;                                  /* ห้าม break-all — ทำให้ไทยตัดกลางพยางค์ */
+  line-break: auto;
+}
+img, svg, canvas, video, table { max-width: 100%; }
+input, select, textarea, button { font-family: inherit; max-width: 100%; }
+
+/* ── 1.5) แถบที่ตั้งใจให้ "เลื่อนแนวนอน" ต้องเลื่อนจริง ห้ามบีบจนตัวอักษรทับกัน ──
+   ข้อ 1) ด้านบนตั้ง min-width:0 ให้ทุก element เพื่อกัน overflow ในแนวตั้ง/แนวกริด ซึ่งถูกต้อง
+   แต่มีผลข้างเคียงกับแถบแท็บ/แถบโซนที่เป็น flex + overflow-x:auto — ลูก ๆ ยอมหดต่ำกว่าความกว้าง
+   เนื้อหาของตัวเอง ผลคือแทนที่จะเลื่อนได้ กลับบีบซ้อนกันจนอ่านไม่ออก (พบที่แถบแท็บหน้าค่าไฟฟ้า
+   บนจอ 390px: "รายชื่อผู้ค้า + ค่าไฟ / แก้ไขค่าไฟรายล็อค / สรุปบิลประจำเดือน / ประวัติค่าไฟ" ทับกัน)
+   จึงยกเว้นเฉพาะลูกโดยตรงของแถบเหล่านี้ให้ไม่หด แล้วปล่อยให้ผู้ใช้ปัดนิ้วเลื่อนตามที่ออกแบบไว้ */
+.main-tabs, .tabs, .zone-bar, .outdoor-strip, .steps, .stepbar {
+  -webkit-overflow-scrolling: touch; overscroll-behavior-x: contain; scrollbar-width: none;
+}
+.main-tabs > *, .tabs > *, .zone-bar > *, .outdoor-strip > *, .steps > *, .stepbar > * {
+  flex-shrink: 0; min-width: max-content;
+}
+.main-tabs::-webkit-scrollbar, .tabs::-webkit-scrollbar, .zone-bar::-webkit-scrollbar,
+.outdoor-strip::-webkit-scrollbar, .steps::-webkit-scrollbar,
+.stepbar::-webkit-scrollbar { display: none; }
+/* .stepbar (แถบ 4 ขั้นตอนหน้าลงทะเบียนผู้ค้าใหม่) ไม่ได้ตั้ง overflow-x ไว้แต่แรก และลูกเป็น flex:1
+   บนจอ 390px จึงถูกบีบจนคำไทยตัดเป็นแนวตั้งทีละตัวอักษร ("ข-้-อ-ม-ู-ล-ผ-ู-้-ค-้-า") อ่านไม่ได้เลย
+   → ให้เลื่อนแนวนอนแทน และยกเลิก flex:1 เพื่อให้แต่ละขั้นตอนกว้างตามข้อความจริง */
+.stepbar { overflow-x: auto; }
+.stepbar > .step { flex: none !important; }
+
+/* ── 2) ตารางเลื่อนแนวนอนได้เอง (wrapper ถูกใส่ให้อัตโนมัติโดยสคริปต์ท้ายไฟล์) ── */
+.pm-tablewrap {
+  width: 100%; max-width: 100%; overflow-x: auto; overflow-y: hidden;
+  -webkit-overflow-scrolling: touch; overscroll-behavior-x: contain;
+}
+.pm-tablewrap > table { min-width: 100%; }
+
+/* ── 3) แท็บเล็ต ── */
+@media (max-width: 900px) {
+  .two-col { grid-template-columns: 1fr !important; }
+  .g2 { grid-template-columns: 1fr !important; }
+  .kgrid, .kpi-grid, .kpi-row, .mgrid, .summary-grid { grid-template-columns: repeat(3, 1fr) !important; }
+}
+
+/* ── 4) สมาร์ทโฟน ── */
+@media (max-width: 640px) {
+  body { padding-bottom: max(18px, env(safe-area-inset-bottom)); }
+
+  /* กริดสรุป/KPI → 2 คอลัมน์ อ่านง่ายกว่าบีบ 5 ช่องในจอ 360px */
+  .kgrid, .kpi-grid, .kpi-row, .mgrid, .summary-grid,
+  .elec-types, .grid { grid-template-columns: repeat(2, 1fr) !important; }
+  /* ฟอร์ม 2 ช่องต่อแถว → 1 ช่องต่อแถว */
+  .frow, .m-row, .field-row { grid-template-columns: 1fr !important; }
+
+  /* แถบหัวเรื่อง/เครื่องมือ: ให้ห่อบรรทัดได้ ไม่ดันจนล้นจอ */
+  .toolbar, .topbar, .tb-actions, .filter-row, .action-btns,
+  .modal-btns, .option-row, .date-filter, .items-title, .summary-title {
+    flex-wrap: wrap !important;
+  }
+  .toolbar, .topbar { padding-left: 12px !important; padding-right: 12px !important; row-gap: 8px; }
+  .toolbar { padding-top: max(10px, env(safe-area-inset-top)) !important; }
+  .topbar  { padding-top: max(10px, env(safe-area-inset-top)) !important; }
+
+  /* พื้นที่กดขั้นต่ำ 44px ตาม WCAG 2.5.5 / Apple HIG — ผู้จัดตลาดกดด้วยนิ้วโป้งกลางตลาด */
+  button, .btn, .tb-btn, a.btn, input[type=checkbox], input[type=radio] { min-height: 40px; }
+  /* ปุ่มไอคอนเล็ก ๆ ที่ฝังในช่องกรอก (เช่น ปุ่มดู/ซ่อนรหัสผ่าน) และลิงก์ในเมนู */
+  .pw-eye, .icon-btn, .btn-rm { min-width: 40px; min-height: 40px; }
+  .ni, .sidebar a, a.ni { min-height: 44px; }
+  input[type=checkbox], input[type=radio] { min-width: 22px; min-height: 22px; }
+  .btn-sm, .tb-btn { min-height: 38px; }
+  /* iOS ซูมเองถ้า font-size < 16px ในช่องกรอก — ล็อคไว้ที่ 16px กัน layout เพี้ยน */
+  input, select, textarea { font-size: 16px !important; }
+
+  /* หน้ารายงาน: ตัดกรอบกระดาษ A4 ออกบนมือถือให้ใช้ความกว้างเต็มจอ */
+  .page { margin: 10px auto !important; padding: 14px 12px !important; border-radius: 8px !important; }
+  .r-head { flex-direction: column; gap: 6px; }
+  .r-meta { text-align: left !important; }
+  .sign-area { flex-direction: column; gap: 18px; align-items: flex-start; }
+
+  /* หน้ารับชำระหลายล็อค (batch payment) — เดิมไม่มี @media เลย
+     .layout เป็น flex 2 คอลัมน์ + height:100vh + overflow:hidden ทำให้ฝั่งขวาหลุดออกนอกจอ
+     และเลื่อนดูไม่ได้บนมือถือ → เปลี่ยนเป็นเรียงลงล่างและให้หน้าเลื่อนตามปกติ
+
+     ⚠️ บทเรียนบั๊ก 2569-07-27 (จอดำบนมือถือ): กฎก้อนนี้เคยเขียนเป็น `.layout` เปล่า ๆ แล้วไป
+     ชนกับ `.layout` ของ shell ในหน้าแอพหลัก (ซึ่งต้องมีความสูงแน่นอน = 100vh − topbar
+     ไม่งั้น iframe ของทุกโมดูลจะยุบเหลือ 150px แล้วที่เหลือกลายเป็นพื้นหลังเปล่า)
+     กติกาใหม่: ห้ามใช้ชื่อคลาสกว้าง ๆ เป็นตัวเลือกลอย ๆ อีก — หน้าไหนต้องการให้คอลัมน์เรียงลงล่าง
+     บนมือถือ ต้อง "ขอเอง" ด้วยการติดคลาส .pm-stack-mobile ที่ตัว .layout ของหน้านั้น
+     (ทำแบบ opt-in ไม่ใช้ :has() เพราะถ้าเบราว์เซอร์เก่าไม่รู้จัก :has() ทั้งกฎจะถูกทิ้งทั้งก้อน) */
+  .layout.pm-stack-mobile {
+    flex-direction: column !important; height: auto !important;
+    min-height: 0 !important; overflow: visible !important;
+  }
+
+  /* shell ของแอพหลัก: ย้ำความสูงให้แน่นอนเสมอ กัน iframe โมดูลยุบเหลือ 150px */
+  .app-shell { height: calc(100vh - var(--topH, 56px)) !important; overflow: hidden !important; }
+  .app-shell > .content, .app-shell .pane, .app-shell .pane.active { min-height: 0; }
+  .module-frame { min-height: 0; height: 100% !important; }
+  .left-panel, .right-panel {
+    width: 100% !important; max-width: 100% !important; flex: none !important;
+    border-right: none !important; border-left: none !important;
+  }
+  .right-scroll { overflow: visible !important; padding: 14px 12px !important; }
+  .lock-item { flex-wrap: wrap; }
+
+  /* โมดัล: สูงไม่เกินจอ เลื่อนในตัวได้ ไม่ชิดขอบล่าง */
+  .modal, .modal-box, .m-box, .modal-content, .confirm-box {
+    max-width: calc(100vw - 20px) !important;
+    max-height: calc(100vh - 40px) !important;
+    overflow-y: auto !important;
+    margin-bottom: max(10px, env(safe-area-inset-bottom));
+  }
+
+  /* แถบเมนู/sidebar ที่เลื่อนแนวนอน */
+  .sidebar, .side, .nav { max-width: 100% !important; }
+}
+
+/* ── 5) จอเล็กมาก (iPhone SE / 320-360px) ── */
+@media (max-width: 380px) {
+  .kgrid, .kpi-grid, .kpi-row, .mgrid, .summary-grid { grid-template-columns: 1fr !important; }
+  .toolbar h1, .topbar h1 { font-size: .82rem !important; }
+}
+
+/* ── 6) โหมดแนวนอนจอเตี้ย: อย่าล็อคความสูงเป็น 100vh ──
+   (ใช้เฉพาะหน้าที่ opt-in เท่านั้น ด้วยเหตุผลเดียวกับข้อ 4 — shell ของแอพต้องคงความสูงไว้) */
+@media (max-height: 480px) and (orientation: landscape) {
+  .layout.pm-stack-mobile { height: auto !important; overflow: visible !important; }
+}
+
+/* ── 7) พิมพ์: ยกเลิกทุกอย่างของ mobile kit ที่อาจกวนการพิมพ์รายงาน ── */
+@media print {
+  .pm-tablewrap { overflow: visible !important; }
+  body { padding-bottom: 0 !important; overflow: visible !important; }
+}
+</style>
+<script id="pm-mobile-kit-js">
+/* ครอบ <table> ทุกตัวด้วยกล่องเลื่อนแนวนอน เพื่อไม่ให้ตารางกว้างดันหน้าจอล้น
+   ทำด้วย JS เพราะแก้ CSS ล้วนไม่ได้ (ต้องมี element ครอบ) และทำแบบนี้ไม่กระทบ layout เดิมบนเดสก์ท็อป
+   ใช้ MutationObserver เพราะเกือบทุกหน้าสร้างตารางด้วย innerHTML หลังโหลดข้อมูลจาก Sheets เสร็จ */
+(function () {
+  function wrapTables(root) {
+    var tables = (root || document).querySelectorAll ? (root || document).querySelectorAll('table') : [];
+    for (var i = 0; i < tables.length; i++) {
+      var t = tables[i];
+      if (t.parentElement && t.parentElement.classList.contains('pm-tablewrap')) continue;
+      if (t.closest && t.closest('.pm-tablewrap')) continue;
+      var w = document.createElement('div');
+      w.className = 'pm-tablewrap';
+      t.parentNode.insertBefore(w, t);
+      w.appendChild(t);
+    }
+  }
+  function boot() {
+    wrapTables(document);
+    try {
+      new MutationObserver(function (muts) {
+        for (var i = 0; i < muts.length; i++) {
+          for (var j = 0; j < muts[i].addedNodes.length; j++) {
+            var n = muts[i].addedNodes[j];
+            if (n.nodeType !== 1) continue;
+            if (n.tagName === 'TABLE') { wrapTables(n.parentNode); }
+            else if (n.querySelector && n.querySelector('table')) { wrapTables(n); }
+          }
+        }
+      }).observe(document.body, { childList: true, subtree: true });
+    } catch (e) { /* เบราว์เซอร์เก่า — ยังได้ตารางชุดแรกที่ wrap ไปแล้ว */ }
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot);
+  else boot();
+})();
+</script>
+<!-- ==== PM_MOBILE_KIT:END ==== -->
 <!-- ==== PM_API_CLIENT:START (สร้างโดย tools/inject_api_client.py — ห้ามแก้ในไฟล์นี้) ==== -->
 <script id="pm-api-client">
 /* ═══════════════════════════════════════════════════════════════════════════
@@ -138,6 +328,7 @@ function esc(s){return String(s??'').replace(/[&<>"']/g,x=>({'&':'&amp;','<':'&l
 async function render(){const out=document.getElementById('rows');out.innerHTML='<tr><td colspan="9" class="empty">กำลังโหลดข้อมูล…</td></tr>';const all=await apiGet('getVendors');if(!Array.isArray(all)){out.innerHTML='<tr><td colspan="9" class="error">โหลดข้อมูลไม่สำเร็จ — กรุณาเข้าสู่ระบบและลองใหม่</td></tr>';return}const vs=all.filter(v=>v.status!=='terminated').sort((a,b)=>(a.zone||'').localeCompare(b.zone||'')||String(a.lock).localeCompare(String(b.lock),undefined,{numeric:true}));let rent=0,power=0;out.innerHTML=vs.length?vs.map(v=>{const r=(Number(v.dailyRate)||0)*daysInMonth(),e=elec(v);rent+=r;power+=e;const unpaid=v.status==='unpaid';return '<tr><td>'+esc(v.zone)+'</td><td><b>'+esc(v.lock)+'</b></td><td>'+esc(v.name||'—')+'</td><td>'+esc(v.phone||'—')+'</td><td>'+esc(v.product||'—')+'</td><td class="num">'+baht(r)+'</td><td class="num">'+baht(e)+'</td><td class="num"><b>'+baht(r+e)+'</b></td><td><span class="status '+(unpaid?'unpaid':'')+'">'+(unpaid?'ค้างชำระ':'ปกติ')+'</span></td></tr>'}).join(''):'<tr><td colspan="9" class="empty">ยังไม่มีผู้ค้าปัจจุบัน</td></tr>';document.getElementById('summary').innerHTML='<div class="stat"><b>'+vs.length+'</b><span>ผู้ค้าปัจจุบัน</span></div><div class="stat"><b>'+daysInMonth()+'</b><span>วันตลาดในเดือนนี้</span></div><div class="stat"><b>'+baht(rent)+'</b><span>ค่าเช่า/เดือน</span></div><div class="stat"><b>'+baht(rent+power)+'</b><span>รวมค่าเช่า+ค่าไฟ/เดือน</span></div>';document.getElementById('stamp').textContent='ข้อมูล ณ '+new Date().toLocaleString('th-TH')}
 render();
 </script>
+
 
 
 

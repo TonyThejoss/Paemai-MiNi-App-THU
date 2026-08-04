@@ -151,6 +151,10 @@ select.filter-select:focus { border-color: #ea580c; }
 .input-amount:focus { border-color: #ea580c; }
 .input-amount.overpaid { border-color: #dd6b20; background: #fffaf0; }
 .input-amount.exact { border-color: #a15e38; background: #fff7ed; }
+/* ค่าปรับ/ค่าอื่นต้องถูกตั้งเป็นยอดเรียกเก็บก่อน หน้ารับชำระไม่สร้างหนี้ใหม่ระหว่างรับเงิน */
+.items-table th:nth-child(5),.items-table td:nth-child(5),
+.items-table th:nth-child(6),.items-table td:nth-child(6),
+.items-table th:nth-child(7),.items-table td:nth-child(7){display:none}
 
 .note-input {
   width: 100%; padding: 5px 8px; border: 1.5px solid var(--bd); border-radius: 6px;
@@ -262,6 +266,8 @@ select.filter-select:focus { border-color: #ea580c; }
 .pm-feetag{display:inline-block;font-size:.58rem;font-weight:800;border-radius:8px;padding:1px 6px;margin-top:2px;white-space:nowrap;}
 .pm-feetag.pm-annual{background:#fef3c7;color:#92400e;}
 .pm-feetag.pm-disc{background:#fee2e2;color:#b91c1c;}
+
+
 
 
 
@@ -727,7 +733,6 @@ input, select, textarea, button { font-family: inherit; max-width: 100%; }
           <div style="display:flex;gap:8px;flex-wrap:wrap">
             <button class="method-btn active" onclick="setMethod(this,'เงินสด')"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="12" cy="12" r="3"/></svg> เงินสด</button>
             <button class="method-btn" onclick="setMethod(this,'โอนเงิน')"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><rect x="6" y="2" width="12" height="20" rx="2"/><line x1="11" y1="18" x2="13" y2="18"/></svg> โอนเงิน</button>
-            <button class="method-btn" onclick="setMethod(this,'QR Code')"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 8h3l2-2h6l2 2h3v11H4Z"/><circle cx="12" cy="13.5" r="3.5"/></svg> QR Code</button>
           </div>
         </div>
         <div class="option-row">
@@ -806,12 +811,6 @@ input, select, textarea, button { font-family: inherit; max-width: 100%; }
           <label class="modal-label" for="dcAmount">ส่วนลด (บาท)</label>
           <input class="form-input" type="number" id="dcAmount" min="0" step="1" placeholder="0" style="max-width:130px">
         </div>
-      </div>
-
-      <div class="option-row" style="margin-top:8px;align-items:center;gap:8px" id="dcInstallWrap">
-        <input type="checkbox" id="dcInstall">
-        <label for="dcInstall" style="font-size:.78rem">ให้ส่วนลดกับล็อคที่อยู่ระหว่าง<strong>ผ่อนชำระ</strong>ด้วย
-          <span style="color:var(--text-lo,#718096)">(ถ้าไม่ติ๊ก ล็อคที่มีแผนผ่อนชำระจะไม่ได้รับส่วนลดทั้งตลาดของเดือนนี้)</span></label>
       </div>
 
       <div style="display:flex;flex-direction:column;gap:3px;margin-top:8px">
@@ -917,7 +916,6 @@ function calcElecFromVendor(v){ // ราคา/วันพฤหัสบด�
 //    → บิลค่าเช่าเดือนมีนาคมต้องบวกค่าธรรมเนียมรายปีให้อัตโนมัติ พร้อมหมายเหตุระบุว่าเป็นค่าธรรมเนียมรายปี
 //  · ส่วนลดค่าเช่า: กำหนดท้ายบิลได้ 2 ระดับ — รายล็อค (ไม่เท่ากันได้) และทั้งตลาด (เท่ากันทุกล็อค)
 //    ใช้เฉพาะเดือนที่กำหนด เดือนปัจจุบันหรืออนาคตเท่านั้น (ห้ามย้อนหลัง — ตรวจซ้ำที่ backend ด้วย)
-//    ถ้าล็อคอยู่ระหว่างผ่อนชำระ ต้องเลือกได้ว่าจะให้ส่วนลดหรือไม่ (กรณีส่วนลดทั้งตลาด)
 //
 // ลำดับการคิดเงินต่อล็อคในหนึ่งเดือน:
 //    ค่าเช่าเต็มเดือน (ค่าเช่า/วัน × จำนวนวันตลาดของเดือน)
@@ -927,7 +925,6 @@ function calcElecFromVendor(v){ // ราคา/วันพฤหัสบด�
 // ══════════════════════════════════════════════════════════════════════════════
 let PM_DISCOUNTS = [];        // ทุกรายการส่วนลดจากชีต rent_discounts
 let PM_SETTINGS = {};         // ค่าตั้งค่ากลาง (annual_fee ฯลฯ)
-let PM_INSTALL_LOCKS = new Set();  // ล็อคที่มีแผนผ่อนชำระ active
 let PM_ANNUAL_PAID = new Set();    // ล็อคที่จ่ายค่าธรรมเนียมรายปีของเดือนมีนาคมปีนี้แล้ว
 
 function pmBillMonthKey(){
@@ -946,25 +943,19 @@ function pmEffectiveDiscount(lockId, monthKey){
   if (perLock) return { amount: parseFloat(perLock.amount)||0, src:'ส่วนลดรายล็อค', note: perLock.note||'' };
   const mk = PM_DISCOUNTS.find(d=>d.month===monthKey && d.scope==='market');
   if (!mk) return { amount:0, src:'', note:'' };
-  if (PM_INSTALL_LOCKS.has(lockId) && !mk.apply_installment) {
-    return { amount:0, src:'ส่วนลดทั้งตลาด (ยกเว้นล็อคผ่อนชำระ)', note: mk.note||'' };
-  }
   return { amount: parseFloat(mk.amount)||0, src:'ส่วนลดทั้งตลาด', note: mk.note||'' };
 }
 
 async function pmLoadDiscountData(){
   const monthKey = pmBillMonthKey();
-  const [disc, settings, plans, marchPays] = await Promise.all([
+  const [disc, settings, marchPays] = await Promise.all([
     apiGet('getDiscounts'),
     apiGet('getSettings'),
-    apiGet('getInstallmentPlans'),
     // ตรวจว่าล็อคใดจ่ายค่าธรรมเนียมรายปีของเดือนมีนาคมรอบนี้ไปแล้ว (กันเก็บซ้ำ)
     pmIsMarchMonth(monthKey) ? apiGet('getPayments', { month: monthKey }) : Promise.resolve([]),
   ]);
   PM_DISCOUNTS = Array.isArray(disc) ? disc : [];
   PM_SETTINGS  = (settings && typeof settings==='object') ? settings : {};
-  PM_INSTALL_LOCKS = new Set((Array.isArray(plans)?plans:[])
-    .filter(p=>String(p.status||'active')==='active').map(p=>p.lock_id));
   PM_ANNUAL_PAID = new Set((Array.isArray(marchPays)?marchPays:[])
     .filter(p=>String(p.type)==='ค่าธรรมเนียมรายปี').map(p=>p.lock_id));
 }
@@ -997,7 +988,7 @@ async function loadLocksFromSheets(){
     return;
   }
   if(wrap) wrap.innerHTML='<div class="empty-state"><div class="empty-icon">⏳</div><div class="empty-text">กำลังโหลดข้อมูลผู้ค้าจาก Google Sheets...</div></div>';
-  await pmLoadDiscountData();   // ส่วนลด/ค่าธรรมเนียมรายปี/แผนผ่อนชำระ ต้องพร้อมก่อนคิดยอด
+  await pmLoadDiscountData();   // ส่วนลดและค่าธรรมเนียมรายปีต้องพร้อมก่อนคิดยอด
   const vendors = await apiGet('getVendors');
   if(!Array.isArray(vendors)){
     if(wrap) wrap.innerHTML='<div class="empty-state"><div class="empty-icon"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg></div><div class="empty-text">โหลดข้อมูลผู้ค้าไม่สำเร็จ<br>ตรวจสอบการเชื่อมต่อ Google Sheets</div></div>';
@@ -1026,6 +1017,29 @@ async function loadLocksFromSheets(){
     lock.feeNotes = bd.notes;
     lock.due = bd.net;
     return lock;
+  });
+  // สร้างยอดเรียกเก็บประจำเดือนแบบ idempotent แล้วใช้ "ยอดค้างรวม" จากบัญชีเป็นแหล่งความจริง
+  const billMonth = pmBillMonthKey()+'-01';
+  const ensureRows = ALL_LOCKS.map(l=>({
+    lock_id:l.id, billing_month:billMonth, type:'ยอดเรียกเก็บประจำเดือน',
+    description:'ยอดรวมประจำเดือน', amount:l.due+l.electric
+  })).filter(r=>r.amount>0);
+  const ensured = await apiPost('ensureVendorCharges',{data:{rows:ensureRows}});
+  if(!ensured || ensured.status!=='ok'){
+    if(wrap) wrap.innerHTML='<div class="empty-state"><div class="empty-text">สร้างยอดเรียกเก็บประจำเดือนไม่สำเร็จ<br>กรุณาลองใหม่</div></div>';
+    return;
+  }
+  const accounts = await apiGet('getVendorAccounts');
+  if(!Array.isArray(accounts)){
+    if(wrap) wrap.innerHTML='<div class="empty-state"><div class="empty-text">โหลดยอดค้างไม่สำเร็จ<br>กรุณาลองใหม่</div></div>';
+    return;
+  }
+  const accountByLock=new Map(accounts.map(a=>[a.lock_id,a]));
+  ALL_LOCKS.forEach(l=>{
+    const a=accountByLock.get(l.id); const outstanding=parseFloat(a?.outstanding)||0;
+    l.leaseId=a?.lease_id||null; l.due=outstanding; l.electric=0;
+    l.unpaidPenalty=0; l.unpaidOther=0; l.unpaidOtherLabel='';
+    l.status=outstanding>0?'unpaid':'paid'; l.feeNotes=['ยอดค้างรวมที่หักการชำระเดิมแล้ว'];
   });
   filteredLocks=[...ALL_LOCKS];
   renderLockList();
@@ -1203,7 +1217,7 @@ function renderTable() {
       </td>
       <td style="text-align:right;font-weight:800;color:${penalty||other?'#c05621':'inherit'}">฿${totalDue.toLocaleString()}</td>
       <td style="text-align:right">
-        <input class="input-amount ${amtClass}" type="number" value="${amt}" min="0"
+        <input class="input-amount ${amtClass}" type="number" value="${amt}" min="0" max="${totalDue}"
           style="width:90px;text-align:right"
           oninput="setAmount('${l.id}', this.value)">
       </td>
@@ -1258,7 +1272,12 @@ function setOther(id, val) {
   updateSummary(); renderTable();
 }
 function setOtherLabel(id, val) { payOtherLabels[id] = val; }
-function setAmount(id, val) { payAmounts[id] = val; updateSummary(); renderTable(); }
+function setAmount(id, val) {
+  const lock=ALL_LOCKS.find(l=>l.id===id);
+  const max=lock ? lock.due+lock.electric+(payPenalties[id]||0)+(payOthers[id]||0) : 0;
+  payAmounts[id]=String(Math.min(parseFloat(val)||0,max));
+  updateSummary(); renderTable();
+}
 function setNote(id, val) { payNotes[id] = val; }
 function removeLock(id) { toggleLock(id); }
 
@@ -1373,46 +1392,16 @@ async function confirmSave() {
   let okCount=0, failCount=0;
   for(const l of selected){
     const amount = parseFloat(payAmounts[l.id]) || 0;
-    const penalty = payPenalties[l.id] || 0;
-    const other = payOthers[l.id] || 0;
-    const otherLabel = payOtherLabels[l.id] || '';
     const note = payNotes[l.id] || '';
-    // ── PM_SAVE_SPLIT (2026-07-26) ──
-    // ค่าธรรมเนียมรายปีของเดือนมีนาคมต้องบันทึกเป็นรายการแยก type='ค่าธรรมเนียมรายปี'
-    // ไม่รวมกับค่าเช่า เพื่อให้รายงานรับชำระแยกประเภทได้ถูกต้อง และตรวจซ้ำได้ว่าล็อคใดจ่ายรายปีแล้ว
-    // ส่วนลดบันทึกเป็น "หมายเหตุ" กำกับรายการค่าเช่า (ยอด amount คือยอดที่รับจริงหลังหักส่วนลดแล้ว)
-    const feeNote = [];
-    if (l.annualFee > 0) feeNote.push(l.annualNote);
-    if (l.discount > 0) feeNote.push('หัก' + (l.discountSrc||'ส่วนลดค่าเช่า') + ' ฿' + l.discount.toLocaleString()
-      + (l.discountNote ? (' — ' + l.discountNote) : ''));
-    const baseNote = note || ('ผู้รับเงิน: ' + collector);
-    const fullNote = feeNote.length ? (baseNote + ' | ' + feeNote.join(' | ')) : baseNote;
-
-    // แยกยอดค่าธรรมเนียมรายปีออกจากยอดที่กรอก (ถ้าผู้ใช้กรอกเต็มตามที่ระบบคิดให้)
-    const annualPart = (l.annualFee > 0 && amount >= l.annualFee) ? l.annualFee : 0;
-    const rentPart   = amount - annualPart;
-
-    const res = await apiPost('savePayment', { data: {
-      lock_id: l.id, vendor_name: l.vendor, product: l.product,
-      type: 'ค่าเช่าประจำเดือน', amount: rentPart, penalty, other_fee: other,
-      other_label: otherLabel, method: payMethod, note: fullNote,
-      date: payDate, time: nowTime(),
+    const res = await apiPost('recordVendorPayment', { data: {
+      lock_id:l.id, amount, method:payMethod,
+      note:(note ? note+' · ' : '')+'ผู้รับเงิน: '+collector,
+      date:payDate, time:nowTime()
     }});
-    if (annualPart > 0 && res && res.status === 'ok') {
-      await apiPost('savePayment', { data: {
-        lock_id: l.id, vendor_name: l.vendor, product: l.product,
-        type: 'ค่าธรรมเนียมรายปี', amount: annualPart, penalty: 0, other_fee: 0,
-        other_label: '', method: payMethod, note: l.annualNote,
-        date: payDate, time: nowTime(),
-      }});
-    }
     if(res && res.status==='ok'){
       okCount++;
-      const fullDue=l.due+l.electric+penalty+other;
-      const isClosed=amount>=fullDue;
-      l.status=isClosed?'paid':'unpaid';
-      // สถานะค้างชำระคงอยู่จนกว่าจะรับครบยอดที่ต้องชำระเท่านั้น
-      if(isClosed) await apiPost('saveVendor',{data:{lock:l.id,status:'active',unpaid_penalty:0,unpaid_other:0,unpaid_other_label:''}});
+      const remaining=parseFloat(res.data?.outstanding)||0;
+      l.due=remaining; l.status=remaining===0?'paid':'unpaid';
     } else {
       failCount++;
     }
@@ -1470,7 +1459,6 @@ function closeDiscountModal(){ document.getElementById('discountModal').classLis
 function dcScopeChanged(){
   const isLock=document.getElementById('dcScope').value==='lock';
   document.getElementById('dcLockWrap').style.display=isLock?'flex':'none';
-  document.getElementById('dcInstallWrap').style.display=isLock?'none':'flex';
 }
 
 async function loadDiscountUI(){
@@ -1488,10 +1476,9 @@ async function loadDiscountUI(){
   } else {
     const list=rows.map(d=>{
       const who = d.scope==='market' ? 'ทั้งตลาด (ทุกล็อค)' : ('ล็อค '+d.lock_id);
-      const inst = d.scope==='market' ? (d.apply_installment?' · รวมล็อคผ่อนชำระ':' · ไม่รวมล็อคผ่อนชำระ') : '';
       const del = past ? '' : ' <button class="btn btn-outline" style="padding:2px 8px;font-size:.68rem" onclick="deleteDiscountEntry(\''+d.id+'\')">ลบ</button>';
       return '<div style="display:flex;justify-content:space-between;gap:8px;align-items:center;padding:4px 0;border-bottom:1px dashed var(--border,#e2e8f0)">'
-        +'<span><strong>'+who+'</strong> — ฿'+(parseFloat(d.amount)||0).toLocaleString()+inst
+        +'<span><strong>'+who+'</strong> — ฿'+(parseFloat(d.amount)||0).toLocaleString()
         +(d.note?' <span style="color:#718096">('+d.note+')</span>':'')+'</span><span>'+del+'</span></div>';
     }).join('');
     wrap.innerHTML=(past?wrap.innerHTML:'')+list;
@@ -1503,7 +1490,6 @@ async function loadDiscountUI(){
     : rows.find(d=>d.scope==='lock' && d.lock_id===document.getElementById('dcLock').value);
   document.getElementById('dcAmount').value = cur ? (parseFloat(cur.amount)||0) : '';
   document.getElementById('dcNote').value   = cur ? (cur.note||'') : '';
-  document.getElementById('dcInstall').checked = cur ? !!cur.apply_installment : false;
 }
 
 async function saveDiscountEntry(){
@@ -1516,7 +1502,6 @@ async function saveDiscountEntry(){
   const payload={
     month, scope, amount,
     lock_id: scope==='lock' ? document.getElementById('dcLock').value : '',
-    apply_installment: scope==='market' ? document.getElementById('dcInstall').checked : false,
     note: document.getElementById('dcNote').value.trim(),
     created_by: (document.getElementById('collector')?.value || 'ผู้จัดตลาด'),
   };
@@ -1644,33 +1629,35 @@ function showToast(msg) {
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 <!-- ==== PM_THEME_JS:START (สร้างโดย tools/inject_theme_kit.py) ==== -->
 <script>
 function toggleDark(){const h=document.documentElement,d=h.getAttribute('data-theme')==='dark';h.setAttribute('data-theme',d?'light':'dark');localStorage.setItem('pmthu-t',d?'light':'dark');}
 (()=>{const s=localStorage.getItem('pmthu-t');if(s)document.documentElement.setAttribute('data-theme',s);else if(window.matchMedia('(prefers-color-scheme:dark)').matches)document.documentElement.setAttribute('data-theme','dark');})();
 </script>
 <!-- ==== PM_THEME_JS:END ==== -->
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 <script id="pm-api-shim">
 /* apiGet/apiPost เวอร์ชันที่รองรับสามโหมด — เก็บของเดิมไว้เป็น __pmSheets* เพื่อใช้เทียบผล
