@@ -1020,10 +1020,11 @@ async function loadLocksFromSheets(){
   });
   // สร้างยอดเรียกเก็บประจำเดือนแบบ idempotent แล้วใช้ "ยอดค้างรวม" จากบัญชีเป็นแหล่งความจริง
   const billMonth = pmBillMonthKey()+'-01';
-  const ensureRows = ALL_LOCKS.map(l=>({
-    lock_id:l.id, billing_month:billMonth, type:'ยอดเรียกเก็บประจำเดือน',
-    description:'ยอดรวมประจำเดือน', amount:l.due+l.electric
-  })).filter(r=>r.amount>0);
+  // แยกค่าเช่ากับค่าไฟเป็นคนละรายการตั้งหนี้ เพื่อให้หน้ารับชำระและรายงานแสดงองค์ประกอบจริง
+  const ensureRows = ALL_LOCKS.flatMap(l=>[
+    {lock_id:l.id,billing_month:billMonth,type:'ค่าเช่าประจำเดือน',description:'ค่าเช่าและค่าธรรมเนียมประจำเดือน',amount:l.due},
+    {lock_id:l.id,billing_month:billMonth,type:'ค่าไฟฟ้า',description:'ค่าไฟประจำเดือน',amount:l.electric},
+  ]).filter(r=>r.amount>0);
   const ensured = await apiPost('ensureVendorCharges',{data:{rows:ensureRows}});
   if(!ensured || ensured.status!=='ok'){
     if(wrap) wrap.innerHTML='<div class="empty-state"><div class="empty-text">สร้างยอดเรียกเก็บประจำเดือนไม่สำเร็จ<br>กรุณาลองใหม่</div></div>';
@@ -1037,9 +1038,10 @@ async function loadLocksFromSheets(){
   const accountByLock=new Map(accounts.map(a=>[a.lock_id,a]));
   ALL_LOCKS.forEach(l=>{
     const a=accountByLock.get(l.id); const outstanding=parseFloat(a?.outstanding)||0;
-    l.leaseId=a?.lease_id||null; l.due=outstanding; l.electric=0;
+    const electric=Math.min(outstanding,parseFloat(a?.outstanding_electric)||0);
+    l.leaseId=a?.lease_id||null; l.electric=electric; l.due=Math.max(0,outstanding-electric);
     l.unpaidPenalty=0; l.unpaidOther=0; l.unpaidOtherLabel='';
-    l.status=outstanding>0?'unpaid':'paid'; l.feeNotes=['ยอดค้างรวมที่หักการชำระเดิมแล้ว'];
+    l.status=outstanding>0?'unpaid':'paid'; l.feeNotes=['ยอดค้างรวมค่าเช่าและค่าไฟ หลังหักการชำระเดิมแล้ว'];
   });
   filteredLocks=[...ALL_LOCKS];
   renderLockList();
@@ -1098,7 +1100,7 @@ function renderLockList() {
       <div class="lock-amount">
         <div class="amount-due">฿${totalDue.toLocaleString()}</div>
         ${(l.feeNotes&&l.feeNotes.length)?`<div class="pm-feenote" title="${l.feeNotes.join(' · ').replace(/"/g,'&quot;')}">${l.feeNotes.join(' · ')}</div>`:''}
-        <div class="amount-label">เช่า ฿${l.due.toLocaleString()} + ไฟ ฿${l.electric}</div>
+        <div class="amount-label">เช่า/อื่น ฿${l.due.toLocaleString()} + ไฟ ฿${l.electric.toLocaleString()}</div>
       </div>
       <span class="badge-status ${statusMap[l.status]}">${statusLabel[l.status]}</span>
     </div>`;
@@ -1237,7 +1239,7 @@ function renderTable() {
         <tr>
           <th style="min-width:48px">ล็อค</th>
           <th style="min-width:90px">สินค้า</th>
-          <th style="text-align:right;min-width:72px">ค่าเช่า</th>
+          <th style="text-align:right;min-width:72px">ค่าเช่า/อื่น</th>
           <th style="text-align:right;min-width:58px">ค่าไฟ</th>
           <th style="text-align:right;min-width:80px"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0Z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg> ค่าปรับ (฿)</th>
           <th style="text-align:right;min-width:80px"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2a5 5 0 0 0-5 5c0 3 2 4.6 3.5 8.2L12 22l1.5-6.8C15 11.6 17 10 17 7a5 5 0 0 0-5-5Z"/><circle cx="12" cy="7" r="1.6" fill="currentColor" stroke="none"/></svg> ค่าอื่น (฿)</th>
@@ -1658,6 +1660,8 @@ function toggleDark(){const h=document.documentElement,d=h.getAttribute('data-th
 (()=>{const s=localStorage.getItem('pmthu-t');if(s)document.documentElement.setAttribute('data-theme',s);else if(window.matchMedia('(prefers-color-scheme:dark)').matches)document.documentElement.setAttribute('data-theme','dark');})();
 </script>
 <!-- ==== PM_THEME_JS:END ==== -->
+
+
 
 <script id="pm-api-shim">
 /* apiGet/apiPost เวอร์ชันที่รองรับสามโหมด — เก็บของเดิมไว้เป็น __pmSheets* เพื่อใช้เทียบผล

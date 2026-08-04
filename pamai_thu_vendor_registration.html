@@ -573,6 +573,13 @@ textarea { resize: vertical; min-height: 70px; }
   .field-row { grid-template-columns: 1fr; }
   .field-row.col3 { grid-template-columns: 1fr 1fr; }
   .topbar h1 { font-size: .9rem; }
+  /* ขั้นตอน 3 เดิมวาง label + จำนวนเงิน + หมายเหตุในบรรทัดเดียวจนล้นจอ */
+  .fee-row { flex-wrap: wrap; align-items: stretch; }
+  .fee-row label { width: 100%; min-width: 0; }
+  .fee-row input, .fee-row select, .fee-row .hint { width: 100% !important; flex: 1 1 100% !important; }
+  .fee-header, .card-title { flex-wrap: wrap; row-gap: 7px; }
+  .badge-section { margin-left: 0; }
+  .fee-block { padding: 13px 12px; }
 }
 
 .ic{width:1em;height:1em;vertical-align:-.15em;display:inline-block;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0}
@@ -1169,7 +1176,7 @@ input, select, textarea, button { font-family: inherit; max-width: 100%; }
   <!-- ── RIGHT: SUMMARY ── -->
   <div class="summary-sticky">
     <div class="summary-card">
-      <div class="sum-title"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg> สรุปยอดชำระ</div>
+    <div class="sum-title"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg> สรุปยอดค้างตั้งต้น</div>
       <div class="sum-row"><span class="sum-label">ค่าธรรมเนียมแรกเข้า</span><span class="sum-val" id="s-entry">฿0</span></div>
       <div class="sum-row"><span class="sum-label">ค่าธรรมเนียมรายปี</span><span class="sum-val" id="s-annual">฿0</span></div>
       <div class="sum-row"><span class="sum-label">ค่าเช่าเดือนแรก</span><span class="sum-val" id="s-rent">฿0</span></div>
@@ -1200,7 +1207,7 @@ input, select, textarea, button { font-family: inherit; max-width: 100%; }
 <div class="success-wrap" id="successScreen">
   <div class="success-circle"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg></div>
   <div class="success-title">ลงทะเบียนสำเร็จ!</div>
-  <div class="success-sub">บันทึกข้อมูลและรับชำระค่าธรรมเนียมเรียบร้อย</div>
+  <div class="success-sub">บันทึกข้อมูลและตั้งยอดค้างเรียบร้อย · ยังไม่ได้รับชำระ</div>
   <div class="success-receipt" id="successReceipt"></div>
   <div class="success-btns">
     <button class="btn btn-secondary" onclick="showToast('กำลังส่งไปยังเครื่องพิมพ์...','info')"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>️ พิมพ์ใบเสร็จ</button>
@@ -1655,7 +1662,7 @@ function pmSetLockedFee(id, amount, connected){
   el.style.cursor = 'not-allowed';
   el.title = connected
     ? 'อัตรากลางของตลาด — แก้ได้ที่เมนู ระบบ › ตั้งค่าค่าธรรมเนียม'
-    : 'ยังไม่ได้เชื่อมต่อ Google Sheets จึงยังดึงอัตรากลางมาไม่ได้';
+    : 'ยังไม่ได้เชื่อมต่อฐานข้อมูล จึงยังดึงอัตรากลางมาไม่ได้';
 }
 async function loadFeeSettings(){
   const connected = !!getApiUrl();
@@ -1670,7 +1677,7 @@ async function loadFeeSettings(){
   if(!connected){
     pmSetLockedFee('feeEntryAmt', 0, false);
     pmSetLockedFee('feeAnnualAmt', 0, false);
-    srcNote('ยังไม่ได้เชื่อมต่อ Google Sheets — ดึงอัตรากลางของตลาดมาไม่ได้ '
+    srcNote('ยังไม่ได้เชื่อมต่อฐานข้อมูล — ดึงอัตรากลางของตลาดมาไม่ได้ '
           + 'กรุณาตั้งค่าการเชื่อมต่อที่หน้าหลักก่อนลงทะเบียนผู้ค้าใหม่', true);
     return;
   }
@@ -1814,7 +1821,7 @@ async function submitForm(btn) {
   const grand = entry + annual + fRent + elec + extSum;
   const today = new Date().toLocaleDateString('th-TH',{year:'numeric',month:'long',day:'numeric'});
 
-  // ── บันทึกลง Google Sheets (ถ้าเชื่อมต่อไว้) ──
+  // ── บันทึกลงฐานข้อมูลกลาง (ถ้าเชื่อมต่อไว้) ──
   let saveNote = '';
   if (getApiUrl() && selectedLock) {
     if (btn){ btn.disabled = true; btn.textContent = '⏳ กำลังบันทึก...'; }
@@ -1854,11 +1861,11 @@ async function submitForm(btn) {
 
     const vOk = vRes && vRes.status==='ok';
     saveNote = (vOk && payOk)
-      ? '<div style="margin-top:10px;padding:8px 12px;background:#e6f7ee;border-radius:8px;color:#7f3f1a;font-weight:700;font-size:.72rem"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M17.5 19H9a5 5 0 1 1 1.6-9.7A6 6 0 0 1 22 11.5 4.5 4.5 0 0 1 17.5 19Z"/></svg> บันทึกขึ้น Google Sheets แล้ว</div>'
+      ? '<div style="margin-top:10px;padding:8px 12px;background:#e6f7ee;border-radius:8px;color:#7f3f1a;font-weight:700;font-size:.72rem"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M17.5 19H9a5 5 0 1 1 1.6-9.7A6 6 0 0 1 22 11.5 4.5 4.5 0 0 1 17.5 19Z"/></svg> บันทึกลงฐานข้อมูลแล้ว · ยอดนี้ยังไม่ได้รับชำระ</div>'
       : '<div style="margin-top:10px;padding:8px 12px;background:#fff3cd;border-radius:8px;color:#92400e;font-weight:700;font-size:.72rem"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0Z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg> บันทึกบางส่วนไม่สำเร็จ กรุณาตรวจสอบการเชื่อมต่อ</div>';
     if (btn){ btn.disabled = false; btn.innerHTML = '<svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg> บันทึกข้อมูลผู้ค้า'; }
   } else if (!getApiUrl()) {
-    saveNote = '<div style="margin-top:10px;padding:8px 12px;background:#fff3cd;border-radius:8px;color:#92400e;font-weight:700;font-size:.72rem"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0Z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg> ยังไม่ได้เชื่อมต่อ Google Sheets — รายการนี้ยังไม่ถูกบันทึกลงระบบกลาง</div>';
+    saveNote = '<div style="margin-top:10px;padding:8px 12px;background:#fff3cd;border-radius:8px;color:#92400e;font-weight:700;font-size:.72rem"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0Z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg> ยังไม่ได้เชื่อมต่อฐานข้อมูล — รายการนี้ยังไม่ถูกบันทึกลงระบบกลาง</div>';
   }
 
   document.getElementById('mainLayout').style.display  = 'none';
@@ -1953,6 +1960,8 @@ function showToast(msg, type='info') {
   t._timer = setTimeout(()=>t.classList.remove('show'), 3000);
 }
 </script>
+
+
 
 
 

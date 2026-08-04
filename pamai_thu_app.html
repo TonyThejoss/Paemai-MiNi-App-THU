@@ -740,6 +740,7 @@ input, select, textarea, button { font-family: inherit; max-width: 100%; }
       <button class="ni" id="ni-fees" onclick="goTab('fees')"><span class="ico"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .34 1.87l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.7 1.7 0 0 0-1.87-.34 1.7 1.7 0 0 0-1.04 1.56V21a2 2 0 0 1-4 0v-.09A1.7 1.7 0 0 0 9 19.37a1.7 1.7 0 0 0-1.87.34l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.7 1.7 0 0 0 4.63 15a1.7 1.7 0 0 0-1.56-1.04H3a2 2 0 0 1 0-4h.09A1.7 1.7 0 0 0 4.63 9a1.7 1.7 0 0 0-.34-1.87l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.7 1.7 0 0 0 9 4.63a1.7 1.7 0 0 0 1.04-1.56V3a2 2 0 0 1 4 0v.09a1.7 1.7 0 0 0 1.04 1.56 1.7 1.7 0 0 0 1.87-.34l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.7 1.7 0 0 0 19.37 9a1.7 1.7 0 0 0 1.56 1.04H21a2 2 0 0 1 0 4h-.09A1.7 1.7 0 0 0 19.4 15Z"/></svg></span>ตั้งค่าค่าธรรมเนียม</button>
       <button class="ni" id="ni-reports" onclick="goTab('reports')"><span class="ico"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><line x1="6" y1="20" x2="6" y2="12"/><line x1="12" y1="20" x2="12" y2="6"/><line x1="18" y1="20" x2="18" y2="15"/></svg></span>รายงาน PDF</button>
       <button class="ni" id="ni-actlog" onclick="goTab('actlog')"><span class="ico"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg></span>บันทึกกิจกรรม</button>
+      <button class="ni" id="ni-users" onclick="goTab('users')"><span class="ico">👥</span>บัญชีผู้ใช้และสิทธิ์</button>
     </div>
     <div class="sb-div"></div>
     <button class="sb-db-badge" onclick="showApiSetup()" id="sb-db-badge">
@@ -958,6 +959,7 @@ input, select, textarea, button { font-family: inherit; max-width: 100%; }
     <div id="floatingqueue" class="pane" data-src="pamai_thu_floating_queue.html"><div class="module-loading">⏳ กำลังโหลด คิวจองล็อคจร...</div></div>
     <div id="rules" class="pane" data-src="pamai_thu_market_rules.html"><div class="module-loading">⏳ กำลังโหลด กฎระเบียบตลาด...</div></div>
     <div id="reports"  class="pane" data-src="pamai_thu_reports_launcher.html"><div class="module-loading">⏳ กำลังโหลด รายงาน...</div></div>
+    <div id="users" class="pane" data-src="pamai_thu_user_management.html"><div class="module-loading">⏳ กำลังโหลด บัญชีผู้ใช้...</div></div>
   </main>
 </div>
 
@@ -1002,7 +1004,7 @@ function toggleDark(){
   else if(window.matchMedia('(prefers-color-scheme:dark)').matches) document.documentElement.setAttribute('data-theme','dark');
 })();
 
-const APP_BUILD='20260804-2242'; // cache-buster — build.py แทนค่าอัตโนมัติ
+const APP_BUILD='20260805-0010'; // cache-buster — build.py แทนค่าอัตโนมัติ
 const DAYS=['อาทิตย์','จันทร์','อังคาร','พุธ','พฤหัสบดี','ศุกร์','เสาร์'];
 const MONS=['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
 const PM_CLOCK_KEY='pm-system-clock';
@@ -1036,15 +1038,16 @@ function closeSidebar(){
 // NAVIGATION — Single goTab, no conflicts
 // ════════════════════════════════════════════════════
 let curTab='dash';
+const TAB_PERMISSIONS={dash:'dashboard',map:'map',payment:'payments',electric:'electric',register:'register_vendor',vdb:'edit_vendor',leavehist:'leave',floatingqueue:'floating_queue',rules:'rules',reports:'reports',actlog:'activity_log',fees:'settings',users:'manage_users'};
+function userHasPermission(key){
+  if(!currentUser)return false;
+  const p=Array.isArray(currentUser.permissions)?currentUser.permissions:[];
+  return currentUser.username==='paemai'||p.includes('*')||p.includes(key);
+}
 
 function goTab(id){
-  // Viewer role check
-  // rules (กฎระเบียบตลาด) เปิดให้ viewer อ่านได้ (แค่ดูได้ แก้ไขไม่ได้ — บังคับสิทธิ์ในตัวหน้านั้นเองอีกชั้น)
-  // floatingqueue (คิวจองล็อคจร) เกี่ยวข้องกับการขาย/เงิน จึงไม่ให้ viewer เข้าเหมือนหน้าอื่นที่แตะเงิน
-  // fees = หน้าตั้งค่าอัตราค่าธรรมเนียมกลาง — ให้ viewer เปิดดูได้ (ช่องถูกล็อคอยู่แล้วถ้าไม่ใช่ admin)
-  const viewerAllowed=['dash','reports','actlog','rules','fees'];
-  if(window._viewerRole && !viewerAllowed.includes(id)){
-    showToast('<svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><line x1="5" y1="12" x2="19" y2="12"/></svg> คุณไม่มีสิทธิ์เข้าถึงส่วนนี้ (ดูได้อย่างเดียว)','e');
+  if(!userHasPermission(TAB_PERMISSIONS[id]||'dashboard')){
+    showToast('⛔ บัญชีนี้ไม่มีสิทธิ์เปิดฟังก์ชันดังกล่าว','e');
     return;
   }
   // Switch pane
@@ -1068,10 +1071,10 @@ function goTab(id){
                leavehist:'ประวัติแจ้งลา/ขาด/ยกเลิก',
                floatingqueue:'คิวจองล็อคจร',rules:'กฎระเบียบตลาด',
                reports:'รายงาน',actlog:'บันทึกกิจกรรม',vdb:'ทะเบียนผู้ค้า',
-               fees:'ตั้งค่าระบบ'};
+               fees:'ตั้งค่าระบบ',users:'บัญชีผู้ใช้และสิทธิ์'};
   if(id!=='actlog') logAct('nav','เปิดหน้า: '+(names[id]||id));
   // Lazy load iframe module when first accessed
-  const moduleIds=['map','payment','install','electric','register','leavehist','floatingqueue','rules','reports'];
+  const moduleIds=['map','payment','electric','register','leavehist','floatingqueue','rules','reports','users'];
   if(moduleIds.includes(id)){
     setTimeout(()=>loadModule(id),50);
   }
@@ -1084,8 +1087,8 @@ function goTab(id){
 // ไม่ใช่บัญชีจริงของทีมงาน — บัญชีจริงตรวจสอบผ่าน backend (verifyUser) เท่านั้น ดู doLogin()
 // (แก้ 2026-07-14: เดิม hardcode รหัสผ่านจริงของทีมงานไว้ตรงนี้เป็น plain text บน public repo — บั๊ก #20)
 const DEFAULT_USERS=[
-  {username:'demo_admin', password:'demo12345',role:'admin', displayName:'ผู้ดูแลระบบ (สาธิต)', roleLabel:'ผู้ดูแลระบบ'},
-  {username:'demo_viewer',password:'demo12345',role:'viewer',displayName:'ผู้ชม (สาธิต)',       roleLabel:'ดูอย่างเดียว'},
+  {username:'demo_admin', password:'demo12345',role:'admin', displayName:'ผู้ดูแลระบบ (สาธิต)', roleLabel:'ผู้ดูแลระบบ',permissions:['*']},
+  {username:'demo_viewer',password:'demo12345',role:'viewer',displayName:'ผู้ชม (สาธิต)',roleLabel:'ดูอย่างเดียว',permissions:['dashboard','reports']},
 ];
 function getUsers(){
   const s=localStorage.getItem('pmthu-users');
@@ -1153,7 +1156,7 @@ async function doLogin(){
     document.getElementById('login-pass').value='';
     return;
   }
-  sessionStorage.setItem('pmthu-session',JSON.stringify({username:user.username,role:user.role,displayName:user.displayName,roleLabel:user.roleLabel,apiToken:user.apiToken||''}));
+  sessionStorage.setItem('pmthu-session',JSON.stringify({username:user.username,role:user.role,displayName:user.displayName,roleLabel:user.roleLabel,permissions:user.permissions||[],isOwner:!!user.isOwner,apiToken:user.apiToken||''}));
   loginSuccess(user);
 }
 
@@ -1172,28 +1175,22 @@ function loginSuccess(user){
   document.getElementById('sb-user').style.display='block';
   document.getElementById('sb-uname').textContent=user.displayName;
   document.getElementById('sb-urole').textContent=user.roleLabel;
-  applyRole(user.role);
+  applyPermissions(user);
   updateDbStatus();
   logAct('system','เข้าสู่ระบบ: '+user.displayName);
   if(getApiUrl()) setTimeout(loadVendorsFromSheets,600);
   setTimeout(()=>loadSystemSettings(false),800);
 }
 
-function applyRole(role){
-  if(role==='viewer'){
-    window._viewerRole=true;
-    document.getElementById('readonly-banner').style.display='block';
-    setTimeout(()=>{
-      document.querySelectorAll('.btn-p,.btn-d,.btn-icon').forEach(b=>{
-        b.disabled=true; b.style.opacity='.4'; b.style.cursor='not-allowed';
-      });
-    },500);
-    // Disable sidebar buttons that viewer can't access
-    ['ni-map','ni-payment','ni-electric','ni-register','ni-leavehist'].forEach(id=>{
-      const el=document.getElementById(id);
-      if(el){el.style.opacity='.4';el.style.cursor='not-allowed';el.onclick=function(){showToast('<svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><line x1="5" y1="12" x2="19" y2="12"/></svg> ไม่มีสิทธิ์เข้าถึง','e');};}
-    });
-  }
+function applyPermissions(user){
+  window._viewerRole=user.role==='viewer';
+  const allowed=Object.keys(TAB_PERMISSIONS).filter(id=>userHasPermission(TAB_PERMISSIONS[id]));
+  document.getElementById('readonly-banner').style.display=user.role==='viewer'?'block':'none';
+  Object.keys(TAB_PERMISSIONS).forEach(id=>{
+    const el=document.getElementById('ni-'+id);if(!el)return;
+    const ok=allowed.includes(id);el.style.opacity=ok?'':'.38';el.style.cursor=ok?'':'not-allowed';
+    el.title=ok?'':'บัญชีนี้ไม่ได้รับสิทธิ์ใช้งาน';
+  });
 }
 
 function doLogout(){
@@ -1208,10 +1205,8 @@ function doLogoutConfirmed(){
   document.getElementById('login-err').style.display='none';
   document.getElementById('sb-user').style.display='none';
   document.getElementById('readonly-banner').style.display='none';
-  // re-enable buttons
-  document.querySelectorAll('.btn-p,.btn-d,.btn-icon').forEach(b=>{b.disabled=false;b.style.opacity='';b.style.cursor='';});
-  ['ni-map','ni-payment','ni-electric','ni-register','ni-leavehist'].forEach(id=>{
-    const el=document.getElementById(id);
+  Object.keys(TAB_PERMISSIONS).forEach(id=>{
+    const el=document.getElementById('ni-'+id);
     if(el){el.style.opacity='';el.style.cursor='';}
   });
   const ls=document.getElementById('login-screen');
@@ -2199,6 +2194,8 @@ window.onload=function(){
   logAct('system','ระบบเริ่มทำงาน — แพไม้มินิ v1.0');
 };
 </script>
+
+
 
 
 
