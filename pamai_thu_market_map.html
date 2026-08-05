@@ -1313,11 +1313,15 @@ async function confirmCancelLease(){
     }
     await apiPost('logLeave',{data:{lock_id:lockId,zone:oldZone,shop:oldShop,type:'lease_cancel',note:note||'สิ้นสุดสัญญา',manager:getCurrentUserName(),date:nowTH(),time:nowTime()}});
     addHist(lockId,{type:'absent',label:'🚫 ยกเลิกการเช่า',note:note||'สิ้นสุดสัญญา'});
-    el.dataset.status='vacant'; el.dataset.shop='ว่าง'; el.dataset.rent='0';
-    el.querySelector('.lk-shop').textContent='ว่าง';
+    el.dataset.status='vacant'; el.dataset.shop='ล็อคว่าง'; el.dataset.rent='0';
+    el.dataset.vname=''; el.dataset.vphone=''; el.dataset.vproduct='';
+    el.querySelector('.lk-shop').textContent='—';
     ['occupied','unpaid','cancelled'].forEach(c=>el.classList.remove(c));
     el.classList.add('vacant');
     lockAbsent[lockId]='';
+    delete VENDORS[lockId];
+    const closedVendor=REAL_VENDORS.find(v=>v.lock===lockId);
+    if(closedVendor) closedVendor.status='terminated';
     // ดึงแหล่งความจริงใหม่ทันที ป้องกันข้อมูลผู้ค้าเก่าค้างบนผัง
     await loadVendorOccupancy();
   }
@@ -1504,7 +1508,7 @@ let REAL_VENDORS=[];
 async function refreshRealVendorsTHU(){ const l=await apiGet('getVendors'); if(Array.isArray(l)) REAL_VENDORS=l; }
 function calcMonthlyRentMap(dailyRate){ return (dailyRate||0)*thisMonthThursdays(); }
 function getVendorForEdit(lockId){
-  const real=REAL_VENDORS.find(v=>v.lock===lockId);
+  const real=REAL_VENDORS.find(v=>v.lock===lockId&&v.status!=='terminated'&&v.status!=='vacant');
   if(real) return real;
   const el=document.querySelector('.lk[data-id="'+lockId+'"]');
   const d=el?el.dataset:{};
