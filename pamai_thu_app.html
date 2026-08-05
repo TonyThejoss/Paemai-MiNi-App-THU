@@ -1034,7 +1034,7 @@ function toggleDark(){
   else if(window.matchMedia('(prefers-color-scheme:dark)').matches) document.documentElement.setAttribute('data-theme','dark');
 })();
 
-const APP_BUILD='20260805-1516'; // cache-buster — build.py แทนค่าอัตโนมัติ
+const APP_BUILD='20260805-1554'; // cache-buster — build.py แทนค่าอัตโนมัติ
 const DAYS=['อาทิตย์','จันทร์','อังคาร','พุธ','พฤหัสบดี','ศุกร์','เสาร์'];
 const MONS=['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
 const PM_CLOCK_KEY='pm-system-clock';
@@ -1068,7 +1068,7 @@ function closeSidebar(){
 // NAVIGATION — Single goTab, no conflicts
 // ════════════════════════════════════════════════════
 let curTab='dash';
-const TAB_PERMISSIONS={dash:'dashboard',map:'map',payment:'payments',electric:'electric',discounts:'settings',register:'register_vendor',vdb:'edit_vendor',leavehist:'leave',floatingqueue:'floating_queue',rules:'rules',reports:'reports',actlog:'activity_log',fees:'settings',users:'manage_users'};
+const TAB_PERMISSIONS={dash:'dashboard',map:'map',payment:'payments',electric:'electric',discounts:'discount',register:'register_vendor',vdb:'edit_vendor',leavehist:'leave',floatingqueue:'floating_queue',rules:'rules',reports:'reports',actlog:'activity_log',fees:'settings',users:'manage_users'};
 function userHasPermission(key){
   if(!currentUser)return false;
   const p=Array.isArray(currentUser.permissions)?currentUser.permissions:[];
@@ -1806,7 +1806,7 @@ let PM_DISCOUNT_ROWS=[];
 function discountEsc(v){return String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
 function discountMonthKey(){const n=pmNow();return n.getFullYear()+'-'+String(n.getMonth()+1).padStart(2,'0');}
 function discountMonthLabel(k){const p=String(k||'').split('-'),m=['มกราคม','กุมภาพันธ์','มีนาคม','เมษายน','พฤษภาคม','มิถุนายน','กรกฎาคม','สิงหาคม','กันยายน','ตุลาคม','พฤศจิกายน','ธันวาคม'];return p.length===2?m[parseInt(p[1],10)-1]+' '+(parseInt(p[0],10)+543):k;}
-function discountCanEdit(){return userHasPermission('settings');}
+function discountCanEdit(){return userHasPermission('discount');}
 function discountScopeChanged(){
   const lock=document.getElementById('discount-scope').value==='lock';
   document.getElementById('discount-lock-wrap').style.display=lock?'block':'none';
@@ -2148,8 +2148,24 @@ function openLeaveHistoryForLock(lockId) {
 }
 
 function openPaymentHistoryForLock(lockId, leaseId) {
-  const q='?lock='+encodeURIComponent(lockId)+(leaseId?'&lease='+encodeURIComponent(leaseId):'');
-  window.open('pamai_thu_report_10.html'+q,'_blank','noopener');
+  /* ห้ามใช้ window.open(..., 'noopener') กับหน้าใด ๆ ของระบบ (บั๊กรอบ v3.0.5)
+     'noopener' ตัดความสัมพันธ์ opener ทิ้ง แท็บใหม่จึงไม่ได้รับสำเนา sessionStorage
+     ของแท็บเดิม → pm-session ว่าง → RPC ตอบ "ต้องเข้าสู่ระบบก่อนใช้งาน" →
+     รายงาน 10 ขึ้น "โหลดบัญชีผู้ค้าไม่สำเร็จ" ทั้งที่ล็อกอินอยู่
+     เปิดใน pane รายงานของ shell แทน (แพทเทิร์นเดียวกับ openLeaveHistoryForLock) */
+  goTab('reports');
+  const pane = document.getElementById('reports');
+  if (!pane) return;
+  const src = 'pamai_thu_report_10.html?lock=' + encodeURIComponent(lockId) +
+              (leaseId ? '&lease=' + encodeURIComponent(leaseId) : '');
+  const existingFrame = pane.querySelector('iframe');
+  if (existingFrame) {
+    existingFrame.src = src;
+  } else {
+    pane.dataset.src = src;
+    loadedModules.delete('reports');
+    loadModule('reports');
+  }
 }
 
 // ════════════════════════════════════════════════════

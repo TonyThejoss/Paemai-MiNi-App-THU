@@ -953,6 +953,47 @@ const ELEC_TYPES = [
 ];
 
 // ══════════════════════════════════════
+//  เรียงล็อคและจัดกลุ่มตามโซน (v3.0.5)
+// ══════════════════════════════════════
+/* ตัวเปรียบเทียบเดียวกับหน้ารับชำระหลายล็อค (pamai_thu_batch_payment.html) — A2 ต้องมาก่อน A10 */
+function compareLockIds(a,b){
+  return String(a||'').localeCompare(String(b||''),'en',{numeric:true,sensitivity:'base'});
+}
+/* zone จากฐานข้อมูลว่างได้ (mapSheetVendor คืน '') ถ้าไม่มีทางสำรอง แถวนั้นจะกลายเป็นกลุ่มไม่มีชื่อ
+   จึงใช้อักษรนำหน้ารหัสล็อคแทน — วิธีเดียวกับรายงาน 09 */
+function elecZone(v){
+  return String((v && v.zone) || ((String((v && v.id) || '').match(/^[A-Za-z]+/) || [''])[0]) || 'ไม่ระบุ');
+}
+/* จัดกลุ่มตามลำดับโซนของตลาดนั้น โซนที่ไม่อยู่ในลิสต์ต่อท้ายแบบเรียงตัวอักษร
+   ภายในโซนเรียงเลขล็อคแบบธรรมชาติเสมอ */
+function groupByZone(list){
+  const byZone={};
+  list.forEach(v=>{ const z=elecZone(v); (byZone[z]=byZone[z]||[]).push(v); });
+  const known=ELEC_ZONE_ORDER.filter(z=>byZone[z]);
+  const extra=Object.keys(byZone).filter(z=>ELEC_ZONE_ORDER.indexOf(z)<0)
+                .sort((a,b)=>a.localeCompare(b,'en',{numeric:true}));
+  return known.concat(extra).map(z=>({
+    zone:z,
+    rows:byZone[z].slice().sort((a,b)=>compareLockIds(a.id,b.id))
+  }));
+}
+/* เรียงแบน ๆ ตามลำดับโซนแล้วตามเลขล็อค (ใช้กับ dropdown และตารางออกบิล) */
+function sortByZoneThenLock(list){
+  return list.slice().sort((a,b)=>{
+    const ia=ELEC_ZONE_ORDER.indexOf(elecZone(a)), ib=ELEC_ZONE_ORDER.indexOf(elecZone(b));
+    const ra=ia<0?9999:ia, rb=ib<0?9999:ib;
+    if(ra!==rb) return ra-rb;
+    const za=elecZone(a), zb=elecZone(b);
+    if(za!==zb) return za.localeCompare(zb,'en',{numeric:true});
+    return compareLockIds(a.id,b.id);
+  });
+}
+
+//== MARKET_BLOCK:ZONE_ORDER ==//
+const ELEC_ZONE_ORDER = ['A','B','C','D','E','F','G','J','K','N','U','O','M','H','L','T','AB','TA','TB','TC'];
+//== END_MARKET_BLOCK ==//
+
+// ══════════════════════════════════════
 //  VENDOR DATABASE (mock — อิงจาก Excel)
 // ══════════════════════════════════════
 //== MARKET_BLOCK:SEED ==//
@@ -1018,7 +1059,7 @@ function renderTable() {
   });
 
   const tbody = document.getElementById('vendorTbody');
-  tbody.innerHTML = filtered.length ? filtered.map(v => {
+  const elecRowHtml = (v) => {
     const elec = calcElecMonthly(v.elec); // คอลัมน์นี้คือ ค่าไฟ/เดือน (บั๊ก #27)
     const total = v.rent + elec;
     const sBadge = v.status==='paid'
@@ -1038,7 +1079,14 @@ function renderTable() {
         <button class="tbl-action btn-pay" onclick="openPayModal('${v.id}')" style="margin-left:4px"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M9.5 9.5c0-1.1 1.1-2 2.5-2s2.5.9 2.5 2-1.1 1.6-2.5 2-2.5.9-2.5 2 1.1 2 2.5 2 2.5-.9 2.5-2"/></svg> ไปหน้ารับชำระ</button>
       </td>
     </tr>`;
-  }).join('') : '<tr><td colspan="9" style="padding:24px;text-align:center;color:var(--text-lo)">ไม่มีข้อมูลผู้ค้าที่ตรงกับเงื่อนไข</td></tr>';
+  };
+  /* จัดกลุ่มตามโซนพร้อมหัวข้อโซน เพื่อให้ไล่ดูเลขล็อคได้ทีละโซน (คำขอผู้ดูแล 5 ส.ค. 2026) */
+  tbody.innerHTML = filtered.length
+    ? groupByZone(filtered).map(g =>
+        `<tr class="zone-head"><td colspan="9" style="background:var(--surface3);border-top:2px solid var(--border2);padding:8px 11px;font-weight:800;color:var(--text-hi)">โซน ${g.zone} <span style="font-weight:600;color:var(--text-lo)">· ${g.rows.length} ล็อค</span></td></tr>`
+        + g.rows.map(elecRowHtml).join('')
+      ).join('')
+    : '<tr><td colspan="9" style="padding:24px;text-align:center;color:var(--text-lo)">ไม่มีข้อมูลผู้ค้าที่ตรงกับเงื่อนไข</td></tr>';
 
   document.getElementById('tableCount').textContent = `แสดง ${filtered.length} จาก ${vendors.length} ราย`;
 
@@ -1061,7 +1109,7 @@ let specialCnt = 0;
 function initUpdateTab() {
   const sel = document.getElementById('editLockSel');
   sel.innerHTML = '<option value="">-- เลือกล็อค --</option>' +
-    vendors.map(v=>`<option value="${v.id}">${v.id} — ${v.shop}</option>`).join('');
+    sortByZoneThenLock(vendors).map(v=>`<option value="${v.id}">${v.id} — ${v.shop}</option>`).join('');
 
   // also populate history
   const hs = document.getElementById('histLockSel');
@@ -1310,7 +1358,7 @@ function renderBilling() {
   const tbody = document.getElementById('billingTbody');
   const foot  = document.getElementById('billingFoot');
 
-  let fv = vendors;
+  let fv = sortByZoneThenLock(vendors);
   if (zoneFilterBillActive) fv = fv.filter(v=>v.zone===zoneFilterBillActive);
 
   let tRent=0, tElec=0, tUnpaid=0;
@@ -1348,11 +1396,10 @@ function renderBilling() {
   document.getElementById('b-elec').textContent   = fmt(tElec);
   document.getElementById('b-unpaid').textContent = tUnpaid;
 
-  // build zone filter buttons
-  const zones = [...new Set(vendors.map(v=>v.zone))];
+  // build zone filter buttons — ลำดับโซนอ่านจาก ELEC_ZONE_ORDER แหล่งเดียว
   document.getElementById('zoneFilterBill').innerHTML =
 //== MARKET_BLOCK:EXPORT_ZONES ==//
-    ['','A','B','C','D','E','F','G','J','K','N','U','O','M','H','L','T','AB','TA','TB','TC'].map(z=>
+    [''].concat(ELEC_ZONE_ORDER).map(z=>
 //== END_MARKET_BLOCK ==//
       `<button class="zf-btn ${zoneFilterBillActive===z?'active':''}" onclick="setBillZone('${z}')">${z||'ทั้งหมด'}</button>`
     ).join('');
@@ -1420,7 +1467,7 @@ function openAddModal() {
 // ส่งออกเป็น CSV (UTF-8 + BOM กันภาษาไทยเพี้ยน) แทน .xlsx จริง — เปิดได้ปกติทั้งใน Excel/Google Sheets
 // เลือก CSV เพราะไม่ต้องพึ่งไลบรารีภายนอก (สอดคล้องกับสถาปัตยกรรม vanilla JS ไม่มี build step ของระบบนี้)
 function exportBill() {
-  let fv = vendors;
+  let fv = sortByZoneThenLock(vendors);
   if (zoneFilterBillActive) fv = fv.filter(v=>v.zone===zoneFilterBillActive);
   if (!fv.length) { showToast('ไม่มีข้อมูลให้ส่งออกในตัวกรองนี้', 'error'); return; }
 

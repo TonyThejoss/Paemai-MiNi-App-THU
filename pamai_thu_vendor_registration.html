@@ -392,6 +392,8 @@ textarea { resize: vertical; min-height: 70px; }
 .btn-primary:disabled { background: var(--border2); box-shadow: none; cursor: not-allowed; color: var(--text-lo); }
 .btn-secondary {
   background: var(--surface2); border: 1.5px solid var(--border); color: var(--text-md);
+  /* PM_REG_NAV 2026-08-05: ต้องมีคู่นี้ ไม่งั้น ripple() วาดวงขาวหลุดออกนอกปุ่มทุกครั้งที่กดย้อนกลับ */
+  position: relative; overflow: hidden;
 }
 .btn-secondary:hover { background: var(--border); transform: translateY(-1px); }
 
@@ -549,6 +551,17 @@ textarea { resize: vertical; min-height: 70px; }
   transition: all .35s var(--ease);
 }
 .elec-num { font-weight: 800; color: var(--green-m); font-size: 1rem; }
+
+/* ── ปุ่มปิดหน้าสรุป (ขั้นตอนที่ 4) มุมบนซ้าย ── */
+.step4-close {
+  position: absolute; top: 10px; left: 10px; z-index: 3;
+  width: 34px; height: 34px; min-width: 34px; padding: 0;
+  display: inline-flex; align-items: center; justify-content: center;
+  background: var(--surface2); border: 1.5px solid var(--border); border-radius: 10px;
+  color: var(--text-md); cursor: pointer; font-family: inherit; line-height: 1;
+}
+.step4-close:hover { background: var(--border); }
+.step4-close .ic { width: 18px; height: 18px; }
 
 /* ── RIPPLE ── */
 .btn-primary { position: relative; overflow: hidden; }
@@ -1168,12 +1181,14 @@ input, select, textarea, button { font-family: inherit; max-width: 100%; }
 
     <!-- STEP 4 -->
     <div id="step4" class="step-content">
-      <div class="card">
-        <div class="card-title"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg> ตรวจสอบและยืนยัน <span class="badge-section badge badge-green">ขั้นตอนสุดท้าย</span></div>
+      <div class="card" style="position:relative">
+        <button type="button" class="step4-close" id="step4Close" aria-label="ปิดหน้าสรุปผู้ค้า" title="ปิดหน้าสรุป กลับไปแก้ไขข้อมูล" onclick="closeConfirmStep()"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+        <div class="card-title" style="padding-left:42px"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg> ตรวจสอบและยืนยัน <span class="badge-section badge badge-green">ขั้นตอนสุดท้าย</span></div>
         <div id="confirmContent"></div>
-        <div style="display:flex;justify-content:space-between;margin-top:18px;gap:12px">
-          <button class="btn btn-secondary" onclick="nextStep(3,this,true)"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><line x1="20" y1="12" x2="4" y2="12"/><polyline points="10 6 4 12 10 18"/></svg> แก้ไข</button>
-          <button class="btn btn-primary" onclick="submitForm(this)"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg> บันทึกข้อมูลผู้ค้า</button>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-top:18px;gap:10px;flex-wrap:wrap">
+          <button class="btn btn-secondary" style="flex:none;width:auto;padding:10px 22px" onclick="nextStep(3,this,true)"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><line x1="20" y1="12" x2="4" y2="12"/><polyline points="10 6 4 12 10 18"/></svg> ย้อนกลับ</button>
+          <button class="btn btn-secondary" id="step4GoMap" style="flex:none;width:auto;padding:10px 22px" onclick="goToMarketMap()"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg> ไปที่หน้าผังตลาด</button>
+          <button class="btn btn-primary" style="flex:none;width:auto;padding:10px 26px" onclick="submitForm(this)"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg> บันทึกข้อมูลผู้ค้า</button>
         </div>
       </div>
     </div>
@@ -1445,9 +1460,31 @@ function nextStep(n, btn, goBack=false) {
   if (n > currentStep && !validate(currentStep)) return;
   if (btn) ripple(btn);
 
-  const prev = document.getElementById(`step${currentStep}`);
-  prev.classList.remove('visible','back-anim');
-  prev.style.display = 'none';
+  /* PM_REG_NAV (2026-08-05) — ต้องเตรียมข้อมูลของขั้นตอนปลายทางให้เสร็จ "ก่อน" ซ่อนขั้นตอนเดิม
+     ของเดิมซ่อน panel ทิ้งตั้งแต่บรรทัดแรก ถ้า recalc()/buildConfirm() โยน error กลางทาง
+     จะไม่มี panel ไหนถูกแสดงเลย = จอว่างทั้งหน้า ซึ่งผู้ใช้เห็นเป็น "กดปุ่มย้อนกลับแล้วไม่ทำงาน"
+     (กฎเหล็กข้อ 15: ความล้มเหลวต้องไม่หน้าตาเหมือน "ไม่มีอะไรเกิดขึ้น") */
+  const fromStep = currentStep;
+  currentStep = n;
+  try {
+    if (n === 3) {
+      const dailyR = parseFloat(document.getElementById('rentPrice').value) || 0;
+      document.getElementById('feeFirstRentAmt').value = monthlyFromDaily(dailyR);
+      recalc();
+    }
+    if (n === 4) buildConfirm();
+  } catch (err) {
+    currentStep = fromStep;
+    console.error('nextStep:', err);
+    try { showToast('เปิดขั้นตอนนี้ไม่สำเร็จ — กรุณาลองใหม่', 'error'); } catch (e) {}
+    return;
+  }
+
+  const prev = document.getElementById(`step${fromStep}`);
+  if (prev) {
+    prev.classList.remove('visible','back-anim');
+    prev.style.display = 'none';
+  }
 
   document.querySelectorAll('.stepbar .step').forEach((el,i) => {
     el.classList.remove('active','done');
@@ -1457,20 +1494,29 @@ function nextStep(n, btn, goBack=false) {
     else dot.textContent = i+1;
   });
 
-  currentStep = n;
-  if (n === 3) {
-    const dailyR = parseFloat(document.getElementById('rentPrice').value) || 0;
-    document.getElementById('feeFirstRentAmt').value = monthlyFromDaily(dailyR);
-    recalc();
-  }
-  if (n === 4) buildConfirm();
-
   const next = document.getElementById(`step${n}`);
   next.style.display = 'block';
   next.classList.remove('visible','back-anim');
   void next.offsetWidth; // force reflow
   next.classList.add(goBack ? 'back-anim' : 'visible');
   window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+/* ปุ่มกากบาทมุมบนซ้ายของขั้นตอนที่ 4 — ปิดหน้าสรุป กลับไปขั้นตอนที่ 3 โดยไม่ล้างข้อมูลที่กรอกไว้ */
+function closeConfirmStep() { nextStep(3, null, true); }
+
+/* ปุ่ม "ไปที่หน้าผังตลาด" ของขั้นตอนที่ 4
+   หน้านี้ปกติอยู่ใน iframe ของแอปหลัก จึงสั่งสลับแท็บผ่าน shell แบบ same-origin
+   ถ้าเปิดไฟล์นี้เดี่ยว ๆ ค่อยเปลี่ยนหน้าไปผังตรง ๆ (build.py แปลงชื่อไฟล์ให้ฝั่งวันพฤหัสฯ เอง)
+   ห้ามใช้ window.open(..., 'noopener') เด็ดขาด — ตัดสำเนา sessionStorage ทิ้งทั้งแท็บ */
+function goToMarketMap() {
+  try {
+    if (window.parent && window.parent !== window && typeof window.parent.goTab === 'function') {
+      window.parent.goTab('map');
+      return;
+    }
+  } catch (err) {}
+  location.href = 'pamai_thu_market_map.html';
 }
 
 function validate(s) {

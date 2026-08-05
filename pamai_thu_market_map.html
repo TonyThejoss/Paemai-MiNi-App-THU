@@ -825,6 +825,19 @@ async function apiPost(action,data={}){
 window.addEventListener('message', function(e){
   if(e && e.data && e.data.type==='pm-refresh' && typeof loadVendorOccupancy==='function') loadVendorOccupancy();
 });
+
+/* pmHasPerm (v3.0.5) — อ่านสิทธิ์สดจาก session ด้วยลำดับเดียวกับ PM_API_CLIENT
+   ใช้กั้นปุ่มที่เปลี่ยนสถานะล็อคบนผัง ไม่ใช่แค่ซ่อนเมนูที่หน้าหลัก
+   หมายเหตุ: การซ่อนปุ่มเป็นชั้นหน้าจอ ส่วนคำสั่งที่แตะฐานข้อมูลถูกตรวจซ้ำที่ RPC อีกชั้น */
+function pmHasPerm(key){
+  var sess=null;
+  try{ sess=JSON.parse(sessionStorage.getItem('pmthu-session')||'null'); }catch(e){}
+  try{ if(!sess && window.parent && window.parent!==window && window.parent.__pmSessionBridge) sess=JSON.parse(window.parent.__pmSessionBridge); }catch(e){}
+  try{ if(!sess && window.parent && window.parent!==window) sess=JSON.parse(window.parent.sessionStorage.getItem('pmthu-session')||'null'); }catch(e){}
+  if(!sess) return false;
+  var p=Array.isArray(sess.permissions)?sess.permissions:[];
+  return sess.username==='paemai' || p.indexOf('*')>=0 || p.indexOf(key)>=0;
+}
 function getCurrentUserName(){ try{const s=sessionStorage.getItem('pmthu-session');if(s){const u=JSON.parse(s);return u.username||'ผู้ใช้';}}catch(e){} return 'ผู้ใช้'; }
 
 const STATE_KEY='pmthu-mkt-state';
@@ -955,6 +968,8 @@ function loadMarketState(){
 }
 
 function clearMarketState(){
+  /* กันเรียกตรงจาก console: การซ่อนปุ่มอย่างเดียวไม่ใช่การควบคุมสิทธิ์ */
+  if(!pmHasPerm('reset_lock_status')){ toast('บัญชีนี้ไม่มีสิทธิ์รีเซตสถานะล็อค','e'); return; }
   localStorage.removeItem(STATE_KEY);
   Object.keys(lockAbsent).forEach(k=>delete lockAbsent[k]);
   Object.keys(dailyBookings).forEach(k=>delete dailyBookings[k]);
@@ -990,7 +1005,9 @@ function showStateBanner(tue,dl){
   const dStr=d.getDate()+' '+MONS[d.getMonth()]+' '+(d.getFullYear()+543);
   const col=dl<=1?'#fca5a5':dl<=2?'#fde68a':'#fed7aa';
   b.innerHTML='<span>📅 สถานะวันพฤหัสบดี <strong>'+dStr+'</strong> · รีเซ็ตอีก <span style="color:'+col+'">'+dl+' วัน</span></span>'
-    +'<button onclick="if(confirm(\'ล้างเฉพาะสถานะลา/ขาด/ล็อคจร? สถานะค้างชำระจะไม่ถูกล้าง\'))clearMarketState()" style="background:rgba(255,255,255,.18);border:1.5px solid rgba(255,255,255,.28);color:#fff;padding:3px 10px;border-radius:8px;cursor:pointer;font-size:.64rem;font-weight:700;font-family:inherit">🔄 รีเซ็ตรายวัน</button>';
+    +(pmHasPerm('reset_lock_status')
+      ? '<button onclick="if(confirm(\'ล้างเฉพาะสถานะลา/ขาด/ล็อคจร? สถานะค้างชำระจะไม่ถูกล้าง\'))clearMarketState()" style="background:rgba(255,255,255,.18);border:1.5px solid rgba(255,255,255,.28);color:#fff;padding:3px 10px;border-radius:8px;cursor:pointer;font-size:.64rem;font-weight:700;font-family:inherit">🔄 รีเซ็ตรายวัน</button>'
+      : '<span style="opacity:.75;font-size:.62rem">ไม่มีสิทธิ์รีเซตสถานะล็อค</span>');
 }
 function hideBanner(){const b=document.getElementById('state-banner');if(b)b.remove();}
 
@@ -1471,7 +1488,7 @@ async function loadPopupFinance(lockId,isOccupied){
   box.innerHTML='<div class="pp-fin-title">การเงิน · ยอดค้าง <strong style="color:var(--r)">'+fmt(due)+'</strong></div>'+(due>0?'<div class="pp-fin-row"><input id="ppPayAmt" type="number" min="1" max="'+due+'" value="'+due+'"><select id="ppPayMethod"><option>เงินสด</option><option>โอนเงิน</option></select><button onclick="receivePopupPayment(\''+lockId+'\','+a.lease_id+','+due+')">รับชำระ</button></div>':'<div style="color:var(--gm);font-weight:800">✓ ไม่มียอดค้าง</div>')+'<div class="pp-fin-hist"><b>5 รายการล่าสุด</b>'+(latest.length?latest.map(x=>'<span>'+x.date+' · '+x.method+' · '+fmt(x.amount)+'</span>').join(''):'<span>ยังไม่มีประวัติรับชำระ</span>')+'<a href="#" onclick="openPaymentHistory(\''+lockId+'\','+a.lease_id+');return false">ดูประวัติการชำระทั้งหมด</a></div>';
 }
 async function receivePopupPayment(lockId,leaseId,due){const amount=parseFloat(document.getElementById('ppPayAmt')?.value)||0,method=document.getElementById('ppPayMethod')?.value||'';if(amount<=0||amount>due){toast('จำนวนเงินต้องไม่เกินยอดค้าง','e');return}const res=await apiPost('recordVendorPayment',{data:{lock_id:lockId,amount,method,date:nowTH(),time:nowTime(),note:'รับชำระจากป๊อปอัพผังตลาด · ผู้รับ: '+getCurrentUserName()}});if(!res||res.status!=='ok'){toast(res?.message||'รับชำระไม่สำเร็จ','e');return}toast('รับชำระ '+fmt(amount)+' สำเร็จ','s');await syncRealVendors();await loadPopupFinance(lockId,true)}
-function openPaymentHistory(lockId,leaseId){if(window.parent&&window.parent!==window&&typeof window.parent.openPaymentHistoryForLock==='function')window.parent.openPaymentHistoryForLock(lockId,leaseId);else window.open('pamai_thu_report_10.html?lock='+encodeURIComponent(lockId)+'&lease='+encodeURIComponent(leaseId),'_blank')}
+function openPaymentHistory(lockId,leaseId){if(window.parent&&window.parent!==window&&typeof window.parent.openPaymentHistoryForLock==='function')window.parent.openPaymentHistoryForLock(lockId,leaseId);else location.href='pamai_thu_report_10.html?lock='+encodeURIComponent(lockId)+'&lease='+encodeURIComponent(leaseId)}
 function closePopup(){if(popWrap)popWrap.classList.remove('show');curLk=null;}
 // click listener moved to initPopup()
 
