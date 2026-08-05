@@ -319,6 +319,72 @@ input, select, textarea, button { font-family: inherit; max-width: 100%; }
 })();
 </script>
 <!-- ==== PM_API_CLIENT:END ==== -->
+<!-- ==== PM_PRINT_KIT:START (สร้างโดย tools/inject_print_kit.py — ห้ามแก้ในไฟล์นี้) ==== -->
+<style id="pm-print-kit">
+/* กติกากลางสำหรับรายงานทุกฉบับ: A4 แนวตั้งและใช้พื้นที่กระดาษอย่างคุ้มค่า */
+@page { size: A4 portrait; margin: 5mm; }
+@media print {
+  html, body {
+    width: auto !important; min-width: 0 !important; margin: 0 !important;
+    padding: 0 !important; background: #fff !important; color: #000 !important;
+    font-size: 7.5pt !important; line-height: 1.18 !important;
+    overflow: visible !important; print-color-adjust: exact; -webkit-print-color-adjust: exact;
+  }
+
+  /* ปุ่ม ตัวกรอง และแถบควบคุมไม่ใช่เนื้อหารายงาน */
+  .toolbar, .bar, .filters, .date-filter, .pm-fbar, .no-print,
+  .tb-actions, button, input, select { display: none !important; }
+
+  /* ยกเลิกกรอบแบบหน้าจอ ให้ใช้พื้นที่พิมพ์ได้เต็มความกว้าง */
+  .page, .report, .container, .wrap, .report-wrap {
+    width: 100% !important; max-width: none !important; min-width: 0 !important;
+    margin: 0 !important; padding: 0 !important; border: 0 !important;
+    border-radius: 0 !important; box-shadow: none !important; background: #fff !important;
+  }
+  .pm-tablewrap, .tablewrap { overflow: visible !important; width: 100% !important; }
+
+  /* ส่วนหัวและกล่องสรุปกระชับ แต่ยังคงข้อมูลสำคัญครบ */
+  .r-head, .head { padding-bottom: 2mm !important; margin-bottom: 2mm !important; }
+  .r-title { margin: 1.5mm 0 .7mm !important; font-size: 10pt !important; }
+  .r-brand, .brand { font-size: 10pt !important; }
+  .r-sub, .r-meta, .meta, .r-note { font-size: 6.5pt !important; margin: 0 !important; }
+  .warn, .other-note, .special-note { padding: 1.5mm 2mm !important; margin: 0 0 2mm !important; }
+  .kgrid, .summary, .equip-summary {
+    display: grid !important; grid-template-columns: repeat(6, 1fr) !important;
+    gap: 1mm !important; margin: 0 0 2mm !important;
+  }
+  .summary { grid-template-columns: repeat(3, 1fr) !important; }
+  .kc, .card, .stat, .es-item {
+    padding: 1.2mm !important; border-radius: 1mm !important; min-height: 0 !important;
+  }
+  .kc .n, .card b, .stat b, .es-n { font-size: 9pt !important; }
+  .kc .l { font-size: 5.8pt !important; margin-top: 0 !important; }
+
+  /* ตารางกะทัดรัดสำหรับแนวตั้ง และพิมพ์หัวตารางซ้ำเมื่อขึ้นหน้าใหม่ */
+  table { width: 100% !important; max-width: 100% !important; min-width: 0 !important;
+    border-collapse: collapse !important; table-layout: auto !important;
+    margin: 0 0 2mm !important; font-size: 6.3pt !important; line-height: 1.12 !important; }
+  thead { display: table-header-group; }
+  tfoot { display: table-footer-group; }
+  tr { break-inside: avoid; page-break-inside: avoid; }
+  th, td { padding: .65mm .8mm !important; height: auto !important; vertical-align: top !important;
+    overflow-wrap: anywhere !important; word-break: normal !important; }
+  th { font-size: 6pt !important; white-space: normal !important; }
+  td.num, th.num { white-space: nowrap !important; }
+
+  /* ไม่กันทั้งหมวดใหญ่ไว้หน้าเดียว เพราะจะเหลือกระดาษว่าง; กันเฉพาะหัวหมวดกับแถวถัดไป */
+  .zone-section { break-inside: auto !important; page-break-inside: auto !important; margin: 0 0 2mm !important; }
+  .zone-head { break-after: avoid; page-break-after: avoid; padding: 1mm 1.5mm !important; }
+  .zone-total, .grand-total { padding: 1mm 1.5mm !important; }
+  .foot { margin-top: 2mm !important; padding-top: 1mm !important; font-size: 5.8pt !important; }
+  .sign-area { margin-top: 4mm !important; gap: 8mm !important; break-inside: avoid; }
+  .sign-box { min-height: 12mm !important; }
+
+  a { color: #000 !important; text-decoration: none !important; }
+  .void { display: none !important; }
+}
+</style>
+<!-- ==== PM_PRINT_KIT:END ==== -->
 </head><body>
 <div class="bar"><h1>รายงานประวัติรับชำระผู้ค้าประจำแยกตามล็อค</h1><div><button onclick="render()">รีเฟรช</button> <button onclick="print()">พิมพ์ / PDF</button></div></div>
 <main class="page"><div class="filters">
