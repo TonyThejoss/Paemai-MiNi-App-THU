@@ -1634,7 +1634,9 @@ node tools/test_offline_map.js                 ✅ ทุกสถานกา�
   ล้างตัวเลือก และตัดสัญญาที่สิ้นสุด
 - `test:billing`, `test:accounts`, `test:permissions`, `test:sheets`, `test:aug2026`,
   `test:responsive` และ `test:maps` ผ่าน โดยไม่มีการเขียนข้อมูลผู้ค้าหรือรายการรับเงินจริง
-- ณ เวลาบันทึกคู่มือ เครื่องทำงานไม่มี local Git repository และไม่มี GitHub CLI จึงยังไม่ได้สร้าง commit/
-  deploy รอบ v3.0.1; ต้องเผยแพร่ `dist/tuesday/` และ `dist/thursday/` ก่อนตรวจ GitHub Pages จริง
+- เผยแพร่ผ่าน GitHub Browser แล้ว: TUE commit `ff9b917a9d2073e4efd8cc0244413e9460cb16a0` และ
+  THU commit `0507398864698bd23dfd528407327fcfdd368bbc`; เปิดรายงาน 09 จาก GitHub Pages จริงทั้งสองตลาด
+  แล้วพบว่าหน้าไม่เด้งออกและส่วนเลือกหลายโซนแสดงถูกต้อง การตรวจข้อมูลจริงยังต้องทำใน session ที่ล็อกอิน
+  เนื่องจาก `getVendors` ปฏิเสธผู้ที่เปิดลิงก์รายงานโดยตรงโดยไม่มีสิทธิ์ตามการออกแบบ
 
 **[⬆ กลับไปที่สารบัญ](#สารบัญ)**
