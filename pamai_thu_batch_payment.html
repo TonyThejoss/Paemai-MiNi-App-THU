@@ -667,7 +667,7 @@ input, select, textarea, button { font-family: inherit; max-width: 100%; }
         </select>
         <select class="filter-select" id="statusFilter" onchange="filterLocks()">
           <option value="">ทุกสถานะ</option>
-          <option value="unpaid">ค้างชำระ</option>
+          <option value="unpaid" selected>ค้างชำระ</option>
           <option value="partial">ชำระบางส่วน</option>
           <option value="paid">ชำระแล้ว</option>
         </select>
@@ -761,7 +761,6 @@ input, select, textarea, button { font-family: inherit; max-width: 100%; }
       <div class="action-btns">
         <button class="btn btn-outline" onclick="clearAll()"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>️ ล้างทั้งหมด</button>
         <button class="btn btn-outline" onclick="fillAllFull()"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg> กรอกเต็มทุกล็อค</button>
-        <button class="btn btn-outline" onclick="openDiscountModal()" title="กำหนดส่วนลดค่าเช่ารายเดือน (รายล็อค หรือเท่ากันทั้งตลาด)"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M20.6 3.4A2 2 0 0 0 19.2 3H15L5.4 12.6a2 2 0 0 0 0 2.8l5.2 5.2a2 2 0 0 0 2.8 0L23 11V6.8a2 2 0 0 0-.6-1.4Z"/><circle cx="17.5" cy="8.5" r="1.3" fill="currentColor" stroke="none"/></svg> ส่วนลดค่าเช่า</button>
         <button class="btn btn-primary" id="saveBtn" disabled onclick="openConfirm()">
           <svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2Z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg> บันทึกการรับเงิน
         </button>
@@ -981,6 +980,12 @@ function pmRentBreakdown(lock){
 // ── DATA — โหลดจาก Google Sheets จริง (แทน mock data เดิม) ──
 let ALL_LOCKS = [];
 
+// เรียงเลขล็อคแบบธรรมชาติ: A1, A2, A10, B1, ... SA1, SF1
+// ใช้ตัวเปรียบเทียบเดียวกันทั้งรายการค้นหาและตารางที่เลือก
+function compareLockIds(a,b){
+  return String(a||'').localeCompare(String(b||''),'en',{numeric:true,sensitivity:'base'});
+}
+
 async function loadLocksFromSheets(){
   const wrap=document.getElementById('lockList');
   if(!getApiUrl()){
@@ -1043,6 +1048,7 @@ async function loadLocksFromSheets(){
     l.unpaidPenalty=0; l.unpaidOther=0; l.unpaidOtherLabel='';
     l.status=outstanding>0?'unpaid':'paid'; l.feeNotes=['ยอดค้างรวมค่าเช่าและค่าไฟ หลังหักการชำระเดิมแล้ว'];
   });
+  ALL_LOCKS.sort((a,b)=>compareLockIds(a.id,b.id));
   filteredLocks=[...ALL_LOCKS];
   renderLockList();
 }
@@ -1080,7 +1086,7 @@ function renderLockList() {
     const matchZone = !zone || l.zone === zone;
     const matchStatus = !status || l.status === status;
     return matchQ && matchZone && matchStatus;
-  });
+  }).sort((a,b)=>compareLockIds(a.id,b.id));
 
   const html = filteredLocks.map(l => {
     const totalDue = l.due + l.electric + l.unpaidPenalty + l.unpaidOther;

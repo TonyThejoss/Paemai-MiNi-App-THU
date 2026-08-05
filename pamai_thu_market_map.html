@@ -1454,8 +1454,7 @@ function showPopup(el,ev){
 async function loadPopupFinance(lockId,isOccupied){
   const box=document.getElementById('ppFinance');if(!box)return;if(!isOccupied){box.style.display='none';box.innerHTML='';return}
   box.style.display='block';box.innerHTML='<div class="pp-fin-title">การเงิน</div>กำลังโหลดยอดค้าง…';
-  const rent=parseFloat(document.querySelector('.lk[data-id="'+lockId+'"]')?.dataset.rent)||0;const n=new Date(),month=n.getFullYear()+'-'+String(n.getMonth()+1).padStart(2,'0')+'-01';
-  await apiPost('ensureVendorCharges',{data:{rows:[{lock_id:lockId,billing_month:month,type:'ยอดเรียกเก็บประจำเดือน',description:'ยอดรวมประจำเดือน',amount:rent}]}});
+  // ผังตลาดอ่านจากบัญชีลูกหนี้เท่านั้น ห้ามสร้างหนี้ตอนเปิดป๊อปอัป (ป้องกันค่าเช่าซ้ำ)
   const accounts=await apiGet('getVendorAccounts',{lockId}),a=Array.isArray(accounts)?accounts.find(x=>!x.ended_at):null;if(!a){box.innerHTML='<div class="pp-fin-title">การเงิน</div><span style="color:var(--r)">โหลดบัญชีผู้ค้าไม่สำเร็จ</span>';return}
   const due=parseFloat(a.outstanding)||0,hist=await apiGet('getVendorPaymentHistory',{leaseId:a.lease_id}),latest=(Array.isArray(hist)?hist:[]).slice(0,5);
   box.innerHTML='<div class="pp-fin-title">การเงิน · ยอดค้าง <strong style="color:var(--r)">'+fmt(due)+'</strong></div>'+(due>0?'<div class="pp-fin-row"><input id="ppPayAmt" type="number" min="1" max="'+due+'" value="'+due+'"><select id="ppPayMethod"><option>เงินสด</option><option>โอนเงิน</option></select><button onclick="receivePopupPayment(\''+lockId+'\','+a.lease_id+','+due+')">รับชำระ</button></div>':'<div style="color:var(--gm);font-weight:800">✓ ไม่มียอดค้าง</div>')+'<div class="pp-fin-hist"><b>5 รายการล่าสุด</b>'+(latest.length?latest.map(x=>'<span>'+x.date+' · '+x.method+' · '+fmt(x.amount)+'</span>').join(''):'<span>ยังไม่มีประวัติรับชำระ</span>')+'<a href="#" onclick="openPaymentHistory(\''+lockId+'\','+a.lease_id+');return false">ดูประวัติการชำระทั้งหมด</a></div>';

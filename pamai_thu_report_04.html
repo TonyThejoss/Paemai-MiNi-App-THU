@@ -787,10 +787,12 @@ async function render(){
   const unpaid = vendors.filter(v=>(parseFloat(accountByLock.get(v.lock)?.outstanding)||0)>0);
   const tuesdays = thisMonthThursdays();
 
-  // คำนวณยอดค้างแต่ละล็อค: ค่าเช่ารายเดือน + ค่าไฟ + ค่าปรับค้างจ่าย + ค่าอื่นค้างจ่าย
+  // อ่านองค์ประกอบยอดค้างจากบัญชีลูกหนี้ชุดเดียวกับผัง/หน้ารับชำระ
+  // เดิมนำ outstanding (ซึ่งรวมค่าไฟแล้ว) ไปแสดงเป็นค่าเช่า ทำให้รายงานแยกประเภทผิด
   const withDebt = unpaid.map(v=>{
-    const rent = parseFloat(accountByLock.get(v.lock)?.outstanding)||0;
-    const elec = 0;
+    const account = accountByLock.get(v.lock)||{};
+    const rent = parseFloat(account.outstanding_non_electric)||0;
+    const elec = parseFloat(account.outstanding_electric)||0;
     const penalty = 0;
     const other = 0;
     const otherLabel = v.unpaid_other_label||'';

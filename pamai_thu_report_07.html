@@ -807,10 +807,11 @@ async function render(){
   // 08 = ยอดที่รับชำระจริงจากชีต payments) ผู้ใช้เข้าใจผิดว่าเป็นรายงานซ้ำ จึงรวมเป็นฉบับเดียว
   // แสดงเทียบกันคอลัมน์ต่อคอลัมน์ + ส่วนต่าง เพื่อให้เห็นว่าล็อคใดยังเก็บค่าไฟไม่ครบ
   const elecMonth = PM_FILTER.monthKey();   // เดือนที่ใช้เทียบยอดรับชำระจริง
-  const paidRows  = await apiGet('getPayments', { month: elecMonth }) || [];
+  // ยอดรับค่าไฟต้องอ่านจาก payment_allocations เพราะการรับเงินหนึ่งครั้งอาจตัดทั้งค่าเช่าและค่าไฟ
+  const paidRows  = await apiGet('getVendorPaymentHistory', { month: elecMonth }) || [];
   const PAID_BY_LOCK = {};
-  paidRows.filter(x=>String(x.type)==='ค่าไฟฟ้า').forEach(x=>{
-    const k=x.lock_id||''; PAID_BY_LOCK[k]=(PAID_BY_LOCK[k]||0)+(parseFloat(x.amount)||0);
+  paidRows.forEach(x=>{
+    const k=x.lock_id||''; PAID_BY_LOCK[k]=(PAID_BY_LOCK[k]||0)+(parseFloat(x.electric_amount)||0);
   });
   const totalPaidElec = Object.keys(PAID_BY_LOCK).reduce((a,k)=>a+PAID_BY_LOCK[k],0);
   // เฉพาะผู้ค้าที่ยังเช่าอยู่จริง (ไม่รวมที่ยกเลิกสัญญา) และมีอุปกรณ์ไฟฟ้าอย่างน้อย 1 ชิ้น
