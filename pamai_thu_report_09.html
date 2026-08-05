@@ -7,6 +7,7 @@
 <style>
 :root{--g:#7c2d12;--gm:#c2410c;--gl:#ffedd5;--bg:#eef2f0;--sf:#fff;--bd:#d0ddd5;--tx:#0a1a10;--txl:#9c7c5b;--r:#b91c1c;}
 *{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--tx);font:14px system-ui,-apple-system,"Sarabun",sans-serif}.toolbar{position:sticky;top:0;z-index:2;background:linear-gradient(135deg,var(--g),var(--gm));color:#fff;padding:11px 18px;display:flex;justify-content:space-between;gap:10px;align-items:center;flex-wrap:wrap}.toolbar h1{font-size:1rem;margin:0}.toolbar p{margin:2px 0 0;font-size:.75rem;opacity:.82}.btn{border:1px solid rgba(255,255,255,.35);border-radius:8px;padding:8px 12px;color:#fff;background:rgba(255,255,255,.14);font:inherit;font-weight:700;cursor:pointer}.page{max-width:1240px;margin:18px auto;background:var(--sf);padding:24px;border-radius:12px;box-shadow:0 2px 14px #0001}.head{display:flex;justify-content:space-between;gap:12px;border-bottom:3px solid var(--gm);padding-bottom:12px}.brand{font-weight:900;color:var(--g);font-size:1.1rem}.meta{font-size:.75rem;color:var(--txl);text-align:right}.summary{display:grid;grid-template-columns:repeat(4,1fr);gap:9px;margin:16px 0}.stat{background:#f4f8f5;border:1px solid var(--bd);border-radius:8px;padding:10px;text-align:center}.stat b{display:block;color:var(--gm);font-size:1.2rem}.stat span{font-size:.72rem;color:var(--txl)}.tablewrap{overflow:auto}table{width:100%;border-collapse:collapse;min-width:900px}th{background:#e8f0eb;color:var(--g);font-size:.72rem;text-align:left;padding:8px;border-bottom:2px solid var(--gm)}td{padding:8px;border-bottom:1px solid var(--bd);vertical-align:top}tbody tr:nth-child(even){background:#f8faf9}.num{text-align:right;white-space:nowrap}.status{font-size:.72rem;font-weight:800;padding:3px 7px;border-radius:999px;background:var(--gl);color:var(--g)}.status.unpaid{background:#fff0d8;color:#8a3b00}.empty,.error{padding:30px;text-align:center;color:var(--txl)}.error{color:var(--r)}@media(max-width:700px){.page{margin:0;padding:15px;border-radius:0}.summary{grid-template-columns:repeat(2,1fr)}.head{display:block}.meta{text-align:left;margin-top:7px}}@media print{body{background:#fff}.toolbar{display:none}.page{box-shadow:none;margin:0;padding:0;max-width:none}.tablewrap{overflow:visible}@page{size:A4 landscape;margin:10mm}}
+.zone-filter{margin:14px 0;padding:11px 13px;border:1px solid var(--bd);border-radius:9px;background:#f8faf9}.zone-filter-head{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:8px}.zone-filter-title{font-size:.8rem;font-weight:800;color:var(--g)}.zone-filter-hint{font-size:.7rem;color:var(--txl)}.zone-options{display:flex;gap:7px;flex-wrap:wrap}.zone-check{display:inline-flex;align-items:center;gap:5px;padding:5px 9px;border:1px solid var(--bd);border-radius:999px;background:#fff;font-size:.74rem;font-weight:700;cursor:pointer;user-select:none}.zone-check:has(input:checked){border-color:var(--gm);background:var(--gl);color:var(--g)}.zone-check input{margin:0;accent-color:var(--gm)}.zone-clear{border:0;background:none;color:var(--gm);font:inherit;font-size:.72rem;font-weight:800;cursor:pointer;padding:4px 0}@media print{.zone-filter{display:none}}
 </style>
 <!-- ==== PM_MOBILE_KIT:START (สร้างโดย tools/inject_mobile_kit.py — ห้ามแก้ในไฟล์นี้) ==== -->
 <style id="pm-mobile-kit">
@@ -217,6 +218,9 @@ input, select, textarea, button { font-family: inherit; max-width: 100%; }
       if (event.origin !== window.location.origin) return;
       if (event.data && event.data.type === 'pmthu-session' && typeof event.data.session === 'string') {
         embeddedSession = event.data.session;
+        /* รายงาน PDF เปิดจาก iframe ไปยัง browsing context ใหม่ เดิม token อยู่แค่ใน
+           ตัวแปรของ iframe จึงหายระหว่างเปิดรายงาน แม้ผู้ใช้ยังล็อกอินอยู่. */
+        try { sessionStorage.setItem('pmthu-session', event.data.session); } catch (e) {}
         /* ผังเริ่มโหลดข้อมูลตั้งแต่ window.onload ซึ่งอาจเร็วกว่าข้อความจากหน้าแม่
            จึงต้องสั่งดึงใหม่ทันทีหลังรับ token ไม่รอ retry รอบเดิมหมดก่อน. */
         if (typeof window.loadVendorOccupancy === 'function') window.loadVendorOccupancy();
@@ -278,6 +282,10 @@ input, select, textarea, button { font-family: inherit; max-width: 100%; }
       if ((!sess || !sess.apiToken) && window.parent && window.parent !== window) {
         sess = JSON.parse(window.parent.sessionStorage.getItem('pmthu-session') || 'null');
       }
+      /* รายงานที่เปิดเป็นหน้าต่างใหม่มี opener เป็น launcher เดิม ไม่ใช่ parent. */
+      if ((!sess || !sess.apiToken) && window.opener && window.opener.location.origin === window.location.origin) {
+        sess = JSON.parse(window.opener.sessionStorage.getItem('pmthu-session') || 'null');
+      }
       if (sess && sess.apiToken) body.sessionToken = sess.apiToken;
     } catch (e) {}
     return fetch(SB_URL + '/rest/v1/rpc/api', {
@@ -316,7 +324,7 @@ input, select, textarea, button { font-family: inherit; max-width: 100%; }
 </head>
 <body>
 <header class="toolbar"><div><h1>รายงานข้อมูลผู้ค้าปัจจุบัน</h1><p>แพไม้มินิ · แสดงเฉพาะผู้ค้าที่ยังมีสัญญา</p></div><div><button class="btn" onclick="render()">↻ อัปเดต</button> <button class="btn" onclick="print()">พิมพ์ / PDF</button> <button class="btn" onclick="history.back()">← กลับ</button></div></header>
-<main class="page"><div class="head"><div><div class="brand">แพไม้มินิ — รายชื่อผู้ค้าปัจจุบัน</div><div style="font-size:.78rem;color:var(--txl);margin-top:3px">โซน · ล็อค · ชื่อ · เบอร์โทร · สินค้า · ค่าเช่า · ค่าไฟ · ยอดรวม</div></div><div class="meta" id="stamp">—</div></div><section class="summary" id="summary"></section><div class="tablewrap"><table><thead><tr><th>โซน</th><th>ล็อค</th><th>ชื่อผู้ค้า</th><th>เบอร์โทร</th><th>สินค้า</th><th class="num">ค่าเช่า/เดือน</th><th class="num">ค่าไฟ/เดือน</th><th class="num">รวม/เดือน</th><th>สถานะ</th></tr></thead><tbody id="rows"><tr><td colspan="9" class="empty">กำลังโหลดข้อมูล…</td></tr></tbody></table></div></main>
+<main class="page"><div class="head"><div><div class="brand">แพไม้มินิ — รายชื่อผู้ค้าปัจจุบัน</div><div style="font-size:.78rem;color:var(--txl);margin-top:3px">โซน · ล็อค · ชื่อ · เบอร์โทร · สินค้า · ค่าเช่า · ค่าไฟ · ยอดรวม</div></div><div class="meta" id="stamp">—</div></div><section class="summary" id="summary"></section><section class="zone-filter" aria-labelledby="zone-filter-title"><div class="zone-filter-head"><div><div class="zone-filter-title" id="zone-filter-title">เลือกโซนที่ต้องการดู</div><div class="zone-filter-hint">ไม่ติ๊กโซน = แสดงผู้ค้าปัจจุบันทุกล็อค</div></div><button class="zone-clear" type="button" onclick="clearZoneFilter()">ล้างตัวเลือก (ดูทั้งหมด)</button></div><div class="zone-options" id="zone-options"><span class="zone-filter-hint">กำลังโหลดรายชื่อโซน…</span></div></section><div class="tablewrap"><table><thead><tr><th>โซน</th><th>ล็อค</th><th>ชื่อผู้ค้า</th><th>เบอร์โทร</th><th>สินค้า</th><th class="num">ค่าเช่า/เดือน</th><th class="num">ค่าไฟ/เดือน</th><th class="num">รวม/เดือน</th><th>สถานะ</th></tr></thead><tbody id="rows"><tr><td colspan="9" class="empty">กำลังโหลดข้อมูล…</td></tr></tbody></table></div></main>
 <script>
 function getApiUrl(){return (localStorage.getItem('pm-thu-api-url')||localStorage.getItem('pm-api-url'))||'';}
 function getApiToken(){return (localStorage.getItem('pm-thu-api-token')||localStorage.getItem('pm-api-token'))||'';}
@@ -325,9 +333,33 @@ const baht=n=>'฿'+Math.round(n||0).toLocaleString('th-TH');
 function daysInMonth(){const n=new Date(),d=new Date(n.getFullYear(),n.getMonth(),1);let c=0;while(d.getMonth()===n.getMonth()){if(d.getDay()===4)c++;d.setDate(d.getDate()+1)}return c}
 function elec(v){const sp=(Array.isArray(v.elec_special)?v.elec_special:[]).reduce((s,x)=>s+(Number(x.price)||0),0);return ((Number(v.elec_bulb)||0)*10+(Number(v.elec_fan)||0)*20+(Number(v.elec_small)||0)*50+(Number(v.elec_large)||0)*100+sp)*daysInMonth()}
 function esc(s){return String(s??'').replace(/[&<>"']/g,x=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[x]))}
-async function render(){const out=document.getElementById('rows');out.innerHTML='<tr><td colspan="9" class="empty">กำลังโหลดข้อมูล…</td></tr>';const all=await apiGet('getVendors');if(!Array.isArray(all)){out.innerHTML='<tr><td colspan="9" class="error">โหลดข้อมูลไม่สำเร็จ — กรุณาเข้าสู่ระบบและลองใหม่</td></tr>';return}const vs=all.filter(v=>v.status!=='terminated').sort((a,b)=>(a.zone||'').localeCompare(b.zone||'')||String(a.lock).localeCompare(String(b.lock),undefined,{numeric:true}));let rent=0,power=0;out.innerHTML=vs.length?vs.map(v=>{const r=(Number(v.dailyRate)||0)*daysInMonth(),e=elec(v);rent+=r;power+=e;const unpaid=v.status==='unpaid';return '<tr><td>'+esc(v.zone)+'</td><td><b>'+esc(v.lock)+'</b></td><td>'+esc(v.name||'—')+'</td><td>'+esc(v.phone||'—')+'</td><td>'+esc(v.product||'—')+'</td><td class="num">'+baht(r)+'</td><td class="num">'+baht(e)+'</td><td class="num"><b>'+baht(r+e)+'</b></td><td><span class="status '+(unpaid?'unpaid':'')+'">'+(unpaid?'ค้างชำระ':'ปกติ')+'</span></td></tr>'}).join(''):'<tr><td colspan="9" class="empty">ยังไม่มีผู้ค้าปัจจุบัน</td></tr>';document.getElementById('summary').innerHTML='<div class="stat"><b>'+vs.length+'</b><span>ผู้ค้าปัจจุบัน</span></div><div class="stat"><b>'+daysInMonth()+'</b><span>วันตลาดในเดือนนี้</span></div><div class="stat"><b>'+baht(rent)+'</b><span>ค่าเช่า/เดือน</span></div><div class="stat"><b>'+baht(rent+power)+'</b><span>รวมค่าเช่า+ค่าไฟ/เดือน</span></div>';document.getElementById('stamp').textContent='ข้อมูล ณ '+new Date().toLocaleString('th-TH')}
+let CURRENT_VENDORS=[];
+function vendorZone(v){return String(v.zone||((String(v.lock||'').match(/^[A-Z]+/)||[''])[0])||'ไม่ระบุ')}
+function selectedZones(){return new Set(Array.from(document.querySelectorAll('#zone-options input:checked')).map(x=>x.value))}
+function renderZoneOptions(){
+  const box=document.getElementById('zone-options'),selected=selectedZones();
+  const zones=[...new Set(CURRENT_VENDORS.map(v=>vendorZone(v)))].sort((a,b)=>a.localeCompare(b,undefined,{numeric:true}));
+  box.innerHTML=zones.length?zones.map(z=>'<label class="zone-check"><input type="checkbox" value="'+esc(z)+'" '+(selected.has(z)?'checked ':'')+'onchange="renderRows()">โซน '+esc(z)+'</label>').join(''):'<span class="zone-filter-hint">ยังไม่มีโซนในข้อมูลผู้ค้าปัจจุบัน</span>';
+}
+function clearZoneFilter(){document.querySelectorAll('#zone-options input').forEach(x=>x.checked=false);renderRows()}
+function renderRows(){
+  const chosen=selectedZones();
+  const vs=CURRENT_VENDORS.filter(v=>!chosen.size||chosen.has(vendorZone(v))).sort((a,b)=>vendorZone(a).localeCompare(vendorZone(b),undefined,{numeric:true})||String(a.lock||'').localeCompare(String(b.lock||''),undefined,{numeric:true}));
+  let rent=0,power=0;
+  const out=document.getElementById('rows');
+  out.innerHTML=vs.length?vs.map(v=>{const r=(Number(v.dailyRate??v.daily_rate??v.rent)||0)*daysInMonth(),e=elec(v);rent+=r;power+=e;const unpaid=v.status==='unpaid';return '<tr><td>'+esc(vendorZone(v))+'</td><td><b>'+esc(v.lock||'—')+'</b></td><td>'+esc(v.name||'—')+'</td><td>'+esc(v.phone||'—')+'</td><td>'+esc(v.product||'—')+'</td><td class="num">'+baht(r)+'</td><td class="num">'+baht(e)+'</td><td class="num"><b>'+baht(r+e)+'</b></td><td><span class="status '+(unpaid?'unpaid':'')+'">'+(unpaid?'ค้างชำระ':'ปกติ')+'</span></td></tr>'}).join(''):'<tr><td colspan="9" class="empty">ไม่พบผู้ค้าปัจจุบันในโซนที่เลือก</td></tr>';
+  document.getElementById('summary').innerHTML='<div class="stat"><b>'+vs.length+'</b><span>ผู้ค้าปัจจุบัน'+(chosen.size?'ในโซนที่เลือก':'ทั้งหมด')+'</span></div><div class="stat"><b>'+daysInMonth()+'</b><span>วันตลาดในเดือนนี้</span></div><div class="stat"><b>'+baht(rent)+'</b><span>ค่าเช่า/เดือน</span></div><div class="stat"><b>'+baht(rent+power)+'</b><span>รวมค่าเช่า+ค่าไฟ/เดือน</span></div>';
+  document.getElementById('stamp').textContent='ข้อมูล ณ '+new Date().toLocaleString('th-TH')+(chosen.size?' · '+[...chosen].map(z=>'โซน '+z).join(', '):' · ทุกโซน');
+}
+async function render(){
+  const out=document.getElementById('rows');out.innerHTML='<tr><td colspan="9" class="empty">กำลังโหลดข้อมูล…</td></tr>';
+  const all=await apiGet('getVendors');
+  if(!Array.isArray(all)){out.innerHTML='<tr><td colspan="9" class="error">โหลดข้อมูลไม่สำเร็จ — กรุณาเข้าสู่ระบบและลองใหม่</td></tr>';return}
+  CURRENT_VENDORS=all.filter(v=>v&&v.status!=='terminated');renderZoneOptions();renderRows();
+}
 render();
 </script>
+
 
 
 

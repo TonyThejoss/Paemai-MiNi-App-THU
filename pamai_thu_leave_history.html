@@ -309,6 +309,9 @@ input, select, textarea, button { font-family: inherit; max-width: 100%; }
       if (event.origin !== window.location.origin) return;
       if (event.data && event.data.type === 'pmthu-session' && typeof event.data.session === 'string') {
         embeddedSession = event.data.session;
+        /* รายงาน PDF เปิดจาก iframe ไปยัง browsing context ใหม่ เดิม token อยู่แค่ใน
+           ตัวแปรของ iframe จึงหายระหว่างเปิดรายงาน แม้ผู้ใช้ยังล็อกอินอยู่. */
+        try { sessionStorage.setItem('pmthu-session', event.data.session); } catch (e) {}
         /* ผังเริ่มโหลดข้อมูลตั้งแต่ window.onload ซึ่งอาจเร็วกว่าข้อความจากหน้าแม่
            จึงต้องสั่งดึงใหม่ทันทีหลังรับ token ไม่รอ retry รอบเดิมหมดก่อน. */
         if (typeof window.loadVendorOccupancy === 'function') window.loadVendorOccupancy();
@@ -369,6 +372,10 @@ input, select, textarea, button { font-family: inherit; max-width: 100%; }
       }
       if ((!sess || !sess.apiToken) && window.parent && window.parent !== window) {
         sess = JSON.parse(window.parent.sessionStorage.getItem('pmthu-session') || 'null');
+      }
+      /* รายงานที่เปิดเป็นหน้าต่างใหม่มี opener เป็น launcher เดิม ไม่ใช่ parent. */
+      if ((!sess || !sess.apiToken) && window.opener && window.opener.location.origin === window.location.origin) {
+        sess = JSON.parse(window.opener.sessionStorage.getItem('pmthu-session') || 'null');
       }
       if (sess && sess.apiToken) body.sessionToken = sess.apiToken;
     } catch (e) {}
@@ -880,6 +887,7 @@ window.onload=()=>{
   loadAll();
 };
 </script>
+
 
 
 

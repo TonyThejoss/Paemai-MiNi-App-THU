@@ -489,6 +489,14 @@ input, select, textarea, button { font-family: inherit; max-width: 100%; }
 </div>
 
 <script>
+/* หน้า launcher ไม่มี apiGet จึงไม่ได้รับ PM_API_CLIENT อัตโนมัติ แต่เป็นผู้เปิดรายงาน
+   ใน browsing context ใหม่เอง ต้องรับ session จาก shell และเก็บใน sessionStorage ก่อน. */
+window.addEventListener('message',function(event){
+  if(event.origin!==window.location.origin||!event.data||event.data.type!=='pmthu-session'||typeof event.data.session!=='string')return;
+  try{sessionStorage.setItem('pmthu-session',event.data.session);}catch(e){}
+});
+try{if(window.parent&&window.parent!==window)window.parent.postMessage({type:'pm-session-request'},window.location.origin);}catch(e){}
+
 function toggleDark(){
   const h=document.documentElement,d=h.getAttribute('data-theme')==='dark';
   h.setAttribute('data-theme',d?'light':'dark');
@@ -515,7 +523,9 @@ function getApiUrl(){ return (localStorage.getItem('pm-thu-api-url')||localStora
 function getApiToken(){return (localStorage.getItem('pm-thu-api-token')||localStorage.getItem('pm-api-token'))||'';}
 
 function openReport(file){
-  window.open(file, '_blank');
+  const reportWindow=window.open(file, '_blank');
+  /* WebView/PWA บางรุ่นบล็อก popup: เปิดในหน้าเดิมแทนเพื่อไม่ให้ผู้ใช้กดแล้วเด้งกลับ. */
+  if(!reportWindow) window.location.href=file;
 }
 
 function goSetupSheets(){

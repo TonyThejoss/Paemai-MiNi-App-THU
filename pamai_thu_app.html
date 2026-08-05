@@ -540,6 +540,9 @@ input, select, textarea, button { font-family: inherit; max-width: 100%; }
       if (event.origin !== window.location.origin) return;
       if (event.data && event.data.type === 'pmthu-session' && typeof event.data.session === 'string') {
         embeddedSession = event.data.session;
+        /* รายงาน PDF เปิดจาก iframe ไปยัง browsing context ใหม่ เดิม token อยู่แค่ใน
+           ตัวแปรของ iframe จึงหายระหว่างเปิดรายงาน แม้ผู้ใช้ยังล็อกอินอยู่. */
+        try { sessionStorage.setItem('pmthu-session', event.data.session); } catch (e) {}
         /* ผังเริ่มโหลดข้อมูลตั้งแต่ window.onload ซึ่งอาจเร็วกว่าข้อความจากหน้าแม่
            จึงต้องสั่งดึงใหม่ทันทีหลังรับ token ไม่รอ retry รอบเดิมหมดก่อน. */
         if (typeof window.loadVendorOccupancy === 'function') window.loadVendorOccupancy();
@@ -600,6 +603,10 @@ input, select, textarea, button { font-family: inherit; max-width: 100%; }
       }
       if ((!sess || !sess.apiToken) && window.parent && window.parent !== window) {
         sess = JSON.parse(window.parent.sessionStorage.getItem('pmthu-session') || 'null');
+      }
+      /* รายงานที่เปิดเป็นหน้าต่างใหม่มี opener เป็น launcher เดิม ไม่ใช่ parent. */
+      if ((!sess || !sess.apiToken) && window.opener && window.opener.location.origin === window.location.origin) {
+        sess = JSON.parse(window.opener.sessionStorage.getItem('pmthu-session') || 'null');
       }
       if (sess && sess.apiToken) body.sessionToken = sess.apiToken;
     } catch (e) {}
@@ -1027,7 +1034,7 @@ function toggleDark(){
   else if(window.matchMedia('(prefers-color-scheme:dark)').matches) document.documentElement.setAttribute('data-theme','dark');
 })();
 
-const APP_BUILD='20260805-1428'; // cache-buster — build.py แทนค่าอัตโนมัติ
+const APP_BUILD='20260805-1516'; // cache-buster — build.py แทนค่าอัตโนมัติ
 const DAYS=['อาทิตย์','จันทร์','อังคาร','พุธ','พฤหัสบดี','ศุกร์','เสาร์'];
 const MONS=['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
 const PM_CLOCK_KEY='pm-system-clock';
@@ -2270,6 +2277,7 @@ window.onload=function(){
   logAct('system','ระบบเริ่มทำงาน — แพไม้มินิ v1.0');
 };
 </script>
+
 
 
 

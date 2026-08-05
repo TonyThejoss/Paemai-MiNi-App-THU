@@ -216,6 +216,9 @@ input, select, textarea, button { font-family: inherit; max-width: 100%; }
       if (event.origin !== window.location.origin) return;
       if (event.data && event.data.type === 'pmthu-session' && typeof event.data.session === 'string') {
         embeddedSession = event.data.session;
+        /* รายงาน PDF เปิดจาก iframe ไปยัง browsing context ใหม่ เดิม token อยู่แค่ใน
+           ตัวแปรของ iframe จึงหายระหว่างเปิดรายงาน แม้ผู้ใช้ยังล็อกอินอยู่. */
+        try { sessionStorage.setItem('pmthu-session', event.data.session); } catch (e) {}
         /* ผังเริ่มโหลดข้อมูลตั้งแต่ window.onload ซึ่งอาจเร็วกว่าข้อความจากหน้าแม่
            จึงต้องสั่งดึงใหม่ทันทีหลังรับ token ไม่รอ retry รอบเดิมหมดก่อน. */
         if (typeof window.loadVendorOccupancy === 'function') window.loadVendorOccupancy();
@@ -277,6 +280,10 @@ input, select, textarea, button { font-family: inherit; max-width: 100%; }
       if ((!sess || !sess.apiToken) && window.parent && window.parent !== window) {
         sess = JSON.parse(window.parent.sessionStorage.getItem('pmthu-session') || 'null');
       }
+      /* รายงานที่เปิดเป็นหน้าต่างใหม่มี opener เป็น launcher เดิม ไม่ใช่ parent. */
+      if ((!sess || !sess.apiToken) && window.opener && window.opener.location.origin === window.location.origin) {
+        sess = JSON.parse(window.opener.sessionStorage.getItem('pmthu-session') || 'null');
+      }
       if (sess && sess.apiToken) body.sessionToken = sess.apiToken;
     } catch (e) {}
     return fetch(SB_URL + '/rest/v1/rpc/api', {
@@ -336,6 +343,7 @@ async function render(){body.className='empty';body.textContent='กำลัง
 async function voidPayment(id){if(!canDeletePayment()){alert('เฉพาะ Admin ที่ได้รับสิทธิ์ลบธุรกรรมเท่านั้น');return}const reason=prompt('ระบุเหตุผลที่ยกเลิกรายการรับเงิน (อย่างน้อย 4 ตัวอักษร)');if(reason===null)return;if(reason.trim().length<4){alert('กรุณาระบุเหตุผลอย่างน้อย 4 ตัวอักษร');return}if(!confirm('ยืนยันยกเลิกรายการรับเงิน #'+id+' และคืนยอดค้างใช่หรือไม่?'))return;const r=await apiPost('reverseVendorPayment',{data:{payment_id:id,reason:reason.trim()}});if(!r||r.status!=='ok'){alert(r?.message||'ยกเลิกรายการไม่สำเร็จ');return}alert('ยกเลิกรายการแล้ว และคืนยอดค้างอัตโนมัติ');await loadAccounts();await render()}
 window.addEventListener('load',async()=>{try{await loadAccounts();await render()}catch(e){body.className='error';body.textContent=e.message}});
 </script>
+
 
 
 <script id="pm-api-shim">
