@@ -523,9 +523,9 @@ function getApiUrl(){ return (localStorage.getItem('pm-thu-api-url')||localStora
 function getApiToken(){return (localStorage.getItem('pm-thu-api-token')||localStorage.getItem('pm-api-token'))||'';}
 
 function openReport(file){
-  const reportWindow=window.open(file, '_blank');
-  /* WebView/PWA บางรุ่นบล็อก popup: เปิดในหน้าเดิมแทนเพื่อไม่ให้ผู้ใช้กดแล้วเด้งกลับ. */
-  if(!reportWindow) window.location.href=file;
+  /* เปิดใน iframe/browsing context เดิมเสมอ เพื่อรักษา session ที่ shell ส่งมาให้ launcher
+     และตัดปัญหา popup/new-tab แยก session ซึ่งทำให้รายงานเห็นข้อมูลชั่วคราวแล้วถูก 401 เขียนทับ. */
+  window.location.href=file;
 }
 
 function goSetupSheets(){

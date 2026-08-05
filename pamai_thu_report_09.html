@@ -357,7 +357,10 @@ async function render(){
   if(!Array.isArray(all)){out.innerHTML='<tr><td colspan="9" class="error">โหลดข้อมูลไม่สำเร็จ — กรุณาเข้าสู่ระบบและลองใหม่</td></tr>';return}
   CURRENT_VENDORS=all.filter(v=>v&&v.status!=='terminated');renderZoneOptions();renderRows();
 }
-render();
+/* ห้ามเรียก render() ตรงนี้: PM_API shim อยู่ท้าย <body> และยังติดตั้งไม่เสร็จ
+   การยิงรอบเก่ากับรอบ Supabase พร้อมกันทำให้ผลที่ช้ากว่าเขียนทับหน้าทีหลัง
+   (อาการจริง: เห็นข้อมูล 5–10 วินาทีแล้วหาย). รอ load เพื่อให้ใช้ apiGet กลางรอบเดียว. */
+window.addEventListener('load',render,{once:true});
 </script>
 
 
