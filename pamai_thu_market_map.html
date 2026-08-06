@@ -781,6 +781,11 @@ input, select, textarea, button { font-family: inherit; max-width: 100%; }
   </div>
 </div>
 <div class="toast" id="toast"></div>
+<!-- PM_REALTIME (เพิ่ม 2026-08-06) — ให้ผังอัพเดตข้ามแท็บ/อุปกรณ์แบบสด ๆ โดยไม่ต้อง F5
+     โหลดจาก CDN แบบสคริปต์ธรรมดา (ไม่ใช่ inline) ไม่ผูกกับ build step ใด ๆ ของโปรเจกต์นี้
+     ถ้าโหลดไม่สำเร็จ (ออฟไลน์/บล็อก CDN) หน้าเว็บยังทำงานปกติทุกอย่างเหมือนเดิม —
+     ตัวรับสัญญาณด้านล่างเช็ค typeof ก่อนใช้เสมอ ไม่ทำให้หน้าเว็บพังถ้าไม่มี -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
 // ════════════════════════════════════════════════════
 // ตลาดแพไม้ — ผังตลาด JS Logic
@@ -947,6 +952,47 @@ async function loadFromSheets(){
 window.addEventListener('message',function(e){
   if(e&&e.data&&e.data.type==='pm-refresh'){ if(typeof loadFromSheets==='function') loadFromSheets(); }
 });
+
+// ════════════════════════════════════════════════════
+// PM_REALTIME (เพิ่ม 2026-08-06) — ผังอัพเดตข้ามแท็บ/อุปกรณ์แบบสด ๆ โดยไม่ต้อง F5
+// กลไก postMessage 'pm-refresh' ข้างบนใช้ได้แค่ iframe ในหน้า shell เดียวกัน (เบราว์เซอร์
+// เดียวกัน) ข้ามแท็บ/เครื่องจริง (4 คนเห็นข้อมูลตรงกันตามที่ออกแบบ — ดู PM_API_CLIENT) ไม่มี
+// ทางรู้เลยว่ามีคนย้ายล็อค/แจ้งลา/ขาดล็อคไปแล้ว จนกว่าจะกด F5 เต็มหน้า (อาการที่ผู้ดูแลตลาดแจ้ง)
+//
+// ทางแก้: subscribe ช่อง Broadcast 'market-updates' ของ Supabase Realtime — ฝั่งฐานข้อมูลมี
+// trigger บนตาราง vendors/leave_log/daily_bookings ส่งสัญญาณ "มีอะไรเปลี่ยน" (ไม่ใช่ข้อมูลจริง
+// ไม่มีชื่อ/เบอร์/ยอดเงินหลุดออกมาทางนี้เด็ดขาด — ดู supabase/migrations/0021_*.sql) แล้วให้
+// หน้านี้ re-fetch ผ่าน api() RPC เดิมที่มีอยู่แล้วเท่านั้น — ไม่เปิดช่องอ่านตารางตรง ๆ ใหม่
+// ไม่แตะ RLS เดิม (ตารางทั้งหมดยังปิดจากการเข้าถึงตรง ๆ เหมือนเดิมทุกประการ)
+//
+// ถ้าโหลด CDN ไม่สำเร็จ/บล็อก หรือโหมดฐานข้อมูลยังไม่ใช่ Supabase — เงียบและไม่ทำอะไรเลย
+// หน้าเว็บยังทำงานปกติทุกอย่างเหมือนเดิมด้วย postMessage bus ข้างบนและปุ่ม "ลองใหม่"
+(function(){
+  function pmStartRealtime(){
+    try{
+      if(typeof window.supabase==='undefined' || typeof window.supabase.createClient!=='function') return;
+      if(pmBackendMode()!=='supabase') return; // โหมด sheets/parallel ยังไม่มีตารางฝั่ง Supabase ให้ subscribe
+      const url=(window.PM_API&&window.PM_API.url)||'';
+      if(!url) return;
+      // คีย์เดียวกับ PM_API_CLIENT (SB_KEY) — เป็น publishable key ที่ตั้งใจให้ฝังในโค้ดฝั่งเว็บอยู่แล้ว
+      // (ทุก action จริงยังต้องผ่าน api() RPC ที่ตรวจสิทธิ์/token อีกชั้นเสมอ ดูหมายเหตุใน PM_API_CLIENT)
+      const key='sb_publishable_kGSsjrQvDa9EKaw7CDPeQg_UnkKtCLa';
+      const client=window.supabase.createClient(url,key);
+      let lastAt=0;
+      client.channel('market-updates')
+        .on('broadcast',{event:'pm_data_changed'},function(){
+          const now=Date.now();
+          if(now-lastAt<800) return; // ย้ายล็อคหนึ่งครั้งเขียนหลายตาราง กันยิงรีเฟรชถี่เกินไป
+          lastAt=now;
+          if(typeof loadVendorOccupancy==='function') loadVendorOccupancy();
+          if(typeof loadFromSheets==='function') loadFromSheets();
+        })
+        .subscribe();
+    }catch(e){ console.warn('PM_REALTIME: subscribe ไม่สำเร็จ — ใช้ pm-refresh/F5 เป็นทางสำรอง',e); }
+  }
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',pmStartRealtime);
+  else pmStartRealtime();
+})();
 
 function addDays(date,n){const d=new Date(date);d.setDate(d.getDate()+n);return d;}
 // สถานะลา/ขาดแสดงถึงก่อน 00:00 ของวันอาทิตย์ (สามวันหลังวันพฤหัสบดี)
