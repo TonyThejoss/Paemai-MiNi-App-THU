@@ -1054,7 +1054,7 @@ function toggleDark(){
   else if(window.matchMedia('(prefers-color-scheme:dark)').matches) document.documentElement.setAttribute('data-theme','dark');
 })();
 
-const APP_BUILD='20260806-0601'; // cache-buster — build.py แทนค่าอัตโนมัติ
+const APP_BUILD='20260806-0624'; // cache-buster — build.py แทนค่าอัตโนมัติ
 const DAYS=['อาทิตย์','จันทร์','อังคาร','พุธ','พฤหัสบดี','ศุกร์','เสาร์'];
 const MONS=['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
 const PM_CLOCK_KEY='pm-system-clock';
@@ -1095,10 +1095,26 @@ function userHasPermission(key){
   return currentUser.username==='paemai'||p.includes('*')||p.includes(key);
 }
 
+/* v3.1: ชื่อ pane ที่กำลังถูกเปิดแบบ "เจาะจงล็อค" อยู่ ณ ขณะนี้ (deep link จากป๊อปอัพผัง)
+   ใช้แยกให้ออกว่า goTab() ถูกเรียกจาก deep link หรือจากการที่ผู้ใช้กดเมนูเอง */
+let pmDeepLinkPane = null;
+
 function goTab(id){
   if(!userHasPermission(TAB_PERMISSIONS[id]||'dashboard')){
     showToast('⛔ บัญชีนี้ไม่มีสิทธิ์เปิดฟังก์ชันดังกล่าว','e');
     return;
+  }
+  /* ── v3.1: คืนโมดูลกลับเป็นหน้าหลักเมื่อผู้ใช้กดเมนูเข้ามาเอง ──────────────────
+     ป๊อปอัพผังเปิด "รายงานประวัติรับชำระของล็อคนี้" ทับ iframe ของแท็บรายงานไว้
+     ถ้าไม่คืนค่า กดเมนู "รายงาน PDF" ครั้งต่อไปจะยังค้างอยู่ที่รายงานเดิม
+     (loadModule จะแค่ส่ง pm-refresh เพราะโมดูลถูกโหลดไปแล้ว ไม่เคยเปลี่ยน src กลับ)
+     ใช้ pmDeepLinkPane แยกให้ออกว่าเป็นการเข้าจาก deep link หรือจากเมนู */
+  const paneAdhoc = document.getElementById(id);
+  if(paneAdhoc && paneAdhoc.dataset.adhoc && pmDeepLinkPane !== id){
+    const fr = paneAdhoc.querySelector('iframe');
+    const home = paneAdhoc.dataset.src || '';
+    if(fr && home) fr.src = home + (home.includes('?')?'&':'?') + 'v=' + encodeURIComponent(APP_BUILD);
+    delete paneAdhoc.dataset.adhoc;
   }
   // Switch pane
   document.querySelectorAll('.pane').forEach(p=>p.classList.remove('active'));
@@ -2262,18 +2278,24 @@ function openRegisterForLock(lockId) {
 }
 
 function openLeaveHistoryForLock(lockId) {
+  pmDeepLinkPane = 'leavehist';
   goTab('leavehist');
   const pane = document.getElementById('leavehist');
-  if (!pane) return;
+  if (!pane) { pmDeepLinkPane = null; return; }
   const src = 'pamai_thu_leave_history.html?lock=' + encodeURIComponent(lockId);
   const existingFrame = pane.querySelector('iframe');
   if (existingFrame) {
     existingFrame.src = src;
   } else {
+    /* v3.1: ห้ามเขียนทับ dataset.src ถาวร — มันคือ "หน้าหลักของโมดูล" ที่ใช้คืนค่าตอนกดเมนู */
+    const keep = pane.dataset.src;
     pane.dataset.src = src;
     loadedModules.delete('leavehist');
     loadModule('leavehist');
+    pane.dataset.src = keep || 'pamai_thu_leave_history.html';
   }
+  pane.dataset.adhoc = '1';
+  pmDeepLinkPane = null;
 }
 
 function openPaymentHistoryForLock(lockId, leaseId) {
@@ -2282,9 +2304,10 @@ function openPaymentHistoryForLock(lockId, leaseId) {
      ของแท็บเดิม → pm-session ว่าง → RPC ตอบ "ต้องเข้าสู่ระบบก่อนใช้งาน" →
      รายงาน 10 ขึ้น "โหลดบัญชีผู้ค้าไม่สำเร็จ" ทั้งที่ล็อกอินอยู่
      เปิดใน pane รายงานของ shell แทน (แพทเทิร์นเดียวกับ openLeaveHistoryForLock) */
+  pmDeepLinkPane = 'reports';
   goTab('reports');
   const pane = document.getElementById('reports');
-  if (!pane) return;
+  if (!pane) { pmDeepLinkPane = null; return; }
   const src = 'pamai_thu_report_10.html?lock=' + encodeURIComponent(lockId) +
               (leaseId ? '&lease=' + encodeURIComponent(leaseId) : '');
   const existingFrame = pane.querySelector('iframe');
@@ -2299,6 +2322,10 @@ function openPaymentHistoryForLock(lockId, leaseId) {
     loadModule('reports');
     pane.dataset.src = keep || 'pamai_thu_reports_launcher.html';
   }
+  /* ทำเครื่องหมายว่าแท็บนี้กำลังแสดงรายงานเจาะจงล็อคอยู่ — goTab() จะคืนค่าให้เอง
+     เมื่อผู้ใช้กดเมนูเข้ามาครั้งถัดไป */
+  pane.dataset.adhoc = '1';
+  pmDeepLinkPane = null;
 }
 
 /* v3.1: ปุ่ม "← กลับ" ของรายงาน 10 ต้องพากลับไปผังตลาดพร้อมเปิดป๊อปอัพล็อคเดิม
