@@ -608,6 +608,22 @@ input, select, textarea, button { font-family: inherit; max-width: 100%; }
 })();
 </script>
 <!-- ==== PM_API_CLIENT:END ==== -->
+<style>
+/* ==== PM_LEAVE5:CSS (v3.1) — ประวัติแจ้งลา/ขาดล็อค 5 ครั้งล่าสุดในป๊อปอัพ ==== */
+.pp-l5{margin-top:6px;padding-top:6px;border-top:1px solid var(--bd,#e2e8f0);}
+.pp-l5-title{font-size:.84rem;font-weight:800;color:var(--txl,#64748b);margin-bottom:3px;}
+.pp-l5-row{display:flex;gap:6px;align-items:baseline;font-size:.82rem;padding:2px 0;border-bottom:1px dotted var(--bd,#e2e8f0);}
+.pp-l5-row:last-child{border-bottom:none;}
+.pp-l5-row .l5-d{white-space:nowrap;color:var(--txl,#64748b);}
+.pp-l5-row .l5-t{white-space:nowrap;font-weight:800;}
+.pp-l5-row.l5-leave .l5-t{color:#6d28d9;}
+.pp-l5-row.l5-absent .l5-t{color:#b91c1c;}
+.pp-l5-row .l5-n{flex:1;min-width:0;overflow-wrap:anywhere;color:var(--tx,#0f172a);}
+.pp-l5-empty{font-size:.82rem;color:var(--txl,#64748b);}
+.pp-l5-err{font-size:.82rem;color:#b45309;font-weight:700;}
+.pp-l5-err button{margin-left:6px;padding:2px 9px;border:1px solid #d97706;background:#fff3cd;color:#92400e;border-radius:7px;font-weight:700;font-size:.78rem;cursor:pointer;font-family:inherit;}
+/* ==== PM_LEAVE5:CSS:END ==== */
+</style>
 </head>
 <body>
 <div class="topbar">
@@ -664,6 +680,7 @@ input, select, textarea, button { font-family: inherit; max-width: 100%; }
       </div>
       <div class="pp-fin" id="ppFinance" style="display:none"></div>
       <div class="pp-hist" id="ppHist"></div>
+      <div class="pp-l5" id="ppLeave5" style="display:none"></div>
       <div class="pp-actions" id="ppActions"></div>
     </div>
   </div>
@@ -777,6 +794,10 @@ function toggleDark(){const h=document.documentElement,d=h.getAttribute('data-th
 // ════════════════════════════════════════════════════
 // STATE + TUESDAY CYCLE — สถานะคงอยู่ 3 วัน
 // ════════════════════════════════════════════════════
+/* ลำดับโซนจริงของตลาดนี้ (v3.1) — ใช้เรียงตัวเลือกล็อคปลายทางตอนย้ายล็อค
+   ให้ตรงกับลำดับที่ผู้จัดเดินดูผังจริง · โซนที่ไม่อยู่ในลิสต์จะต่อท้ายแบบเรียงตัวอักษร
+   (ชุดเดียวกับ ELEC_ZONE_ORDER ของหน้าค่าไฟ ต้องแก้คู่กันเสมอถ้าเพิ่มโซนใหม่) */
+const PM_MAP_ZONE_ORDER = ['A','B','C','D','E','F','G','J','K','N','U','O','M','H','L','T','AB','TA','TB','TC'];
 const lockHistory={}, dailyBookings={}, lockAbsent={};
 const MONS=['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
 function nowTH(){const n=pmMapNow();return n.getDate()+' '+MONS[n.getMonth()]+' '+(n.getFullYear()+543);}
@@ -1078,7 +1099,7 @@ async function confirmLeave(){
   const shop=el?.dataset.shop||'';
   const res=await apiPost('logLeave',{data:{lock_id:id,zone:el?.dataset.zone||'',shop,type:'leave',note:note||'',manager:getCurrentUserName(),date:marketDayTH(),time:nowTime()}});
   if(!res||res.status!=='ok'){toast('บันทึกแจ้งลาไม่สำเร็จ — กรุณาลองใหม่','e');return;}
-  lockAbsent[id]='leave';
+  lockAbsent[id]='leave'; pmLeave5Invalidate(id);
   addHist(id,{type:'leave',label:'📋 แจ้งลา',note:note||'—'});
   if(el) refreshLk(el);
   document.getElementById('leaveModal').classList.remove('show');
@@ -1093,7 +1114,7 @@ async function doAbsent(lockId){
   const shop=el?.dataset.shop||'';
   const res=await apiPost('logLeave',{data:{lock_id:lockId,zone:el?.dataset.zone||'',shop,type:'absent',note:'บันทึกโดยผู้ดูแล',manager:getCurrentUserName(),date:marketDayTH(),time:nowTime()}});
   if(!res||res.status!=='ok'){toast('บันทึกขาดล็อคไม่สำเร็จ — กรุณาลองใหม่','e');return;}
-  lockAbsent[lockId]='absent';
+  lockAbsent[lockId]='absent'; pmLeave5Invalidate(lockId);
   addHist(lockId,{type:'absent',label:'⚠️ ขาดล็อค (ไม่แจ้ง)',note:'บันทึกโดยผู้ดูแล'});
   if(el) refreshLk(el);
   saveMarketState(); updateExpireBanner();
@@ -1108,6 +1129,7 @@ async function cancelAbsent(lockId){
   const el=document.querySelector('.lk[data-id="'+lockId+'"]');
   const res=await apiPost('logLeave',{data:{lock_id:lockId,zone:el?.dataset.zone||'',shop:el?.dataset.shop||'',type:prevType==='leave'?'leave_cancel':'absent_cancel',note:'คืนสถานะปกติโดยผู้ดูแล',manager:getCurrentUserName(),date:marketDayTH(),time:nowTime()}});
   if(!res||res.status!=='ok'){ toast('ยกเลิกสถานะไม่สำเร็จ — กรุณาลองใหม่','e'); return; }
+  pmLeave5Invalidate(lockId);
   addHist(lockId,{type:'leave',label:'↩️ ยกเลิก'+(prevType==='leave'?'การแจ้งลา':'บันทึกขาดล็อค'),note:'คืนสถานะปกติโดยผู้ดูแล'});
   await loadFromSheets();
   saveMarketState(); updateExpireBanner();
@@ -1149,11 +1171,33 @@ async function cancelDaily(lockId){
 // MOVE LOCK
 // ════════════════════════════════════════════════════
 // ════════════════════════════════════════════════════
-// PM_MOVE_V2:START (v2.5) — สร้างโดย tools/patch_market_maps.py ห้ามแก้ในไฟล์นี้
+// PM_MOVE_V2:START (v3.1) — สร้างโดย tools/patch_market_maps.py ห้ามแก้ในไฟล์นี้
 // ย้ายล็อคจร / ย้ายผู้ค้าประจำ — บันทึกลงฐานข้อมูลก่อนเสมอ แล้วค่อยแตะหน้าจอ
 // (บทเรียน v2.2: หน้าจอที่เปลี่ยนก่อนโดยไม่รอผลจาก backend = หน้าจอที่โกหกผู้ใช้)
+//
+// v3.1 (คำสั่งผู้ดูแลตลาด 6 ส.ค. 2026) เพิ่ม 2 เรื่อง:
+//   ก. ตัวเลือกล็อคปลายทางต้องเรียง "ตามโซน แล้วตามเลขล็อค" และจัดกลุ่มด้วย <optgroup>
+//      เดิมใส่ตามลำดับที่วาดในผังล้วน ๆ ไม่มี .sort() เลย โซนจึงสลับไปมาและ A10 มาก่อน A2
+//   ข. ย้ายผู้ค้าประจำที่กำลังแจ้งลา/ขาดล็อคอยู่ → สถานะนั้นต้องตามไปล็อคใหม่ด้วย
+//      แต่ "การขายล็อคจร" ต้องอยู่ที่ล็อคเดิมเสมอ เพราะเป็นการขายของวันนั้นให้ผู้ค้าจรคนใหม่
+//      (ฐานข้อมูลย้ายแถว leave_log ให้ที่ migration 0019 · ตรงนี้แค่ทำให้จอตรงกันทันที)
 // ════════════════════════════════════════════════════
 let pendingMoveId=null, pendingMoveKind='daily';
+
+/* ลำดับโซนของตลาดนั้น — ไฟล์ผังแต่ละตลาดประกาศ PM_MAP_ZONE_ORDER ไว้เอง
+   โซนที่ไม่อยู่ในลิสต์ต่อท้ายแบบเรียงตัวอักษร ต้องไม่หายไปจากตัวเลือก */
+function pmMoveZoneRank(zone){
+  const order=(typeof PM_MAP_ZONE_ORDER!=='undefined'&&Array.isArray(PM_MAP_ZONE_ORDER))?PM_MAP_ZONE_ORDER:[];
+  const i=order.indexOf(String(zone||''));
+  return i<0 ? 9999 : i;
+}
+/* ตัวเปรียบเทียบเลขล็อคชุดเดียวกับหน้าค่าไฟและหน้ารับชำระหลายล็อค (A2 มาก่อน A10) */
+function pmMoveCompareLockIds(a,b){
+  return String(a||'').localeCompare(String(b||''),'en',{numeric:true,sensitivity:'base'});
+}
+function pmMoveZoneOf(el){
+  return String((el&&el.dataset&&el.dataset.zone)||((String((el&&el.dataset&&el.dataset.id)||'').match(/^[A-Za-z]+/)||[''])[0])||'ไม่ระบุ');
+}
 
 /** kind: 'daily' = ย้ายผู้ค้าจรของวันตลาดนี้ · 'vendor' = ย้ายผู้ค้าประจำ (ย้ายถาวร) */
 function openMoveModal(lockId, kind){
@@ -1188,13 +1232,29 @@ function openMoveModal(lockId, kind){
   if(!targets.length){
     sel.innerHTML='<option value="">ไม่มีล็อคว่างให้ย้ายไปในขณะนี้</option>';
   } else {
-    targets.forEach(function(el){
+    // v3.1: เรียงตามโซน (ตามลำดับจริงของตลาด) แล้วตามเลขล็อคแบบธรรมชาติ เพื่อให้ค้นหาง่าย
+    const sorted=targets.slice().sort(function(a,b){
+      const za=pmMoveZoneOf(a), zb=pmMoveZoneOf(b);
+      const ra=pmMoveZoneRank(za), rb=pmMoveZoneRank(zb);
+      if(ra!==rb) return ra-rb;
+      if(za!==zb) return za.localeCompare(zb,'en',{numeric:true});
+      return pmMoveCompareLockIds(a.dataset.id,b.dataset.id);
+    });
+    let curZone=null, group=null;
+    sorted.forEach(function(el){
+      const z=pmMoveZoneOf(el);
+      if(z!==curZone){
+        curZone=z;
+        group=document.createElement('optgroup');
+        group.label='โซน '+z;
+        sel.appendChild(group);
+      }
       const o=document.createElement('option');
       o.value=el.dataset.id;
       const note=(lockAbsent[el.dataset.id]==='leave')?' · ผู้ค้าประจำแจ้งลาวันนี้'
                 :(lockAbsent[el.dataset.id]==='absent')?' · ผู้ค้าประจำขาดล็อควันนี้':'';
-      o.textContent=el.dataset.id+' ('+el.dataset.zone+')'+note;
-      sel.appendChild(o);
+      o.textContent=el.dataset.id+' ('+z+')'+note;
+      (group||sel).appendChild(o);
     });
   }
   const info=document.getElementById('mv-target-info');
@@ -1254,9 +1314,23 @@ async function confirmMove(){
     // ฟังก์ชันนั้นจะเรียก clearMarketState() ล้าง dailyBookings ทั้งก้อนทิ้งทันทีที่ย้ายเสร็จ
     // (เจอตอนทดสอบ: ย้ายสำเร็จในฐานข้อมูลแล้ว แต่หน้าจอกลับว่างทั้งสองล็อค)
   } else {
-    // ผู้ค้าประจำ: ให้ backend เป็นแหล่งความจริง แล้วโหลดผังใหม่ทั้งผืน
+    // ── v3.1: สถานะแจ้งลา/ขาดล็อคต้องตามผู้ค้าประจำไปล็อคใหม่ ──────────────────────────
+    // ฐานข้อมูลย้ายแถว leave_log ของวันตลาดนี้ให้แล้ว (migration 0019) แต่หน้าจอยังถืออ่าน
+    // lockAbsent ก้อนเดิมอยู่ ถ้าไม่ย้ายตามทันที ผู้จัดจะเห็นล็อคเดิม (ที่ว่างแล้ว) ขึ้น "แจ้งลา"
+    // ค้างอยู่จนกว่าจะโหลดเสร็จ — ช่วงกระพริบนั้นคือช่วงที่ตัดสินใจขายล็อคจรผิดล็อคได้
+    // ⚠️ ห้ามแตะ dailyBookings เด็ดขาด: การขายล็อคจรเป็นการขายของ "วันนั้น" ให้ผู้ค้าจรคนใหม่
+    //    จึงต้องอยู่กับล็อคเดิมเสมอ (คำสั่งผู้ดูแลตลาด 6 ส.ค. 2026)
+    if(typeof pmLeave5Invalidate==='function'){ pmLeave5Invalidate(pendingMoveId); pmLeave5Invalidate(targetId); }
+    const carried=lockAbsent[pendingMoveId]||'';
+    if(carried==='leave'||carried==='absent'){
+      lockAbsent[targetId]=carried;
+      lockAbsent[pendingMoveId]='';
+      addHist(targetId,{type:carried,label:(carried==='leave'?'แจ้งลา':'ขาดล็อค')+' (ย้ายตามมาจาก '+pendingMoveId+')',note:'ย้ายล็อค'});
+    }
     addHist(targetId,{type:'leave',label:'ย้ายผู้ค้าประจำมาจากล็อค '+pendingMoveId,note:'ย้ายล็อค'});
     addHist(pendingMoveId,{type:'leave',label:'ย้ายผู้ค้าประจำไปล็อค '+targetId,note:'ย้ายล็อค'});
+    refreshLk(srcEl); refreshLk(tgtEl);
+    saveMarketState();
     await loadVendorOccupancy();
   }
 
@@ -1464,6 +1538,7 @@ function showPopup(el,ev){
   }
   const actEl=document.getElementById('ppActions');
   actEl.innerHTML=acts||'<span style="font-size:.62rem;color:var(--txl)">ล็อคนี้ไม่มีผู้เช่า</span>';
+  pmLeave5Load(lockId);   // v3.1: ประวัติแจ้งลา/ขาดล็อค 5 ครั้งล่าสุดจากฐานข้อมูลจริง
   loadPopupFinance(lockId,isOccupied);
 
   // POSITION
@@ -2245,6 +2320,106 @@ window.onload=function(){buildAll();setTimeout(checkThursdayCycle,400);};
   if (document.readyState === 'complete') setTimeout(kickIfNeverFetched, 0);
   else window.addEventListener('load', function () { setTimeout(kickIfNeverFetched, 0); });
 })();
+
+// ════════════════════════════════════════════════════
+// PM_LEAVE5:START (v3.1) — ประวัติแจ้งลา/ขาดล็อค 5 ครั้งล่าสุดในป๊อปอัพผังตลาด
+// คำสั่งผู้ดูแลตลาด 6 ส.ค. 2026: "ให้แสดงประวัติการแจ้งลาแจ้งขาดล็อค 5 ครั้งล่าสุด
+// พร้อมสาเหตุการลาด้วย หากไม่ได้ใส่สาเหตุการลาไว้ให้ปล่อยว่าง"
+//
+// เดิมป๊อปอัพแสดง lockHistory ซึ่งเก็บอยู่ในหน่วยความจำของเซสชันนี้เท่านั้น (รีเฟรชแล้วหาย)
+// และปนรายการล็อคจร/ย้ายล็อค ตอนนี้อ่านจาก leave_log ของจริงและกรองเฉพาะ leave/absent
+// กฎเหล็กข้อ 15: โหลดไม่สำเร็จต้องบอกให้เห็นชัดพร้อมปุ่มลองใหม่ ห้ามขึ้น "ยังไม่มีประวัติ"
+// ════════════════════════════════════════════════════
+let PM_LEAVE5_CACHE = {};   // lockId -> {rows:[...]} | {error:true}
+
+function pmLeave5Esc(s){
+  return String(s==null?'':s).replace(/[&<>"']/g,function(c){
+    return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];
+  });
+}
+/* สาเหตุที่ระบบเติมให้เองไม่นับว่าเป็น "สาเหตุที่ผู้ดูแลใส่ไว้" — ต้องปล่อยว่างตามที่สั่ง */
+function pmLeave5Reason(note){
+  const t=String(note==null?'':note).trim();
+  if(!t || t==='—' || t==='-' || t==='บันทึกโดยผู้ดูแล') return '';
+  return t;
+}
+function pmLeave5Render(lockId){
+  const box=document.getElementById('ppLeave5');
+  if(!box) return;
+  const state=PM_LEAVE5_CACHE[lockId];
+  const head='<div class="pp-l5-title">ประวัติแจ้งลา/ขาดล็อค 5 ครั้งล่าสุด</div>';
+  if(!state){ box.innerHTML=head+'<div class="pp-l5-empty">กำลังโหลด…</div>'; box.style.display='block'; return; }
+  if(state.error){
+    box.innerHTML=head+'<div class="pp-l5-err">โหลดประวัติไม่สำเร็จ '+
+      '<button type="button" onclick="pmLeave5Load(\''+pmLeave5Esc(lockId)+'\',true)">ลองใหม่</button></div>';
+    box.style.display='block'; return;
+  }
+  const rows=state.rows||[];
+  if(!rows.length){ box.innerHTML=head+'<div class="pp-l5-empty">ยังไม่เคยแจ้งลาหรือขาดล็อค</div>'; box.style.display='block'; return; }
+  box.innerHTML=head+rows.map(function(r){
+    const isLeave=r.type==='leave';
+    const reason=pmLeave5Reason(r.note);
+    return '<div class="pp-l5-row '+(isLeave?'l5-leave':'l5-absent')+'">'+
+             '<span class="l5-d">'+pmLeave5Esc(r.date||r.date_iso||'')+'</span>'+
+             '<span class="l5-t">'+(isLeave?'แจ้งลา':'ขาดล็อค')+'</span>'+
+             '<span class="l5-n">'+pmLeave5Esc(reason)+'</span>'+
+           '</div>';
+  }).join('');
+  box.style.display='block';
+}
+/* เรียงวันล่าสุดก่อนแล้วตัดเหลือ 5 · หนึ่งล็อคหนึ่งวันมีได้รายการเดียวอยู่แล้วที่ฐานข้อมูล */
+function pmLeave5Sort(rows){
+  return rows.slice().sort(function(a,b){
+    const ka=String(a.date_iso||a.created_at||''), kb=String(b.date_iso||b.created_at||'');
+    if(ka!==kb) return kb.localeCompare(ka);
+    return String(b.created_at||'').localeCompare(String(a.created_at||''));
+  }).slice(0,5);
+}
+async function pmLeave5Load(lockId, force){
+  if(!force && PM_LEAVE5_CACHE[lockId]){ pmLeave5Render(lockId); return; }
+  if(force) delete PM_LEAVE5_CACHE[lockId];
+  pmLeave5Render(lockId);
+  if(!pmHasBackend()){ PM_LEAVE5_CACHE[lockId]={rows:[]}; pmLeave5Render(lockId); return; }
+  const rows=await apiGet('getLeaveLog',{lockId:lockId});
+  if(!Array.isArray(rows)){ PM_LEAVE5_CACHE[lockId]={error:true}; pmLeave5Render(lockId); return; }
+  PM_LEAVE5_CACHE[lockId]={rows:pmLeave5Sort(rows.filter(function(r){
+    return r && r.lock_id===lockId && (r.type==='leave'||r.type==='absent');
+  }))};
+  pmLeave5Render(lockId);
+}
+/* ข้อมูลลา/ขาดเปลี่ยนเมื่อไหร่ต้องล้างแคช ไม่งั้นป๊อปอัพโชว์ของเก่า */
+function pmLeave5Invalidate(lockId){
+  if(lockId) delete PM_LEAVE5_CACHE[lockId]; else PM_LEAVE5_CACHE={};
+}
+
+/* ── รับคำสั่ง "เปิดป๊อปอัพล็อคนี้" จาก shell (ปุ่มกลับของรายงาน 10) ── */
+window.addEventListener('message', function(e){
+  if(!e || !e.data || e.data.type!=='pm-open-lock') return;
+  const id=String(e.data.lockId||'');
+  const el=document.querySelector('.lk[data-id="'+id.replace(/"/g,'')+'"]');
+  if(!el) return;                       // ผังยังวาดไม่เสร็จ — shell จะส่งซ้ำให้เอง
+  try{ el.scrollIntoView({block:'center',inline:'center',behavior:'smooth'}); }catch(err){}
+  curLk=null;                           // กัน toggle ปิดตัวเองถ้าล็อคนี้เปิดค้างอยู่
+  showPopup(el,{stopPropagation:function(){}});
+  try{ (e.source||window.parent).postMessage({type:'pm-open-lock-ok',lockId:id},'*'); }catch(err){}
+});
+/* เปิดไฟล์ผังเดี่ยว ๆ ด้วย ?lock=XX (ทางถอยของปุ่มกลับในรายงาน 10) ก็ต้องเปิดป๊อปอัพให้เหมือนกัน */
+window.addEventListener('load', function(){
+  var id='';
+  try{ id=new URLSearchParams(location.search).get('lock')||''; }catch(e){}
+  if(!id) return;
+  var tries=0;
+  var t=setInterval(function(){
+    var el=document.querySelector('.lk[data-id="'+id.replace(/"/g,'')+'"]');
+    if(el){
+      clearInterval(t);
+      try{ el.scrollIntoView({block:'center',inline:'center'}); }catch(err){}
+      curLk=null; showPopup(el,{stopPropagation:function(){}});
+    } else if(++tries>=20){ clearInterval(t); }
+  },300);
+});
+// PM_LEAVE5:END
+
 </script>
 </body>
 </html>

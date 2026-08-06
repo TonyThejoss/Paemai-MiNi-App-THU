@@ -805,6 +805,26 @@ input, select, textarea, button { font-family: inherit; max-width: 100%; }
             </div>
           </div>
         </div>
+        <!-- ═══ ตัวชี้วัดผลตอบแทนต่อล็อค (เพิ่ม v3.1 ตามคำสั่งผู้ดูแลตลาด 6 ส.ค. 2026) ═══
+             5 ตัวชี้วัด: รายได้เฉลี่ย/ล็อค/วัน · /ล็อค/เดือน · รายได้สูญเสียจากล็อคว่าง ·
+             %ส่วนลดต่อรายได้ค่าเช่า · %อัตราการเช่ารวม
+             ใช้คลาส kpi-grid ซึ่ง PM_MOBILE_KIT ยุบให้เอง 3→2→1 คอลัมน์ (ห้ามตั้ง grid เองซ้ำ) -->
+        <div class="dc" style="margin-bottom:12px">
+          <div class="dch">
+            <div class="dct"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><line x1="6" y1="20" x2="6" y2="12"/><line x1="12" y1="20" x2="12" y2="6"/><line x1="18" y1="20" x2="18" y2="15"/></svg> ตัวชี้วัดผลตอบแทนต่อล็อค — <span id="kpi-month">—</span></div>
+            <span id="kpi-badge" style="font-size:.68rem;font-weight:700;color:var(--txl)">—</span>
+          </div>
+          <div class="dcb">
+            <div id="kpi-warn" style="display:none;margin-bottom:9px;padding:8px 11px;border-radius:9px;background:#fff3cd;border:1.5px solid #d97706;color:#92400e;font-weight:700;font-size:.74rem"></div>
+            <div class="kpi-grid" style="display:grid;grid-template-columns:repeat(5,1fr);gap:10px">
+              <div class="kc"><div class="knum" id="kpi-avg-day" style="color:var(--gm);font-size:1.15rem">—</div><div class="klbl">รายได้เฉลี่ยผู้ค้าประจำ<br>ต่อล็อคต่อวันตลาด</div><div class="ksub" id="kpi-avg-day-sub" style="color:var(--gm)">—</div></div>
+              <div class="kc"><div class="knum" id="kpi-avg-month" style="color:var(--gm);font-size:1.15rem">—</div><div class="klbl">รายได้เฉลี่ยผู้ค้าประจำ<br>ต่อล็อคต่อเดือน</div><div class="ksub" id="kpi-avg-month-sub" style="color:var(--gm)">—</div></div>
+              <div class="kc r"><div class="knum" id="kpi-lost" style="color:var(--r);font-size:1.15rem">—</div><div class="klbl">รายได้สูญเสียจากล็อคว่าง<br>ที่ไม่มีผู้ค้าประจำ/เดือน</div><div class="ksub" id="kpi-lost-sub" style="color:var(--r)">—</div></div>
+              <div class="kc o"><div class="knum" id="kpi-disc" style="color:var(--o);font-size:1.15rem">—</div><div class="klbl">ส่วนลดต่อรายได้<br>ผู้ค้าประจำรายเดือน</div><div class="ksub" id="kpi-disc-sub" style="color:var(--o)">—</div></div>
+              <div class="kc b"><div class="knum" id="kpi-occ" style="color:var(--b);font-size:1.15rem">—</div><div class="klbl">อัตราการเช่ารวม<br>เทียบล็อคทั้งหมด</div><div class="ksub" id="kpi-occ-sub" style="color:var(--b)">—</div></div>
+            </div>
+          </div>
+        </div>
         <div class="dc" style="margin-bottom:12px">
           <div class="dch"><div class="dct"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2s5 2.5 5 9-2.5 9-2.5 9-2.5-2.5-2.5-9 5-9 5-9Z" transform="scale(0.85) translate(1.8 1.8)"/><path d="M8 15c-3 0-4 4-4 4s4-1 4-4Z"/><path d="M16 15c3 0 4 4 4 4s-4-1-4-4Z"/></svg> ไปยังโมดูล</div></div>
           <div class="dcb">
@@ -1034,7 +1054,7 @@ function toggleDark(){
   else if(window.matchMedia('(prefers-color-scheme:dark)').matches) document.documentElement.setAttribute('data-theme','dark');
 })();
 
-const APP_BUILD='20260805-1554'; // cache-buster — build.py แทนค่าอัตโนมัติ
+const APP_BUILD='20260806-0601'; // cache-buster — build.py แทนค่าอัตโนมัติ
 const DAYS=['อาทิตย์','จันทร์','อังคาร','พุธ','พฤหัสบดี','ศุกร์','เสาร์'];
 const MONS=['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
 const PM_CLOCK_KEY='pm-system-clock';
@@ -1494,6 +1514,111 @@ function renderDashboard(){
       }).join('');
     }
   }
+  renderLotKpi();
+}
+
+// ════════════════════════════════════════════════════
+// ตัวชี้วัดผลตอบแทนต่อล็อค (v3.1 — คำสั่งผู้ดูแลตลาด 6 ส.ค. 2026)
+// ════════════════════════════════════════════════════
+// กติกาที่ผู้ดูแลยืนยัน:
+//   · ข้อ 3 (รายได้สูญเสีย) คิดจาก "ค่าเช่าเฉลี่ยทั้งตลาด" ไม่แยกโซน
+//   · ข้อ 5 (อัตราการเช่า) ตัวหารต้องหักล็อคที่ยกเลิกการขายออก (EXCLUDED_LOCKS)
+// ส่วนลดต้องใช้ตรรกะเดียวกับหน้ารับชำระหลายล็อคเป๊ะ ๆ (ส่วนลดรายล็อคทับส่วนลดทั้งตลาด
+// และไม่เกินค่าเช่าฐานของล็อคนั้น) มิฉะนั้นตัวเลขสองหน้าจะขัดกันเองแล้วผู้ใช้ไม่รู้ว่าเชื่อหน้าไหน
+let PM_KPI_DISCOUNTS = null;   // null = ยังไม่โหลด · false = โหลดไม่สำเร็จ · [] = โหลดแล้วไม่มีส่วนลด
+
+function kpiMonthKey(){
+  const n = (typeof pmNow==='function') ? pmNow() : new Date();
+  return n.getFullYear()+'-'+String(n.getMonth()+1).padStart(2,'0');
+}
+/* ส่วนลดที่มีผลจริงของล็อคหนึ่ง — คัดลอกกติกามาจาก pmEffectiveDiscount() ในหน้ารับชำระ */
+function kpiEffectiveDiscount(rows, lockId, monthKey){
+  const perLock = rows.find(d=>d.month===monthKey && d.scope==='lock' && d.lock_id===lockId);
+  if(perLock) return parseFloat(perLock.amount)||0;
+  const mk = rows.find(d=>d.month===monthKey && d.scope==='market');
+  return mk ? (parseFloat(mk.amount)||0) : 0;
+}
+
+/* โหลดส่วนลดของเดือนปัจจุบันเพื่อใช้กับตัวชี้วัดข้อ 4
+   กฎเหล็กข้อ 15: ล้มเหลวต้องบอกให้เห็นชัด + มีปุ่มลองใหม่ ห้ามแสดง 0% ซึ่งโกหกผู้ใช้ */
+async function loadKpiDiscounts(){
+  if(!getApiUrl()){ PM_KPI_DISCOUNTS=[]; renderLotKpi(); return; }
+  const rows = await apiGet('getDiscounts',{month:kpiMonthKey()});
+  PM_KPI_DISCOUNTS = Array.isArray(rows) ? rows : false;
+  renderLotKpi();
+}
+
+function renderLotKpi(){
+  const setText=(id,val)=>{const el=document.getElementById(id); if(el) el.textContent=val;};
+  const monthKey = kpiMonthKey();
+  const marketDays = currentThursdayCount();
+  const excluded = Array.isArray(EXCLUDED_LOCKS) ? EXCLUDED_LOCKS : [];
+  const sellableLocks = Math.max(0, TOTAL_LOCKS - excluded.length);
+
+  // ผู้ค้า "ประจำ" ที่ยังเช่าอยู่เท่านั้น (ไม่รวมผู้ค้าจรและไม่รวมล็อคที่ยกเลิกการเช่าแล้ว)
+  const regular = VENDORS.filter(v=>v.status!=='terminated' && v.type!=='daily' && !excluded.includes(v.lock));
+  const occupied = regular.length;
+
+  setText('kpi-month', currentMonthLabelTH());
+  const badge=document.getElementById('kpi-badge');
+  if(badge) badge.textContent = marketDays+' วันตลาด · '+sellableLocks+' ล็อคที่ขายได้';
+
+  if(!occupied){
+    ['kpi-avg-day','kpi-avg-month','kpi-lost','kpi-disc','kpi-occ'].forEach(id=>setText(id,'—'));
+    ['kpi-avg-day-sub','kpi-avg-month-sub','kpi-lost-sub','kpi-disc-sub','kpi-occ-sub']
+      .forEach(id=>setText(id,'ยังไม่มีผู้ค้าประจำที่ยังเช่าอยู่'));
+    const w0=document.getElementById('kpi-warn'); if(w0) w0.style.display='none';
+    return;
+  }
+
+  // 1) รายได้เฉลี่ยผู้ค้าประจำต่อล็อคต่อวันตลาด
+  const dailySum = regular.reduce((s,v)=>s+(parseFloat(v.dailyRate)||0),0);
+  const avgPerLockPerDay = dailySum/occupied;
+  setText('kpi-avg-day', baht(Math.round(avgPerLockPerDay)));
+  setText('kpi-avg-day-sub', 'จาก '+occupied+' ล็อค · รวม '+baht(dailySum)+'/วันตลาด');
+
+  // 2) รายได้เฉลี่ยผู้ค้าประจำต่อล็อคต่อเดือน = ข้อ 1 × จำนวนวันตลาดของเดือนนั้น
+  const avgPerLockPerMonth = avgPerLockPerDay*marketDays;
+  const rentMonthSum = regular.reduce((s,v)=>s+calcMonthlyRent(v.dailyRate),0);
+  setText('kpi-avg-month', baht(Math.round(avgPerLockPerMonth)));
+  setText('kpi-avg-month-sub', 'ค่าเช่าผู้ค้าประจำรวม '+baht(rentMonthSum)+'/เดือน');
+
+  // 3) รายได้สูญเสียจากล็อคว่างที่ไม่มีผู้ค้าประจำ (ค่าเช่าเฉลี่ยทั้งตลาด × จำนวนล็อคว่าง)
+  const vacantLocks = Math.max(0, sellableLocks-occupied);
+  const lost = vacantLocks*avgPerLockPerMonth;
+  setText('kpi-lost', baht(Math.round(lost)));
+  setText('kpi-lost-sub', vacantLocks+' ล็อคว่าง × '+baht(Math.round(avgPerLockPerMonth))+'/ล็อค/เดือน');
+
+  // 4) % ส่วนลดต่อรายได้ค่าเช่าผู้ค้าประจำรายเดือน
+  const warn=document.getElementById('kpi-warn');
+  if(PM_KPI_DISCOUNTS===false){
+    setText('kpi-disc','ไม่ทราบ');
+    setText('kpi-disc-sub','โหลดส่วนลดไม่สำเร็จ');
+    if(warn){
+      warn.style.display='block';
+      warn.innerHTML='โหลดข้อมูลส่วนลดค่าเช่าไม่สำเร็จ จึงยังคำนวณเปอร์เซ็นต์ส่วนลดไม่ได้ '+
+        '&nbsp;<button class="btn btn-s" style="padding:3px 10px;font-size:.72rem" onclick="loadKpiDiscounts()">ลองใหม่</button>';
+    }
+  } else if(PM_KPI_DISCOUNTS===null){
+    setText('kpi-disc','—');
+    setText('kpi-disc-sub','กำลังโหลดส่วนลด…');
+    if(warn) warn.style.display='none';
+  } else {
+    if(warn) warn.style.display='none';
+    let discSum=0;
+    regular.forEach(v=>{
+      const base=calcMonthlyRent(v.dailyRate);
+      discSum += Math.min(kpiEffectiveDiscount(PM_KPI_DISCOUNTS, v.lock, monthKey), base);
+    });
+    const pct = rentMonthSum>0 ? (discSum/rentMonthSum*100) : 0;
+    setText('kpi-disc', (Math.round(pct*10)/10)+'%');
+    setText('kpi-disc-sub', 'ส่วนลดรวม '+baht(discSum)+' จากค่าเช่า '+baht(rentMonthSum));
+  }
+
+  // 5) % อัตราการเช่ารวมเทียบล็อคทั้งหมด (หักล็อคยกเลิกการขายออกจากตัวหาร)
+  const occPct = sellableLocks>0 ? (occupied/sellableLocks*100) : 0;
+  setText('kpi-occ', (Math.round(occPct*10)/10)+'%');
+  setText('kpi-occ-sub', occupied+' / '+sellableLocks+' ล็อค'+(excluded.length?' (หักยกเลิกการขาย '+excluded.length+' ล็อค)':''));
 }
 
 // ════════════════════════════════════════════════════
@@ -1528,6 +1653,9 @@ const ZONE_GROUPS = {
   'ข้างโลตัส': ['O','M','H','L','T','AB'],
   'เปิดท้าย': ['TA','TB','TC'],
 };
+/* ล็อคที่ตลาด "ยกเลิกการขาย" ถาวร (สถานะ excluded บนผัง) — ตลาดวันพฤหัสบดียังไม่มี
+   ถ้าในอนาคตมี ให้เติมเลขล็อคที่นี่ที่เดียว Dashboard จะหักออกจากตัวหารให้เอง */
+const EXCLUDED_LOCKS = [];
 const TOTAL_LOCKS = Object.values(ZONE_TOTALS).reduce((a,b)=>a+b,0);
 //== END_MARKET_BLOCK ==//
 
@@ -1847,10 +1975,10 @@ async function saveDiscountSetting(){
   if(!month||month<discountMonthKey()){showToast('ห้ามกำหนดส่วนลดย้อนหลัง','e');return;}if(!isFinite(amount)||amount<0){showToast('กรุณาระบุส่วนลดเป็นจำนวนเงินที่ไม่ติดลบ','e');return;}
   const data={month,scope,amount,lock_id:scope==='lock'?document.getElementById('discount-lock').value:'',note:document.getElementById('discount-note').value.trim(),created_by:currentUser?.displayName||currentUser?.username||'ผู้ดูแลตลาด'};
   const res=await apiPost('saveDiscount',{data});if(!res||res.status!=='ok'){showToast(res?.message||'บันทึกส่วนลดไม่สำเร็จ','e');return;}
-  showToast('บันทึกส่วนลดแล้ว','s');broadcastRefreshToModules();await loadDiscountSettings();
+  showToast('บันทึกส่วนลดแล้ว','s');broadcastRefreshToModules();await loadDiscountSettings();loadKpiDiscounts();
 }
 async function deleteDiscountSetting(id){
-  if(!discountCanEdit())return;const res=await apiPost('deleteDiscount',{id});if(!res||res.status!=='ok'){showToast(res?.message||'ลบส่วนลดไม่สำเร็จ','e');return;}showToast('ลบส่วนลดแล้ว','s');broadcastRefreshToModules();await loadDiscountSettings();
+  if(!discountCanEdit())return;const res=await apiPost('deleteDiscount',{id});if(!res||res.status!=='ok'){showToast(res?.message||'ลบส่วนลดไม่สำเร็จ','e');return;}showToast('ลบส่วนลดแล้ว','s');broadcastRefreshToModules();await loadDiscountSettings();loadKpiDiscounts();
 }
 
 let PM_FEE_SETTINGS = { entry_fee: 0, annual_fee: 0 };
@@ -2011,6 +2139,7 @@ async function loadVendorsFromSheets(){
   VENDORS.length=0;
   data.forEach(row=>{VENDORS.push({lock:row.lock,zone:row.zone,name:row.name||'(ยังไม่ระบุ)',phone:row.phone||'—',line:row.line||'—',product:row.product||'—',type:row.type||'regular',dailyRate:parseInt(row.dailyRate||row.daily_rate||row.rent)||0,elec:{bulb:parseInt(row.elec_bulb)||0,fan:parseInt(row.elec_fan)||0,small:parseInt(row.elec_small)||0,large:parseInt(row.elec_large)||0,special:Array.isArray(row.elec_special)?row.elec_special:[]},status:row.status||'active',unpaidPenalty:parseFloat(row.unpaid_penalty)||0,unpaidOther:parseFloat(row.unpaid_other)||0,unpaidOtherLabel:row.unpaid_other_label||''});});
   renderDashboard();
+  loadKpiDiscounts();   // v3.1 — ตัวชี้วัดต้องใช้ส่วนลดของเดือนนี้คู่กับข้อมูลผู้ค้าที่เพิ่งโหลด
   showToast('<svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg> โหลดข้อมูล '+VENDORS.length+' ราย จาก '+sourceName,'s');
 }
 function updateDbStatus(){
@@ -2162,10 +2291,38 @@ function openPaymentHistoryForLock(lockId, leaseId) {
   if (existingFrame) {
     existingFrame.src = src;
   } else {
+    /* v3.1: เดิมเขียนทับ pane.dataset.src ถาวร ทำให้กดเมนู "รายงาน PDF" ครั้งต่อไป
+       ได้รายงาน 10 แทนศูนย์รวมรายงาน — สร้าง iframe เองแล้วคืนค่า dataset.src ทันที */
+    const keep = pane.dataset.src;
     pane.dataset.src = src;
     loadedModules.delete('reports');
     loadModule('reports');
+    pane.dataset.src = keep || 'pamai_thu_reports_launcher.html';
   }
+}
+
+/* v3.1: ปุ่ม "← กลับ" ของรายงาน 10 ต้องพากลับไปผังตลาดพร้อมเปิดป๊อปอัพล็อคเดิม
+   (คำสั่งผู้ดูแลตลาด 6 ส.ค. 2026) — เดิมเป็น history.back() เปล่า ๆ ซึ่งใช้ไม่ได้เลย
+   เพราะรายงานถูกโหลดเข้า iframe ที่เพิ่งสร้างใหม่ browsing context นั้นไม่มีประวัติก่อนหน้า
+   ห้ามใช้ window.open ที่นี่เด็ดขาด (กฎเหล็กข้อ 27) */
+function openMapForLock(lockId){
+  goTab('map');
+  const pane = document.getElementById('map');
+  if(!pane) return;
+  const send = () => {
+    const f = pane.querySelector('iframe');
+    if(f && f.contentWindow){
+      try{ f.contentWindow.postMessage({type:'pm-open-lock', lockId:String(lockId||'')},'*'); }catch(e){}
+    }
+  };
+  /* ผังอาจยังโหลดไม่เสร็จตอนกดกลับ จึงส่งซ้ำเป็นจังหวะจนกว่าจะติด
+     (ผังตอบกลับ pm-open-lock-ok เมื่อเปิดป๊อปอัพได้แล้ว) */
+  let tries = 0;
+  const timer = setInterval(()=>{ send(); if(++tries>=10) clearInterval(timer); }, 350);
+  window.addEventListener('message', function once(e){
+    if(e && e.data && e.data.type==='pm-open-lock-ok'){ clearInterval(timer); window.removeEventListener('message', once); }
+  });
+  setTimeout(send, 60);
 }
 
 // ════════════════════════════════════════════════════
@@ -2289,6 +2446,7 @@ function showModuleFallback(pane, src, id) {
 window.onload=function(){
   checkSession();
   renderDashboard();
+  loadKpiDiscounts();   // v3.1 — ตัวชี้วัดข้อ 4 ต้องใช้ส่วนลดของเดือนนี้
   updateDbStatus();
   logAct('system','ระบบเริ่มทำงาน — แพไม้มินิ v1.0');
 };
